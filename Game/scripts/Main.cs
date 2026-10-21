@@ -26,6 +26,9 @@ public partial class Main : Control
     private Button _stepButton = null!;
     private HistoryChart _history = null!;
     private Control? _overlay;
+    private CommuneList _communeList = null!;
+    private ToastStack _toasts = null!;
+    private readonly HashSet<string> _tipsShown = new();
     private ScenarioDefinition _scenario = null!;
     private List<ScenarioDefinition> _scenarios = new();
     private SandboxGenerator? _sandbox;
@@ -71,7 +74,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -90,9 +93,9 @@ public partial class Main : Control
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
         int selectAt = Array.IndexOf(args, "--select");
         if (selectAt >= 0 && selectAt + 1 < args.Length) _map.Selected = int.Parse(args[selectAt + 1]);
-        for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++) _world.Step();
+        for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++) StepTurn();
+        if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         Refresh();
-        OnOutcome();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         int focusAt = Array.IndexOf(args, "--focus");
         int zoomAt = Array.IndexOf(args, "--zoom");
@@ -114,9 +117,20 @@ public partial class Main : Control
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (_overlay != null || e is not InputEventKey { Pressed: true, Echo: false } key) return;
+        if (e is not InputEventKey { Pressed: true, Echo: false } key) return;
+        if (_overlay != null)
+        {
+            if (key.Keycode == Key.Escape)
+            {
+                CloseOverlay();
+                GetViewport().SetInputAsHandled();
+            }
+            return;
+        }
         switch (key.Keycode)
         {
+            case Key.C: ToggleCommuneList(); break;
+            case Key.Escape when _communeList.Visible: ToggleCommuneList(); break;
             case Key.Space: SetSpeed(_speed == 0 ? 1 : 0); break;
             case Key.Key1: SetSpeed(1); break;
             case Key.Key2: SetSpeed(2); break;
@@ -132,14 +146,49 @@ public partial class Main : Control
         if (_world.Outcome != Outcome.Ongoing) return;
         _world.Step();
         // Like a Paradox popup: pause when the movement has a decision to make.
-        if (_world.Log.Skip(_seenEvents).Any(e => e.Severity == Severity.Decision)) SetSpeed(0);
+        var fresh = _world.Log.Skip(_seenEvents).ToList();
+        if (fresh.Any(e => e.Severity == Severity.Decision)) SetSpeed(0);
+        foreach (var e in fresh.Where(e => e.Severity is Severity.Danger or Severity.Decision))
+            _toasts.Show(Shorten(e.Text), e.Severity == Severity.Decision ? new Color(0.38f, 0.85f, 0.95f) : new Color(0.95f, 0.4f, 0.35f));
         Refresh();
+        ShowTips();
         OnOutcome();
     }
+
+    private void ToggleCommuneList()
+    {
+        _communeList.Visible = !_communeList.Visible;
+        _communeList.World = _world;
+        _communeList.Refresh();
+    }
+
+    /// <summary>One-time hints the first time something important happens in a game.</summary>
+    private void ShowTips()
+    {
+        var w = _world;
+        if (w.Outcome != Outcome.Ongoing) return;
+        void Tip(string key, bool when, Func<string> text)
+        {
+            if (when && _tipsShown.Add(key)) _toasts.Show("Tip: " + text(), new Color(0.95f, 0.8f, 0.35f), 12);
+        }
+        var losing = w.Federation.FirstOrDefault(c => c.Front && c.Pressure > c.Defense);
+        Tip("front", losing != null, () => $"{losing!.Name} is losing ground. Propose a defensive campaign, or form the war committee — it adds drift every {w.Turn} it sits.");
+        var hungry = w.Federation.FirstOrDefault(c => c.Starving);
+        Tip("famine", hungry != null, () => $"{hungry!.Name} is starving. Propose famine relief for it, or mediate with its neighbours so they share more.");
+        var experts = w.Federation.FirstOrDefault(c => c.ExpertGap > 0.12);
+        Tip("experts", experts != null, () => $"In {experts!.Name}, practical education is running ahead of political education. That expert trap adds drift; fund political schooling there.");
+        Tip("leaving", w.PendingSecessions.Count > 0, () => "A commune is voting to leave. Select it and mediate with its neighbours to change its mind; holding it by force costs trust and drift.");
+        Tip("councils", w.Drift.Stage >= DriftStage.PermanentCouncils, () => "Drift passed 25. Recall delegates to push it back down — a stage only reverts once drift falls well below its threshold.");
+        Tip("influence", w.Influence >= w.Balance.InfluenceCap - 0.5, () => "Influence is full and anything more is wasted. Spend it: fund schools, mediate, circulate ideas.");
+    }
+
+    private static string Shorten(string text) => text.Length <= 160 ? text : text[..157].TrimEnd() + "…";
 
     private void SetWorld(World world)
     {
         _world = world;
+        _tipsShown.Clear();
+        _communeList.World = world;
         _map.World = _driftMeter.World = _history.World = world;
         _map.Selected = _map.Secondary = null;
         _map.Banner = null;
@@ -257,6 +306,7 @@ public partial class Main : Control
         _scenario = scenario;
         NewGame();
         Say($"{scenario.Name} begins.");
+        _toasts.Show("Tip: press Space or ▶ to start time. Click any commune to see it; press C for a list of all of them.", new Color(0.95f, 0.8f, 0.35f), 12);
     }
 
     private void OnOutcome()
@@ -356,6 +406,28 @@ public partial class Main : Control
         _map.CommuneClicked += OnCommuneClicked;
         root.AddChild(_map);
 
+        // Top-right of the map, clear of the commune list (bottom-left). They fade after a few seconds.
+        _toasts = new ToastStack
+        {
+            AnchorLeft = 1, AnchorRight = 1,
+            OffsetLeft = -460, OffsetRight = -16, OffsetTop = 16, OffsetBottom = 300,
+        };
+        _map.AddChild(_toasts);
+        _communeList = new CommuneList
+        {
+            Visible = false,
+            AnchorTop = 1, AnchorBottom = 1,
+            OffsetLeft = 16, OffsetRight = 776, OffsetTop = -420, OffsetBottom = -56,
+        };
+        _communeList.CommuneChosen += id =>
+        {
+            _map.Selected = id;
+            _map.Secondary = null;
+            _map.CenterOn(id);
+            Refresh();
+        };
+        _map.AddChild(_communeList);
+
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(460, 0) };
         root.AddChild(panel);
         var scroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
@@ -380,6 +452,7 @@ public partial class Main : Control
         var step = _stepButton = new Button { TooltipText = "Advance one turn (.)" };
         step.Pressed += StepTurn;
         speeds.AddChild(step);
+        AddButton(speeds, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
         AddButton(speeds, "Save", "Save to a single quick-save slot.", SaveGame);
         AddButton(speeds, "Load", "Load the quick-save.", LoadGame);
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -392,6 +465,8 @@ public partial class Main : Control
         speeds.AddChild(_mapMode);
 
         _influence = AddLabel(side);
+        _influence.MouseFilter = MouseFilterEnum.Stop;
+        _influence.TooltipText = "Influence is the movement's only resource. It regenerates every turn from political education, wellbeing and the press, up to 100.\nIt pays for schools, pamphlets, mediation, projects, congresses, recall.";
         Section(side, "Hierarchy drift");
         _stage = AddLabel(side, 15);
         _driftMeter = new DriftMeter();
@@ -401,6 +476,8 @@ public partial class Main : Control
         Section(side, "Outside pressure");
         _enemy = AddRich(side);
         _scores = AddLabel(side);
+        _scores.MouseFilter = MouseFilterEnum.Stop;
+        _scores.TooltipText = "Survival: how long, and how much of, the federation stays free.\nQuality of life: food, wellbeing and education across communes.\nSpread: how radicalized workers behind enemy lines become.\nFreedom: how low hierarchy drift has stayed, on average.";
 
         Section(side, "So far");
         _history = new HistoryChart();
@@ -478,6 +555,14 @@ public partial class Main : Control
 
         _stage.Text = $"{DriftEffects.Name(w.Drift.Stage)} — {w.Drift.Value:0.0}" + (w.Drift.NextThreshold is { } t ? $"  (next stage at {t:0})" : "");
         _driftMeter.QueueRedraw();
+        _driftMeter.TooltipText =
+            "Hierarchy drift: informal power piling up.\n" +
+            "25 Permanent councils: +4% output, cheaper coordination; assemblies consulted less.\n" +
+            "50 Commissars: +20% defense; trust and political education suffer.\n" +
+            "75 Police force: +30% defense, free-riding ends by coercion; trust erodes everywhere.\n" +
+            "100 A state: the revolution is over. Game lost.\n\n" +
+            "A stage only reverts once drift falls 10 below its threshold. Brakes: political education, recall, mandates, rotation.";
+        if (_communeList.Visible) _communeList.Refresh();
         _history.QueueRedraw();
         var d = w.LastDrift;
         _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",

@@ -266,6 +266,13 @@ public partial class MapView : Control
 
     private Vector2 ToScreen(Commune c) => (Layout()[c.Id] - Size / 2) * _zoom + Size / 2 + _pan;
 
+    /// <summary>Centres the map on a commune, keeping the current zoom.</summary>
+    public void CenterOn(int commune)
+    {
+        _pan = -(Layout()[commune] - Size / 2) * _zoom;
+        QueueRedraw();
+    }
+
     /// <summary>Centres the map on a commune at the given zoom.</summary>
     public void FocusOn(int commune, float zoom)
     {

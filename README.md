@@ -96,6 +96,14 @@ trader            63%       36%     1% │    76    54     12    72    53 │   
   mean trust, with the enemy offensives shaded.
 - **Results screen:** the outcome, the four scores, and the full history chart, with
   options to keep looking or start a new game.
+- **Commune list** (the Communes button, or C): a sortable table of every commune's trust,
+  wellbeing, education, discontent and status. Click a row to select it and centre the map on it.
+- **Toasts:** brief pop-ups on the map for falls, offensives and decisions.
+- **Tips:** one-time hints the first time something important happens, such as the front
+  losing ground, famine, the expert trap, a commune voting to leave, the first drift stage,
+  or influence full and unspent.
+- **Tooltips:** hover the drift meter, influence or scores for an explanation. Esc closes the
+  results screen and the commune list.
 
 ## Foreign trade and embargoes
 
