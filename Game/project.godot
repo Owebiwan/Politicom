@@ -28,4 +28,7 @@ project/assembly_name="Politicom.Game"
 
 [rendering]
 
+; Required to export for Apple Silicon (arm64 / universal).
+textures/vram_compression/import_etc2_astc=true
+
 anti_aliasing/quality/msaa_2d=2

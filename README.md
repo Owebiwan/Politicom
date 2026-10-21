@@ -154,11 +154,24 @@ out exactly as it would have. Tests check this at three points in the game.
 
 ## Exporting a standalone build
 
-`Data/` is mirrored into `Game/data/` on every build and packed into exports. To export:
-1. In Godot, go to **Editor → Manage Export Templates** and download the templates for your
-   version (about 1 GB).
-2. Run **Project → Export → macOS** (or
-   `godot --headless --path Game --export-release macOS ../build/Politicom.zip`).
+`Data/` is mirrored into `Game/data/` on every build and packed into exports, so the app
+needs nothing outside itself.
+
+1. Install the macOS export template once. In Godot, use **Editor → Manage Export Templates**.
+   Or copy `templates/macos.zip` and `templates/version.txt` from the official
+   `Godot_v4.7.2-stable_mono_export_templates.tpz` into
+   `~/Library/Application Support/Godot/export_templates/4.7.2.stable.mono/`. Only the macOS
+   template (124 MB) is needed, not the whole 1.2 GB bundle.
+2. Export:
+   `godot --headless --path Game --export-release macOS ../build/Politicom.zip`,
+   then unzip it to get `Politicom.app`. It's a universal build for Apple Silicon and Intel.
+
+The app is unsigned. It runs normally on the Mac that built it. Anyone you send it to must
+right-click it and choose **Open** the first time, or macOS will refuse to start it.
+
+Two project settings the export needs, already in place:
+- `Game/Politicom.Game.sln`, so Godot can build the C# code.
+- ETC2/ASTC texture import, required for Apple Silicon.
 
 ## Balancing with batches
 
