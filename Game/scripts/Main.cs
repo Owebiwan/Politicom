@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Politicom.Sim;
+using Politicom.Sim.Sandbox;
 
 namespace Politicom.Game;
 
@@ -27,6 +28,7 @@ public partial class Main : Control
     private Control? _overlay;
     private ScenarioDefinition _scenario = null!;
     private List<ScenarioDefinition> _scenarios = new();
+    private SandboxGenerator? _sandbox;
     private TechCatalog _techs = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
@@ -52,6 +54,7 @@ public partial class Main : Control
                 .ToList();
             if (_scenarios.Count == 0) throw new System.IO.FileNotFoundException("No scenarios in res://data/scenarios.");
             _scenario = _scenarios.FirstOrDefault(s => s.Id == "catalonia_1936") ?? _scenarios[0];
+            _sandbox = SandboxGenerator.Parse(ReadData("res://data/sandbox/event_templates.json"), _techs);
             _world = World.Create(_scenario, _techs, seed: (ulong)DateTime.Now.Ticks);
         }
         catch (Exception e)
@@ -78,7 +81,7 @@ public partial class Main : Control
         if (at < 0 || at + 1 >= args.Length) return;
         string path = args[at + 1];
         int scenarioAt = Array.IndexOf(args, "--scenario");
-        if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && _scenarios.FirstOrDefault(s => s.Id == args[scenarioAt + 1]) is { } chosen)
+        if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && FindScenario(args[scenarioAt + 1]) is { } chosen)
         {
             _scenario = chosen;
             SetWorld(World.Create(chosen, _techs, seed: 1));
@@ -165,8 +168,8 @@ public partial class Main : Control
             var text = new RichTextLabel
             {
                 BbcodeEnabled = true, FitContent = true, ScrollActive = false,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(560, 0),
-                Text = $"[b]{Esc(scenario.Name)}[/b]  [color=#9aa0a8]{scenario.StartDate.Year}–{end.Year} · {scenario.Communes.Count} communes · "
+                SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(820, 0),
+                Text = $"[b]{Esc(scenario.Name)}[/b]  [color=#9aa0a8]{(end.Year == scenario.StartDate.Year ? $"{end.Year}" : $"{scenario.StartDate.Year}–{end.Year}")} · {scenario.Communes.Count} communes · "
                        + $"against {Esc(string.Join(" and ", scenario.Enemies.Select(e => e.Name)))}[/color]\n{Esc(scenario.Description)}",
             };
             text.AddThemeFontSizeOverride("normal_font_size", 14);
@@ -179,17 +182,75 @@ public partial class Main : Control
             list.AddChild(row);
             list.AddChild(new HSeparator());
         }
+        if (_sandbox != null) list.AddChild(SandboxRow());
+
+        // Four scenarios don't fit on a small screen with the rules above them: let the list scroll.
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(PickerWidth - 56, 470), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        list.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scroll.AddChild(list);
 
         ShowOverlay("Choose a revolution", """
             [b]You are the movement, not the government.[/b] You can't order a commune to do anything. You fund schools, mediate disputes, circulate ideas and propose projects; the communes decide for themselves.
 
             [b]The dilemma.[/b] Almost everything that helps you win the war (a war committee, government arms, conscription, appointed commanders) pushes [color=#f2c94c]hierarchy drift[/color] up. At 25, 50 and 75 drift, permanent councils, then commissars, then a police force take over, each with real bonuses. At 100 a state has crystallized and the revolution is over, however strong the society is. Political education, recall and rotation are the brakes.
 
-            [b]Winning.[/b] Hold out as a free federation until the scenario ends. You're scored on survival, quality of life, spread of the idea across the lines, and freedom.
-
-            [b]Controls.[/b] Click a commune to select it; shift-click a second one for mediation or railways. Space pauses, 1–3 set speed, [code].[/code] advances one turn. Scroll or pinch to zoom, drag to pan. The game pauses itself when a decision is waiting.
-            """, list);
+            [b]Winning.[/b] Hold out as a free federation until the scenario ends; you're scored on survival, quality of life, spread and freedom. [b]Controls:[/b] click a commune, shift-click a second; Space pauses, 1–3 set speed; scroll to zoom, drag to pan.
+            """, scroll, PickerWidth);
     }
+
+    private const float PickerWidth = 1040;
+
+    private ScenarioDefinition? FindScenario(string id) =>
+        SandboxGenerator.TryParseId(id, out var seed, out var size) && _sandbox != null
+            ? _sandbox.Generate(seed, size)
+            : _scenarios.FirstOrDefault(s => s.Id == id);
+
+    /// <summary>The Sandbox row: seed, size and Play. Generation (with calibration) takes well under a second.</summary>
+    private Control SandboxRow()
+    {
+        var box = new VBoxContainer();
+        var text = new RichTextLabel
+        {
+            BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(820, 0),
+            Text = "[b]Sandbox[/b]  [color=#9aa0a8]a generated region · two years · one or two enemies[/color]\n"
+                   + "An alternate-history map with its own communes, fronts and dilemmas, tuned to be winnable but hard. Same seed, same map.",
+        };
+        text.AddThemeFontSizeOverride("normal_font_size", 14);
+        text.AddThemeFontSizeOverride("bold_font_size", 16);
+        box.AddChild(text);
+
+        var controls = new HBoxContainer();
+        controls.AddThemeConstantOverride("separation", 8);
+        controls.AddChild(new Label { Text = "Seed" });
+        var seed = new LineEdit { Text = NewSeed().ToString(), CustomMinimumSize = new Vector2(140, 0), MaxLength = 12 };
+        seed.TextChanged += t =>
+        {
+            string digits = new(t.Where(char.IsDigit).ToArray());
+            if (digits != t)
+            {
+                seed.Text = digits;
+                seed.CaretColumn = digits.Length;
+            }
+        };
+        controls.AddChild(seed);
+        AddButton(controls, "Random", "Pick a new seed.", () => seed.Text = NewSeed().ToString());
+        controls.AddChild(new Label { Text = "Communes" });
+        var size = new OptionButton();
+        foreach (var n in SandboxGenerator.Sizes) size.AddItem(n.ToString(), n);
+        size.Select(Array.IndexOf(SandboxGenerator.Sizes, SandboxGenerator.DefaultSize));
+        controls.AddChild(size);
+        controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        var play = AddButton(controls, "Play", "", () =>
+        {
+            ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
+            StartScenario(_sandbox!.Generate(value, size.GetSelectedId()));
+        });
+        play.CustomMinimumSize = new Vector2(110, 40);
+        box.AddChild(controls);
+        return box;
+    }
+
+    private static ulong NewSeed() => (ulong)Random.Shared.Next(1, 1_000_000);
 
     private void StartScenario(ScenarioDefinition scenario)
     {
@@ -217,11 +278,14 @@ public partial class Main : Control
 
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 
-            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)})
+            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)}){(SandboxGenerator.TryParseId(w.Scenario.Id, out var mapSeed, out var mapSize) ? $"\n\nSandbox map: seed {mapSeed}, {mapSize} communes." : "")}
             """, chart, ("Keep looking", CloseOverlay), ("Play again", NewGame), ("Choose scenario", ShowIntro));
     }
 
-    private void ShowOverlay(string title, string body, Control? extra, params (string Label, Action OnPress)[] buttons)
+    private void ShowOverlay(string title, string body, Control? extra, params (string Label, Action OnPress)[] buttons) =>
+        ShowOverlay(title, body, extra, 760, buttons);
+
+    private void ShowOverlay(string title, string body, Control? extra, float width, params (string Label, Action OnPress)[] buttons)
     {
         CloseOverlay();
         SetSpeed(0);
@@ -231,7 +295,7 @@ public partial class Main : Control
         center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         dim.AddChild(center);
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(760, 0) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(width, 0) };
         panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
         {
             BgColor = new Color(0.11f, 0.12f, 0.14f),
@@ -246,7 +310,7 @@ public partial class Main : Control
         var heading = new Label { Text = title };
         heading.AddThemeFontSizeOverride("font_size", 26);
         v.AddChild(heading);
-        var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(704, 0), Text = body.Trim() };
+        var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(width - 56, 0), Text = body.Trim() };
         text.AddThemeFontSizeOverride("normal_font_size", 15);
         text.AddThemeFontSizeOverride("bold_font_size", 15);
         v.AddChild(text);
@@ -407,7 +471,8 @@ public partial class Main : Control
     private void Refresh()
     {
         var w = _world;
-        _header.Text = $"{w.Scenario.Name} — {w.Date:d MMMM yyyy}  ({w.Turn} {w.Tick}/{w.Scenario.EndTick})";
+        _header.Text = $"{w.Scenario.Name} — {w.Date:d MMMM yyyy}  ({w.Turn} {w.Tick}/{w.Scenario.EndTick})"
+                       + (SandboxGenerator.TryParseId(w.Scenario.Id, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
         _stepButton.Text = $"+1 {w.Turn}";
         _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
 

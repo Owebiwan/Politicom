@@ -49,7 +49,11 @@ static int Usage()
           politicom params
               List every balance parameter and its default.
 
-        Policies: passive, educator, centralizer, balanced
+        Scenarios: catalonia_1936 (default), free_territory_1918, paris_commune_1871,
+                   sandbox:SEED[:COMMUNES] for a generated map. A bare "sandbox" uses --seed;
+                   in batch it generates a fresh map for every game.
+
+        Policies: passive, educator, centralizer, balanced, trader
         """);
     return 0;
 }

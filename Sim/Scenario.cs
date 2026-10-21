@@ -25,6 +25,15 @@ public sealed class ScenarioDefinition
 
     public static ScenarioDefinition Load(string path) => Parse(File.ReadAllText(path));
 
+    /// <summary>
+    /// A scenario by id: a file in Data/scenarios, or a generated map for
+    /// "sandbox:SEED" / "sandbox:SEED:COMMUNES".
+    /// </summary>
+    public static ScenarioDefinition Resolve(string dataDir, string id) =>
+        Sandbox.SandboxGenerator.TryParseId(id, out var seed, out var communes)
+            ? Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes)
+            : Load(DataPaths.Scenario(dataDir, id));
+
     public static ScenarioDefinition Parse(string json) =>
         JsonSerializer.Deserialize<ScenarioDefinition>(json, Json.Options)
         ?? throw new InvalidDataException("Could not read the scenario file.");
@@ -67,4 +76,5 @@ public static class DataPaths
 
     public static string Scenario(string dataDir, string id) => Path.Combine(dataDir, "scenarios", id + ".json");
     public static string Technologies(string dataDir) => Path.Combine(dataDir, "technologies.json");
+    public static string SandboxTemplates(string dataDir) => Path.Combine(dataDir, "sandbox", "event_templates.json");
 }

@@ -1,0 +1,149 @@
+{
+  // Generic versions of the historical dilemmas, for generated sandbox maps.
+  // The generator picks five, gives each a turn inside its window (early, mid or late),
+  // and fills in placeholders:
+  //   {region}  the region's name        {city}   its largest commune
+  //   {village} a random farming commune  {hero}   a popular commander
+  //   {enemy}   the main enemy            {enemy2} the second enemy (or the main one)
+  "templates": [
+    {
+      "window": "early",
+      "event": {
+        "id": "conscription",
+        "title": "Raising an army",
+        "text": "Delegates from across {region} meet to decide how to fight the {enemy}. Some want a volunteer militia; others say only conscription can match a real army.",
+        "defaultOption": 0,
+        "options": [
+          { "label": "Voluntary militia", "description": "Each commune sends whom it chooses, under elected delegates.",
+            "effects": { "drift": 1, "enemy": "{enemy}", "enemyStrength": -0.5 } },
+          { "label": "General conscription", "description": "A bigger army, and a staff to command it.",
+            "effects": { "drift": 6, "enemy": "{enemy}", "enemyStrength": -1.5, "wellbeing": -0.05 } }
+        ]
+      }
+    },
+    {
+      "window": "early",
+      "event": {
+        "id": "coalition",
+        "title": "Ministries in {city}",
+        "text": "The old authorities in {city} offer the movement seats in a government of unity against the {enemy}. The committees would answer to ministers.",
+        "defaultOption": 0,
+        "options": [
+          { "label": "Join the government", "description": "Access to the treasury and arms purchases, at the price of the committees' independence.",
+            "effects": { "drift": 6, "influence": 25, "goodsToFront": 25 } },
+          { "label": "Stay outside", "description": "The committees keep their power. The ministers will remember.",
+            "effects": { "drift": -1, "influence": -5, "trust": 0.03 } }
+        ]
+      }
+    },
+    {
+      "window": "early",
+      "event": {
+        "id": "bank",
+        "title": "The bank in {city}",
+        "text": "The regional bank's vaults are full and lightly guarded. Seizing them would arm the militias — and hand a treasury to whoever controls it.",
+        "defaultOption": 0,
+        "options": [
+          { "label": "Leave it untouched", "description": "The movement keeps its hands clean, and the {enemy} keeps its credit.",
+            "effects": { "influence": 5, "enemy": "{enemy}", "enemyStrength": 0.3 } },
+          { "label": "Seize the reserves", "description": "Arms and pay for the militias; a central treasury for the federation.",
+            "effects": { "drift": 5, "goodsToFront": 40, "enemy": "{enemy}", "enemyStrength": -0.3 } }
+        ]
+      }
+    },
+    {
+      "window": "mid",
+      "event": {
+        "id": "hero_dies",
+        "title": "{hero} is dead",
+        "text": "{hero}, the most loved commander of the {region} militias, has been killed at the front. Thousands follow the coffin. The column needs new leadership.",
+        "defaultOption": 0,
+        "options": [
+          { "label": "Let the column elect its delegates", "description": "The militia stays self-managed, but loses its most experienced commander.",
+            "effects": { "drift": -2, "enemyStrength": 0.3, "wellbeing": 0.03 } },
+          { "label": "Appoint a commander", "description": "Continuity at the front, at the price of a chain of command.",
+            "effects": { "drift": 3, "enemyStrength": -0.3 } }
+        ]
+      }
+    },
+    {
+      "window": "mid",
+      "event": {
+        "id": "epidemic",
+        "title": "Typhus in {village}",
+        "text": "An epidemic spreads out from {village} along the supply roads. Whole units are bedridden.",
+        "defaultOption": 1,
+        "options": [
+          { "label": "Turn workshops over to hospitals", "description": "Organizers and every spare cart go to the sick.",
+            "effects": { "influence": -15, "wellbeing": -0.04 } },
+          { "label": "Carry on", "description": "Each commune copes as it can.",
+            "effects": { "wellbeing": -0.15 } }
+        ]
+      }
+    },
+    {
+      "window": "mid",
+      "event": {
+        "id": "requisition",
+        "title": "Requisition the harvest?",
+        "text": "The front is short of everything. The war committee proposes requisitioning the harvest of {village} and selling it for arms.",
+        "defaultOption": 1,
+        "requiresFederated": [ "{village}" ],
+        "options": [
+          { "label": "Requisition it", "description": "Arms for the front. Armed men in {village}'s granaries.",
+            "effects": { "drift": 5, "goodsToFront": 30, "communes": [ "{village}" ], "wellbeing": -0.2, "trust": -0.1 } },
+          { "label": "Ask for volunteers and gifts", "description": "Less, and later — given freely.",
+            "effects": { "influence": -10, "goodsToFront": 8 } }
+        ]
+      }
+    },
+    {
+      "window": "mid",
+      "event": {
+        "id": "autonomy",
+        "title": "{village} wants to go its own way",
+        "text": "The peasants of {village} say the federation takes more than it gives, and their assembly has voted to leave.",
+        "defaultOption": 0,
+        "requiresFederated": [ "{village}" ],
+        "options": [
+          { "label": "Let them go", "description": "Secession is a legitimate choice. The door stays open.",
+            "effects": { "drift": -1, "secede": [ "{village}" ] } },
+          { "label": "Negotiate autonomy within the federation", "description": "It costs the movement standing, but {village} stays.",
+            "effects": { "influence": -15, "communes": [ "{village}" ], "wellbeing": 0.05 } },
+          { "label": "Send the militia", "description": "{village} stays. Everyone sees how.",
+            "effects": { "drift": 8, "communes": [ "{village}" ], "trust": -0.15, "wellbeing": -0.1 } }
+        ]
+      }
+    },
+    {
+      "window": "late",
+      "event": {
+        "id": "emergency_committee",
+        "title": "A committee of public safety?",
+        "text": "With the {enemy2} closing in, a majority proposes a five-person committee with full powers for the duration of the emergency. The minority calls it a dictatorship.",
+        "defaultOption": 0,
+        "options": [
+          { "label": "Create the committee", "description": "Emergency powers for the war. It will not want to give them back.",
+            "effects": { "drift": 12, "militarizationTicks": 10, "trust": -0.04 } },
+          { "label": "Side with the minority", "description": "No dictatorship, even now. The majority does not forgive it.",
+            "effects": { "drift": -3, "influence": -10, "trust": -0.02 } }
+        ]
+      }
+    },
+    {
+      "window": "late",
+      "event": {
+        "id": "last_stand",
+        "title": "The decisive battle",
+        "text": "The {enemy2} is massing for a final push. Should every militia be thrown into one great battle?",
+        "defaultOption": 1,
+        "options": [
+          { "label": "Send everything", "description": "Full mobilization blunts the enemy — and hollows out the communes.",
+            "effects": { "drift": 4, "enemy": "{enemy2}", "enemyStrength": -3, "wellbeing": -0.1 } },
+          { "label": "Volunteers only", "description": "Those who want to fight go. The communes keep working.",
+            "effects": { "enemy": "{enemy2}", "enemyStrength": -1 } }
+        ]
+      }
+    }
+  ]
+}

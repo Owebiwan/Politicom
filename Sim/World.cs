@@ -143,7 +143,7 @@ public sealed class World
     }
 
     public static World Load(string dataDir, string scenarioId, Balance? balance = null, ulong seed = 1) =>
-        Create(ScenarioDefinition.Load(DataPaths.Scenario(dataDir, scenarioId)), TechCatalog.Load(DataPaths.Technologies(dataDir)), balance, seed);
+        Create(ScenarioDefinition.Resolve(dataDir, scenarioId), TechCatalog.Load(DataPaths.Technologies(dataDir)), balance, seed);
 
     /// <summary>Snapshot of the full game state.</summary>
     public SaveGame Save() => new()

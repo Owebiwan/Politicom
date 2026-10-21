@@ -22,7 +22,10 @@ internal static class Batch
         var baseBalance = o.BuildBalance();
 
         string dataDir = DataPaths.Find();
-        var scenario = ScenarioDefinition.Load(DataPaths.Scenario(dataDir, o.Scenario));
+        // A bare --scenario sandbox measures balance across many generated maps: one per game.
+        var sandbox = o.FreshSandboxPerRun ? Sim.Sandbox.SandboxGenerator.Load(dataDir) : null;
+        var fixedScenario = sandbox == null ? ScenarioDefinition.Resolve(dataDir, o.Scenario) : null;
+        var maps = new System.Collections.Concurrent.ConcurrentDictionary<ulong, Lazy<ScenarioDefinition>>(); // every policy plays the same map per seed
         var techs = TechCatalog.Load(DataPaths.Technologies(dataDir));
 
         var jobs = (from v in sweepValues from p in policies from i in Enumerable.Range(0, runs) select (Value: v, Policy: p, Seed: seed + (ulong)i)).ToList();
@@ -33,6 +36,7 @@ internal static class Batch
             var (value, policyTemplate, s) = jobs[i];
             var balance = baseBalance.Clone();
             if (value is { } v) balance.Set(sweep!.Value.Name, v);
+            var scenario = fixedScenario ?? maps.GetOrAdd(s, key => new Lazy<ScenarioDefinition>(() => sandbox!.Generate(key))).Value;
             var world = World.Create(scenario, techs, balance, s);
             var policy = Policies.Get(policyTemplate.Name);
             while (world.Outcome == Outcome.Ongoing)

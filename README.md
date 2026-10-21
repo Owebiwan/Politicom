@@ -12,6 +12,7 @@ hostile states, and an "ally" that offers arms in exchange for centralization.
 | Revolutionary Catalonia, 1936–39 | 30 | Nationalist Army | Running an industrial economy through collectives while the front slowly gives way |
 | Free Territory, Ukraine, 1918–21 | 22 | White Army; Red Army (an ally until it isn't) | Militia war on several fronts, and the pull toward a single command |
 | The Paris Commune, 1871 | 20 | Versailles army | A siege with almost no time to organize; each turn is a day |
+| Sandbox | 20–40 | 1–2, generated | A new alternate-history region from a seed |
 
 The Godot intro screen lets you choose one. In the terminal, pass `--scenario free_territory_1918`
 or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`, and can set:
@@ -33,7 +34,7 @@ or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`
 ## Quick start
 
 ```sh
-dotnet test                                     # 34 tests
+dotnet test                                     # 42 tests
 dotnet run --project Sim.Cli -- play            # play in the terminal (type `help`)
 dotnet run --project Sim.Cli -c Release -- batch --runs 300
 ```
@@ -51,6 +52,40 @@ Controls:
 
 If your Godot version differs from 4.7.2, Godot will offer to update the `Godot.NET.Sdk`
 version in `Game/Politicom.Game.csproj`. Accept it.
+
+## Sandbox
+
+`Sim/Sandbox/SandboxGenerator.cs` builds an alternate-history region from a seed:
+- **The map:** fictional communes on a map, with one or two cities, towns around them and
+  farming villages elsewhere.
+- **Values:** spread out from a few ideological centres.
+- **Enemies:** one or two, each with its own front, colour and offensives. Sometimes the
+  second starts as an ally and turns on you.
+- **The rest:** maybe an ally offering arms, and five events drawn from the templates in
+  `Data/sandbox/event_templates.json`.
+
+It returns an ordinary scenario, so play, batch runs, the AI players and saves all work
+unchanged. A sandbox save carries its own map.
+
+**Calibration.** Generated maps differ wildly in how defensible they are. So after building
+one, the generator plays a few quick games with the built-in balanced player, and bisects a
+strength multiplier for the enemies until that player survives about 70% of the time. This
+takes about half a second and is deterministic. Without it, the balanced player's survival
+ranged from 0% to 100% across maps. With it, every map lands between about 30% and 70%.
+
+- **Godot:** the scenario picker has a Sandbox row with a seed, a Random button and a size
+  (20–40 communes). The header and results screen show the seed, so a good map can be shared.
+- **Terminal:** `--scenario sandbox:42` (or `sandbox:42:32` for 32 communes). A bare
+  `--scenario sandbox` uses `--seed`, and in `batch` generates a fresh map for every game:
+
+```
+policy       survived destroyed  state │  surv   QoL spread  free total │ drift
+passive            0%      100%     0% │    52    53      8    82    49 │    35
+educator           1%       99%     0% │    53    54      9    85    50 │    30
+centralizer        0%        0%   100% │    54    53      6    50    41 │   100
+balanced          66%       34%     0% │    75    53     12    77    54 │    37
+trader            63%       36%     1% │    76    54     12    72    53 │    49
+```
 
 ## What the player sees
 

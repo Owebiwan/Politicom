@@ -1,4 +1,5 @@
 using Politicom.Sim.Ai;
+using Politicom.Sim.Sandbox;
 
 namespace Politicom.Sim.Tests;
 
@@ -25,6 +26,7 @@ public class SimulationTests
         "catalonia_1936",
         "free_territory_1918",
         "paris_commune_1871",
+        "sandbox:7",
     };
 
     [Theory]
@@ -59,6 +61,70 @@ public class SimulationTests
             }
         Assert.NotEqual(Outcome.Ongoing, straight.Outcome);
         Assert.Equal(straight.Log.Select(e => e.Text), resumed.Log.Select(e => e.Text));
+    }
+
+    private static readonly Lazy<SandboxGenerator> Sandbox = new(() => SandboxGenerator.Load(DataDir));
+
+    [Fact]
+    public void Sandbox_maps_are_deterministic_per_seed()
+    {
+        string Json(ScenarioDefinition s) => System.Text.Json.JsonSerializer.Serialize(s);
+        Assert.Equal(Json(Sandbox.Value.Generate(42)), Json(Sandbox.Value.Generate(42)));
+        Assert.NotEqual(Json(Sandbox.Value.Generate(42, calibrate: false)), Json(Sandbox.Value.Generate(43, calibrate: false)));
+    }
+
+    [Theory]
+    [InlineData(20)]
+    [InlineData(26)]
+    [InlineData(40)]
+    public void Sandbox_maps_are_valid_across_many_seeds(int size)
+    {
+        var techs = NewWorld().Techs;
+        for (ulong seed = 1; seed <= 50; seed++)
+        {
+            var scenario = Sandbox.Value.Generate(seed, size, calibrate: false);
+            Assert.Equal(size, scenario.Communes.Count);
+            Assert.Equal(size, scenario.Communes.Select(c => c.Name).Distinct().Count());
+            Assert.All(scenario.Enemies, e => Assert.Contains(scenario.Communes, c => c.FrontOf.Contains(e.Name)));
+            Assert.Equal(5, scenario.Events.Count);
+            var w = World.Create(scenario, techs, seed: seed); // validates event, enemy and tech references
+            Assert.All(w.Communes, c => Assert.NotEmpty(w.Trust.Neighbors(c.Id)));
+        }
+    }
+
+    [Fact]
+    public void Sandbox_ids_parse()
+    {
+        Assert.True(SandboxGenerator.TryParseId("sandbox:42", out var seed, out var size));
+        Assert.Equal((42UL, SandboxGenerator.DefaultSize), (seed, size));
+        Assert.True(SandboxGenerator.TryParseId("sandbox:7:32", out seed, out size));
+        Assert.Equal((7UL, 32), (seed, size));
+        Assert.False(SandboxGenerator.TryParseId("catalonia_1936", out _, out _));
+        Assert.False(SandboxGenerator.TryParseId("sandbox:x", out _, out _));
+    }
+
+    /// <summary>Calibration should make every map winnable but hard for the balanced player, and passive play a loss.</summary>
+    [Fact]
+    public void Calibrated_sandbox_maps_are_winnable_but_hard()
+    {
+        var techs = NewWorld().Techs;
+        foreach (ulong map in new ulong[] { 3, 11, 29 })
+        {
+            var scenario = Sandbox.Value.Generate(map);
+            int Survivals(IPolicy policy) => Enumerable.Range(100, 10).Count(g =>
+            {
+                var w = World.Create(scenario, techs, seed: (ulong)g);
+                while (w.Outcome == Outcome.Ongoing)
+                {
+                    policy.Act(w);
+                    w.Step();
+                }
+                return w.Outcome == Outcome.Survived;
+            });
+            int balanced = Survivals(new Balanced());
+            Assert.InRange(balanced, 2, 10);
+            Assert.True(Survivals(new Passive()) < balanced, $"map {map}: passive should do worse than balanced");
+        }
     }
 
     [Fact]

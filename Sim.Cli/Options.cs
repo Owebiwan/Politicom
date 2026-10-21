@@ -28,7 +28,13 @@ internal sealed class Options
     public string? Get(string key) => _values.GetValueOrDefault(key);
     public int GetInt(string key, int fallback) => _values.TryGetValue(key, out var v) ? int.Parse(v, CultureInfo.InvariantCulture) : fallback;
     public ulong GetSeed() => _values.TryGetValue("seed", out var v) ? ulong.Parse(v, CultureInfo.InvariantCulture) : 1;
-    public string Scenario => Get("scenario", "catalonia_1936");
+    /// <summary>A bare "sandbox" means a generated map seeded by --seed.</summary>
+    public string Scenario => Get("scenario", "catalonia_1936") is var id && id == Sim.Sandbox.SandboxGenerator.IdPrefix
+        ? Sim.Sandbox.SandboxGenerator.Id(GetSeed())
+        : id;
+
+    /// <summary>True for a bare --scenario sandbox: batch runs then generate a fresh map per game.</summary>
+    public bool FreshSandboxPerRun => Get("scenario") == Sim.Sandbox.SandboxGenerator.IdPrefix;
 
     public Balance BuildBalance()
     {
