@@ -18,7 +18,8 @@ The Godot intro screen lets you choose one. In the terminal, pass `--scenario fr
 or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`, and can set:
 - **Enemies:** any number, each with its own front, offensives and map colour.
 - **`daysPerTick`:** the turn length. Paris uses 1, so its turns are days.
-- **`foodImports` / `goodsImports`:** supplies from outside each turn. Paris was fed through the Prussian lines.
+- **`foodImports` / `goodsImports`:** supplies from outside each turn. Paris was fed through the
+  Prussian lines; Catalonia imported grain it couldn't grow for Barcelona's factories.
 - **`warPace`:** how fast front communes are lost or regained. Paris uses 5 for street fighting.
 
 ## Layout
@@ -119,9 +120,11 @@ capitalist states needs currency, which brings markets and accounts back in.
   so goods from trade, the ally or events actually help hold the line.
 
 Whether trade pays depends on the scenario (compare `balanced` and `trader` in the tables
-below). In Paris's short siege the arms come in time and the drift doesn't, so it helps
-(39% survival vs 28%). In the Free Territory's long war the drift piles up, and the trader
-becomes a state 61% of the time.
+below):
+- **Paris:** it helps (39% survival vs 28%). In the short siege the arms come in time and the drift doesn't.
+- **Catalonia:** it pays off in a different way. Survival is the same, but final drift is lower
+  (54 vs 70), because better-armed fronts mean fewer emergencies and less time with a war committee.
+- **Free Territory:** the drift piles up over the long war, and the trader becomes a state 61% of the time.
 
 ## Historical events
 
@@ -181,11 +184,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           14%       86%     0% │    62    49     15    67    48 │    63
-educator          89%       11%     0% │    65    51     22    73    53 │    62
-centralizer        0%        0%   100% │    35    50      5    52    36 │   100
-balanced          99%        1%     1% │    87    50     19    64    55 │    80
-trader            97%        0%     3% │    87    51     19    63    55 │    84
+passive           26%       74%     0% │    64    50     16    66    49 │    65
+educator          94%        6%     0% │    66    51     22    73    53 │    60
+centralizer        0%        0%   100% │    36    50      5    52    36 │   100
+balanced          99%        0%     0% │    87    51     19    68    56 │    70
+trader            99%        0%     1% │    84    52     19    73    57 │    54
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through

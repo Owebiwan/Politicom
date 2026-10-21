@@ -11,7 +11,7 @@ internal static class SingleRun
     {
         var policy = Policies.Get(o.Get("policy", "balanced"));
         var world = World.Load(DataPaths.Find(), o.Scenario, o.BuildBalance(), o.GetSeed());
-        var series = new StringBuilder("tick,date,influence,drift,stage,federated,occupied,seceded,mean_trust,mean_wellbeing,mean_practical,mean_political,enemy_strength,radicalization,survival,quality,spread,freedom\n");
+        var series = new StringBuilder("tick,date,influence,drift,stage,federated,occupied,seceded,mean_trust,starving,mean_wellbeing,mean_practical,mean_political,enemy_strength,radicalization,survival,quality,spread,freedom\n");
 
         int printed = 0;
         while (world.Outcome == Outcome.Ongoing)
@@ -40,6 +40,7 @@ internal static class SingleRun
         return string.Join(",", w.Tick, w.Date.ToString("yyyy-MM-dd"), F(w.Influence), F(w.Drift.Value), w.Drift.Stage,
             w.Federation.Count(), w.Communes.Count(c => c.Occupied), w.Communes.Count(c => !c.Occupied && !c.Federated),
             F(edges.Count == 0 ? 0 : edges.Average(e => w.Trust[e.A, e.B])),
+            w.Communes.Count(c => !c.Occupied && c.Starving),
             F(w.Mean(c => c.Wellbeing)), F(w.Mean(c => c.PracticalEducation)), F(w.Mean(c => c.PoliticalEducation)),
             F(w.Enemies.Sum(e => e.EffectiveStrength)), F(w.Radicalization),
             F(w.Scores.Survival), F(w.Scores.QualityOfLife), F(w.Scores.Spread), F(w.Scores.Freedom));

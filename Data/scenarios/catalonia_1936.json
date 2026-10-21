@@ -6,6 +6,8 @@
   "endTick": 135,
   "neighborCount": 3,
   "neighborRadiusKm": 25,
+  // Republican Spain and foreign purchases supplied grain Catalonia could not grow itself.
+  "foodImports": 50,
 
   "enemies": [ {
     "name": "Nationalist Army",
