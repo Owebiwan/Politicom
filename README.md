@@ -11,10 +11,14 @@ hostile states, and an "ally" that offers arms in exchange for centralization.
 |---|---|---|---|
 | Revolutionary Catalonia, 1936–39 | 30 | Nationalist Army | Running an industrial economy through collectives while the front slowly gives way |
 | Free Territory, Ukraine, 1918–21 | 22 | White Army; Red Army (an ally until it isn't) | Militia war on several fronts, and the pull toward a single command |
+| The Paris Commune, 1871 | 20 | Versailles army | A siege with almost no time to organize; each turn is a day |
 
-The Godot intro screen lets you choose one. In the terminal, pass `--scenario free_territory_1918`.
-Scenarios are pure JSON in `Data/scenarios/`. A scenario has any number of enemies, each with
-its own front, offensives and map colour.
+The Godot intro screen lets you choose one. In the terminal, pass `--scenario free_territory_1918`
+or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`, and can set:
+- **Enemies:** any number, each with its own front, offensives and map colour.
+- **`daysPerTick`:** the turn length. Paris uses 1, so its turns are days.
+- **`foodImports` / `goodsImports`:** supplies from outside each turn. Paris was fed through the Prussian lines.
+- **`warPace`:** how fast front communes are lost or regained. Paris uses 5 for street fighting.
 
 ## Layout
 
@@ -29,7 +33,7 @@ its own front, offensives and map colour.
 ## Quick start
 
 ```sh
-dotnet test                                     # 28 tests
+dotnet test                                     # 32 tests
 dotnet run --project Sim.Cli -- play            # play in the terminal (type `help`)
 dotnet run --project Sim.Cli -c Release -- batch --runs 300
 ```
@@ -68,7 +72,7 @@ Catalonia has six scripted decisions in its `events` list:
 - the SIM's offer of its services (September 1937)
 - the Battle of the Ebro (July 1938)
 
-The Free Territory has its own six: the Second Regional Congress, Trotsky's Order No. 1824,
+Paris has six, ending in the Committee of Public Safety vote and Bloody Week. The Free Territory has its own six: the Second Regional Congress, Trotsky's Order No. 1824,
 Peregonovka, typhus, the Starobilsk agreement, and the final betrayal.
 
 Each has options with effects such as drift, influence, wellbeing, trust, enemy strength,
@@ -138,6 +142,20 @@ balanced          70%        5%    25% │    84    49     18    70    55 │   
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
 with the highest freedom. The educator's total score ties the balanced player's.
+
+Paris (`--scenario paris_commune_1871`) is the tragic one:
+
+```
+policy       survived destroyed  state │  surv   QoL spread  free total │ drift
+passive            0%      100%     0% │    79    67     11    91    62 │    26
+educator           0%      100%     0% │    78    67     12    95    63 │     8
+centralizer        0%        0%   100% │    88    64      8    52    53 │   100
+balanced          30%       70%     0% │    96    68     11    93    67 │    17
+```
+
+The front holds through April and early May, and Bloody Week (from 21 May) breaks it in
+days. A war committee at the right moment gives a 30% chance of outlasting history. Winning
+the war outright means becoming a state.
 
 In the Catalonia table, centralizing wins the war and loses the revolution, doing nothing loses
 the war, and playing the dilemma well scores best while living close to the edge.

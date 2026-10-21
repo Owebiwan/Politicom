@@ -12,7 +12,7 @@ namespace Politicom.Game;
 /// </summary>
 public partial class Main : Control
 {
-    private static readonly double[] SecondsPerWeek = { 0, 1.0, 0.45, 0.15 };
+    private static readonly double[] SecondsPerTurn = { 0, 1.0, 0.45, 0.15 };
 
     private World _world = null!;
     private MapView _map = null!;
@@ -22,6 +22,7 @@ public partial class Main : Control
 
     private Label _header = null!, _influence = null!, _stage = null!, _scores = null!, _feedback = null!;
     private DriftMeter _driftMeter = null!;
+    private Button _stepButton = null!;
     private HistoryChart _history = null!;
     private Control? _overlay;
     private ScenarioDefinition _scenario = null!;
@@ -103,9 +104,9 @@ public partial class Main : Control
     {
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
         _accumulator += delta;
-        if (_accumulator < SecondsPerWeek[_speed]) return;
+        if (_accumulator < SecondsPerTurn[_speed]) return;
         _accumulator = 0;
-        StepWeek();
+        StepTurn();
     }
 
     public override void _UnhandledInput(InputEvent e)
@@ -117,13 +118,13 @@ public partial class Main : Control
             case Key.Key1: SetSpeed(1); break;
             case Key.Key2: SetSpeed(2); break;
             case Key.Key3: SetSpeed(3); break;
-            case Key.Period: StepWeek(); break;
+            case Key.Period: StepTurn(); break;
             default: return;
         }
         GetViewport().SetInputAsHandled();
     }
 
-    private void StepWeek()
+    private void StepTurn()
     {
         if (_world.Outcome != Outcome.Ongoing) return;
         _world.Step();
@@ -160,7 +161,7 @@ public partial class Main : Control
         {
             var row = new HBoxContainer();
             row.AddThemeConstantOverride("separation", 16);
-            var end = scenario.StartDate.AddDays(7 * scenario.EndTick);
+            var end = scenario.StartDate.AddDays(scenario.DaysPerTick * scenario.EndTick);
             var text = new RichTextLabel
             {
                 BbcodeEnabled = true, FitContent = true, ScrollActive = false,
@@ -186,7 +187,7 @@ public partial class Main : Control
 
             [b]Winning.[/b] Hold out as a free federation until the scenario ends. You're scored on survival, quality of life, spread of the idea across the lines, and freedom.
 
-            [b]Controls.[/b] Click a commune to select it; shift-click a second one for mediation or railways. Space pauses, 1–3 set speed, [code].[/code] advances one week. Scroll or pinch to zoom, drag to pan. The game pauses itself when a decision is waiting.
+            [b]Controls.[/b] Click a commune to select it; shift-click a second one for mediation or railways. Space pauses, 1–3 set speed, [code].[/code] advances one turn. Scroll or pinch to zoom, drag to pan. The game pauses itself when a decision is waiting.
             """, list);
     }
 
@@ -312,8 +313,8 @@ public partial class Main : Control
             speeds.AddChild(b);
             _speedButtons.Add(b);
         }
-        var step = new Button { Text = "+1 week", TooltipText = "Advance one week (.)" };
-        step.Pressed += StepWeek;
+        var step = _stepButton = new Button { TooltipText = "Advance one turn (.)" };
+        step.Pressed += StepTurn;
         speeds.AddChild(step);
         AddButton(speeds, "Save", "Save to a single quick-save slot.", SaveGame);
         AddButton(speeds, "Load", "Load the quick-save.", LoadGame);
@@ -347,10 +348,10 @@ public partial class Main : Control
         Section(side, "The movement");
         var row1 = new HBoxContainer();
         side.AddChild(row1);
-        _warCommittee = new CheckButton { Text = "War committee", TooltipText = "Defense +35% and cheaper coordination — drift every week it sits." };
+        _warCommittee = new CheckButton { Text = "War committee", TooltipText = "Defense +35% and cheaper coordination — drift every turn it sits." };
         _warCommittee.Toggled += on => { if (on != _world.WarCommittee) Do(new SetWarCommittee(on)); };
         row1.AddChild(_warCommittee);
-        AddButton(row1, "Recall delegates", "Drift down, experience lost for 4 weeks.", () => Do(new RecallDelegates()));
+        AddButton(row1, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
         AddButton(row1, "Congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
 
         var row2 = new HBoxContainer();
@@ -370,7 +371,7 @@ public partial class Main : Control
             _idea.SetItemTooltip(i, $"+ {t.Perk}\n− {t.Risk}");
         }
         row3.AddChild(_idea);
-        AddButton(row3, "Circulate idea", "Steer what communes discover and adopt for 20 weeks.",
+        AddButton(row3, "Circulate idea", "Steer what communes discover and adopt for 20 turns.",
             () => Do(new CirculateIdea(_world.Techs.All[_idea.GetSelectedId()].Id)));
 
         _feedback = AddLabel(side);
@@ -403,14 +404,15 @@ public partial class Main : Control
     private void Refresh()
     {
         var w = _world;
-        _header.Text = $"{w.Scenario.Name} — {w.Date:d MMMM yyyy}  (week {w.Tick}/{w.Scenario.EndTick})";
-        _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/week)    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
+        _header.Text = $"{w.Scenario.Name} — {w.Date:d MMMM yyyy}  ({w.Turn} {w.Tick}/{w.Scenario.EndTick})";
+        _stepButton.Text = $"+1 {w.Turn}";
+        _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
 
         _stage.Text = $"{DriftEffects.Name(w.Drift.Stage)} — {w.Drift.Value:0.0}" + (w.Drift.NextThreshold is { } t ? $"  (next stage at {t:0})" : "");
         _driftMeter.QueueRedraw();
         _history.QueueRedraw();
         var d = w.LastDrift;
-        _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast week {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",
+        _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",
             d.Items().Where(i => Math.Abs(i.Value) > 0.005).OrderByDescending(i => Math.Abs(i.Value)).Take(5)
                 .Select(i => $"{Esc(i.Label)} [color={(i.Value > 0 ? "#f07060" : "#70d080")}]{(i.Value > 0 ? "+" : "")}{i.Value:0.00}[/color]"));
 
@@ -425,7 +427,7 @@ public partial class Main : Control
                    + $"\nFront: {(fronts.Any() ? string.Join(", ", fronts) : "none")}";
         });
         _enemy.Text = string.Join("\n", lines)
-                      + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Ally.MilitarizationTicks} more weeks." : "");
+                      + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Turns(w.Ally.MilitarizationTicks)} more." : "");
         var s = w.Scores;
         _scores.Text = $"Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
 
@@ -452,20 +454,20 @@ public partial class Main : Control
             var def = w.EventDefinition(pending.Id);
             var options = def.Options.Select((o, i) => (
                 $"{o.Label}",
-                $"{o.Description}\n\n{o.Effects.Summary()}" + (i == def.DefaultOption ? "\n\n(happens if you don't answer)" : ""),
+                $"{o.Description}\n\n{o.Effects.Summary(w.Turn)}" + (i == def.DefaultOption ? "\n\n(happens if you don't answer)" : ""),
                 (Action)(() => Do(new ChooseEventOption(def.Id, i))))).ToArray();
-            AddDecision($"{def.Title}\n{def.Text}  (answer by week {pending.Expires})", options);
+            AddDecision($"{def.Title}\n{def.Text}  (answer by {w.Turn} {pending.Expires})", options);
         }
         if (w.Ally.OfferPending)
         {
-            AddDecision($"The {w.Ally.Name} offers arms if the militias accept militarization. (expires week {w.Ally.OfferExpires})",
-                ("Accept arms", "+30% defense for 26 weeks; +5 drift now and more while it lasts.", () => Do(new AnswerAllyOffer(true))),
+            AddDecision($"The {w.Ally.Name} offers arms if the militias accept militarization. (expires {w.Turn} {w.Ally.OfferExpires})",
+                ("Accept arms", $"+30% defense for {w.Turns(w.Balance.MilitarizationTicks)}; +5 drift now and more while it lasts.", () => Do(new AnswerAllyOffer(true))),
                 ("Refuse", "The militias stay under their own control.", () => Do(new AnswerAllyOffer(false))));
         }
         foreach (var sec in w.PendingSecessions)
         {
             var c = w.Communes[sec.Commune];
-            AddDecision($"{c.Name} votes to leave the federation in week {sec.Deadline}. Mediate with its neighbours, let it go, or hold it by force.",
+            AddDecision($"{c.Name} votes to leave the federation in {w.Turn} {sec.Deadline}. Mediate with its neighbours, let it go, or hold it by force.",
                 ("Select it", "Select it, then shift-click a neighbour and Mediate.", () => { _map.Selected = c.Id; Refresh(); }),
                 ("Hold by force", "Costs influence, its trust with every neighbour, and drift.", () => Do(new HoldCommune(c.Id))));
         }
@@ -524,7 +526,7 @@ public partial class Main : Control
             string target = p.Target is int a ? $" — {w.Communes[a].Name}" + (p.Target2 is int b ? $" ↔ {w.Communes[b].Name}" : "") : "";
             row.AddChild(new Label
             {
-                Text = $"#{p.Id} {p.Definition.Name}{target}: {p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due week {p.Deadline}",
+                Text = $"#{p.Id} {p.Definition.Name}{target}: {p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
                 CustomMinimumSize = new Vector2(420, 0),
             });
@@ -550,7 +552,7 @@ public partial class Main : Control
             return;
         }
         file.StoreString(_world.SaveJson());
-        Say($"Saved week {_world.Tick} ({_world.Date:d MMMM yyyy}).");
+        Say($"Saved {_world.Turn} {_world.Tick} ({_world.Date:d MMMM yyyy}).");
     }
 
     private void LoadGame()
@@ -566,7 +568,7 @@ public partial class Main : Control
             _scenario = _scenarios.FirstOrDefault(s => s.Id == world.Scenario.Id) ?? _scenario;
             CloseOverlay();
             SetWorld(world);
-            Say($"Loaded week {world.Tick} ({world.Date:d MMMM yyyy}).");
+            Say($"Loaded {world.Turn} {world.Tick} ({world.Date:d MMMM yyyy}).");
         }
         catch (Exception e)
         {

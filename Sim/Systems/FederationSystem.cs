@@ -34,7 +34,7 @@ internal static class FederationSystem
                 if (!w.Rng.Chance(b.SecessionChance * (c.Discontent - b.SecessionThreshold) * 10)) continue;
                 w.PendingSecessions.Add(new PendingSecession(c.Id, w.Tick + b.SecessionWarningTicks));
                 w.Emit(Severity.Decision,
-                    $"{c.Name}'s assembly votes to leave the federation in {b.SecessionWarningTicks} weeks. " +
+                    $"{c.Name}'s assembly votes to leave the federation in {w.Turns(b.SecessionWarningTicks)}. " +
                     $"(trust {w.Trust.AverageTrust(c.Id):P0}, wellbeing {c.Wellbeing:P0}) Mediate to change its mind, or hold it by force.", c.Id);
             }
             else if (c.Discontent < b.RejoinThreshold && w.Rng.Chance(b.RejoinChance))

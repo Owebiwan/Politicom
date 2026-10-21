@@ -39,6 +39,8 @@ public sealed class EventEffects
     public string Enemy { get; set; } = "";
     /// <summary>Goods shared out among the front communes.</summary>
     public double GoodsToFront { get; set; }
+    /// <summary>Change to the scenario's food imports per turn (a blockade tightening or easing).</summary>
+    public double FoodImports { get; set; }
     public int MilitarizationTicks { get; set; }
     /// <summary>The ally stops offering arms for the rest of the game.</summary>
     public bool EndAllyOffers { get; set; }
@@ -46,7 +48,7 @@ public sealed class EventEffects
     public string[] Secede { get; set; } = Array.Empty<string>();
 
     /// <summary>Short human-readable summary, e.g. "+6 drift, +25 influence".</summary>
-    public string Summary()
+    public string Summary(string turn = "week")
     {
         var parts = new List<string>();
         void Add(double v, string what, string format = "+0.##;-0.##")
@@ -61,7 +63,8 @@ public sealed class EventEffects
         Add(PoliticalEducation * 100, "% political education" + scope);
         Add(EnemyStrength, Enemy.Length > 0 ? $"{Enemy} strength" : "enemy strength");
         Add(GoodsToFront, "goods to the front");
-        if (MilitarizationTicks > 0) parts.Add($"militarized {MilitarizationTicks} weeks");
+        Add(FoodImports, "food imports per " + turn);
+        if (MilitarizationTicks > 0) parts.Add($"militarized {MilitarizationTicks} {turn}s");
         if (EndAllyOffers) parts.Add("no more arms offers");
         if (Secede.Length > 0) parts.Add($"{string.Join(", ", Secede)} leave");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);

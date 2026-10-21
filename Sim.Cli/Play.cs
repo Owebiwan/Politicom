@@ -23,15 +23,15 @@ internal static class Play
           project collectivize                    plan industry together (output, drift)
           persuade <commune> <project#>           make the case in an assembly
           congress                                spread techniques federation-wide (some drift)
-          idea <tech_id>                          circulate a technology for 20 weeks
+          idea <tech_id>                          circulate a technology for 20 turns
           recall                                  recall delegates: drift down, experience lost
-          committee on|off                        war committee: defense up, drift up every week
+          committee on|off                        war committee: defense up, drift up every turn
           arms accept|reject                      answer the government's offer
           hold <commune>                          keep a seceding commune by force (costly)
           choose <n>                              answer the oldest historical event with option n
 
           save [file] / load [file] save or restore the game (default politicom-save.json)
-          next [n] / Enter          advance n weeks          quit
+          next [n] / Enter          advance n turns          quit
         <commune> is a number or the start of a name.
         """;
 
@@ -88,7 +88,7 @@ internal static class Play
                     case "save":
                         string saveTo = parts.Length > 1 ? parts[1] : DefaultSave;
                         File.WriteAllText(saveTo, w.SaveJson());
-                        Console.WriteLine(Render.Paint($"Saved week {w.Tick} to {saveTo}.", "32"));
+                        Console.WriteLine(Render.Paint($"Saved {w.Turn} {w.Tick} to {saveTo}.", "32"));
                         break;
                     case "load":
                         string loadFrom = parts.Length > 1 ? parts[1] : DefaultSave;

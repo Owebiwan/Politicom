@@ -9,6 +9,13 @@ public sealed class ScenarioDefinition
     public string Description { get; set; } = "";
     public DateOnly StartDate { get; set; }
     public int EndTick { get; set; }
+    /// <summary>Calendar days per turn. 7 for most scenarios; shorter for sieges like Paris 1871.</summary>
+    public int DaysPerTick { get; set; } = 7;
+    /// <summary>Food and goods arriving from outside each turn, shared by population among federated communes.</summary>
+    public double FoodImports { get; set; }
+    /// <summary>Multiplies how fast front communes lose and regain control — higher for street fighting.</summary>
+    public double WarPace { get; set; } = 1;
+    public double GoodsImports { get; set; }
     public int NeighborCount { get; set; } = 3;
     public double NeighborRadiusKm { get; set; } = 25;
     public List<HostileState> Enemies { get; set; } = new();

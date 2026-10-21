@@ -24,6 +24,7 @@ public class SimulationTests
     {
         "catalonia_1936",
         "free_territory_1918",
+        "paris_commune_1871",
     };
 
     [Theory]
@@ -58,6 +59,32 @@ public class SimulationTests
             }
         Assert.NotEqual(Outcome.Ongoing, straight.Outcome);
         Assert.Equal(straight.Log.Select(e => e.Text), resumed.Log.Select(e => e.Text));
+    }
+
+    [Fact]
+    public void Turn_length_follows_the_scenario()
+    {
+        var paris = World.Load(DataDir, "paris_commune_1871");
+        var catalonia = NewWorld();
+        paris.Run(10);
+        catalonia.Run(10);
+        Assert.Equal(new DateOnly(1871, 3, 28), paris.Date);
+        Assert.Equal(new DateOnly(1936, 9, 27), catalonia.Date);
+        Assert.Equal("day", paris.Turn);
+        Assert.Equal("week", catalonia.Turn);
+        Assert.Equal("3 days", paris.Turns(3));
+    }
+
+    [Fact]
+    public void Imports_feed_a_city_that_cannot_feed_itself()
+    {
+        var fed = World.Load(DataDir, "paris_commune_1871");
+        var blockaded = ScenarioDefinition.Load(DataPaths.Scenario(DataDir, "paris_commune_1871"));
+        blockaded.FoodImports = 0;
+        var cut = World.Create(blockaded, fed.Techs);
+        fed.Run(20);
+        cut.Run(20);
+        Assert.True(cut.Communes.Count(c => c.Starving) > fed.Communes.Count(c => c.Starving));
     }
 
     [Fact]

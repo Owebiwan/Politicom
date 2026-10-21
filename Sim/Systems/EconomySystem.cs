@@ -23,6 +23,7 @@ internal static class EconomySystem
     {
         var b = w.Balance;
         var stage = w.Drift.Stage;
+        Imports(w);
         foreach (var c in w.Active)
         {
             double labor = Math.Max(0, 1 - c.PracticalSchooling - c.PoliticalSchooling - b.ProjectLabor * w.ProjectsJoinedBy(c.Id));
@@ -42,6 +43,21 @@ internal static class EconomySystem
             c.GoodsProduced = c.Population * goodsYield * m * (1 + w.LocalEffect(c, e => e.GoodsProduction));
             c.Food += c.FoodProduced - c.Population * b.FoodNeed;
             c.Goods += c.GoodsProduced - GoodsDemand(w, c);
+        }
+    }
+
+    /// <summary>Supplies from outside (e.g. Paris fed through the Prussian lines), shared by population.</summary>
+    private static void Imports(World w)
+    {
+        var s = w.Scenario;
+        if (s.FoodImports <= 0 && s.GoodsImports <= 0) return;
+        var members = w.Federation.ToList();
+        double population = members.Sum(c => c.Population);
+        if (population <= 0) return;
+        foreach (var c in members)
+        {
+            c.Food += s.FoodImports * c.Population / population;
+            c.Goods += s.GoodsImports * c.Population / population;
         }
     }
 

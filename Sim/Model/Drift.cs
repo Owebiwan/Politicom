@@ -65,7 +65,7 @@ public sealed class DriftBreakdown
         yield return ("Wartime emergency", WarStress);
         yield return ("Government militarization", Militarization);
         yield return ("Large federal projects", LargeProjects);
-        yield return ("Events this week", Events);
+        yield return ("One-off events", Events);
         yield return ("Political education", -PoliticalEducationBrake);
         yield return ("Mandates, recall, rotation", -TechnologyBrake);
     }

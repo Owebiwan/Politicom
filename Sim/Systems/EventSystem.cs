@@ -69,6 +69,7 @@ internal static class EventSystem
             var fronts = w.Federation.Where(c => c.Front).ToList();
             foreach (var c in fronts) c.Goods += e.GoodsToFront / fronts.Count;
         }
+        w.Scenario.FoodImports = Math.Max(0, w.Scenario.FoodImports + e.FoodImports);
         w.Ally.MilitarizationTicks += e.MilitarizationTicks;
         if (e.EndAllyOffers)
         {

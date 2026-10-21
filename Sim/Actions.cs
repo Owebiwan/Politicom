@@ -137,7 +137,7 @@ internal static class ActionSystem
     {
         var b = w.Balance;
         if (w.Tick - w.LastCongressTick < b.CongressCooldown)
-            return ActionResult.Fail($"The last congress was too recent (wait {b.CongressCooldown - (w.Tick - w.LastCongressTick)} weeks).");
+            return ActionResult.Fail($"The last congress was too recent (wait {w.Turns(b.CongressCooldown - (w.Tick - w.LastCongressTick))}).");
         if (!Spend(w, b.CostCongress)) return Broke(w, b.CostCongress);
         w.LastCongressTick = w.Tick;
         var members = w.Federation.ToList();
@@ -162,7 +162,7 @@ internal static class ActionSystem
         if (!Spend(w, w.Balance.CostCirculateIdea)) return Broke(w, w.Balance.CostCirculateIdea);
         w.IdeaNudges[a.TechId] = w.Balance.IdeaNudgeTicks;
         var t = w.Techs[a.TechId];
-        return ActionResult.Done($"Pamphlets and speakers promote {t.Name} for {w.Balance.IdeaNudgeTicks} weeks.");
+        return ActionResult.Done($"Pamphlets and speakers promote {t.Name} for {w.Turns(w.Balance.IdeaNudgeTicks)}.");
     }
 
     private static ActionResult Recall(World w)
@@ -182,7 +182,7 @@ internal static class ActionSystem
         if (w.WarCommittee == a.Active) return ActionResult.Fail(a.Active ? "The war committee is already sitting." : "There is no war committee.");
         w.WarCommittee = a.Active;
         w.Emit(a.Active ? Severity.Warning : Severity.Good, a.Active
-            ? "A war committee takes charge of the militias. Faster decisions, stronger defense — and drift every week it sits."
+            ? $"A war committee takes charge of the militias. Faster decisions, stronger defense — and drift every {w.Turn} it sits."
             : "The war committee dissolves. Militias answer to their assemblies again.");
         return ActionResult.Done(a.Active ? "War committee formed." : "War committee dissolved.");
     }

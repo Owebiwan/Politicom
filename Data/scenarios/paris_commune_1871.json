@@ -1,0 +1,135 @@
+{
+  "id": "paris_commune_1871",
+  "name": "The Paris Commune",
+  "description": "18 March 1871. Thiers sent troops to seize the National Guard's cannons on Montmartre; the crowd stopped them, and the government fled to Versailles. Paris governs itself. There is almost no time: the Versailles army is being rebuilt with prisoners returned by Prussia. Each turn is a day. Last as long as you can — and stay a commune while you do.",
+  "startDate": "1871-03-18",
+  "endTick": 71,
+  "daysPerTick": 1,
+  "neighborCount": 3,
+  "neighborRadiusKm": 2.2,
+  // Paris was fed through the Prussian lines to the north and east.
+  "foodImports": 115,
+  // Street fighting: an arrondissement can fall in days, not weeks.
+  "warPace": 5,
+
+  "enemies": [
+    {
+      "name": "Versailles army",
+      "color": "#5b8def",
+      "strength": 0.2,
+      "growth": 0.015,
+      "offensives": [
+        { "name": "The fighting at Courbevoie and Neuilly", "tick": 15, "duration": 4, "strength": 0.6 },
+        { "name": "The assault on Fort Issy", "tick": 46, "duration": 7, "strength": 0.8 },
+        { "name": "Bloody Week", "tick": 64, "duration": 8, "strength": 22 }
+      ]
+    }
+  ],
+
+  "ally": { "name": "", "offerInterval": 0 },
+
+  "events": [
+    {
+      "id": "march_on_versailles",
+      "tick": 1,
+      "title": "March on Versailles?",
+      "text": "The government has fled and its army is in disarray. Some in the Central Committee of the National Guard want to march on Versailles at once; others say Paris must first elect its Commune.",
+      "defaultOption": 1,
+      "options": [
+        { "label": "March now", "description": "Strike before Thiers can rebuild. The Guard needs a general staff to do it.",
+          "effects": { "drift": 4, "enemyStrength": -0.4, "wellbeing": -0.05 } },
+        { "label": "Hold elections first", "description": "Legitimacy before war. Thiers gets the time he needs.",
+          "effects": { "drift": -2, "enemyStrength": 0.3, "politicalEducation": 0.05 } }
+      ]
+    },
+    {
+      "id": "elections",
+      "tick": 8,
+      "title": "Electing the Commune",
+      "text": "Paris votes. How bound should its delegates be to the arrondissements that send them?",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Imperative mandates, recallable at any time", "description": "Delegates are messengers, not representatives.",
+          "effects": { "drift": -3, "influence": -5 } },
+        { "label": "A strong council with a free hand", "description": "Quicker decisions, and a body that thinks of itself as a government.",
+          "effects": { "drift": 3, "influence": 10 } }
+      ]
+    },
+    {
+      "id": "bank_of_france",
+      "tick": 12,
+      "title": "The Bank of France",
+      "text": "Its vaults hold billions of francs, guarded by a handful of men. Seizing them would fund the Guard — and hand a treasury to whoever controls it.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Leave it untouched", "description": "The Commune borrows politely, as it did historically. Versailles keeps its credit.",
+          "effects": { "influence": 5, "enemyStrength": 0.3 } },
+        { "label": "Seize the reserves", "description": "Arms and pay for the Guard; a central treasury for the Commune.",
+          "effects": { "drift": 5, "goodsToFront": 40, "enemyStrength": -0.3 } }
+      ]
+    },
+    {
+      "id": "union_des_femmes",
+      "tick": 24,
+      "title": "The Women's Union",
+      "text": "Élisabeth Dmitrieff and Nathalie Lemel found the Union des femmes pour la défense de Paris. They ask for cooperative workshops to employ women and supply the Guard.",
+      "defaultOption": 1,
+      "options": [
+        { "label": "Fund the workshops", "description": "Self-managed production and a new network of organizers.",
+          "effects": { "influence": -10, "wellbeing": 0.05, "politicalEducation": 0.04, "goodsToFront": 15 } },
+        { "label": "No funds to spare", "description": "The Union organizes anyway, with less.",
+          "effects": { "politicalEducation": 0.01 } }
+      ]
+    },
+    {
+      "id": "committee_of_public_safety",
+      "tick": 44,
+      "title": "The Committee of Public Safety",
+      "text": "The majority proposes a five-man Committee of Public Safety with full powers, after 1793. The minority — Varlin, Vallès, Courbet — protest that the Commune is abdicating to a dictatorship.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Create the Committee", "description": "Emergency powers for the war. It is the vote that splits the Commune.",
+          "effects": { "drift": 12, "militarizationTicks": 10, "trust": -0.04 } },
+        { "label": "Side with the minority", "description": "No dictatorship, even now. The majority does not forgive it.",
+          "effects": { "drift": -3, "influence": -10, "trust": -0.02 } }
+      ]
+    },
+    {
+      "id": "bloody_week",
+      "tick": 64,
+      "title": "The Versaillais are inside the walls",
+      "text": "A traitor signals an unguarded gate at Saint-Cloud. Versailles troops pour into the west of the city.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Every quartier defends itself", "description": "Barricades in every street, each arrondissement on its own. As it happened.",
+          "effects": { "drift": -2, "trust": 0.05, "wellbeing": -0.1 } },
+        { "label": "Concentrate on a central defence", "description": "One command, one line, every battalion where it is sent.",
+          "effects": { "drift": 6, "enemyStrength": -8 } }
+      ]
+    }
+  ],
+
+  // Population in tens of thousands, abstracted. Kind: Mixed = market gardens on the edge.
+  "communes": [
+    { "name": "1st · Louvre", "kind": "Industrial", "lon": 2.341, "lat": 48.862, "population": 8, "collectivism": -0.2, "militancy": -0.2, "federalism": 0.0, "practical": 0.4, "political": 0.15 },
+    { "name": "2nd · Bourse", "kind": "Industrial", "lon": 2.342, "lat": 48.868, "population": 8, "collectivism": -0.3, "militancy": -0.3, "federalism": 0.0, "practical": 0.4, "political": 0.15 },
+    { "name": "3rd · Temple", "kind": "Industrial", "lon": 2.360, "lat": 48.863, "population": 9, "collectivism": 0.4, "militancy": 0.3, "federalism": 0.4, "practical": 0.35, "political": 0.3, "description": "Workshops of skilled artisans: bronze, jewellery, toys." },
+    { "name": "4th · Hôtel-de-Ville", "kind": "Industrial", "lon": 2.357, "lat": 48.854, "population": 9, "collectivism": 0.3, "militancy": 0.3, "federalism": 0.5, "practical": 0.3, "political": 0.3, "techs": [ "libertarian_press" ], "description": "Seat of the Commune." },
+    { "name": "5th · Panthéon", "kind": "Industrial", "lon": 2.350, "lat": 48.844, "population": 10, "collectivism": 0.3, "militancy": 0.2, "federalism": 0.4, "practical": 0.35, "political": 0.35, "description": "The Latin Quarter: students and print shops." },
+    { "name": "6th · Luxembourg", "kind": "Industrial", "lon": 2.333, "lat": 48.849, "population": 9, "collectivism": 0.0, "militancy": -0.1, "federalism": 0.2, "practical": 0.35, "political": 0.2 },
+    { "name": "7th · Palais-Bourbon", "kind": "Industrial", "lon": 2.312, "lat": 48.856, "population": 7, "collectivism": -0.6, "militancy": -0.5, "federalism": -0.3, "practical": 0.4, "political": 0.1, "description": "Ministries and aristocratic hôtels; many have fled to Versailles." },
+    { "name": "8th · Élysée", "kind": "Industrial", "lon": 2.312, "lat": 48.873, "population": 7, "collectivism": -0.7, "militancy": -0.5, "federalism": -0.4, "practical": 0.4, "political": 0.1 },
+    { "name": "9th · Opéra", "kind": "Industrial", "lon": 2.338, "lat": 48.877, "population": 9, "collectivism": -0.3, "militancy": -0.2, "federalism": 0.0, "practical": 0.4, "political": 0.15 },
+    { "name": "10th · Entrepôt", "kind": "Industrial", "lon": 2.361, "lat": 48.876, "population": 13, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.4, "practical": 0.25, "political": 0.25, "techs": [ "libertarian_press" ] },
+    { "name": "11th · Popincourt", "kind": "Industrial", "lon": 2.380, "lat": 48.859, "population": 15, "collectivism": 0.8, "militancy": 0.8, "federalism": 0.6, "practical": 0.25, "political": 0.35, "techs": [ "ateneo_libraries", "collective_workshops" ], "description": "The red heart of the faubourgs; the Commune's last headquarters." },
+    { "name": "12th · Reuilly", "kind": "Mixed", "lon": 2.396, "lat": 48.835, "population": 9, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.3, "practical": 0.2, "political": 0.2 },
+    { "name": "13th · Gobelins", "kind": "Mixed", "lon": 2.355, "lat": 48.828, "population": 8, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.3, "practical": 0.2, "political": 0.25, "description": "Tanneries and the Gobelins works; Wróblewski's command." },
+    { "name": "14th · Observatoire", "kind": "Mixed", "lon": 2.327, "lat": 48.829, "population": 7, "collectivism": 0.4, "militancy": 0.4, "federalism": 0.3, "practical": 0.2, "political": 0.2 },
+    { "name": "15th · Vaugirard", "kind": "Mixed", "lon": 2.300, "lat": 48.840, "population": 8, "collectivism": 0.2, "militancy": 0.3, "federalism": 0.2, "practical": 0.2, "political": 0.15, "frontOf": [ "Versailles army" ] },
+    { "name": "16th · Passy", "kind": "Mixed", "lon": 2.262, "lat": 48.860, "population": 5, "collectivism": -0.6, "militancy": -0.6, "federalism": -0.3, "practical": 0.35, "political": 0.1, "frontOf": [ "Versailles army" ], "description": "Wealthy suburb facing Mont-Valérien and the Bois de Boulogne." },
+    { "name": "17th · Batignolles", "kind": "Industrial", "lon": 2.307, "lat": 48.887, "population": 10, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.4, "practical": 0.25, "political": 0.25, "frontOf": [ "Versailles army" ] },
+    { "name": "18th · Montmartre", "kind": "Industrial", "lon": 2.344, "lat": 48.892, "population": 13, "collectivism": 0.8, "militancy": 0.9, "federalism": 0.6, "practical": 0.2, "political": 0.35, "techs": [ "ateneo_libraries" ], "description": "Where it began: the cannons on the butte, and Louise Michel's vigilance committee." },
+    { "name": "19th · Buttes-Chaumont", "kind": "Industrial", "lon": 2.384, "lat": 48.887, "population": 10, "collectivism": 0.7, "militancy": 0.8, "federalism": 0.5, "practical": 0.2, "political": 0.3 },
+    { "name": "20th · Ménilmontant", "kind": "Industrial", "lon": 2.401, "lat": 48.863, "population": 11, "collectivism": 0.9, "militancy": 0.9, "federalism": 0.6, "practical": 0.2, "political": 0.35, "description": "Belleville. Where the last barricade will stand." }
+  ]
+}

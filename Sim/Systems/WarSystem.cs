@@ -54,9 +54,9 @@ internal static class WarSystem
         {
             c.Defense = Defense(w, c) + campaign;
             if (c.Pressure > c.Defense)
-                c.Control -= b.ControlLossRate * (c.Pressure - c.Defense) / c.Pressure;
+                c.Control -= b.ControlLossRate * w.Scenario.WarPace * (c.Pressure - c.Defense) / c.Pressure;
             else
-                c.Control = Math.Min(1, c.Control + b.ControlRecovery);
+                c.Control = Math.Min(1, c.Control + b.ControlRecovery * w.Scenario.WarPace);
             if (c.Control <= 0) fallen.Add(c);
         }
 
@@ -113,7 +113,7 @@ internal static class WarSystem
         e.Exhaustion += w.Balance.OccupationExhaustion;
         foreach (var n in w.Trust.Neighbors(c.Id))
             if (!w.Communes[n].Occupied) w.Communes[n].Fronts.Add(enemy);
-        w.Emit(Severity.Danger, $"{c.Name} falls to the {e.Name}. With no capital to take, the occupation must be fought village by village.", c.Id);
+        w.Emit(Severity.Danger, $"{c.Name} falls to the {e.Name}. With no capital to take, every commune has to be taken one by one.", c.Id);
     }
 
     /// <summary>Contagion: political education and the press radicalize workers across each border.</summary>
@@ -153,7 +153,7 @@ internal static class WarSystem
             a.OfferExpires = w.Tick + 4;
             w.Emit(Severity.Decision,
                 $"The {a.Name} offers arms for the front — if the militias accept militarization under its command. " +
-                $"(+{w.Balance.MilitarizationDefense:P0} defense for {w.Balance.MilitarizationTicks} weeks, +{w.Balance.ArmsAcceptDrift:0} drift now and more while it lasts)");
+                $"(+{w.Balance.MilitarizationDefense:P0} defense for {w.Turns(w.Balance.MilitarizationTicks)}, +{w.Balance.ArmsAcceptDrift:0} drift now and more while it lasts)");
         }
     }
 }

@@ -24,11 +24,11 @@ internal static class SingleRun
         }
 
         Console.WriteLine(Render.Status(world));
-        Console.WriteLine($"Outcome: {Render.Bold(world.Outcome.ToString())} after {world.Tick} weeks with policy '{policy.Name}' (seed {world.Seed}).");
+        Console.WriteLine($"Outcome: {Render.Bold(world.Outcome.ToString())} after {world.Turns(world.Tick)} with policy '{policy.Name}' (seed {world.Seed}).");
         if (o.Get("timeseries") is { } path)
         {
             File.WriteAllText(path, series.ToString());
-            Console.WriteLine($"Wrote weekly time series to {path}");
+            Console.WriteLine($"Wrote per-turn time series to {path}");
         }
         return 0;
     }

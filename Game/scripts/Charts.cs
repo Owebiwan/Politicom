@@ -114,8 +114,9 @@ public partial class HistoryChart : Control
             DrawString(font, new Vector2(lx + 14, FontSize + 1), label, HorizontalAlignment.Left, -1, FontSize, Palette.Text);
             lx += 22 + font.GetStringSize(label, HorizontalAlignment.Left, -1, FontSize).X;
         }
-        DrawString(font, new Vector2(0, Size.Y - 2), w.Scenario.StartDate.ToString("MMM yyyy"), HorizontalAlignment.Left, -1, FontSize, Palette.Text);
-        string last = w.Scenario.StartDate.AddDays(7 * end).ToString("MMM yyyy");
+        string format = w.Scenario.DaysPerTick < 7 ? "d MMM yyyy" : "MMM yyyy";
+        DrawString(font, new Vector2(0, Size.Y - 2), w.Scenario.StartDate.ToString(format), HorizontalAlignment.Left, -1, FontSize, Palette.Text);
+        string last = w.DateAt(end).ToString(format);
         DrawString(font, new Vector2(Size.X - font.GetStringSize(last, HorizontalAlignment.Left, -1, FontSize).X, Size.Y - 2), last, HorizontalAlignment.Left, -1, FontSize, Palette.Text);
     }
 

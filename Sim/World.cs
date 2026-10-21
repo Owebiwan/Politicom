@@ -4,7 +4,7 @@ namespace Politicom.Sim;
 
 /// <summary>
 /// The whole simulation state. Deterministic given a scenario, balance and seed.
-/// Each <see cref="Step"/> is one week.
+/// Each <see cref="Step"/> is one turn (a week unless the scenario says otherwise).
 /// </summary>
 public sealed class World
 {
@@ -47,7 +47,11 @@ public sealed class World
     public int InitialCommuneCount { get; }
 
     public int Tick { get; private set; }
-    public DateOnly Date => Scenario.StartDate.AddDays(7 * Tick);
+    public DateOnly Date => DateAt(Tick);
+    public DateOnly DateAt(int tick) => Scenario.StartDate.AddDays(Scenario.DaysPerTick * tick);
+    /// <summary>What one turn is called in this scenario: "week", "day" or "turn".</summary>
+    public string Turn => Scenario.DaysPerTick switch { 7 => "week", 1 => "day", _ => "turn" };
+    public string Turns(int n) => $"{n} {Turn}{(n == 1 ? "" : "s")}";
     public double Influence { get; internal set; }
     public DriftTracker Drift { get; } = new();
     public DriftBreakdown LastDrift { get; internal set; } = new();
@@ -220,7 +224,7 @@ public sealed class World
     public ActionResult Apply(PlayerAction action) =>
         Outcome != Outcome.Ongoing ? ActionResult.Fail("The game is over.") : ActionSystem.Apply(this, action);
 
-    /// <summary>Advances one week.</summary>
+    /// <summary>Advances one turn.</summary>
     public void Step()
     {
         if (Outcome != Outcome.Ongoing) return;
