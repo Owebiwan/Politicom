@@ -9,6 +9,7 @@ internal static class EconomySystem
     public static void Run(World w)
     {
         Produce(w);
+        Trade(w);
         foreach (var food in new[] { true, false })
         {
             NeighborAid(w, food);
@@ -44,6 +45,34 @@ internal static class EconomySystem
             c.Food += c.FoodProduced - c.Population * b.FoodNeed;
             c.Goods += c.GoodsProduced - GoodsDemand(w, c);
         }
+    }
+
+    /// <summary>
+    /// Selling surplus food abroad for goods and arms. Capitalist states want currency, so trading
+    /// brings markets and accounts back in (drift, see DriftSystem); and the further the idea
+    /// spreads, the more of them embargo the federation.
+    /// </summary>
+    private static void Trade(World w)
+    {
+        w.LastExports = w.LastImports = 0;
+        if (!w.ForeignTrade) return;
+        var b = w.Balance;
+        var members = w.Federation.ToList();
+        foreach (var c in members)
+        {
+            double surplus = c.Food - Reserve(b, c, true);
+            if (surplus <= 0) continue;
+            double sold = surplus * b.TradeShare;
+            c.Food -= sold;
+            w.LastExports += sold;
+        }
+        w.LastImports = w.LastExports * b.TradeRate * (1 - w.Embargo);
+        if (w.LastImports <= 0) return;
+        // Arms go to the front first, the rest by population.
+        var fronts = members.Where(c => c.Front).ToList();
+        var receivers = fronts.Count > 0 ? fronts : members;
+        double population = receivers.Sum(c => c.Population);
+        foreach (var c in receivers) c.Goods += w.LastImports * c.Population / population;
     }
 
     /// <summary>Supplies from outside (e.g. Paris fed through the Prussian lines), shared by population.</summary>

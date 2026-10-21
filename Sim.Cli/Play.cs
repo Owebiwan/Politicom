@@ -26,6 +26,7 @@ internal static class Play
           idea <tech_id>                          circulate a technology for 20 turns
           recall                                  recall delegates: drift down, experience lost
           committee on|off                        war committee: defense up, drift up every turn
+          trade on|off                            sell surplus grain abroad for arms (drift; embargoes)
           arms accept|reject                      answer the government's offer
           hold <commune>                          keep a seceding commune by force (costly)
           choose <n>                              answer the oldest historical event with option n
@@ -148,6 +149,7 @@ internal static class Play
         "idea" => new CirculateIdea(Arg(p, 1)),
         "recall" => new RecallDelegates(),
         "committee" => new SetWarCommittee(Arg(p, 1) == "on"),
+        "trade" => new SetForeignTrade(Arg(p, 1) == "on"),
         "arms" => new AnswerAllyOffer(Arg(p, 1) == "accept"),
         "hold" => new HoldCommune(Commune(w, p, 1)),
         "choose" => w.PendingEvents.Count == 0

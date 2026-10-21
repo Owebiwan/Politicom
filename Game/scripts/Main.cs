@@ -30,7 +30,7 @@ public partial class Main : Control
     private TechCatalog _techs = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
-    private CheckButton _warCommittee = null!;
+    private CheckButton _warCommittee = null!, _trade = null!;
     private OptionButton _projectKind = null!, _idea = null!, _mapMode = null!;
     private readonly List<Button> _speedButtons = new();
 
@@ -351,6 +351,9 @@ public partial class Main : Control
         _warCommittee = new CheckButton { Text = "War committee", TooltipText = "Defense +35% and cheaper coordination — drift every turn it sits." };
         _warCommittee.Toggled += on => { if (on != _world.WarCommittee) Do(new SetWarCommittee(on)); };
         row1.AddChild(_warCommittee);
+        _trade = new CheckButton { Text = "Foreign trade", TooltipText = "Sell surplus grain abroad for arms. Buyers want currency, which brings markets and accounts back in (drift every turn). Embargoes grow as the idea spreads." };
+        _trade.Toggled += on => { if (on != _world.ForeignTrade) Do(new SetForeignTrade(on)); };
+        row1.AddChild(_trade);
         AddButton(row1, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
         AddButton(row1, "Congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
 
@@ -427,11 +430,13 @@ public partial class Main : Control
                    + $"\nFront: {(fronts.Any() ? string.Join(", ", fronts) : "none")}";
         });
         _enemy.Text = string.Join("\n", lines)
+                      + $"\nTrade: {(w.ForeignTrade ? $"selling {w.LastExports:0} food for {w.LastImports:0} goods per {w.Turn}" : "closed")} · embargo {w.Embargo:P0}"
                       + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Turns(w.Ally.MilitarizationTicks)} more." : "");
         var s = w.Scores;
         _scores.Text = $"Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
 
         _warCommittee.SetPressedNoSignal(w.WarCommittee);
+        _trade.SetPressedNoSignal(w.ForeignTrade);
         RefreshDecisions();
         RefreshCommune();
         RefreshProjects();

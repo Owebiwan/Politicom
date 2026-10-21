@@ -39,6 +39,7 @@ internal static class Render
         sb.AppendLine($"Influence {Bold($"{w.Influence:0}")} (+{w.InfluenceRegen:0.0}/{w.Turn})   Federation {w.Federation.Count()}/{w.InitialCommuneCount}   " +
                       $"Occupied {w.Communes.Count(c => c.Occupied)}   Seceded {w.Communes.Count(c => !c.Occupied && !c.Federated)}" +
                       (w.WarCommittee ? Paint("   WAR COMMITTEE SITTING", "33") : "") +
+                      (w.ForeignTrade ? Paint($"   TRADING: {w.LastExports:0} food → {w.LastImports:0} goods", "33") : "") +
                       (w.Ally.MilitarizationTicks > 0 ? Paint($"   militarized {w.Turns(w.Ally.MilitarizationTicks)}", "33") : ""));
 
         string driftColor = w.Drift.Stage switch { DriftStage.Free => "32", DriftStage.PermanentCouncils => "33", _ => "31" };
@@ -52,6 +53,7 @@ internal static class Render
         foreach (var e in w.Enemies)
             sb.AppendLine($"Enemy     {e.Name} strength {e.EffectiveStrength:0.0}" + (e.CurrentOffensive is { } o ? Paint($"  ▶ {o.Name.ToUpperInvariant()}", "31;1") : "") +
                           Dim($"   exhaustion {e.Exhaustion:P0}   workers radicalized {e.Radicalization:P0}"));
+        sb.AppendLine(Dim($"          embargo: {w.Embargo:P0} of the outside world refuses to trade (grows as the idea spreads)"));
         var fronts = w.Active.Where(c => c.Front).ToList();
         if (fronts.Count > 0)
             sb.AppendLine("Front     " + string.Join("  ", fronts.Select(c =>

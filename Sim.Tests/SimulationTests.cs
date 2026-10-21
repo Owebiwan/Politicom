@@ -207,6 +207,37 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Foreign_trade_turns_grain_into_arms_at_the_cost_of_drift()
+    {
+        var closed = NewWorld();
+        var open = NewWorld();
+        Assert.True(open.Apply(new SetForeignTrade(true)).Ok);
+        closed.Run(3);
+        open.Run(3);
+        Assert.True(open.LastExports > 0);
+        Assert.True(open.LastImports > 0);
+        Assert.True(open.LastDrift.ForeignTrade > 0);
+        Assert.True(open.Drift.Value > closed.Drift.Value);
+        var front = closed.Communes.First(c => c.Front).Id;
+        Assert.True(open.Communes[front].Goods >= closed.Communes[front].Goods);
+    }
+
+    [Fact]
+    public void Spreading_the_idea_brings_embargoes()
+    {
+        var w = NewWorld();
+        w.Apply(new SetForeignTrade(true));
+        w.Step();
+        double before = w.LastImports / w.LastExports;
+        foreach (var e in w.Enemies) e.Radicalization = 0.4;
+        Assert.Equal(0.6, w.Embargo, 6);
+        w.Step();
+        // Trade this turn happened at the 60% embargo: 0.8 goods per grain becomes 0.32.
+        Assert.Equal(w.Balance.TradeRate * 0.4, w.LastImports / w.LastExports, 6);
+        Assert.True(w.LastImports / w.LastExports < before);
+    }
+
+    [Fact]
     public void Mediation_raises_trust_and_costs_influence()
     {
         var w = NewWorld();

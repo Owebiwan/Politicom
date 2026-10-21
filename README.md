@@ -33,7 +33,7 @@ or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`
 ## Quick start
 
 ```sh
-dotnet test                                     # 32 tests
+dotnet test                                     # 34 tests
 dotnet run --project Sim.Cli -- play            # play in the terminal (type `help`)
 dotnet run --project Sim.Cli -c Release -- batch --runs 300
 ```
@@ -61,6 +61,17 @@ version in `Game/Politicom.Game.csproj`. Accept it.
   mean trust, with the enemy offensives shaded.
 - **Results screen:** the outcome, the four scores, and the full history chart, with
   options to keep looking or start a new game.
+
+## Foreign trade and embargoes
+
+From the design doc's perks table: internal exchange runs on mutual aid, but trading with
+capitalist states needs currency, which brings markets and accounts back in.
+
+- **Opening trade:** use the **Foreign trade** toggle (`trade on` in the terminal). Each turn,
+  part of every commune's grain surplus is sold abroad, and the goods bought go to the front first.
+- **The cost:** drift every turn from the trade bureau and its accounts.
+- **Embargoes:** as the idea spreads behind enemy lines, more of the world refuses to trade.
+  The embargo is 1.5 × mean radicalization, capped at 90%. Spread and trade pull against each other.
 
 ## Historical events
 

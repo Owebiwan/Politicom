@@ -63,6 +63,7 @@ public sealed class Centralizer : IPolicy
     public void Act(World w)
     {
         if (!w.WarCommittee) w.Apply(new SetWarCommittee(true));
+        if (!w.ForeignTrade) w.Apply(new SetForeignTrade(true));
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(true));
         Helpers.AnswerEvents(w, e => e.EnemyStrength * 3 - e.Influence * 0.1);
         foreach (var s in w.PendingSecessions.ToList()) w.Apply(new HoldCommune(s.Commune));
@@ -94,6 +95,11 @@ public sealed class Balanced : IPolicy
 
         if (w.WarCommittee && (!crisis || margin < 6)) w.Apply(new SetWarCommittee(false));
         else if (!w.WarCommittee && crisis && margin > 12) w.Apply(new SetWarCommittee(true));
+
+        // Trade grain for arms only while the front is short and drift has room to spare.
+        bool armsShort = w.Federation.Any(c => c.Front && c.GoodsCoverage < 0.9);
+        if (w.ForeignTrade && (!armsShort || margin < 6)) w.Apply(new SetForeignTrade(false));
+        else if (!w.ForeignTrade && armsShort && margin > 10 && w.Embargo < 0.5) w.Apply(new SetForeignTrade(true));
 
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(crisis && w.Drift.Value < 15));
         Helpers.AnswerEvents(w, e => e.Drift + e.EnemyStrength * (crisis ? 6 : 3) - e.Influence * 0.05 - e.Wellbeing * 10 - e.Trust * 20);

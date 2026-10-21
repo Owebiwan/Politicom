@@ -34,6 +34,7 @@ public sealed class SaveGame
     public List<PendingEvent> PendingEvents { get; set; } = new();
     public List<string> FiredEvents { get; set; } = new();
     public bool WarCommittee { get; set; }
+    public bool ForeignTrade { get; set; }
     public int RecallPenaltyTicks { get; set; }
     public int LastCongressTick { get; set; }
     public Dictionary<string, int> IdeaNudges { get; set; } = new();

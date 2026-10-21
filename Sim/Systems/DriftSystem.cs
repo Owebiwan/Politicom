@@ -12,6 +12,7 @@ internal static class DriftSystem
             ExpertTrap = b.ExpertTrapRate * w.Mean(c => c.ExpertGap),
             WarCommittee = w.WarCommittee ? b.WarCommitteeDrift : 0,
             WarStress = b.WarStressDrift * LosingShare(w),
+            ForeignTrade = w.ForeignTrade ? b.TradeDrift : 0,
             Militarization = w.Ally.MilitarizationTicks > 0 ? b.MilitarizationDrift : 0,
             LargeProjects = w.ActiveProjects.Sum(p => b.LargeProjectDrift * Math.Max(0, p.Participants.Count - b.LargeProjectThreshold)),
             Events = w.PendingDriftBump,

@@ -60,6 +60,12 @@ public sealed class World
     public List<PendingEvent> PendingEvents { get; } = new();
     public HashSet<string> FiredEvents { get; } = new();
     public bool WarCommittee { get; internal set; }
+    public bool ForeignTrade { get; internal set; }
+    /// <summary>Last turn's trade: food sold and goods bought.</summary>
+    public double LastExports { get; internal set; }
+    public double LastImports { get; internal set; }
+    /// <summary>0..0.9: how much of the outside world refuses to trade, as the idea spreads.</summary>
+    public double Embargo => Math.Clamp(Radicalization * Balance.EmbargoPerRadicalization, 0, 0.9);
     public int RecallPenaltyTicks { get; internal set; }
     public int LastCongressTick { get; internal set; } = -999;
     /// <summary>Technologies the player is circulating, with ticks remaining.</summary>
@@ -162,6 +168,7 @@ public sealed class World
         PendingEvents = PendingEvents,
         FiredEvents = FiredEvents.ToList(),
         WarCommittee = WarCommittee,
+        ForeignTrade = ForeignTrade,
         RecallPenaltyTicks = RecallPenaltyTicks,
         LastCongressTick = LastCongressTick,
         IdeaNudges = IdeaNudges,
@@ -201,6 +208,7 @@ public sealed class World
             PendingDriftBump = s.PendingDriftBump,
             NextProjectId = s.NextProjectId,
             WarCommittee = s.WarCommittee,
+            ForeignTrade = s.ForeignTrade,
             RecallPenaltyTicks = s.RecallPenaltyTicks,
             LastCongressTick = s.LastCongressTick,
             TransportBonus = s.TransportBonus,

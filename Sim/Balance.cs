@@ -70,6 +70,16 @@ public sealed class Balance
     public double JoinChance { get; set; } = 0.5;
     public int MaxActiveProjects { get; set; } = 3;
 
+    // ── Foreign trade ──────────────────────────────────────────────────────
+    /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
+    public double TradeShare { get; set; } = 0.3;
+    /// <summary>Goods bought per unit of food sold, before embargoes.</summary>
+    public double TradeRate { get; set; } = 0.8;
+    /// <summary>Drift per turn from currency, accounts and a trade bureau.</summary>
+    public double TradeDrift { get; set; } = 0.2;
+    /// <summary>Embargo strength per point of mean radicalization behind enemy lines.</summary>
+    public double EmbargoPerRadicalization { get; set; } = 1.5;
+
     // ── War and outside pressure ───────────────────────────────────────────
     public double MilitiaPerPop { get; set; } = 0.12;
     public double NeighborSupport { get; set; } = 0.25;

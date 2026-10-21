@@ -17,6 +17,8 @@ public sealed record SponsorCongress : PlayerAction;
 public sealed record CirculateIdea(string TechId) : PlayerAction;
 public sealed record RecallDelegates : PlayerAction;
 public sealed record SetWarCommittee(bool Active) : PlayerAction;
+/// <summary>Open or close trade with capitalist states: food for arms, at the price of drift.</summary>
+public sealed record SetForeignTrade(bool Active) : PlayerAction;
 public sealed record AnswerAllyOffer(bool Accept) : PlayerAction;
 public sealed record HoldCommune(int Commune) : PlayerAction;
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
@@ -43,6 +45,7 @@ internal static class ActionSystem
             CirculateIdea a => Idea(w, a),
             RecallDelegates => Recall(w),
             SetWarCommittee a => WarCommittee(w, a),
+            SetForeignTrade a => ForeignTrade(w, a),
             AnswerAllyOffer a => Ally(w, a),
             HoldCommune a => Hold(w, a),
             ChooseEventOption a => Systems.EventSystem.Choose(w, a.EventId, a.Option),
@@ -185,6 +188,16 @@ internal static class ActionSystem
             ? $"A war committee takes charge of the militias. Faster decisions, stronger defense — and drift every {w.Turn} it sits."
             : "The war committee dissolves. Militias answer to their assemblies again.");
         return ActionResult.Done(a.Active ? "War committee formed." : "War committee dissolved.");
+    }
+
+    private static ActionResult ForeignTrade(World w, SetForeignTrade a)
+    {
+        if (w.ForeignTrade == a.Active) return ActionResult.Fail(a.Active ? "Trade is already open." : "There is no foreign trade to stop.");
+        w.ForeignTrade = a.Active;
+        w.Emit(a.Active ? Severity.Warning : Severity.Good, a.Active
+            ? $"A trade bureau starts selling grain abroad for arms. Buyers want currency, and someone has to keep the accounts. ({w.Embargo:P0} of the world embargoes the federation.)"
+            : "Foreign trade stops. Exchange runs on mutual aid again.");
+        return ActionResult.Done(a.Active ? "Foreign trade opened." : "Foreign trade closed.");
     }
 
     private static ActionResult Ally(World w, AnswerAllyOffer a)
