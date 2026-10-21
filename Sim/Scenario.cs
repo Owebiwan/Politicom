@@ -11,7 +11,7 @@ public sealed class ScenarioDefinition
     public int EndTick { get; set; }
     public int NeighborCount { get; set; } = 3;
     public double NeighborRadiusKm { get; set; } = 25;
-    public HostileState Enemy { get; set; } = new();
+    public List<HostileState> Enemies { get; set; } = new();
     public AllyState Ally { get; set; } = new();
     public List<CommuneDefinition> Communes { get; set; } = new();
     public List<EventDefinition> Events { get; set; } = new();
@@ -36,7 +36,8 @@ public sealed class CommuneDefinition
     public double Federalism { get; set; }
     public double Practical { get; set; }
     public double Political { get; set; }
-    public bool Front { get; set; }
+    /// <summary>Names of the enemies this commune starts on the front against.</summary>
+    public string[] FrontOf { get; set; } = Array.Empty<string>();
     public string[] Techs { get; set; } = Array.Empty<string>();
 }
 

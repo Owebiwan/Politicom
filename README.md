@@ -1,10 +1,20 @@
 # Politicom
 
 A prototype of the anarchist grand strategy game: you are the movement, not the state.
-It covers the prototype scope from the design doc. That is one region (30 communes in
-Catalonia and Aragon, 1936–39), the trust network, voluntary projects, hierarchy drift with
-thresholds and brakes, both education tracks, double-edged technologies, and one hostile
-state plus an "ally" that offers arms in exchange for centralization.
+It covers the prototype scope from the design doc: the trust network, voluntary projects,
+hierarchy drift with thresholds and brakes, both education tracks, double-edged technologies,
+hostile states, and an "ally" that offers arms in exchange for centralization.
+
+## Scenarios
+
+| Scenario | Communes | Enemies | What it tests |
+|---|---|---|---|
+| Revolutionary Catalonia, 1936–39 | 30 | Nationalist Army | Running an industrial economy through collectives while the front slowly gives way |
+| Free Territory, Ukraine, 1918–21 | 22 | White Army; Red Army (an ally until it isn't) | Militia war on several fronts, and the pull toward a single command |
+
+The Godot intro screen lets you choose one. In the terminal, pass `--scenario free_territory_1918`.
+Scenarios are pure JSON in `Data/scenarios/`. A scenario has any number of enemies, each with
+its own front, offensives and map colour.
 
 ## Layout
 
@@ -19,7 +29,7 @@ state plus an "ally" that offers arms in exchange for centralization.
 ## Quick start
 
 ```sh
-dotnet test                                     # 24 tests
+dotnet test                                     # 28 tests
 dotnet run --project Sim.Cli -- play            # play in the terminal (type `help`)
 dotnet run --project Sim.Cli -c Release -- batch --runs 300
 ```
@@ -50,13 +60,16 @@ version in `Game/Politicom.Game.csproj`. Accept it.
 
 ## Historical events
 
-The scenario has six scripted decisions in its `events` list:
+Catalonia has six scripted decisions in its `events` list:
 - joining the Generalitat (September 1936)
 - Durruti's death (November 1936)
 - the May Days (May 1937)
 - the dissolution of the Council of Aragon (August 1937)
 - the SIM's offer of its services (September 1937)
 - the Battle of the Ebro (July 1938)
+
+The Free Territory has its own six: the Second Regional Congress, Trotsky's Order No. 1824,
+Peregonovka, typhus, the Starobilsk agreement, and the final betrayal.
 
 Each has options with effects such as drift, influence, wellbeing, trust, enemy strength,
 arms and secession. If the movement doesn't answer in time, the `defaultOption` happens;
@@ -113,7 +126,20 @@ The war follows the historical shape: with nobody playing, the front mostly hold
 A passive player also lets every historical event take its historical course, which is
 why it fares so badly.
 
-In this table, centralizing wins the war and loses the revolution, doing nothing loses
+The Free Territory (`--scenario free_territory_1918`) is harsher and plays differently:
+
+```
+policy       survived destroyed  state │  surv   QoL spread  free total │ drift
+passive            0%      100%     0% │    60    50     16    86    53 │    32
+educator           0%      100%     0% │    61    51     16    90    55 │    23
+centralizer        0%        0%   100% │    37    48      5    53    36 │   100
+balanced          70%        5%    25% │    84    49     18    70    55 │    67
+```
+
+There, refusing to centralize at all means being crushed by the final Red offensive, but
+with the highest freedom. The educator's total score ties the balanced player's.
+
+In the Catalonia table, centralizing wins the war and loses the revolution, doing nothing loses
 the war, and playing the dilemma well scores best while living close to the edge.
 
 ## How the open design questions are answered (for now)

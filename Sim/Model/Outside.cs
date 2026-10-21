@@ -14,6 +14,8 @@ public sealed class Offensive
 public sealed class HostileState
 {
     public string Name { get; set; } = "";
+    /// <summary>Map colour for its front and occupied communes (#rrggbb).</summary>
+    public string Color { get; set; } = "#eb4d40";
     public double Strength { get; set; }
     public double Growth { get; set; }
     /// <summary>How radicalized its workers are (the Spread score). Forces it to divert troops to repression.</summary>

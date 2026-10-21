@@ -20,13 +20,56 @@ public class SimulationTests
         return w;
     }
 
-    [Fact]
-    public void Scenario_loads_within_prototype_scope()
+    public static TheoryData<string> Scenarios() => new()
     {
-        var w = NewWorld();
+        "catalonia_1936",
+        "free_territory_1918",
+    };
+
+    [Theory]
+    [MemberData(nameof(Scenarios))]
+    public void Scenario_loads_within_prototype_scope(string scenario)
+    {
+        var w = World.Load(DataDir, scenario);
         Assert.InRange(w.Communes.Count, 20, 40);
         Assert.Contains(w.Communes, c => c.Front);
+        Assert.NotEmpty(w.Enemies);
         Assert.All(w.Communes, c => Assert.NotEmpty(w.Trust.Neighbors(c.Id)));
+    }
+
+    [Theory]
+    [MemberData(nameof(Scenarios))]
+    public void Every_scenario_plays_to_an_outcome_and_survives_a_save(string scenario)
+    {
+        var policy = new Balanced();
+        var straight = World.Load(DataDir, scenario, seed: 9);
+        var resumed = World.Load(DataDir, scenario, seed: 9);
+        for (int i = 0; i < 30; i++)
+        {
+            policy.Act(resumed);
+            resumed.Step();
+        }
+        resumed = World.LoadJson(resumed.SaveJson(), resumed.Techs);
+        foreach (var w in new[] { straight, resumed })
+            while (w.Outcome == Outcome.Ongoing)
+            {
+                policy.Act(w);
+                w.Step();
+            }
+        Assert.NotEqual(Outcome.Ongoing, straight.Outcome);
+        Assert.Equal(straight.Log.Select(e => e.Text), resumed.Log.Select(e => e.Text));
+    }
+
+    [Fact]
+    public void Occupation_is_credited_to_the_enemy_pressing_hardest()
+    {
+        var w = World.Load(DataDir, "free_territory_1918", seed: 3);
+        w.Run(140);
+        var occupied = w.Communes.Where(c => c.Occupied).ToList();
+        Assert.NotEmpty(occupied);
+        Assert.All(occupied, c => Assert.NotNull(c.OccupiedBy));
+        Assert.Contains(occupied, c => w.Enemies[c.OccupiedBy!.Value].Name == "Red Army");
+        Assert.Contains(occupied, c => w.Enemies[c.OccupiedBy!.Value].Name == "White Army");
     }
 
     [Fact]

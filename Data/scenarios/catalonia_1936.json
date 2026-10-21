@@ -7,16 +7,16 @@
   "neighborCount": 3,
   "neighborRadiusKm": 25,
 
-  "enemy": {
+  "enemies": [ {
     "name": "Nationalist Army",
     "strength": 1.4,
     "growth": 0.03,
     "offensives": [
-      { "name": "Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
-      { "name": "Aragon Offensive", "tick": 86, "duration": 10, "strength": 16 },
-      { "name": "Catalonia Offensive", "tick": 124, "duration": 12, "strength": 30 }
+      { "name": "The Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
+      { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 16 },
+      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 30 }
     ]
-  },
+  } ],
 
   "ally": {
     "name": "Republican Government",
@@ -145,15 +145,15 @@
     { "name": "Fraga", "kind": "Agrarian", "lon": 0.35, "lat": 41.52, "population": 8, "collectivism": 0.9, "militancy": 0.6, "federalism": 0.2, "practical": 0.1, "political": 0.25, "description": "Aragonese collective; money abolished in the village." },
     { "name": "Binéfar", "kind": "Agrarian", "lon": 0.29, "lat": 41.85, "population": 7, "collectivism": 0.8, "militancy": 0.5, "federalism": 0.3, "practical": 0.1, "political": 0.22 },
     { "name": "Monzón", "kind": "Agrarian", "lon": 0.19, "lat": 41.91, "population": 8, "collectivism": 0.7, "militancy": 0.6, "federalism": 0.3, "practical": 0.12, "political": 0.2 },
-    { "name": "Barbastro", "kind": "Agrarian", "lon": 0.13, "lat": 42.04, "population": 9, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.2, "practical": 0.12, "political": 0.18, "front": true, "description": "Headquarters for the Huesca front." },
+    { "name": "Barbastro", "kind": "Agrarian", "lon": 0.13, "lat": 42.04, "population": 9, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.2, "practical": 0.12, "political": 0.18, "frontOf": [ "Nationalist Army" ], "description": "Headquarters for the Huesca front." },
     { "name": "Graus", "kind": "Agrarian", "lon": 0.34, "lat": 42.19, "population": 6, "collectivism": 0.9, "militancy": 0.4, "federalism": -0.2, "practical": 0.1, "political": 0.25, "description": "Celebrated, fiercely independent collective." },
-    { "name": "Sariñena", "kind": "Agrarian", "lon": -0.16, "lat": 41.79, "population": 6, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.1, "practical": 0.08, "political": 0.15, "front": true },
-    { "name": "Bujaraloz", "kind": "Agrarian", "lon": -0.15, "lat": 41.50, "population": 5, "collectivism": 0.7, "militancy": 0.9, "federalism": 0.0, "practical": 0.08, "political": 0.18, "front": true, "techs": [ "militia_doctrine" ], "description": "Durruti Column headquarters, facing Zaragoza." },
-    { "name": "Pina de Ebro", "kind": "Agrarian", "lon": -0.53, "lat": 41.49, "population": 5, "collectivism": 0.7, "militancy": 0.8, "federalism": 0.0, "practical": 0.08, "political": 0.15, "front": true },
+    { "name": "Sariñena", "kind": "Agrarian", "lon": -0.16, "lat": 41.79, "population": 6, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.1, "practical": 0.08, "political": 0.15, "frontOf": [ "Nationalist Army" ] },
+    { "name": "Bujaraloz", "kind": "Agrarian", "lon": -0.15, "lat": 41.50, "population": 5, "collectivism": 0.7, "militancy": 0.9, "federalism": 0.0, "practical": 0.08, "political": 0.18, "frontOf": [ "Nationalist Army" ], "techs": [ "militia_doctrine" ], "description": "Durruti Column headquarters, facing Zaragoza." },
+    { "name": "Pina de Ebro", "kind": "Agrarian", "lon": -0.53, "lat": 41.49, "population": 5, "collectivism": 0.7, "militancy": 0.8, "federalism": 0.0, "practical": 0.08, "political": 0.15, "frontOf": [ "Nationalist Army" ] },
     { "name": "Caspe", "kind": "Agrarian", "lon": -0.04, "lat": 41.23, "population": 10, "collectivism": 0.8, "militancy": 0.6, "federalism": 0.5, "practical": 0.12, "political": 0.25, "description": "Seat of the Regional Defense Council of Aragon." },
     { "name": "Alcañiz", "kind": "Agrarian", "lon": -0.13, "lat": 41.05, "population": 10, "collectivism": 0.7, "militancy": 0.5, "federalism": 0.2, "practical": 0.12, "political": 0.18 },
     { "name": "Calanda", "kind": "Agrarian", "lon": -0.23, "lat": 40.94, "population": 6, "collectivism": 0.9, "militancy": 0.4, "federalism": -0.3, "practical": 0.08, "political": 0.2 },
     { "name": "Mas de las Matas", "kind": "Agrarian", "lon": -0.24, "lat": 40.83, "population": 4, "collectivism": 1.0, "militancy": 0.2, "federalism": -0.4, "practical": 0.08, "political": 0.25, "description": "A model collective, visited by journalists from abroad." },
-    { "name": "Alcorisa", "kind": "Agrarian", "lon": -0.38, "lat": 40.89, "population": 5, "collectivism": 0.9, "militancy": 0.3, "federalism": -0.2, "practical": 0.08, "political": 0.2, "front": true }
+    { "name": "Alcorisa", "kind": "Agrarian", "lon": -0.38, "lat": 40.89, "population": 5, "collectivism": 0.9, "militancy": 0.3, "federalism": -0.2, "practical": 0.08, "political": 0.2, "frontOf": [ "Nationalist Army" ] }
   ]
 }

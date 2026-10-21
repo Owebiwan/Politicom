@@ -25,10 +25,10 @@ public sealed class World
         Rng = new Rng(seed);
         _communes = communes;
         Trust = trust;
-        Enemy = scenario.Enemy;
+        Enemies = scenario.Enemies;
         Ally = scenario.Ally;
         Influence = balance.StartInfluence;
-        Enemy.EffectiveStrength = Enemy.Strength;
+        foreach (var e in Enemies) e.EffectiveStrength = e.Strength;
         InitialCommuneCount = communes.Count;
     }
 
@@ -39,7 +39,10 @@ public sealed class World
     public Rng Rng { get; }
     public IReadOnlyList<Commune> Communes => _communes;
     public TrustNetwork Trust { get; }
-    public HostileState Enemy { get; }
+    public IReadOnlyList<HostileState> Enemies { get; }
+    /// <summary>Spread score input: mean radicalization behind enemy lines.</summary>
+    public double Radicalization => Enemies.Count == 0 ? 0 : Enemies.Average(e => e.Radicalization);
+    public bool OffensiveUnderway => Enemies.Any(e => e.CurrentOffensive != null);
     public AllyState Ally { get; }
     public int InitialCommuneCount { get; }
 
@@ -90,10 +93,15 @@ public sealed class World
                 PoliticalEducation = d.Political,
                 PracticalSchooling = balance.BaselineSchooling,
                 PoliticalSchooling = balance.BaselineSchooling,
-                Front = d.Front,
             };
             c.Food = c.Population * balance.FoodNeed * balance.ReserveTicks * 1.5;
             c.Goods = c.Population * balance.GoodsNeed * balance.ReserveTicks * 1.5;
+            foreach (var name in d.FrontOf)
+            {
+                int k = scenario.Enemies.FindIndex(e => e.Name == name);
+                if (k < 0) throw new InvalidDataException($"{d.Name} is on the front of unknown enemy '{name}'.");
+                c.Fronts.Add(k);
+            }
             foreach (var t in d.Techs)
             {
                 if (!techs.Contains(t)) throw new InvalidDataException($"{d.Name} starts with unknown tech '{t}'.");
@@ -106,6 +114,9 @@ public sealed class World
         {
             if (ev.Options.Count == 0 || ev.DefaultOption < 0 || ev.DefaultOption >= ev.Options.Count)
                 throw new InvalidDataException($"Event '{ev.Id}' needs options and a valid defaultOption.");
+            foreach (var o in ev.Options)
+                if (o.Effects.Enemy.Length > 0 && scenario.Enemies.All(e => e.Name != o.Effects.Enemy))
+                    throw new InvalidDataException($"Event '{ev.Id}' names unknown enemy '{o.Effects.Enemy}'.");
             var names = ev.RequiresFederated.Concat(ev.Options.SelectMany(o => o.Effects.Communes.Concat(o.Effects.Secede)));
             foreach (var name in names)
                 if (communes.All(c => c.Name != name)) throw new InvalidDataException($"Event '{ev.Id}' names unknown commune '{name}'.");
@@ -282,7 +293,7 @@ public sealed class World
         var edges = Trust.Edges().Where(e => Communes[e.A].InFederation && Communes[e.B].InFederation).ToList();
         History.Add(new WeekRecord(Tick, Drift.Value, Federation.Count(), _communes.Count(c => c.Occupied),
             _communes.Count(c => !c.Occupied && !c.Federated),
-            edges.Count == 0 ? 0 : edges.Average(e => Trust[e.A, e.B]), Influence, Enemy.EffectiveStrength));
+            edges.Count == 0 ? 0 : edges.Average(e => Trust[e.A, e.B]), Influence, Enemies.Sum(e => e.EffectiveStrength)));
     }
 
     private void CheckOutcome()

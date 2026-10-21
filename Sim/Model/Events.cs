@@ -35,6 +35,8 @@ public sealed class EventEffects
     public double Trust { get; set; }
     public double PoliticalEducation { get; set; }
     public double EnemyStrength { get; set; }
+    /// <summary>Which enemy EnemyStrength applies to (by name). Empty = all of them.</summary>
+    public string Enemy { get; set; } = "";
     /// <summary>Goods shared out among the front communes.</summary>
     public double GoodsToFront { get; set; }
     public int MilitarizationTicks { get; set; }
@@ -57,7 +59,7 @@ public sealed class EventEffects
         Add(Wellbeing * 100, "% wellbeing" + scope);
         Add(Trust * 100, "% trust" + scope);
         Add(PoliticalEducation * 100, "% political education" + scope);
-        Add(EnemyStrength, "enemy strength");
+        Add(EnemyStrength, Enemy.Length > 0 ? $"{Enemy} strength" : "enemy strength");
         Add(GoodsToFront, "goods to the front");
         if (MilitarizationTicks > 0) parts.Add($"militarized {MilitarizationTicks} weeks");
         if (EndAllyOffers) parts.Add("no more arms offers");

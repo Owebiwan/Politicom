@@ -100,7 +100,7 @@ public partial class HistoryChart : Control
         }
 
         // Offensives as shaded bands.
-        foreach (var o in w.Enemy.Offensives)
+        foreach (var o in w.Enemies.SelectMany(e => e.Offensives))
         {
             var from = At(o.Tick, 1);
             var to = At(System.Math.Min(o.Tick + o.Duration, end), 0);

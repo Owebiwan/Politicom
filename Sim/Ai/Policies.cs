@@ -68,7 +68,7 @@ public sealed class Centralizer : IPolicy
         foreach (var s in w.PendingSecessions.ToList()) w.Apply(new HoldCommune(s.Commune));
         if (!w.IdeaNudges.ContainsKey("federal_statistics")) w.Apply(new CirculateIdea("federal_statistics"));
         if (w.Tick % 15 == 2) w.Apply(new ProposeProject(ProjectKind.Collectivization));
-        if (w.Enemy.CurrentOffensive != null || w.Tick % 12 == 0) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
+        if (w.OffensiveUnderway || w.Tick % 12 == 0) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
         w.Apply(new SponsorCongress());
         while (w.Influence > 20)
         {
@@ -89,7 +89,7 @@ public sealed class Balanced : IPolicy
     public void Act(World w)
     {
         var b = w.Balance;
-        bool crisis = w.Federation.Any(c => c.Front && c.Control < 0.5) || w.Enemy.CurrentOffensive != null;
+        bool crisis = w.Federation.Any(c => c.Front && c.Control < 0.5) || w.OffensiveUnderway;
         double margin = (w.Drift.NextThreshold ?? 100) - w.Drift.Value;
 
         if (w.WarCommittee && (!crisis || margin < 6)) w.Apply(new SetWarCommittee(false));

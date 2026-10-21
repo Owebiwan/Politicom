@@ -25,6 +25,7 @@ public partial class Main : Control
     private HistoryChart _history = null!;
     private Control? _overlay;
     private ScenarioDefinition _scenario = null!;
+    private List<ScenarioDefinition> _scenarios = new();
     private TechCatalog _techs = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
@@ -43,7 +44,13 @@ public partial class Main : Control
         {
             // Read through Godot's file system so this works from the editor and from an exported .pck.
             _techs = TechCatalog.Parse(ReadData("res://data/technologies.json"));
-            _scenario = ScenarioDefinition.Parse(ReadData("res://data/scenarios/catalonia_1936.json"));
+            _scenarios = DirAccess.GetFilesAt("res://data/scenarios")
+                .Where(f => f.EndsWith(".json"))
+                .Select(f => ScenarioDefinition.Parse(ReadData($"res://data/scenarios/{f}")))
+                .OrderBy(s => s.StartDate)
+                .ToList();
+            if (_scenarios.Count == 0) throw new System.IO.FileNotFoundException("No scenarios in res://data/scenarios.");
+            _scenario = _scenarios.FirstOrDefault(s => s.Id == "catalonia_1936") ?? _scenarios[0];
             _world = World.Create(_scenario, _techs, seed: (ulong)DateTime.Now.Ticks);
         }
         catch (Exception e)
@@ -60,7 +67,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--weeks N] [--select ID] [--focus ID] [--zoom Z]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -69,6 +76,12 @@ public partial class Main : Control
         int at = Array.IndexOf(args, "--screenshot");
         if (at < 0 || at + 1 >= args.Length) return;
         string path = args[at + 1];
+        int scenarioAt = Array.IndexOf(args, "--scenario");
+        if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && _scenarios.FirstOrDefault(s => s.Id == args[scenarioAt + 1]) is { } chosen)
+        {
+            _scenario = chosen;
+            SetWorld(World.Create(chosen, _techs, seed: 1));
+        }
         int weeksAt = Array.IndexOf(args, "--weeks");
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
         int selectAt = Array.IndexOf(args, "--select");
@@ -141,17 +154,47 @@ public partial class Main : Control
 
     private void ShowIntro()
     {
-        ShowOverlay(_world.Scenario.Name, $"""
-            {Esc(_world.Scenario.Description)}
+        var list = new VBoxContainer();
+        list.AddThemeConstantOverride("separation", 10);
+        foreach (var scenario in _scenarios)
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 16);
+            var end = scenario.StartDate.AddDays(7 * scenario.EndTick);
+            var text = new RichTextLabel
+            {
+                BbcodeEnabled = true, FitContent = true, ScrollActive = false,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(560, 0),
+                Text = $"[b]{Esc(scenario.Name)}[/b]  [color=#9aa0a8]{scenario.StartDate.Year}–{end.Year} · {scenario.Communes.Count} communes · "
+                       + $"against {Esc(string.Join(" and ", scenario.Enemies.Select(e => e.Name)))}[/color]\n{Esc(scenario.Description)}",
+            };
+            text.AddThemeFontSizeOverride("normal_font_size", 14);
+            text.AddThemeFontSizeOverride("bold_font_size", 16);
+            row.AddChild(text);
+            var chosen = scenario;
+            var play = AddButton(row, "Play", "", () => StartScenario(chosen));
+            play.CustomMinimumSize = new Vector2(110, 40);
+            play.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            list.AddChild(row);
+            list.AddChild(new HSeparator());
+        }
 
+        ShowOverlay("Choose a revolution", """
             [b]You are the movement, not the government.[/b] You can't order a commune to do anything. You fund schools, mediate disputes, circulate ideas and propose projects; the communes decide for themselves.
 
-            [b]The dilemma.[/b] Almost everything that helps you win the war (a war committee, government arms, statistics bureaus, appointed commanders) pushes [color=#f2c94c]hierarchy drift[/color] up. At 25, 50 and 75 drift, permanent councils, then commissars, then a police force take over, each with real bonuses. At 100 a state has crystallized and the revolution is over, however strong the society is. Political education, recall and rotation are the brakes.
+            [b]The dilemma.[/b] Almost everything that helps you win the war (a war committee, government arms, conscription, appointed commanders) pushes [color=#f2c94c]hierarchy drift[/color] up. At 25, 50 and 75 drift, permanent councils, then commissars, then a police force take over, each with real bonuses. At 100 a state has crystallized and the revolution is over, however strong the society is. Political education, recall and rotation are the brakes.
 
-            [b]Winning.[/b] Hold out as a free federation until February 1939. You're scored on survival, quality of life, spread of the idea across the lines, and freedom.
+            [b]Winning.[/b] Hold out as a free federation until the scenario ends. You're scored on survival, quality of life, spread of the idea across the lines, and freedom.
 
             [b]Controls.[/b] Click a commune to select it; shift-click a second one for mediation or railways. Space pauses, 1–3 set speed, [code].[/code] advances one week. Scroll or pinch to zoom, drag to pan. The game pauses itself when a decision is waiting.
-            """, null, ("Begin", CloseOverlay));
+            """, list);
+    }
+
+    private void StartScenario(ScenarioDefinition scenario)
+    {
+        _scenario = scenario;
+        NewGame();
+        Say($"{scenario.Name} begins.");
     }
 
     private void OnOutcome()
@@ -174,7 +217,7 @@ public partial class Main : Control
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 
             {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)})
-            """, chart, ("Keep looking", CloseOverlay), ("New game", NewGame));
+            """, chart, ("Keep looking", CloseOverlay), ("Play again", NewGame), ("Choose scenario", ShowIntro));
     }
 
     private void ShowOverlay(string title, string body, Control? extra, params (string Label, Action OnPress)[] buttons)
@@ -371,13 +414,18 @@ public partial class Main : Control
             d.Items().Where(i => Math.Abs(i.Value) > 0.005).OrderByDescending(i => Math.Abs(i.Value)).Take(5)
                 .Select(i => $"{Esc(i.Label)} [color={(i.Value > 0 ? "#f07060" : "#70d080")}]{(i.Value > 0 ? "+" : "")}{i.Value:0.00}[/color]"));
 
-        var e = w.Enemy;
-        var fronts = w.Active.Where(c => c.Front).Select(c => $"{Esc(c.Name)} [color={(c.Defense >= c.Pressure ? "#70d080" : "#f07060")}]{c.Control:P0}[/color]");
-        _enemy.Text = $"{Esc(e.Name)}: strength {e.EffectiveStrength:0.0}"
-                      + (e.CurrentOffensive is { } o ? $"  [color=#f07060][b]{Esc(o.Name)}[/b][/color]" : "")
-                      + $"\nExhaustion {e.Exhaustion:P0} · its workers radicalized {e.Radicalization:P0}"
-                      + (w.Ally.MilitarizationTicks > 0 ? $" · militarized {w.Ally.MilitarizationTicks} more weeks" : "")
-                      + $"\nFront: {string.Join(", ", fronts)}";
+        var lines = w.Enemies.Select(e =>
+        {
+            int k = w.Enemies.ToList().IndexOf(e);
+            var fronts = w.Active.Where(c => c.Fronts.Contains(k))
+                .Select(c => $"{Esc(c.Name)} [color={(c.Defense >= c.Pressure ? "#70d080" : "#f07060")}]{c.Control:P0}[/color]");
+            return $"[b][color={e.Color}]■[/color] {Esc(e.Name)}[/b]: strength {e.EffectiveStrength:0.0}"
+                   + (e.CurrentOffensive is { } o ? $"  [color=#f07060][b]{Esc(o.Name)}[/b][/color]" : "")
+                   + $" · exhaustion {e.Exhaustion:P0} · its workers radicalized {e.Radicalization:P0}"
+                   + $"\nFront: {(fronts.Any() ? string.Join(", ", fronts) : "none")}";
+        });
+        _enemy.Text = string.Join("\n", lines)
+                      + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Ally.MilitarizationTicks} more weeks." : "");
         var s = w.Scores;
         _scores.Text = $"Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
 
@@ -515,6 +563,7 @@ public partial class Main : Control
         try
         {
             var world = World.LoadJson(FileAccess.GetFileAsString(SavePath), _techs);
+            _scenario = _scenarios.FirstOrDefault(s => s.Id == world.Scenario.Id) ?? _scenario;
             CloseOverlay();
             SetWorld(world);
             Say($"Loaded week {world.Tick} ({world.Date:d MMMM yyyy}).");

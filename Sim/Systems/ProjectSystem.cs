@@ -139,11 +139,12 @@ internal static class ProjectSystem
                 effect = $"{w.Communes[a1].Name} and {w.Communes[a2].Name} are linked; pooled goods travel cheaper. The line's organizers have gained standing.";
                 break;
             case ProjectKind.DefensiveCampaign:
-                w.Enemy.Strength *= 0.85;
+                var strongest = w.Enemies.MaxBy(x => x.EffectiveStrength)!;
+                strongest.Strength *= 0.85;
                 foreach (var a in participants)
                     foreach (var c in participants)
                         if (a < c) w.Trust.Add(a, c, 0.05);
-                effect = $"The {w.Enemy.Name} is pushed back.";
+                effect = $"The {strongest.Name} is pushed back.";
                 break;
             case ProjectKind.AteneoNetwork:
                 foreach (var id in participants)

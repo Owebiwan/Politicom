@@ -61,7 +61,8 @@ internal static class EventSystem
         if (e.Trust != 0)
             foreach (var (a, c) in w.Trust.Edges())
                 if (ids.Contains(a) && ids.Contains(c)) w.Trust.Add(a, c, e.Trust);
-        w.Enemy.Strength = Math.Max(0, w.Enemy.Strength + e.EnemyStrength);
+        foreach (var enemy in w.Enemies.Where(x => e.Enemy.Length == 0 || x.Name == e.Enemy))
+            enemy.Strength = Math.Max(0, enemy.Strength + e.EnemyStrength);
 
         if (e.GoodsToFront > 0)
         {

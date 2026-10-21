@@ -136,8 +136,9 @@ public partial class MapView : Control
             if (c.Occupied)
             {
                 DrawCircle(p, r, new Color(0.22f, 0.22f, 0.24f));
-                DrawLine(p + new Vector2(-r, -r) * 0.6f, p + new Vector2(r, r) * 0.6f, Danger, 2, true);
-                DrawLine(p + new Vector2(-r, r) * 0.6f, p + new Vector2(r, -r) * 0.6f, Danger, 2, true);
+                var occupier = c.OccupiedBy is int by ? EnemyColor(w, by) : Danger;
+                DrawLine(p + new Vector2(-r, -r) * 0.6f, p + new Vector2(r, r) * 0.6f, occupier, 2, true);
+                DrawLine(p + new Vector2(-r, r) * 0.6f, p + new Vector2(r, -r) * 0.6f, occupier, 2, true);
             }
             else
             {
@@ -147,8 +148,15 @@ public partial class MapView : Control
 
             if (c.Front && !c.Occupied)
             {
-                DrawArc(p, r + 4, 0, Mathf.Tau, 32, new Color(Danger, 0.25f), 3, true);
-                DrawArc(p, r + 4, -Mathf.Pi / 2, -Mathf.Pi / 2 + Mathf.Tau * (float)c.Control, 32, Danger, 3, true);
+                // One ring per enemy faced; the filled arc shows how much of the commune is still held.
+                int ring = 0;
+                foreach (var k in c.Fronts.OrderBy(k => k))
+                {
+                    var color = EnemyColor(w, k);
+                    float rr = r + 4 + ring++ * 4;
+                    DrawArc(p, rr, 0, Mathf.Tau, 32, new Color(color, 0.25f), 3, true);
+                    DrawArc(p, rr, -Mathf.Pi / 2, -Mathf.Pi / 2 + Mathf.Tau * (float)c.Control, 32, color, 3, true);
+                }
             }
             if (!c.Federated && !c.Occupied)
                 for (int i = 0; i < 8; i++)
@@ -199,6 +207,9 @@ public partial class MapView : Control
         }
     }
 
+    private static Color EnemyColor(World w, int enemy) =>
+        Color.FromString(w.Enemies[enemy].Color, Danger);
+
     private static Color TrustColor(float t) =>
         t < 0.5f ? Danger.Lerp(Warn, t * 2) : Warn.Lerp(new Color(0.35f, 0.8f, 0.45f), (t - 0.5f) * 2);
 
@@ -213,13 +224,13 @@ public partial class MapView : Control
         };
         DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         DrawString(font, new Vector2(14, Size.Y - 14),
-            "Red ring: front (filled = control). Dashed yellow: seceded. Pulsing blue: about to secede. Click to select, shift-click a second. Scroll/pinch to zoom, drag to pan.",
+            "Rings: front, one per enemy (filled = control). Crosses: occupied. Dashed yellow: seceded. Pulsing blue: leaving. Shift-click: second commune.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
     private void DrawTooltip(Font font, World w, Commune c)
     {
-        string status = c.Occupied ? "Occupied" : !c.Federated ? "Seceded" : c.Front ? $"Front — control {c.Control:P0}" : "Federated";
+        string status = c.OccupiedBy is int by ? $"Occupied by the {w.Enemies[by].Name}" : c.Occupied ? "Occupied" : !c.Federated ? "Seceded" : c.Front ? $"Front — control {c.Control:P0}" : "Federated";
         var lines = new[]
         {
             $"{c.Name}",

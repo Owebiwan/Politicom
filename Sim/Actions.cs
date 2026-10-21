@@ -77,7 +77,7 @@ internal static class ActionSystem
             var d = w.Communes[n];
             if (!d.Occupied) d.PoliticalEducation += 0.015 * w.Trust[c.Id, n] * (1 - d.PoliticalEducation);
         }
-        if (c.Front) w.Enemy.Radicalization = Math.Min(1, w.Enemy.Radicalization + 0.01);
+        foreach (var k in c.Fronts) w.Enemies[k].Radicalization = Math.Min(1, w.Enemies[k].Radicalization + 0.01);
         return ActionResult.Done($"Pamphlets circulate in and around {c.Name}.");
     }
 

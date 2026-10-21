@@ -41,7 +41,7 @@ internal static class SingleRun
             w.Federation.Count(), w.Communes.Count(c => c.Occupied), w.Communes.Count(c => !c.Occupied && !c.Federated),
             F(edges.Count == 0 ? 0 : edges.Average(e => w.Trust[e.A, e.B])),
             F(w.Mean(c => c.Wellbeing)), F(w.Mean(c => c.PracticalEducation)), F(w.Mean(c => c.PoliticalEducation)),
-            F(w.Enemy.EffectiveStrength), F(w.Enemy.Radicalization),
+            F(w.Enemies.Sum(e => e.EffectiveStrength)), F(w.Radicalization),
             F(w.Scores.Survival), F(w.Scores.QualityOfLife), F(w.Scores.Spread), F(w.Scores.Freedom));
     }
 }

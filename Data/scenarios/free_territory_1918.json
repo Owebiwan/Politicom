@@ -1,0 +1,149 @@
+{
+  "id": "free_territory_1918",
+  "name": "Free Territory, Ukraine",
+  "description": "November 1918. The Austro-German occupiers are leaving southern Ukraine, and around Huliaipole the peasants have taken the land and formed free soviets. The Revolutionary Insurgent Army is a militia of volunteers. Whites to the south and east, Bolsheviks to the north — sometimes allies, never friends. Hold the Free Territory together until the summer of 1921.",
+  "startDate": "1918-11-17",
+  "endTick": 145,
+  "neighborCount": 3,
+  "neighborRadiusKm": 40,
+
+  "enemies": [
+    {
+      "name": "White Army",
+      "color": "#dfe6f0",
+      "strength": 1.1,
+      "growth": 0.015,
+      "offensives": [
+        { "name": "Denikin's summer offensive", "tick": 26, "duration": 16, "strength": 7 },
+        { "name": "Wrangel's breakout from Crimea", "tick": 81, "duration": 14, "strength": 6.3 }
+      ]
+    },
+    {
+      // Starts at zero: an ally of convenience until it isn't.
+      "name": "Red Army",
+      "color": "#eb4d40",
+      "strength": 0,
+      "growth": 0,
+      "offensives": [
+        { "name": "The Red Army's first offensive", "tick": 28, "duration": 10, "strength": 4.2 },
+        { "name": "The Red winter occupation", "tick": 61, "duration": 18, "strength": 5.6 },
+        { "name": "The final Red offensive", "tick": 106, "duration": 40, "strength": 11.2 }
+      ]
+    }
+  ],
+
+  "ally": {
+    "name": "Red Army command",
+    "nextOfferTick": 10,
+    "offerInterval": 30,
+    "armsGoods": 25
+  },
+
+  "events": [
+    {
+      "id": "second_congress",
+      "tick": 12,
+      "title": "The Second Regional Congress",
+      "text": "Delegates from hundreds of villages meet at Huliaipole. The Whites are coming; how should the free soviets raise an army?",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Voluntary, egalitarian mobilization", "description": "Each village sends whom it chooses. Fewer fighters, but they elect their own commanders.",
+          "effects": { "drift": 1, "enemy": "White Army", "enemyStrength": -0.5 } },
+        { "label": "General conscription", "description": "Every able man serves. A bigger army — and a staff to command it.",
+          "effects": { "drift": 6, "enemy": "White Army", "enemyStrength": -1.5, "wellbeing": -0.05 } }
+      ]
+    },
+    {
+      "id": "order_1824",
+      "tick": 28,
+      "title": "Trotsky's Order No. 1824",
+      "text": "Trotsky bans the Fourth Regional Congress and declares the Makhnovists outlaws. Red troops are already on the move.",
+      "defaultOption": 0,
+      "requiresFederated": [ "Huliaipole" ],
+      "options": [
+        { "label": "Hold the congress anyway", "description": "The soviets meet as free soviets. The Bolsheviks take it as a declaration of war.",
+          "effects": { "drift": -3, "enemy": "Red Army", "enemyStrength": 1, "politicalEducation": 0.05 } },
+        { "label": "Cancel it to keep the alliance", "description": "A few more weeks of Red support, bought with the villages' right to meet.",
+          "effects": { "drift": 4, "enemy": "Red Army", "enemyStrength": -1, "trust": -0.05 } }
+      ]
+    },
+    {
+      "id": "peregonovka",
+      "tick": 45,
+      "title": "Peregonovka",
+      "text": "Pursued hundreds of kilometres west by Denikin's army, the Insurgent Army turns to face it near Uman.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Turn and fight", "description": "A pitched battle with everything the army has. Victory would cut Denikin's supply lines.",
+          "effects": { "drift": 2, "enemy": "White Army", "enemyStrength": -3, "wellbeing": -0.08 } },
+        { "label": "Scatter into partisan bands", "description": "No battle, no command — the villages fight their own way home.",
+          "effects": { "drift": -2, "enemy": "White Army", "enemyStrength": -1, "trust": -0.03 } }
+      ]
+    },
+    {
+      "id": "typhus",
+      "tick": 56,
+      "title": "Typhus",
+      "text": "A typhus epidemic sweeps the region over the winter. Makhno himself falls ill; whole units are bedridden.",
+      "defaultOption": 1,
+      "options": [
+        { "label": "Turn workshops over to hospitals", "description": "The movement's organizers and every spare cart go to the sick.",
+          "effects": { "influence": -15, "wellbeing": -0.04 } },
+        { "label": "Carry on", "description": "Each village copes as it can.",
+          "effects": { "wellbeing": -0.15 } }
+      ]
+    },
+    {
+      "id": "starobilsk",
+      "tick": 98,
+      "title": "The Starobilsk agreement",
+      "text": "Wrangel is breaking out of Crimea. The Bolsheviks offer an alliance: amnesty for anarchists and freedom to organize, in exchange for fighting Wrangel.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Sign it", "description": "The Insurgent Army marches on Crimea alongside the Red Army.",
+          "effects": { "drift": 3, "militarizationTicks": 8, "enemy": "Red Army", "enemyStrength": -2 } },
+        { "label": "Refuse", "description": "No more agreements with those who broke the last one.",
+          "effects": { "drift": -1, "enemy": "Red Army", "enemyStrength": 1 } }
+      ]
+    },
+    {
+      "id": "betrayal",
+      "tick": 106,
+      "title": "Betrayal",
+      "text": "Wrangel is beaten. The same week, Red troops arrest the Makhnovist delegates in Kharkiv and attack Huliaipole.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Fight on from the villages", "description": "Guerrilla war across the steppe, for as long as the villages will hide the army.",
+          "effects": { "drift": 1, "wellbeing": -0.05 } },
+        { "label": "Form a single field command", "description": "Concentrate everything under one staff to break out of the encirclement.",
+          "effects": { "drift": 6, "enemy": "Red Army", "enemyStrength": -2 } }
+      ]
+    }
+  ],
+
+  // Rural, low literacy, very militant. Mennonite colonies and Bolshevik-leaning towns are the weak links.
+  "communes": [
+    { "name": "Huliaipole", "kind": "Agrarian", "lon": 36.26, "lat": 47.66, "population": 20, "collectivism": 0.8, "militancy": 0.9, "federalism": 0.6, "practical": 0.12, "political": 0.35, "techs": [ "militia_doctrine" ], "description": "Makhno's home town and the movement's centre: anarchist since the 1905 revolution." },
+    { "name": "Rosa Luxemburg commune", "kind": "Agrarian", "lon": 36.15, "lat": 47.71, "population": 2, "collectivism": 1.0, "militancy": 0.4, "federalism": 0.4, "practical": 0.15, "political": 0.4, "description": "An agrarian commune on a former landowner's estate." },
+    { "name": "Pokrovske", "kind": "Agrarian", "lon": 36.23, "lat": 47.98, "population": 6, "collectivism": 0.7, "militancy": 0.8, "federalism": 0.3, "practical": 0.08, "political": 0.2 },
+    { "name": "Dibrivka", "kind": "Agrarian", "lon": 36.40, "lat": 47.94, "population": 5, "collectivism": 0.7, "militancy": 0.9, "federalism": 0.2, "practical": 0.06, "political": 0.2, "description": "Where Makhno's partisans won their first battle against the occupiers." },
+    { "name": "Chaplyne", "kind": "Agrarian", "lon": 36.24, "lat": 48.13, "population": 4, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.2, "practical": 0.06, "political": 0.12 },
+    { "name": "Komar", "kind": "Agrarian", "lon": 36.83, "lat": 47.84, "population": 4, "collectivism": 0.6, "militancy": 0.6, "federalism": 0.1, "practical": 0.06, "political": 0.15 },
+    { "name": "Polohy", "kind": "Agrarian", "lon": 36.26, "lat": 47.48, "population": 8, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.3, "practical": 0.1, "political": 0.2 },
+    { "name": "Orikhiv", "kind": "Agrarian", "lon": 35.79, "lat": 47.57, "population": 8, "collectivism": 0.6, "militancy": 0.6, "federalism": 0.3, "practical": 0.1, "political": 0.18 },
+    { "name": "Bilmak", "kind": "Agrarian", "lon": 36.65, "lat": 47.35, "population": 5, "collectivism": 0.5, "militancy": 0.6, "federalism": 0.1, "practical": 0.06, "political": 0.15 },
+    { "name": "Tokmak", "kind": "Agrarian", "lon": 35.71, "lat": 47.25, "population": 8, "collectivism": 0.4, "militancy": 0.4, "federalism": 0.2, "practical": 0.1, "political": 0.12 },
+    { "name": "Molochansk colonies", "kind": "Agrarian", "lon": 35.60, "lat": 47.20, "population": 7, "collectivism": -0.6, "militancy": -0.8, "federalism": -0.6, "practical": 0.3, "political": 0.05, "description": "Prosperous, pacifist Mennonite settlements, wary of the insurgents." },
+    { "name": "Vasylivka", "kind": "Agrarian", "lon": 35.28, "lat": 47.44, "population": 6, "collectivism": 0.4, "militancy": 0.4, "federalism": 0.2, "practical": 0.08, "political": 0.12 },
+    { "name": "Oleksandrivsk", "kind": "Industrial", "lon": 35.14, "lat": 47.84, "population": 30, "collectivism": 0.4, "militancy": 0.3, "federalism": 0.4, "practical": 0.25, "political": 0.2, "techs": [ "collective_workshops" ], "description": "Dnieper rail junction and factory town; its workers lean Bolshevik." },
+    { "name": "Nikopol", "kind": "Mixed", "lon": 34.40, "lat": 47.57, "population": 12, "collectivism": 0.4, "militancy": 0.4, "federalism": 0.3, "practical": 0.12, "political": 0.12 },
+    { "name": "Katerynoslav", "kind": "Industrial", "lon": 35.05, "lat": 48.46, "population": 40, "collectivism": 0.3, "militancy": 0.2, "federalism": 0.5, "practical": 0.3, "political": 0.15, "frontOf": [ "Red Army" ], "techs": [ "libertarian_press" ], "description": "The regional capital, held only briefly. Its press and its factories could change everything." },
+    { "name": "Synelnykove", "kind": "Mixed", "lon": 35.52, "lat": 48.32, "population": 8, "collectivism": 0.4, "militancy": 0.5, "federalism": 0.3, "practical": 0.1, "political": 0.15 },
+    { "name": "Pavlohrad", "kind": "Mixed", "lon": 35.87, "lat": 48.53, "population": 12, "collectivism": 0.3, "militancy": 0.4, "federalism": 0.3, "practical": 0.12, "political": 0.12, "frontOf": [ "Red Army" ] },
+    { "name": "Berdiansk", "kind": "Mixed", "lon": 36.79, "lat": 46.76, "population": 20, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.4, "practical": 0.15, "political": 0.2, "description": "Azov port, taken by the insurgents in 1919." },
+    { "name": "Melitopol", "kind": "Mixed", "lon": 35.37, "lat": 46.85, "population": 15, "collectivism": 0.3, "militancy": 0.3, "federalism": 0.3, "practical": 0.15, "political": 0.12, "frontOf": [ "White Army" ] },
+    { "name": "Mariupol", "kind": "Industrial", "lon": 37.55, "lat": 47.10, "population": 25, "collectivism": 0.3, "militancy": 0.3, "federalism": 0.4, "practical": 0.2, "political": 0.12, "frontOf": [ "White Army" ] },
+    { "name": "Volnovakha", "kind": "Agrarian", "lon": 37.50, "lat": 47.60, "population": 6, "collectivism": 0.5, "militancy": 0.7, "federalism": 0.2, "practical": 0.06, "political": 0.15, "frontOf": [ "White Army" ] },
+    { "name": "Yuzivka", "kind": "Industrial", "lon": 37.80, "lat": 48.00, "population": 25, "collectivism": 0.2, "militancy": 0.2, "federalism": 0.4, "practical": 0.25, "political": 0.1, "frontOf": [ "White Army" ], "description": "Donbas mining and steel town, fought over by everyone." }
+  ]
+}

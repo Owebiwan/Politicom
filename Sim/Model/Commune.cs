@@ -53,7 +53,11 @@ public sealed class Commune
     public double Wellbeing { get; set; } = 0.6;
     public bool Federated { get; set; } = true;
     public bool Occupied { get; set; }
-    public bool Front { get; set; }
+    /// <summary>Indices of the enemies this commune faces. Empty = behind the lines.</summary>
+    public HashSet<int> Fronts { get; init; } = new();
+    [JsonIgnore] public bool Front => Fronts.Count > 0;
+    /// <summary>Index of the enemy occupying it, if any.</summary>
+    [JsonInclude] public int? OccupiedBy { get; internal set; }
     /// <summary>1 = fully held; at 0 the commune is occupied.</summary>
     public double Control { get; set; } = 1;
     public HashSet<string> Techs { get; init; } = new();

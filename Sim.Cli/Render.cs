@@ -49,9 +49,9 @@ internal static class Render
             .Select(i => $"{i.Label} {(i.Value >= 0 ? Paint($"+{i.Value:0.00}", "31") : Paint($"{i.Value:0.00}", "32"))}");
         sb.AppendLine(Dim("          last week ") + $"{(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ", top));
 
-        var e = w.Enemy;
-        sb.AppendLine($"Enemy     {e.Name} strength {e.EffectiveStrength:0.0}" + (e.CurrentOffensive is { } o ? Paint($"  ▶ {o.Name.ToUpperInvariant()}", "31;1") : "") +
-                      Dim($"   exhaustion {e.Exhaustion:P0}   workers radicalized {e.Radicalization:P0}"));
+        foreach (var e in w.Enemies)
+            sb.AppendLine($"Enemy     {e.Name} strength {e.EffectiveStrength:0.0}" + (e.CurrentOffensive is { } o ? Paint($"  ▶ {o.Name.ToUpperInvariant()}", "31;1") : "") +
+                          Dim($"   exhaustion {e.Exhaustion:P0}   workers radicalized {e.Radicalization:P0}"));
         var fronts = w.Active.Where(c => c.Front).ToList();
         if (fronts.Count > 0)
             sb.AppendLine("Front     " + string.Join("  ", fronts.Select(c =>
@@ -112,7 +112,8 @@ internal static class Render
         sb.AppendLine($"    education   practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0})  political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})");
         sb.AppendLine($"    economy     food {c.Food:0} (+{c.FoodProduced:0.0}/wk)  goods {c.Goods:0} (+{c.GoodsProduced:0.0}/wk)  wellbeing {c.Wellbeing:P0}");
         sb.AppendLine($"    aid ledger  given {c.AidGiven:0.0}  received {c.AidReceived:0.0}  free-riding {c.FreeRiding:P0}  discontent {c.Discontent:0.00}");
-        if (c.Front) sb.AppendLine($"    front       control {c.Control:P0}  defense {c.Defense:0.00} vs pressure {c.Pressure:0.00}");
+        if (c.Front) sb.AppendLine($"    front       against {string.Join(", ", c.Fronts.Select(k => w.Enemies[k].Name))}: control {c.Control:P0}, defense {c.Defense:0.00} vs pressure {c.Pressure:0.00}");
+        if (c.OccupiedBy is int by) sb.AppendLine($"    occupied    by the {w.Enemies[by].Name}");
         sb.AppendLine($"    techs       {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Select(t => w.Techs[t].Name)))}");
         sb.AppendLine("    neighbours  " + string.Join(", ", w.Trust.Neighbors(c.Id).Select(n =>
             $"{w.Communes[n].Name} [{n}] {TrustColor(w.Trust[c.Id, n])}")));

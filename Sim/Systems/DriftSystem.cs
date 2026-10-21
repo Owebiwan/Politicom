@@ -76,7 +76,7 @@ internal static class ScoreSystem
         s.QualitySum += quality;
         s.QualityOfLife = s.QualitySum / s.Samples;
 
-        s.Spread = 100 * w.Enemy.Radicalization;
+        s.Spread = 100 * w.Radicalization;
 
         s.FreedomSum += 100 - w.Drift.Value;
         s.Freedom = s.FreedomSum / s.Samples;
