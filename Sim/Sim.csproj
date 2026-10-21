@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- net8.0 so the Godot 4 front end (which targets net8.0) can reference it. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+    <RootNamespace>Politicom.Sim</RootNamespace>
+    <AssemblyName>Politicom.Sim</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Politicom.Sim.Tests" />
+  </ItemGroup>
+
+</Project>

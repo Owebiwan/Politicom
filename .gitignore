@@ -1,0 +1,9 @@
+bin/
+obj/
+.godot/
+*.user
+.vs/
+.idea/
+*.csv
+Game/data/
+build/

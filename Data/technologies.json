@@ -1,0 +1,132 @@
+{
+  // Most technologies are double-edged: a tree of pure upgrades would quietly teach that
+  // centralization is free. "Local" effects (production, defense, goods upkeep, political
+  // education) apply to communes that hold the tech; everything else scales with the share
+  // of the federation that holds it.
+  "technologies": [
+    {
+      "id": "crop_rotation",
+      "name": "Crop rotation and irrigation",
+      "category": "Agricultural",
+      "perk": "More grain from the same land",
+      "risk": "Nothing much — some ideas are just good.",
+      "minPractical": 0.12,
+      "affinity": { "agrarian": 3 },
+      "effects": { "foodProduction": 0.15 }
+    },
+    {
+      "id": "mechanized_agriculture",
+      "name": "Mechanized agriculture",
+      "category": "Agricultural",
+      "perk": "Frees labor for education and industry",
+      "risk": "Needs fuel and machinery from coordinated production.",
+      "prerequisites": [ "crop_rotation" ],
+      "minPractical": 0.35,
+      "affinity": { "agrarian": 2 },
+      "effects": { "foodProduction": 0.35, "goodsUpkeep": 0.1, "driftPerTick": 0.05 }
+    },
+    {
+      "id": "collective_workshops",
+      "name": "Collective workshops",
+      "category": "Industrial",
+      "perk": "Self-managed shops share tools and methods",
+      "risk": "Workshop delegates start to speak for the whole trade.",
+      "minPractical": 0.15,
+      "affinity": { "industrial": 3, "collectivist": 1 },
+      "effects": { "goodsProduction": 0.2, "driftPerTick": 0.01 }
+    },
+    {
+      "id": "war_industry",
+      "name": "War industry conversion",
+      "category": "Industrial",
+      "perk": "Factories turn out arms for the front",
+      "risk": "Factory committees answer to a war production board.",
+      "prerequisites": [ "collective_workshops" ],
+      "minPractical": 0.3,
+      "affinity": { "industrial": 2, "militant": 1.5 },
+      "effects": { "goodsProduction": 0.1, "defense": 0.15, "driftPerTick": 0.08 }
+    },
+    {
+      "id": "militia_doctrine",
+      "name": "Militia and guerrilla doctrine",
+      "category": "Military",
+      "perk": "Very strong home defense; occupied communes keep fighting",
+      "risk": "Little help for offensive campaigns.",
+      "minPractical": 0.1,
+      "affinity": { "militant": 4 },
+      "effects": { "defense": 0.4 }
+    },
+    {
+      "id": "libertarian_press",
+      "name": "Libertarian press",
+      "category": "Communication",
+      "perk": "Contagion and trust spread faster",
+      "risk": "Newspapers become hubs; editors gain informal power.",
+      "minPolitical": 0.2,
+      "affinity": { "industrial": 1, "federalist": 1 },
+      "effects": { "diffusion": 0.3, "contagion": 0.5, "trustGrowth": 0.2, "influence": 0.5, "driftPerTick": 0.06 }
+    },
+    {
+      "id": "telegraph_radio",
+      "name": "Telegraph and radio",
+      "category": "Communication",
+      "perk": "Coordination costs scale more slowly",
+      "risk": "Communes at network hubs gain outsized influence.",
+      "minPractical": 0.3,
+      "affinity": { "industrial": 1, "federalist": 1 },
+      "effects": { "coordination": 0.3, "diffusion": 0.2, "driftPerTick": 0.07 }
+    },
+    {
+      "id": "imperative_mandate",
+      "name": "Imperative mandate and recall",
+      "category": "Organizational",
+      "perk": "Strong brake on hierarchy drift",
+      "risk": "Federal decisions become slower.",
+      "minPolitical": 0.35,
+      "affinity": { "federalist": 1, "collectivist": 1 },
+      "effects": { "driftBrake": 0.12, "coordination": -0.15 }
+    },
+    {
+      "id": "rotating_delegates",
+      "name": "Rotating delegates",
+      "category": "Organizational",
+      "perk": "Prevents permanent leaders",
+      "risk": "Loses experienced negotiators and commanders.",
+      "minPolitical": 0.3,
+      "affinity": { "collectivist": 1 },
+      "effects": { "driftBrake": 0.08, "defense": -0.1 }
+    },
+    {
+      "id": "labor_time_accounting",
+      "name": "Labor-time accounting",
+      "category": "Organizational",
+      "perk": "Less free-riding, fairer exchange",
+      "risk": "Accounting bodies can bureaucratize.",
+      "minPractical": 0.25,
+      "minPolitical": 0.2,
+      "affinity": { "industrial": 1, "collectivist": 1 },
+      "effects": { "freeRiding": 0.5, "driftPerTick": 0.04 }
+    },
+    {
+      "id": "federal_statistics",
+      "name": "Federal statistics bureau",
+      "category": "Organizational",
+      "perk": "Large projects get much easier",
+      "risk": "The strongest single driver of technocratic drift.",
+      "prerequisites": [ "labor_time_accounting" ],
+      "minPractical": 0.4,
+      "affinity": { "federalist": 2 },
+      "effects": { "coordination": 0.45, "driftPerTick": 0.15 }
+    },
+    {
+      "id": "ateneo_libraries",
+      "name": "Ateneo libraries",
+      "category": "Organizational",
+      "perk": "Political education spreads faster",
+      "risk": "Lecturers can become an intelligentsia — but rarely do.",
+      "minPolitical": 0.15,
+      "affinity": { "industrial": 1, "collectivist": 0.5 },
+      "effects": { "politicalEducation": 0.3, "influence": 0.3, "driftBrake": 0.03 }
+    }
+  ]
+}

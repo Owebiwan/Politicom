@@ -1,0 +1,160 @@
+using System.Globalization;
+using System.Reflection;
+using System.Text.Json;
+
+namespace Politicom.Sim;
+
+/// <summary>
+/// Every tunable number in the simulation. Batch runs override these by name
+/// (<c>--set CoordinationExponent=1.4</c> or <c>--sweep ...</c>) so the open design
+/// questions can be answered with data instead of guesses.
+/// </summary>
+public sealed class Balance
+{
+    // ── Economy ────────────────────────────────────────────────────────────
+    public double FoodNeed { get; set; } = 1.0;
+    public double GoodsNeed { get; set; } = 0.45;
+    public double AgrarianFoodYield { get; set; } = 1.85;
+    public double AgrarianGoodsYield { get; set; } = 0.2;
+    public double IndustrialFoodYield { get; set; } = 0.35;
+    public double IndustrialGoodsYield { get; set; } = 1.15;
+    public double MixedFoodYield { get; set; } = 1.1;
+    public double MixedGoodsYield { get; set; } = 0.65;
+    /// <summary>Self-managed workplaces: ±this fraction of output at trust 1 / 0.</summary>
+    public double TrustProductivity { get; set; } = 0.3;
+    public double PracticalProductivity { get; set; } = 0.5;
+    /// <summary>Ticks of consumption a commune keeps before it shares surplus.</summary>
+    public double ReserveTicks { get; set; } = 3;
+    public double StorageTicks { get; set; } = 12;
+    public double NeighborGenerosity { get; set; } = 0.6;
+    /// <summary>Share of surplus a fully trusting federated commune puts in the federal pool.</summary>
+    public double PoolShare { get; set; } = 0.5;
+    /// <summary>Transport loss on pooled goods; railways reduce it.</summary>
+    public double PoolLoss { get; set; } = 0.2;
+    public double FamineMortality { get; set; } = 0.01;
+    public double ProjectLabor { get; set; } = 0.05;
+
+    // ── Trust ──────────────────────────────────────────────────────────────
+    public double AidTrustGain { get; set; } = 0.008;
+    public double HoardingTrustLoss { get; set; } = 0.01;
+    public double FreeRideTrustLoss { get; set; } = 0.006;
+    public double ValueFrictionRate { get; set; } = 0.003;
+    public double TrustBaselinePull { get; set; } = 0.004;
+    public double BrokenCommitmentTrustLoss { get; set; } = 0.05;
+    public double SharedStruggleTrustGain { get; set; } = 0.003;
+    public double MediationTrustGain { get; set; } = 0.12;
+    public double WarCommitteeTrustLoss { get; set; } = 0.0008;
+
+    // ── Education ──────────────────────────────────────────────────────────
+    public double SchoolingRate { get; set; } = 0.12;
+    public double EducationDecay { get; set; } = 0.001;
+    public double BaselineSchooling { get; set; } = 0.02;
+    public double FundedSchoolingBoost { get; set; } = 0.04;
+    public double SchoolingRelax { get; set; } = 0.04;
+    public double MaxSchooling { get; set; } = 0.25;
+
+    // ── Research ───────────────────────────────────────────────────────────
+    public double DiscoveryRate { get; set; } = 0.012;
+    public double DiffusionRate { get; set; } = 0.05;
+    public double IdeaNudgeWeight { get; set; } = 4;
+    public int IdeaNudgeTicks { get; set; } = 20;
+
+    // ── Voluntary projects ─────────────────────────────────────────────────
+    public double ContributionBase { get; set; } = 0.5;
+    public double CoordinationScale { get; set; } = 0.08;
+    public double CoordinationExponent { get; set; } = 1.3;
+    public double PoliticalCoordinationRelief { get; set; } = 0.5;
+    public double ProjectDeadlineFactor { get; set; } = 3;
+    public int LargeProjectThreshold { get; set; } = 6;
+    public double LargeProjectDrift { get; set; } = 0.03;
+    public double JoinChance { get; set; } = 0.5;
+    public int MaxActiveProjects { get; set; } = 3;
+
+    // ── War and outside pressure ───────────────────────────────────────────
+    public double MilitiaPerPop { get; set; } = 0.12;
+    public double NeighborSupport { get; set; } = 0.25;
+    public double PressureScale { get; set; } = 3.4;
+    public double ControlLossRate { get; set; } = 0.12;
+    public double ControlRecovery { get; set; } = 0.02;
+    /// <summary>"No head to cut off": each occupied commune exhausts the occupier.</summary>
+    public double OccupationExhaustion { get; set; } = 0.015;
+    public double ExhaustionDecay { get; set; } = 0.006;
+    public double GuerrillaExhaustion { get; set; } = 0.002;
+    public double ArmsUse { get; set; } = 0.5;
+    public double ArmsShortageDefense { get; set; } = 0.6;
+    public double WarCommitteeDefense { get; set; } = 0.35;
+    public double WarCommitteeCoordination { get; set; } = 0.3;
+    public double MilitarizationDefense { get; set; } = 0.3;
+    public int MilitarizationTicks { get; set; } = 26;
+    public double ContagionRate { get; set; } = 0.004;
+    public double RepressionRate { get; set; } = 0.002;
+
+    // ── Hierarchy drift ────────────────────────────────────────────────────
+    public double BaselineDrift { get; set; } = 0.08;
+    /// <summary>Drift per tick per point of (practical − political) education gap.</summary>
+    public double ExpertTrapRate { get; set; } = 0.6;
+    public double PoliticalBrake { get; set; } = 0.2;
+    public double WarCommitteeDrift { get; set; } = 0.5;
+    /// <summary>The temptation: while the front is losing ground, people hand power to whoever gets things done.</summary>
+    public double WarStressDrift { get; set; } = 0.5;
+    public double MilitarizationDrift { get; set; } = 0.25;
+    public double ArmsAcceptDrift { get; set; } = 5;
+    public double ForceStayDrift { get; set; } = 6;
+    public double CongressDrift { get; set; } = 1.5;
+    public double RecallDrift { get; set; } = 6;
+    /// <summary>How far below a threshold drift must fall before a stage is undone.</summary>
+    public double StageHysteresis { get; set; } = 10;
+
+    // ── Federation and secession ───────────────────────────────────────────
+    public double SecessionThreshold { get; set; } = 0.55;
+    public double SecessionChance { get; set; } = 0.3;
+    public double RejoinThreshold { get; set; } = 0.3;
+    public double RejoinChance { get; set; } = 0.03;
+    public int SecessionWarningTicks { get; set; } = 2;
+    public double ForceStayTrustLoss { get; set; } = 0.15;
+    /// <summary>Destroyed when fewer than this share of communes remain free and federated.</summary>
+    public double CollapseFraction { get; set; } = 0.3;
+
+    // ── Influence (player resource) ────────────────────────────────────────
+    public double StartInfluence { get; set; } = 25;
+    public double InfluenceBase { get; set; } = 1.0;
+    public double InfluencePolitical { get; set; } = 2.0;
+    public double InfluenceWellbeing { get; set; } = 0.5;
+    public double InfluenceCap { get; set; } = 100;
+    public double CostSchool { get; set; } = 8;
+    public double CostPamphlets { get; set; } = 5;
+    public double CostMediate { get; set; } = 6;
+    public double CostPropose { get; set; } = 10;
+    public double CostPersuade { get; set; } = 4;
+    public double CostCongress { get; set; } = 15;
+    public double CostCirculateIdea { get; set; } = 6;
+    public double CostRecall { get; set; } = 12;
+    public double CostForceStay { get; set; } = 10;
+    public int CongressCooldown { get; set; } = 8;
+
+    public Balance Clone() => (Balance)MemberwiseClone();
+
+    public static IEnumerable<string> ParameterNames() =>
+        typeof(Balance).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.CanWrite).Select(p => p.Name);
+
+    public double Get(string name) => Convert.ToDouble(Property(name).GetValue(this), CultureInfo.InvariantCulture);
+
+    public void Set(string name, double value)
+    {
+        var p = Property(name);
+        p.SetValue(this, p.PropertyType == typeof(int) ? (object)(int)Math.Round(value) : value);
+    }
+
+    /// <summary>Applies a JSON object of { "ParameterName": number } overrides.</summary>
+    public void ApplyOverrides(string json)
+    {
+        var values = JsonSerializer.Deserialize<Dictionary<string, double>>(json)
+                     ?? throw new InvalidDataException("Balance overrides must be a JSON object of numbers.");
+        foreach (var (k, v) in values) Set(k, v);
+    }
+
+    private static PropertyInfo Property(string name) =>
+        typeof(Balance).GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+        ?? throw new ArgumentException($"Unknown balance parameter '{name}'.");
+}

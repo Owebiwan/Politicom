@@ -1,0 +1,159 @@
+{
+  "id": "catalonia_1936",
+  "name": "Revolutionary Catalonia",
+  "description": "19 July 1936. The military uprising has been defeated in Barcelona by armed workers. Factories, farms and trams are collectivized; columns of militia march on Aragon. You are the movement, not the government. Keep the revolution free — and alive — until 1939.",
+  "startDate": "1936-07-19",
+  "endTick": 135,
+  "neighborCount": 3,
+  "neighborRadiusKm": 25,
+
+  "enemy": {
+    "name": "Nationalist Army",
+    "strength": 1.4,
+    "growth": 0.03,
+    "offensives": [
+      { "name": "Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
+      { "name": "Aragon Offensive", "tick": 86, "duration": 10, "strength": 16 },
+      { "name": "Catalonia Offensive", "tick": 124, "duration": 12, "strength": 30 }
+    ]
+  },
+
+  "ally": {
+    "name": "Republican Government",
+    "nextOfferTick": 12,
+    "offerInterval": 20,
+    "armsGoods": 30
+  },
+
+  // Scripted decisions. Ticks are weeks from 19 July 1936. If the movement doesn't answer
+  // within expiresAfter weeks (default 4), defaultOption happens — usually what happened historically.
+  "events": [
+    {
+      "id": "cnt_joins_government",
+      "tick": 10,
+      "title": "Into the Generalitat?",
+      "text": "The Generalitat offers the CNT three ministries in a government of antifascist unity. The Central Committee of Antifascist Militias would be dissolved into it.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Join the government", "description": "Ministers get access to the gold reserves and arms purchases. The committees now answer to them.",
+          "effects": { "drift": 6, "influence": 25, "goodsToFront": 30 } },
+        { "label": "Stay outside", "description": "The committees keep their power. The government will remember the snub.",
+          "effects": { "drift": -1, "influence": -5, "trust": 0.03 } }
+      ]
+    },
+    {
+      "id": "durruti_death",
+      "tick": 18,
+      "title": "Durruti is dead",
+      "text": "Buenaventura Durruti has been killed on the Madrid front. Half a million people follow his coffin through Barcelona. His column needs new leadership.",
+      "defaultOption": 0,
+      "options": [
+        { "label": "Let the column elect its delegates", "description": "The militia stays self-managed, but loses its most experienced commander.",
+          "effects": { "drift": -2, "enemyStrength": 0.3, "communes": [ "Bujaraloz", "Pina de Ebro" ], "wellbeing": 0.05 } },
+        { "label": "Appoint a commander from the war committee", "description": "Continuity at the front, at the price of a chain of command.",
+          "effects": { "drift": 3, "enemyStrength": -0.3 } }
+      ]
+    },
+    {
+      "id": "may_days",
+      "tick": 41,
+      "title": "The May Days",
+      "text": "Assault Guards seize the Telefónica exchange, held by the CNT since July. Barricades go up across Barcelona. The leadership in Valencia urges a ceasefire; the Friends of Durruti call for resistance.",
+      "defaultOption": 0,
+      "requiresFederated": [ "Sants textile syndicate" ],
+      "options": [
+        { "label": "Call for a ceasefire", "description": "Unity holds. The revolution's control of Barcelona ends quietly, and many militants feel betrayed.",
+          "effects": { "drift": 6, "influence": -10,
+            "communes": [ "Sants textile syndicate", "Poblenou metalworkers", "Barcelona transport collective", "Badalona", "L'Hospitalet" ],
+            "trust": -0.08, "wellbeing": -0.05 } },
+        { "label": "Hold the barricades", "description": "The revolution is defended in the streets. Civil war within the civil war weakens the front, and the government will send no more arms.",
+          "effects": { "drift": -4, "enemyStrength": 1.0, "endAllyOffers": true,
+            "communes": [ "Sants textile syndicate", "Poblenou metalworkers", "Barcelona transport collective", "Badalona", "L'Hospitalet" ],
+            "trust": 0.05, "wellbeing": -0.12 } }
+      ]
+    },
+    {
+      "id": "aragon_council",
+      "tick": 55,
+      "title": "The Council of Aragon is dissolved",
+      "text": "Líster's 11th Division enters Aragon to dissolve the Regional Defense Council and break up the collectives by force.",
+      "defaultOption": 0,
+      "requiresFederated": [ "Caspe" ],
+      "options": [
+        { "label": "Accept the dissolution", "description": "Collectives are broken up and their leaders arrested. Aragon's villages lose faith in the federation.",
+          "effects": { "drift": 4,
+            "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
+            "wellbeing": -0.2, "trust": -0.05 } },
+        { "label": "Negotiate", "description": "Give up the Council to save the collectives. It costs most of the movement's standing.",
+          "effects": { "drift": 2, "influence": -20,
+            "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
+            "wellbeing": -0.05 } },
+        { "label": "Defend the collectives", "description": "Militias face Republican troops. The collectives survive; the front pays for it, and the government cuts off arms.",
+          "effects": { "drift": -2, "enemyStrength": 1.5, "endAllyOffers": true,
+            "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
+            "wellbeing": -0.08, "trust": 0.05 } }
+      ]
+    },
+    {
+      "id": "sim_police",
+      "tick": 62,
+      "title": "The SIM offers its services",
+      "text": "The new Military Investigation Service offers to root out fifth columnists and 'uncontrollables' in the collectives.",
+      "defaultOption": 1,
+      "options": [
+        { "label": "Cooperate with the SIM", "description": "Saboteurs are caught. So are a good number of anarchists.",
+          "effects": { "drift": 8, "enemyStrength": -0.8, "trust": -0.05 } },
+        { "label": "Refuse", "description": "The collectives police themselves, as they always have.",
+          "effects": { "influence": -5 } }
+      ]
+    },
+    {
+      "id": "ebro",
+      "tick": 105,
+      "title": "The Battle of the Ebro",
+      "text": "The Republic stakes everything on a crossing of the Ebro and asks every collective for people and materiel.",
+      "defaultOption": 1,
+      "options": [
+        { "label": "Send everything", "description": "Full mobilization blunts the enemy before the last offensive — and leaves the collectives hollowed out.",
+          "effects": { "drift": 4, "enemyStrength": -3, "wellbeing": -0.1 } },
+        { "label": "Send volunteers only", "description": "Those who want to fight go. The collectives keep working.",
+          "effects": { "enemyStrength": -1 } }
+      ]
+    }
+  ],
+
+  // kind: Agrarian | Industrial | Mixed. Values run -1..1 (collectivist, militant, federalist).
+  // Population in thousands, abstracted — Barcelona's syndicates stand in for the city.
+  "communes": [
+    { "name": "Sants textile syndicate", "kind": "Industrial", "lon": 2.13, "lat": 41.375, "population": 60, "collectivism": 0.7, "militancy": 0.3, "federalism": 0.6, "practical": 0.35, "political": 0.35, "techs": [ "collective_workshops", "ateneo_libraries" ], "description": "The CNT's heartland in Barcelona's textile mills." },
+    { "name": "Poblenou metalworkers", "kind": "Industrial", "lon": 2.20, "lat": 41.40, "population": 55, "collectivism": 0.8, "militancy": 0.6, "federalism": 0.5, "practical": 0.4, "political": 0.3, "techs": [ "collective_workshops" ], "description": "Foundries and machine shops; soon converting to war work." },
+    { "name": "Barcelona transport collective", "kind": "Industrial", "lon": 2.17, "lat": 41.39, "population": 40, "collectivism": 0.6, "militancy": 0.4, "federalism": 0.8, "practical": 0.35, "political": 0.35, "techs": [ "libertarian_press" ], "description": "Trams, buses and the Solidaridad Obrera presses." },
+    { "name": "Badalona", "kind": "Industrial", "lon": 2.25, "lat": 41.45, "population": 25, "collectivism": 0.5, "militancy": 0.3, "federalism": 0.3, "practical": 0.25, "political": 0.25 },
+    { "name": "L'Hospitalet", "kind": "Industrial", "lon": 2.10, "lat": 41.36, "population": 25, "collectivism": 0.6, "militancy": 0.5, "federalism": 0.4, "practical": 0.25, "political": 0.3, "techs": [ "ateneo_libraries" ], "description": "Militant working-class suburb with a strong ateneo tradition." },
+    { "name": "Sabadell", "kind": "Industrial", "lon": 2.11, "lat": 41.55, "population": 30, "collectivism": 0.3, "militancy": 0.1, "federalism": 0.4, "practical": 0.3, "political": 0.2, "description": "Wool town with a moderate, treintista-leaning union." },
+    { "name": "Terrassa", "kind": "Industrial", "lon": 2.01, "lat": 41.56, "population": 30, "collectivism": 0.4, "militancy": 0.2, "federalism": 0.3, "practical": 0.3, "political": 0.2 },
+    { "name": "Mataró", "kind": "Mixed", "lon": 2.44, "lat": 41.54, "population": 18, "collectivism": 0.5, "militancy": 0.2, "federalism": 0.2, "practical": 0.25, "political": 0.2 },
+    { "name": "Girona", "kind": "Mixed", "lon": 2.82, "lat": 41.98, "population": 16, "collectivism": 0.2, "militancy": 0.0, "federalism": 0.1, "practical": 0.25, "political": 0.15 },
+    { "name": "Vic", "kind": "Agrarian", "lon": 2.25, "lat": 41.93, "population": 12, "collectivism": -0.2, "militancy": -0.3, "federalism": -0.3, "practical": 0.15, "political": 0.1, "description": "Conservative Catholic market town; collectivization is unpopular." },
+    { "name": "Manresa", "kind": "Mixed", "lon": 1.83, "lat": 41.73, "population": 18, "collectivism": 0.4, "militancy": 0.2, "federalism": 0.2, "practical": 0.2, "political": 0.2 },
+    { "name": "Tarragona", "kind": "Mixed", "lon": 1.25, "lat": 41.12, "population": 16, "collectivism": 0.3, "militancy": 0.1, "federalism": 0.2, "practical": 0.2, "political": 0.15 },
+    { "name": "Reus", "kind": "Mixed", "lon": 1.10, "lat": 41.16, "population": 15, "collectivism": 0.3, "militancy": 0.2, "federalism": 0.3, "practical": 0.2, "political": 0.2 },
+    { "name": "Tortosa", "kind": "Agrarian", "lon": 0.52, "lat": 40.81, "population": 14, "collectivism": 0.4, "militancy": 0.3, "federalism": 0.0, "practical": 0.12, "political": 0.15 },
+    { "name": "Lleida", "kind": "Mixed", "lon": 0.62, "lat": 41.62, "population": 18, "collectivism": 0.5, "militancy": 0.5, "federalism": 0.4, "practical": 0.2, "political": 0.2, "description": "Crossroads to Aragon; the POUM is strong here." },
+    { "name": "Cervera", "kind": "Agrarian", "lon": 1.27, "lat": 41.67, "population": 9, "collectivism": -0.1, "militancy": -0.2, "federalism": -0.2, "practical": 0.12, "political": 0.1 },
+    { "name": "Balaguer", "kind": "Agrarian", "lon": 0.81, "lat": 41.79, "population": 9, "collectivism": 0.2, "militancy": 0.1, "federalism": -0.1, "practical": 0.12, "political": 0.12 },
+    { "name": "Fraga", "kind": "Agrarian", "lon": 0.35, "lat": 41.52, "population": 8, "collectivism": 0.9, "militancy": 0.6, "federalism": 0.2, "practical": 0.1, "political": 0.25, "description": "Aragonese collective; money abolished in the village." },
+    { "name": "Binéfar", "kind": "Agrarian", "lon": 0.29, "lat": 41.85, "population": 7, "collectivism": 0.8, "militancy": 0.5, "federalism": 0.3, "practical": 0.1, "political": 0.22 },
+    { "name": "Monzón", "kind": "Agrarian", "lon": 0.19, "lat": 41.91, "population": 8, "collectivism": 0.7, "militancy": 0.6, "federalism": 0.3, "practical": 0.12, "political": 0.2 },
+    { "name": "Barbastro", "kind": "Agrarian", "lon": 0.13, "lat": 42.04, "population": 9, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.2, "practical": 0.12, "political": 0.18, "front": true, "description": "Headquarters for the Huesca front." },
+    { "name": "Graus", "kind": "Agrarian", "lon": 0.34, "lat": 42.19, "population": 6, "collectivism": 0.9, "militancy": 0.4, "federalism": -0.2, "practical": 0.1, "political": 0.25, "description": "Celebrated, fiercely independent collective." },
+    { "name": "Sariñena", "kind": "Agrarian", "lon": -0.16, "lat": 41.79, "population": 6, "collectivism": 0.6, "militancy": 0.7, "federalism": 0.1, "practical": 0.08, "political": 0.15, "front": true },
+    { "name": "Bujaraloz", "kind": "Agrarian", "lon": -0.15, "lat": 41.50, "population": 5, "collectivism": 0.7, "militancy": 0.9, "federalism": 0.0, "practical": 0.08, "political": 0.18, "front": true, "techs": [ "militia_doctrine" ], "description": "Durruti Column headquarters, facing Zaragoza." },
+    { "name": "Pina de Ebro", "kind": "Agrarian", "lon": -0.53, "lat": 41.49, "population": 5, "collectivism": 0.7, "militancy": 0.8, "federalism": 0.0, "practical": 0.08, "political": 0.15, "front": true },
+    { "name": "Caspe", "kind": "Agrarian", "lon": -0.04, "lat": 41.23, "population": 10, "collectivism": 0.8, "militancy": 0.6, "federalism": 0.5, "practical": 0.12, "political": 0.25, "description": "Seat of the Regional Defense Council of Aragon." },
+    { "name": "Alcañiz", "kind": "Agrarian", "lon": -0.13, "lat": 41.05, "population": 10, "collectivism": 0.7, "militancy": 0.5, "federalism": 0.2, "practical": 0.12, "political": 0.18 },
+    { "name": "Calanda", "kind": "Agrarian", "lon": -0.23, "lat": 40.94, "population": 6, "collectivism": 0.9, "militancy": 0.4, "federalism": -0.3, "practical": 0.08, "political": 0.2 },
+    { "name": "Mas de las Matas", "kind": "Agrarian", "lon": -0.24, "lat": 40.83, "population": 4, "collectivism": 1.0, "militancy": 0.2, "federalism": -0.4, "practical": 0.08, "political": 0.25, "description": "A model collective, visited by journalists from abroad." },
+    { "name": "Alcorisa", "kind": "Agrarian", "lon": -0.38, "lat": 40.89, "population": 5, "collectivism": 0.9, "militancy": 0.3, "federalism": -0.2, "practical": 0.08, "political": 0.2, "front": true }
+  ]
+}

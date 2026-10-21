@@ -1,0 +1,25 @@
+<Project Sdk="Godot.NET.Sdk/4.7.2">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <!-- Lets Godot host the game on a newer .NET runtime (e.g. only .NET 9 installed). -->
+    <RollForward>LatestMajor</RollForward>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Politicom.Game</RootNamespace>
+  </PropertyGroup>
+
+  <!-- The simulation knows nothing about Godot; this project only draws it and forwards input. -->
+  <ItemGroup>
+    <ProjectReference Include="../Sim/Sim.csproj" />
+  </ItemGroup>
+
+  <!-- ../Data is the single source of truth. Mirror it into res://data so exports pack it. -->
+  <Target Name="MirrorGameData" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <GameData Include="../Data/**/*.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GameData)" DestinationFiles="@(GameData->'data/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
