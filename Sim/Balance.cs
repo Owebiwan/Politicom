@@ -76,7 +76,7 @@ public sealed class Balance
     /// <summary>Goods bought per unit of food sold, before embargoes.</summary>
     public double TradeRate { get; set; } = 0.8;
     /// <summary>Drift per turn from currency, accounts and a trade bureau.</summary>
-    public double TradeDrift { get; set; } = 0.2;
+    public double TradeDrift { get; set; } = 0.12;
     /// <summary>Embargo strength per point of mean radicalization behind enemy lines.</summary>
     public double EmbargoPerRadicalization { get; set; } = 1.5;
 
@@ -92,6 +92,10 @@ public sealed class Balance
     public double GuerrillaExhaustion { get; set; } = 0.002;
     public double ArmsUse { get; set; } = 0.5;
     public double ArmsShortageDefense { get; set; } = 0.6;
+    /// <summary>Defense bonus for a front commune with a full arms stockpile.</summary>
+    public double StockpileDefense { get; set; } = 0.15;
+    /// <summary>Goods per head (thousands) that count as a full stockpile.</summary>
+    public double StockpilePerPop { get; set; } = 3;
     public double WarCommitteeDefense { get; set; } = 0.35;
     public double WarCommitteeCoordination { get; set; } = 0.3;
     public double MilitarizationDefense { get; set; } = 0.3;

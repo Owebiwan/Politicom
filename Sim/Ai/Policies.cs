@@ -14,7 +14,7 @@ public static class Policies
 {
     public static readonly IReadOnlyList<IPolicy> All = new IPolicy[]
     {
-        new Passive(), new Educator(), new Centralizer(), new Balanced(),
+        new Passive(), new Educator(), new Centralizer(), new Balanced(), new Trader(),
     };
 
     public static IPolicy Get(string name) =>
@@ -87,7 +87,10 @@ public sealed class Balanced : IPolicy
 {
     public string Name => "balanced";
 
-    public void Act(World w)
+    public void Act(World w) => Act(w, trade: null);
+
+    /// <summary>trade: null = only when the front is short of arms; true = whenever drift allows.</summary>
+    internal void Act(World w, bool? trade)
     {
         var b = w.Balance;
         bool crisis = w.Federation.Any(c => c.Front && c.Control < 0.5) || w.OffensiveUnderway;
@@ -97,9 +100,9 @@ public sealed class Balanced : IPolicy
         else if (!w.WarCommittee && crisis && margin > 12) w.Apply(new SetWarCommittee(true));
 
         // Trade grain for arms only while the front is short and drift has room to spare.
-        bool armsShort = w.Federation.Any(c => c.Front && c.GoodsCoverage < 0.9);
-        if (w.ForeignTrade && (!armsShort || margin < 6)) w.Apply(new SetForeignTrade(false));
-        else if (!w.ForeignTrade && armsShort && margin > 10 && w.Embargo < 0.5) w.Apply(new SetForeignTrade(true));
+        bool wantTrade = trade ?? w.Federation.Any(c => c.Front && c.GoodsCoverage < 0.9);
+        if (w.ForeignTrade && (!wantTrade || margin < 6)) w.Apply(new SetForeignTrade(false));
+        else if (!w.ForeignTrade && wantTrade && margin > 10 && w.Embargo < 0.5) w.Apply(new SetForeignTrade(true));
 
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(crisis && w.Drift.Value < 15));
         Helpers.AnswerEvents(w, e => e.Drift + e.EnemyStrength * (crisis ? 6 : 3) - e.Influence * 0.05 - e.Wellbeing * 10 - e.Trust * 20);
@@ -123,6 +126,16 @@ public sealed class Balanced : IPolicy
         }
         if (w.Influence > 15) Helpers.MediateWeakest(w);
     }
+}
+
+/// <summary>The balanced player, but trading grain for arms whenever drift has room. Measures whether trade pays.</summary>
+public sealed class Trader : IPolicy
+{
+    private readonly Balanced _balanced = new();
+
+    public string Name => "trader";
+
+    public void Act(World w) => _balanced.Act(w, trade: true);
 }
 
 internal static class Helpers

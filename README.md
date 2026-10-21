@@ -72,6 +72,13 @@ capitalist states needs currency, which brings markets and accounts back in.
 - **The cost:** drift every turn from the trade bureau and its accounts.
 - **Embargoes:** as the idea spreads behind enemy lines, more of the world refuses to trade.
   The embargo is 1.5 × mean radicalization, capped at 90%. Spread and trade pull against each other.
+- **What arms are worth:** a front commune's defense rises with its arms stockpile, up to +15%,
+  so goods from trade, the ally or events actually help hold the line.
+
+Whether trade pays depends on the scenario (compare `balanced` and `trader` in the tables
+below). In Paris's short siege the arms come in time and the drift doesn't, so it helps
+(39% survival vs 28%). In the Free Territory's long war the drift piles up, and the trader
+becomes a state 61% of the time.
 
 ## Historical events
 
@@ -125,15 +132,17 @@ The four policies:
 - **educator**: political education, mediation and recall; never centralizes.
 - **centralizer**: war committee, government arms, the statistics bureau.
 - **balanced**: centralizes only in emergencies and recalls delegates before thresholds.
+- **trader**: the balanced player, but it opens foreign trade whenever drift has room.
 
 The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           11%       89%     0% │    62    49     15    67    48 │    64
-educator          85%       15%     0% │    65    50     22    73    53 │    62
-centralizer        0%        0%   100% │    40    49      6    52    37 │   100
-balanced          99%        0%     1% │    87    50     19    64    55 │    79
+passive           14%       86%     0% │    62    49     15    67    48 │    63
+educator          89%       11%     0% │    65    51     22    73    53 │    62
+centralizer        0%        0%   100% │    35    50      5    52    36 │   100
+balanced          99%        1%     1% │    87    50     19    64    55 │    80
+trader            97%        0%     3% │    87    51     19    63    55 │    84
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -145,27 +154,29 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    60    50     16    86    53 │    32
-educator           0%      100%     0% │    61    51     16    90    55 │    23
-centralizer        0%        0%   100% │    37    48      5    53    36 │   100
-balanced          70%        5%    25% │    84    49     18    70    55 │    67
+passive            0%      100%     0% │    62    50     16    86    54 │    32
+educator           0%      100%     0% │    64    51     17    90    55 │    23
+centralizer        0%        0%   100% │    34    48      4    53    35 │   100
+balanced          65%       19%    16% │    84    49     19    73    56 │    62
+trader            24%       15%    61% │    80    49     16    64    52 │    80
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
-with the highest freedom. The educator's total score ties the balanced player's.
+with the highest freedom. The educator's total score nearly ties the balanced player's.
 
 Paris (`--scenario paris_commune_1871`) is the tragic one:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    79    67     11    91    62 │    26
-educator           0%      100%     0% │    78    67     12    95    63 │     8
-centralizer        0%        0%   100% │    88    64      8    52    53 │   100
-balanced          30%       70%     0% │    96    68     11    93    67 │    17
+passive            0%      100%     0% │    83    67     11    91    63 │    27
+educator           0%      100%     0% │    83    67     11    96    64 │     8
+centralizer        0%        0%   100% │    83    64      8    51    51 │   100
+balanced          28%       72%     0% │    96    68     11    93    67 │    17
+trader            39%       61%     0% │    96    68     11    90    66 │    24
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in
-days. A war committee at the right moment gives a 30% chance of outlasting history. Winning
+days. A war committee at the right moment gives about a 30% chance of outlasting history. Winning
 the war outright means becoming a state.
 
 In the Catalonia table, centralizing wins the war and loses the revolution, doing nothing loses

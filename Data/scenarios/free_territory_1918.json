@@ -27,7 +27,7 @@
       "offensives": [
         { "name": "The Red Army's first offensive", "tick": 28, "duration": 10, "strength": 4.2 },
         { "name": "The Red winter occupation", "tick": 61, "duration": 18, "strength": 5.6 },
-        { "name": "The final Red offensive", "tick": 106, "duration": 40, "strength": 11.2 }
+        { "name": "The final Red offensive", "tick": 106, "duration": 40, "strength": 15 }
       ]
     }
   ],

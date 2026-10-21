@@ -94,6 +94,7 @@ internal static class WarSystem
                       * (w.WarCommittee ? 1 + b.WarCommitteeDefense : 1)
                       * (w.Ally.MilitarizationTicks > 0 ? 1 + b.MilitarizationDefense : 1)
                       * (b.ArmsShortageDefense + (1 - b.ArmsShortageDefense) * c.GoodsCoverage)
+                      * (1 + b.StockpileDefense * Math.Clamp(c.Goods / (c.Population * b.StockpilePerPop), 0, 1))
                       * (w.RecallPenaltyTicks > 0 ? 0.9 : 1);
         return (own + support) * mult;
     }
