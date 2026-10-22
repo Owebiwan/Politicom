@@ -90,6 +90,18 @@ trader            64%       35%     1% │    76    54     12    71    53 │   
 
 ## What the player sees
 
+- **The map:** each commune is a territory (a Voronoi cell, rounded off at the federation's
+  edge), coloured by the map mode over a tint for its land: farmland, mixed or industry.
+  - Occupied land takes the occupier's colour, and front borders are drawn in the enemy's colour.
+  - A small bar under each front commune's name shows how much of it is still held.
+  - Seceded communes are greyed with a dashed border, and the selection is outlined in gold.
+  - Trust links are an optional overlay (T).
+  - The view fits itself to the territories, and you can zoom and pan.
+- **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
+  always visible. Everything else is in four tabs: Overview, Movement, Commune and Log.
+  Clicking a commune opens its tab.
+- **The theme:** one dark theme throughout (`Game/scripts/UiTheme.cs`), with a red accent for
+  the movement.
 - **Intro screen:** the situation, the dilemma, how you win, and the controls.
 - **Drift meter:** split into the four stage zones, with the threshold where a state forms.
   Below it, last week's drift is broken down by cause.

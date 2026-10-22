@@ -51,7 +51,7 @@ public partial class CommuneList : PanelContainer
         {
             _tree.SetColumnTitle(i, Titles[i]);
             _tree.SetColumnExpand(i, i is 0 or 7);
-            _tree.SetColumnCustomMinimumWidth(i, i switch { 0 => 140, 3 => 88, 7 => 190, _ => 64 });
+            _tree.SetColumnCustomMinimumWidth(i, i switch { 0 => 130, 3 => 80, 7 => 150, _ => 58 });
         }
         _tree.ColumnTitleClicked += (column, _) =>
         {

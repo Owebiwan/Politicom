@@ -8,13 +8,20 @@ namespace Politicom.Game;
 public enum MapMode { Trust, Education, Values, Wellbeing }
 
 /// <summary>
-/// Draws the communes and the trust network over them. Edge thickness and colour show trust,
-/// rings show the front, secession and selection; the map mode recolours the communes.
+/// The map. Each commune is a territory (a Voronoi cell rounded off at the federation's edge),
+/// filled by the map mode over a tint for its kind of land. Occupied land takes the occupier's
+/// colour; front borders are drawn in the enemy's colour; the trust network is an overlay.
 /// </summary>
 public partial class MapView : Control
 {
     private const float Margin = 70;
-    private static readonly Color Background = new(0.08f, 0.09f, 0.11f);
+    private const float LegendHeight = 52;
+    private static readonly Color Highlight = new("f2c94c");
+    private static readonly Color Background = new("101216");
+    private static readonly Color Border = new("0b0c0f");
+    private static readonly Color FarmLand = new("3b4a35");
+    private static readonly Color MixedLand = new("4a4838");
+    private static readonly Color Industry = new("44464e");
     private static readonly Color Label = new(0.85f, 0.86f, 0.88f);
     private static readonly Color Muted = new(0.45f, 0.47f, 0.5f);
     private static readonly Color Danger = new(0.92f, 0.3f, 0.25f);
@@ -40,6 +47,7 @@ public partial class MapView : Control
             if (ReferenceEquals(value, _world)) return;
             _world = value;
             _layout = null;
+            _cells = null;
             _zoom = 1;
             _pan = Vector2.Zero;
             _hover = null;
@@ -48,6 +56,7 @@ public partial class MapView : Control
     }
 
     public MapMode Mode { get; set; } = MapMode.Trust;
+    public bool ShowTrustLinks { get; set; } = true;
     public int? Selected { get; set; }
     public int? Secondary { get; set; }
     public string? Banner { get; set; }
@@ -128,66 +137,76 @@ public partial class MapView : Control
         DrawRect(new Rect2(Vector2.Zero, Size), Background);
         if (World is not { } w) return;
         var font = ThemeDB.FallbackFont;
+        var cells = Cells();
+        var screen = cells.Select(cell => cell.Select(ToScreen).ToArray()).ToArray();
 
-        foreach (var (a, b) in w.Trust.Edges())
+        // Territories
+        foreach (var c in w.Communes)
         {
-            var ca = w.Communes[a];
-            var cb = w.Communes[b];
-            var pa = ToScreen(ca);
-            var pb = ToScreen(cb);
-            if (ca.Occupied || cb.Occupied)
-            {
-                DrawDashedLine(pa, pb, new Color(Muted, 0.35f), 1, 4);
-                continue;
-            }
-            float t = (float)w.Trust[a, b];
-            var color = TrustColor(t);
-            if (!ca.Federated || !cb.Federated) color.A = 0.35f;
-            DrawLine(pa, pb, color, 1 + 5 * t, true);
+            var poly = screen[c.Id];
+            if (poly.Length < 3) continue;
+            var fill = Fill(w, c);
+            if (c.Id == _hover) fill = fill.Lightened(0.12f);
+            DrawColoredPolygon(poly, fill);
         }
+        foreach (var c in w.Communes)
+            if (screen[c.Id].Length >= 3) Outline(screen[c.Id], Border, 1.5f);
 
+        // Overlays on the borders: fronts, secession, selection
+        foreach (var c in w.Communes)
+        {
+            var poly = screen[c.Id];
+            if (poly.Length < 3) continue;
+            if (c.OccupiedBy is int by) Outline(poly, new Color(EnemyColor(w, by), 0.7f), 1.5f);
+            else if (c.Front) Outline(poly, EnemyColor(w, c.Fronts.Min()), 3);
+            if (!c.Occupied && !c.Federated) DashedOutline(poly, Warn, 2);
+            if (w.PendingSecessions.Any(s => s.Commune == c.Id))
+                Outline(poly, new Color(Decision, 0.55f + 0.45f * Mathf.Sin((float)_time * 5)), 3);
+        }
+        if (Secondary is int sec && screen[sec].Length >= 3) DashedOutline(screen[sec], Highlight, 2);
+        if (Selected is int sel && screen[sel].Length >= 3) Outline(screen[sel], Highlight, 3.5f);
+
+        if (ShowTrustLinks)
+            foreach (var (a, b) in w.Trust.Edges())
+            {
+                var ca = w.Communes[a];
+                var cb = w.Communes[b];
+                if (ca.Occupied || cb.Occupied) continue;
+                float t = (float)w.Trust[a, b];
+                var color = new Color(TrustColor(t), ca.Federated && cb.Federated ? 0.75f : 0.3f);
+                DrawLine(ToScreen(ca), ToScreen(cb), color, 1 + 3 * t, true);
+            }
+
+        // Towns, front meters and names
         foreach (var c in w.Communes)
         {
             var p = ToScreen(c);
-            float r = Radius(c);
+            float r = Marker(c);
             if (c.Occupied)
             {
-                DrawCircle(p, r, new Color(0.22f, 0.22f, 0.24f));
                 var occupier = c.OccupiedBy is int by ? EnemyColor(w, by) : Danger;
-                DrawLine(p + new Vector2(-r, -r) * 0.6f, p + new Vector2(r, r) * 0.6f, occupier, 2, true);
-                DrawLine(p + new Vector2(-r, r) * 0.6f, p + new Vector2(r, -r) * 0.6f, occupier, 2, true);
+                DrawLine(p + new Vector2(-r, -r), p + new Vector2(r, r), occupier, 2, true);
+                DrawLine(p + new Vector2(-r, r), p + new Vector2(r, -r), occupier, 2, true);
             }
             else
             {
-                DrawCircle(p, r, NodeColor(w, c));
-                DrawArc(p, r, 0, Mathf.Tau, 32, new Color(0, 0, 0, 0.6f), 1.5f, true);
+                DrawCircle(p, r + 1.5f, Border);
+                DrawCircle(p, r, c.Kind == CommuneKind.Industrial ? new Color("e9e4d8") : new Color("cfd6c4"));
+                if (c.Starving) DrawCircle(p + new Vector2(r + 2, -r - 2), 3.5f, Warn);
             }
+
+            var labelAt = p + new Vector2(r + 5, 4);
+            DrawStringOutline(font, labelAt, c.Name, HorizontalAlignment.Left, -1, 12, 4, Border);
+            DrawString(font, labelAt, c.Name, HorizontalAlignment.Left, -1, 12, c.Occupied ? Muted : Label);
 
             if (c.Front && !c.Occupied)
             {
-                // One ring per enemy faced; the filled arc shows how much of the commune is still held.
-                int ring = 0;
-                foreach (var k in c.Fronts.OrderBy(k => k))
-                {
-                    var color = EnemyColor(w, k);
-                    float rr = r + 4 + ring++ * 4;
-                    DrawArc(p, rr, 0, Mathf.Tau, 32, new Color(color, 0.25f), 3, true);
-                    DrawArc(p, rr, -Mathf.Pi / 2, -Mathf.Pi / 2 + Mathf.Tau * (float)c.Control, 32, color, 3, true);
-                }
+                // Control meter under the name: held part light, lost part in the enemy's colour.
+                var bar = new Rect2(labelAt + new Vector2(0, 5), new Vector2(34, 4));
+                DrawRect(bar.Grow(1), Border);
+                DrawRect(bar, EnemyColor(w, c.Fronts.Min()));
+                DrawRect(new Rect2(bar.Position, new Vector2(bar.Size.X * (float)c.Control, bar.Size.Y)), new Color("e9e4d8"));
             }
-            if (!c.Federated && !c.Occupied)
-                for (int i = 0; i < 8; i++)
-                    DrawArc(p, r + 4, i * Mathf.Tau / 8, i * Mathf.Tau / 8 + Mathf.Tau / 16, 6, Warn, 2, true);
-            if (w.PendingSecessions.Any(s => s.Commune == c.Id))
-                DrawArc(p, r + 8 + 3 * Mathf.Sin((float)_time * 5), 0, Mathf.Tau, 32, Decision, 2, true);
-            if (c.Starving && !c.Occupied)
-                DrawCircle(p + new Vector2(r * 0.7f, -r * 0.7f), 3.5f, Warn);
-            if (c.Id == Selected) DrawArc(p, r + 9, 0, Mathf.Tau, 40, Colors.White, 2.5f, true);
-            if (c.Id == Secondary) DrawArc(p, r + 9, 0, Mathf.Tau, 40, new Color(1, 1, 1, 0.5f), 1.5f, true);
-
-            DrawStringOutline(font, p + new Vector2(r + 4, 4), c.Name, HorizontalAlignment.Left, -1, 12, 4, Background);
-            DrawString(font, p + new Vector2(r + 4, 4), c.Name, HorizontalAlignment.Left, -1, 12,
-                c.Occupied ? Muted : Label);
         }
 
         DrawLegend(font);
@@ -199,6 +218,29 @@ public partial class MapView : Control
             DrawRect(new Rect2(at - new Vector2(16, 34), size + new Vector2(32, 20)), new Color(0, 0, 0, 0.75f));
             DrawString(font, at, banner, HorizontalAlignment.Left, -1, 28, Colors.White);
         }
+    }
+
+    /// <summary>Territory colour: the map mode over a tint for the kind of land; occupied land takes the occupier's colour.</summary>
+    private Color Fill(World w, Commune c)
+    {
+        if (c.OccupiedBy is int by) return EnemyColor(w, by).Darkened(0.55f) with { A = 0.85f };
+        var land = c.Kind switch { CommuneKind.Agrarian => FarmLand, CommuneKind.Industrial => Industry, _ => MixedLand };
+        var color = land.Lerp(NodeColor(w, c), 0.75f);
+        if (!c.Federated) color = color.Lerp(new Color(color.V, color.V, color.V), 0.7f).Darkened(0.25f); // seceded: greyed
+        return color;
+    }
+
+    private void Outline(Vector2[] poly, Color color, float width)
+    {
+        var closed = new Vector2[poly.Length + 1];
+        poly.CopyTo(closed, 0);
+        closed[^1] = poly[0];
+        DrawPolyline(closed, color, width, true);
+    }
+
+    private void DashedOutline(Vector2[] poly, Color color, float width)
+    {
+        for (int i = 0; i < poly.Length; i++) DrawDashedLine(poly[i], poly[(i + 1) % poly.Length], color, width, 6);
     }
 
     private Color NodeColor(World w, Commune c)
@@ -227,21 +269,31 @@ public partial class MapView : Control
     private static Color EnemyColor(World w, int enemy) =>
         Color.FromString(w.Enemies[enemy].Color, Danger);
 
-    private static Color TrustColor(float t) =>
-        t < 0.5f ? Danger.Lerp(Warn, t * 2) : Warn.Lerp(new Color(0.35f, 0.8f, 0.45f), (t - 0.5f) * 2);
+    // Rust → sand → sage: a diverging scale that stays readable when blended over the land tint.
+    private static readonly Color Low = new("b4533e");
+    private static readonly Color Mid = new("cdb46e");
+    private static readonly Color High = new("5f9e6a");
+
+    /// <summary>Most trust and wellbeing values sit between 0.3 and 0.9, so stretch that range across the scale.</summary>
+    private static Color TrustColor(float t)
+    {
+        t = Mathf.Clamp((t - 0.3f) / 0.6f, 0, 1);
+        return t < 0.5f ? Low.Lerp(Mid, t * 2) : Mid.Lerp(High, (t - 0.5f) * 2);
+    }
 
     private void DrawLegend(Font font)
     {
         string text = Mode switch
         {
-            MapMode.Trust => "Trust — red low, green high. Line width = trust between neighbours.",
+            MapMode.Trust => "Trust — rust low, sand middling, green high. Lines: trust between neighbours.",
             MapMode.Education => "Education — orange: practical ahead (expert trap), violet: political ahead. Darker = less educated.",
             MapMode.Values => "Values — red: collectivist, green: federalist, blue: militant.",
-            _ => "Wellbeing — red low, green high.",
+            _ => "Wellbeing — rust low, sand middling, green high.",
         };
+        DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
         DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         DrawString(font, new Vector2(14, Size.Y - 14),
-            "Rings: front, one per enemy (filled = control). Crosses: occupied. Dashed yellow: seceded. Pulsing blue: leaving. Shift-click: second commune.",
+            "Coloured border: front (the bar shows control). Enemy colour: occupied. Dashed yellow: seceded. Pulsing blue: leaving. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
@@ -281,12 +333,79 @@ public partial class MapView : Control
     private Vector2[]? _layout;
     private Vector2 _layoutSize;
 
-    private Vector2 ToScreen(Commune c) => (Layout()[c.Id] - Size / 2) * _zoom + Size / 2 + _pan;
+    private Vector2 ToScreen(Commune c) => ToScreen(Layout()[c.Id]);
+
+    // Fit: territories reach beyond their towns, so after computing them the whole map is scaled
+    // to fit the pane (labels need room on the right, the legend at the bottom).
+    private float _fitScale = 1;
+    private Vector2 _fitOffset;
+
+    private Vector2 ToScreen(Vector2 layout) => (layout * _fitScale + _fitOffset - Size / 2) * _zoom + Size / 2 + _pan;
+
+    private Vector2 ToLayout(Vector2 screen) => ((screen - Size / 2 - _pan) / _zoom + Size / 2 - _fitOffset) / _fitScale;
+
+    private void FitToTerritories(Vector2[][] cells)
+    {
+        var all = cells.SelectMany(c => c).ToArray();
+        if (all.Length == 0) return;
+        var min = new Vector2(all.Min(p => p.X), all.Min(p => p.Y));
+        var max = new Vector2(all.Max(p => p.X), all.Max(p => p.Y));
+        var area = new Rect2(16, 16, Size.X - 16 - 110, Size.Y - 16 - LegendHeight - 8);
+        var extent = max - min;
+        _fitScale = Mathf.Min(1, Mathf.Min(area.Size.X / extent.X, area.Size.Y / extent.Y));
+        _fitOffset = area.Position + (area.Size - extent * _fitScale) / 2 - min * _fitScale;
+    }
+
+    private Vector2[][]? _cells;
+    private Vector2[]? _cellsFor;
+
+    /// <summary>
+    /// Territories in layout space. Each starts as a disk around its commune — which gives the
+    /// federation a rounded outer edge — and is clipped by the perpendicular bisector with every
+    /// other commune, so neighbours share exact borders. O(n²) half-plane clips: instant for 40.
+    /// </summary>
+    private Vector2[][] Cells()
+    {
+        var pts = Layout();
+        if (_cells != null && ReferenceEquals(_cellsFor, pts)) return _cells;
+        var nearest = pts.Select((p, i) => pts.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
+        float reach = nearest[nearest.Length / 2] * 1.3f;
+        var cells = new Vector2[pts.Length][];
+        for (int i = 0; i < pts.Length; i++)
+        {
+            var poly = Enumerable.Range(0, 48).Select(k => pts[i] + Vector2.Right.Rotated(k * Mathf.Tau / 48) * reach).ToList();
+            for (int j = 0; j < pts.Length && poly.Count > 0; j++)
+                if (j != i) poly = ClipToward(poly, pts[i], pts[j]);
+            cells[i] = poly.ToArray();
+        }
+        _cellsFor = pts;
+        FitToTerritories(cells);
+        return _cells = cells;
+    }
+
+    /// <summary>Sutherland–Hodgman: keep the part of the polygon closer to <paramref name="a"/> than to <paramref name="b"/>.</summary>
+    private static System.Collections.Generic.List<Vector2> ClipToward(System.Collections.Generic.List<Vector2> poly, Vector2 a, Vector2 b)
+    {
+        var normal = b - a;
+        var mid = (a + b) / 2;
+        float Side(Vector2 p) => (p - mid).Dot(normal);
+        var result = new System.Collections.Generic.List<Vector2>(poly.Count + 2);
+        for (int k = 0; k < poly.Count; k++)
+        {
+            var cur = poly[k];
+            var next = poly[(k + 1) % poly.Count];
+            float sc = Side(cur), sn = Side(next);
+            if (sc <= 0) result.Add(cur);
+            if ((sc < 0 && sn > 0) || (sc > 0 && sn < 0)) result.Add(cur + (next - cur) * (sc / (sc - sn)));
+        }
+        return result;
+    }
 
     /// <summary>Centres the map on a commune, keeping the current zoom.</summary>
     public void CenterOn(int commune)
     {
-        _pan = -(Layout()[commune] - Size / 2) * _zoom;
+        Cells();
+        _pan = -(Layout()[commune] * _fitScale + _fitOffset - Size / 2) * _zoom;
         QueueRedraw();
     }
 
@@ -294,7 +413,8 @@ public partial class MapView : Control
     public void FocusOn(int commune, float zoom)
     {
         _zoom = Mathf.Clamp(zoom, 0.6f, 5f);
-        _pan = -(Layout()[commune] - Size / 2) * _zoom;
+        Cells();
+        _pan = -(Layout()[commune] * _fitScale + _fitOffset - Size / 2) * _zoom;
         QueueRedraw();
     }
 
@@ -340,20 +460,17 @@ public partial class MapView : Control
 
     private static float Radius(Commune c) => 5 + Mathf.Sqrt((float)c.Population) * 1.2f;
 
+    /// <summary>Town marker size: small, growing gently with population.</summary>
+    private static float Marker(Commune c) => 2.5f + Mathf.Sqrt((float)c.Population) * 0.45f;
+
+    /// <summary>The commune whose territory contains the point.</summary>
     private int? Hit(Vector2 at)
     {
-        if (World is not { } w) return null;
-        int? best = null;
-        float bestDist = float.MaxValue;
-        foreach (var c in w.Communes)
-        {
-            float d = at.DistanceTo(ToScreen(c));
-            if (d <= Radius(c) + 6 && d < bestDist)
-            {
-                best = c.Id;
-                bestDist = d;
-            }
-        }
-        return best;
+        if (World is null) return null;
+        var p = ToLayout(at);
+        var cells = Cells();
+        for (int i = 0; i < cells.Length; i++)
+            if (cells[i].Length >= 3 && Geometry2D.IsPointInPolygon(p, cells[i])) return i;
+        return null;
     }
 }

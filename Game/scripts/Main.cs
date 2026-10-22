@@ -27,6 +27,8 @@ public partial class Main : Control
     private HistoryChart _history = null!;
     private Control? _overlay;
     private CommuneList _communeList = null!;
+    private TabContainer _tabs = null!;
+    private const int CommuneTab = 2;
     private ToastStack _toasts = null!;
     private readonly HashSet<string> _tipsShown = new();
     private ScenarioDefinition _scenario = null!;
@@ -66,6 +68,7 @@ public partial class Main : Control
             AddChild(new Label { Text = $"Could not load scenario:\n{e.Message}" });
             return;
         }
+        Theme = UiTheme.Build();
         BuildUi();
         SetWorld(_world);
         var args = OS.GetCmdlineUserArgs();
@@ -74,7 +77,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -94,9 +97,11 @@ public partial class Main : Control
         int weeksAt = Array.IndexOf(args, "--weeks");
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
         int selectAt = Array.IndexOf(args, "--select");
-        if (selectAt >= 0 && selectAt + 1 < args.Length) _map.Selected = int.Parse(args[selectAt + 1]);
+        if (selectAt >= 0 && selectAt + 1 < args.Length) OnCommuneClicked(int.Parse(args[selectAt + 1]), false);
         for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++) StepTurn();
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
+        int tabAt = Array.IndexOf(args, "--tab");
+        if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         int focusAt = Array.IndexOf(args, "--focus");
@@ -132,6 +137,10 @@ public partial class Main : Control
         switch (key.Keycode)
         {
             case Key.C: ToggleCommuneList(); break;
+            case Key.T:
+                _map.ShowTrustLinks = !_map.ShowTrustLinks;
+                _map.QueueRedraw();
+                break;
             case Key.Escape when _communeList.Visible: ToggleCommuneList(); break;
             case Key.Space: SetSpeed(_speed == 0 ? 1 : 0); break;
             case Key.Key1: SetSpeed(1); break;
@@ -432,85 +441,108 @@ public partial class Main : Control
         };
         _map.AddChild(_communeList);
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(460, 0) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(480, 0) };
         root.AddChild(panel);
-        var scroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
-        panel.AddChild(scroll);
-        var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         foreach (var edge in new[] { "left", "right", "top", "bottom" }) margin.AddThemeConstantOverride($"margin_{edge}", 12);
-        scroll.AddChild(margin);
-        var side = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        side.AddThemeConstantOverride("separation", 6);
+        panel.AddChild(margin);
+        var side = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         margin.AddChild(side);
 
-        _header = AddLabel(side, 18);
-        var speeds = new HBoxContainer();
-        side.AddChild(speeds);
+        // ── Always visible: where and when, the clock, influence, drift and anything waiting on you ──
+        _header = AddLabel(side, 16);
+
+        var clock = new HBoxContainer();
+        side.AddChild(clock);
         foreach (var (label, speed) in new[] { ("❚❚", 0), ("▶", 1), ("▶▶", 2), ("▶▶▶", 3) })
         {
-            var b = new Button { Text = label, ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed" };
+            var b = new Button { Text = label, ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed", CustomMinimumSize = new Vector2(40, 0) };
             b.Pressed += () => SetSpeed(speed);
-            speeds.AddChild(b);
+            clock.AddChild(b);
             _speedButtons.Add(b);
         }
-        var step = _stepButton = new Button { TooltipText = "Advance one turn (.)" };
-        step.Pressed += StepTurn;
-        speeds.AddChild(step);
-        AddButton(speeds, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
-        AddButton(speeds, "Save", "Save to a single quick-save slot.", SaveGame);
-        AddButton(speeds, "Load", "Load the quick-save.", LoadGame);
-        _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _stepButton = new Button { TooltipText = "Advance one turn (.)" };
+        _stepButton.Pressed += StepTurn;
+        clock.AddChild(_stepButton);
+        clock.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        AddButton(clock, "Save", "Save to a single quick-save slot.", SaveGame);
+        AddButton(clock, "Load", "Load the quick-save.", LoadGame);
+
+        var view = new HBoxContainer();
+        side.AddChild(view);
+        AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
+        _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show." };
         foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {mode}", (int)mode);
         _mapMode.ItemSelected += index =>
         {
             _map.Mode = (MapMode)_mapMode.GetItemId((int)index);
             _map.QueueRedraw();
         };
-        speeds.AddChild(_mapMode);
+        view.AddChild(_mapMode);
+        var links = new CheckButton { Text = "Trust links", ButtonPressed = true, TooltipText = "Draw the trust network over the map (T)." };
+        links.Toggled += on =>
+        {
+            _map.ShowTrustLinks = on;
+            _map.QueueRedraw();
+        };
+        view.AddChild(links);
 
         _influence = AddLabel(side);
         _influence.MouseFilter = MouseFilterEnum.Stop;
         _influence.TooltipText = "Influence is the movement's only resource. It regenerates every turn from political education, wellbeing and the press, up to 100.\nIt pays for schools, pamphlets, mediation, projects, congresses, recall.";
-        Section(side, "Hierarchy drift");
-        _stage = AddLabel(side, 15);
+        _stage = AddLabel(side, 14);
         _driftMeter = new DriftMeter();
         side.AddChild(_driftMeter);
-        _driftDetail = AddRich(side);
-
-        Section(side, "Outside pressure");
-        _enemy = AddRich(side);
-        _scores = AddLabel(side);
-        _scores.MouseFilter = MouseFilterEnum.Stop;
-        _scores.TooltipText = "Survival: how long, and how much of, the federation stays free.\nQuality of life: food, wellbeing and education across communes.\nSpread: how radicalized workers behind enemy lines become.\nFreedom: how low hierarchy drift has stayed, on average.";
-
-        Section(side, "So far");
-        _history = new HistoryChart();
-        side.AddChild(_history);
 
         _decisions = new VBoxContainer();
         side.AddChild(_decisions);
+        _feedback = AddLabel(side, 13);
 
-        Section(side, "The movement");
-        var row1 = new HBoxContainer();
-        side.AddChild(row1);
+        // ── Everything else, one tab at a time ──
+        _tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill };
+        side.AddChild(_tabs);
+
+        var overview = Tab("Overview");
+        _driftDetail = AddRich(overview);
+        Section(overview, "Outside pressure");
+        _enemy = AddRich(overview);
+        _scores = AddLabel(overview);
+        _scores.MouseFilter = MouseFilterEnum.Stop;
+        _scores.TooltipText = "Survival: how long, and how much of, the federation stays free.\nQuality of life: food, wellbeing and education across communes.\nSpread: how radicalized workers behind enemy lines become.\nFreedom: how low hierarchy drift has stayed, on average.";
+        Section(overview, "So far");
+        _history = new HistoryChart();
+        overview.AddChild(_history);
+
+        var movement = Tab("Movement");
+        movement.AddChild(UiTheme.SectionTitle("Emergency measures"));
+        var measures = new HBoxContainer();
+        movement.AddChild(measures);
         _warCommittee = new CheckButton { Text = "War committee", TooltipText = "Defense +35% and cheaper coordination — drift every turn it sits." };
         _warCommittee.Toggled += on => { if (on != _world.WarCommittee) Do(new SetWarCommittee(on)); };
-        row1.AddChild(_warCommittee);
+        measures.AddChild(_warCommittee);
         _trade = new CheckButton { Text = "Foreign trade", TooltipText = "Sell surplus grain abroad for arms. Buyers want currency, which brings markets and accounts back in (drift every turn). Embargoes grow as the idea spreads." };
         _trade.Toggled += on => { if (on != _world.ForeignTrade) Do(new SetForeignTrade(on)); };
-        row1.AddChild(_trade);
-        AddButton(row1, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
-        AddButton(row1, "Congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
+        measures.AddChild(_trade);
+        var federation = new HBoxContainer();
+        movement.AddChild(federation);
+        AddButton(federation, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
+        AddButton(federation, "Sponsor congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
 
-        var row2 = new HBoxContainer();
-        side.AddChild(row2);
+        Section(movement, "Propose a project");
+        var propose = new HBoxContainer();
+        movement.AddChild(propose);
         _projectKind = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        foreach (var p in ProjectCatalog.All) _projectKind.AddItem(p.Name, (int)p.Kind);
-        row2.AddChild(_projectKind);
-        AddButton(row2, "Propose", "Uses the selected commune (and the shift-selected one for railways).", ProposeProject);
+        foreach (var p in ProjectCatalog.All)
+        {
+            _projectKind.AddItem(p.Name, (int)p.Kind);
+            _projectKind.SetItemTooltip(_projectKind.ItemCount - 1, p.Description);
+        }
+        propose.AddChild(_projectKind);
+        AddButton(propose, "Propose", "Uses the selected commune (and the shift-selected one for railways).", ProposeProject);
 
-        var row3 = new HBoxContainer();
-        side.AddChild(row3);
+        Section(movement, "Circulate an idea");
+        var circulate = new HBoxContainer();
+        movement.AddChild(circulate);
         _idea = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         for (int i = 0; i < _world.Techs.All.Count; i++)
         {
@@ -518,31 +550,29 @@ public partial class Main : Control
             _idea.AddItem(t.Name, i);
             _idea.SetItemTooltip(i, $"+ {t.Perk}\n− {t.Risk}");
         }
-        row3.AddChild(_idea);
-        AddButton(row3, "Circulate idea", "Steer what communes discover and adopt for 20 turns.",
+        circulate.AddChild(_idea);
+        AddButton(circulate, "Circulate", "Steer what communes discover and adopt for 20 turns.",
             () => Do(new CirculateIdea(_world.Techs.All[_idea.GetSelectedId()].Id)));
 
-        _feedback = AddLabel(side);
+        Section(movement, "Projects under way");
+        _projects = new VBoxContainer();
+        movement.AddChild(_projects);
 
-        Section(side, "Selected commune");
-        _commune = AddRich(side);
-        var row4 = new HFlowContainer();
-        side.AddChild(row4);
-        AddButton(row4, "Practical school", "Productivity and innovation. Watch the expert trap.", () => WithSelected(id => new FundSchool(id, EducationTrack.Practical)));
-        AddButton(row4, "Political school", "Cheaper coordination, slower drift, more trust.", () => WithSelected(id => new FundSchool(id, EducationTrack.Political)));
-        AddButton(row4, "Pamphlets", "Political education here and next door.", () => WithSelected(id => new CirculatePamphlets(id)));
-        AddButton(row4, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
+        var commune = Tab("Commune");
+        _commune = AddRich(commune);
+        var actions = new HFlowContainer();
+        commune.AddChild(actions);
+        AddButton(actions, "Practical school", "Productivity and innovation. Watch the expert trap.", () => WithSelected(id => new FundSchool(id, EducationTrack.Practical)));
+        AddButton(actions, "Political school", "Cheaper coordination, slower drift, more trust.", () => WithSelected(id => new FundSchool(id, EducationTrack.Political)));
+        AddButton(actions, "Pamphlets", "Political education here and next door.", () => WithSelected(id => new CirculatePamphlets(id)));
+        AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {
             if (_map.Selected is int a && _map.Secondary is int b) Do(new Mediate(a, b));
             else Say("Select one commune, then shift-click a neighbour.");
         });
 
-        Section(side, "Projects");
-        _projects = new VBoxContainer();
-        side.AddChild(_projects);
-
-        Section(side, "Events");
-        _log = AddRich(side);
+        var log = Tab("Log");
+        _log = AddRich(log);
 
         SetSpeed(0);
     }
@@ -552,7 +582,7 @@ public partial class Main : Control
     private void Refresh()
     {
         var w = _world;
-        _header.Text = $"{w.Scenario.Name} — {w.Date:d MMMM yyyy}  ({w.Turn} {w.Tick}/{w.Scenario.EndTick})"
+        _header.Text = $"{w.Scenario.Name} · {w.Date:d MMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
                        + (SandboxGenerator.TryParseId(w.Scenario.Id, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
         _stepButton.Text = $"+1 {w.Turn}";
         _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
@@ -741,6 +771,7 @@ public partial class Main : Control
 
     private void OnCommuneClicked(int id, bool shift)
     {
+        _tabs.CurrentTab = CommuneTab;
         if (shift && _map.Selected is int sel && sel != id) _map.Secondary = id;
         else
         {
@@ -798,9 +829,17 @@ public partial class Main : Control
     private static void Section(Container parent, string title)
     {
         parent.AddChild(new HSeparator());
-        var l = new Label { Text = title.ToUpperInvariant(), Modulate = new Color(0.6f, 0.75f, 0.95f) };
-        l.AddThemeFontSizeOverride("font_size", 12);
-        parent.AddChild(l);
+        parent.AddChild(UiTheme.SectionTitle(title));
+    }
+
+    /// <summary>A scrolling tab page; TabContainer takes the title from the child's name.</summary>
+    private VBoxContainer Tab(string title)
+    {
+        var scroll = new ScrollContainer { Name = title, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        _tabs.AddChild(scroll);
+        var page = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        scroll.AddChild(page);
+        return page;
     }
 
     private static Button AddButton(Container parent, string text, string tooltip, Action onPress)
