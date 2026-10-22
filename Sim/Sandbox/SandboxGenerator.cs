@@ -235,7 +235,35 @@ public sealed class SandboxGenerator
             Communes = defs,
         };
         scenario.Events = PickEvents(rng, region, city, defs, enemies);
+        scenario.Railways = Railways(rng, defs, points, spacing);
         return calibrate ? Calibrate(scenario, seed) : scenario;
+    }
+
+    /// <summary>
+    /// A railway network: the cities and towns joined by the shortest connections (a minimum
+    /// spanning tree), plus branch lines out to some of the villages near a station.
+    /// </summary>
+    private static List<string[]> Railways(Rng rng, List<CommuneDefinition> defs, List<(double X, double Y)> points, double spacing)
+    {
+        var stations = Enumerable.Range(0, defs.Count).Where(i => defs[i].Kind != CommuneKind.Agrarian).ToList();
+        var lines = new List<string[]>();
+        if (stations.Count == 0) return lines;
+        var connected = new List<int> { stations[0] };
+        var remaining = stations.Skip(1).ToList();
+        while (remaining.Count > 0)
+        {
+            var (from, to) = (from a in connected from b in remaining orderby Dist(points[a], points[b]) select (a, b)).First();
+            lines.Add(new[] { defs[from].Name, defs[to].Name });
+            connected.Add(to);
+            remaining.Remove(to);
+        }
+        foreach (int v in Enumerable.Range(0, defs.Count).Where(i => defs[i].Kind == CommuneKind.Agrarian))
+        {
+            int nearest = connected.OrderBy(s => Dist(points[v], points[s])).First();
+            if (Dist(points[v], points[nearest]) < 1.5 * spacing && rng.Chance(0.35))
+                lines.Add(new[] { defs[nearest].Name, defs[v].Name });
+        }
+        return lines;
     }
 
     /// <summary>

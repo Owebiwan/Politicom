@@ -51,7 +51,8 @@ internal static class ResearchSystem
                     if (dst.Techs.Contains(id)) continue;
                     var t = w.Techs[id];
                     if (!CanAdopt(dst, t)) continue;
-                    double p = b.DiffusionRate * trust * (0.4 + dst.PracticalEducation) * boost * (w.IdeaNudges.ContainsKey(id) ? 2 : 1);
+                    double p = b.DiffusionRate * trust * (0.4 + dst.PracticalEducation) * boost * (w.IdeaNudges.ContainsKey(id) ? 2 : 1)
+                               * (w.Rail(src.Id, dst.Id) ? b.RailDiffusion : 1);
                     if (w.Rng.Chance(p)) adoptions.Add((dst, id));
                 }
             }

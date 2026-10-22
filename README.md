@@ -82,11 +82,11 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    52    53      8    82    49 │    35
-educator           1%       99%     0% │    53    54      9    85    50 │    29
-centralizer        0%        0%   100% │    53    53      6    51    41 │   100
-balanced          61%       39%     0% │    74    53     12    77    54 │    36
-trader            64%       35%     1% │    76    54     12    71    53 │    50
+passive            1%       99%     0% │    51    53      8    82    49 │    34
+educator           1%       99%     0% │    52    54      9    85    50 │    29
+centralizer        0%        0%   100% │    53    53      6    50    40 │   100
+balanced          61%       39%     0% │    74    53     12    78    54 │    36
+trader            70%       30%     0% │    75    53     12    71    53 │    50
 ```
 
 ## What the player sees
@@ -105,6 +105,18 @@ trader            64%       35%     1% │    76    54     12    71    53 │   
   - Seceded communes are greyed with a dashed border, and the selection is outlined in gold.
   - Trust links are an optional overlay (T).
   - The view fits itself to the territories, and you can zoom and pan.
+- **Railways:** Catalonia and the Free Territory start with their historical main lines
+  (approximate routes), and sandbox maps generate a network. A finished railway project adds
+  a new line. Communes joined by rail send each other more aid (×1.15) and militia support
+  (×1.25), and ideas pass between them faster (×1.3). A line into occupied land is shown cut.
+- **Armies:** the war is simulated as pressure, not units, so the map draws that pressure as
+  armies.
+  - Each enemy's army (a box in its colour, sized and labelled by its strength) stands on its
+    side of each front commune.
+  - When a commune falls, the armies come out of it and slide forward, so the front visibly
+    advances. During an offensive they pulse and point at their target.
+  - The federation's militia appear as black-and-red flags sized by their defense, and
+    defensive campaigns send columns marching from the communes taking part to the front.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
   always visible. Everything else is in four tabs: Overview, Movement, Commune and Log.
   Clicking a commune opens its tab.
@@ -174,7 +186,8 @@ schooling.
 - **Nodes:** each shows how widely the idea has spread, whether it adds drift (▲) or brakes
   it (▼), and the education it needs. Locked nodes are ideas no commune can reach yet.
 - **Chains:** hover or click a node to light up the chain leading to it.
-- **Details:** clicking also shows its effects, who has it, what it leads to, and a
+- **Details:** pointing at a node describes it in the side column: perk, risk, effects in
+  plain language, who has it and what it leads to. Clicking keeps it there, with a
   **Circulate** button.
 
 **In the terminal,** `techs` lists the tree by category and depth.
@@ -250,11 +263,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           29%       71%     0% │    67    50     17    65    49 │    67
-educator          93%        7%     0% │    66    51     22    73    53 │    61
+passive           38%       62%     0% │    69    50     20    65    51 │    65
+educator          96%        4%     0% │    68    51     26    76    55 │    52
 centralizer        0%        0%   100% │    36    50      5    52    36 │   100
-balanced         100%        0%     0% │    88    51     19    72    58 │    59
-trader            99%        0%     1% │    86    52     19    74    58 │    50
+balanced          99%        0%     1% │    87    52     23    76    59 │    47
+trader           100%        0%     0% │    86    53     22    76    59 │    47
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -266,11 +279,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    63    50     17    86    54 │    33
-educator           0%      100%     0% │    64    51     17    90    55 │    23
-centralizer        0%        0%   100% │    34    48      4    53    35 │   100
-balanced          73%       12%    15% │    85    49     19    73    56 │    63
-trader            24%       18%    58% │    80    49     17    65    53 │    77
+passive            0%      100%     0% │    67    49     19    85    55 │    36
+educator           1%       99%     0% │    70    51     20    89    58 │    26
+centralizer        0%        0%   100% │    34    48      4    54    35 │   100
+balanced          72%       10%    18% │    86    50     21    73    57 │    64
+trader            28%        6%    66% │    80    50     18    63    53 │    83
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -281,10 +294,10 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    83    67     11    91    63 │    26
-educator           0%      100%     0% │    83    67     11    96    64 │     8
-centralizer        0%        0%   100% │    83    64      8    51    51 │   100
-balanced          29%       71%     0% │    96    68     11    93    67 │    17
-trader            30%       70%     0% │    96    68     11    90    66 │    23
+educator           0%      100%     0% │    83    67     12    96    64 │     9
+centralizer        0%        0%   100% │    84    64      8    51    52 │   100
+balanced          34%       66%     0% │    96    68     11    93    67 │    17
+trader            40%       60%     0% │    96    68     11    90    66 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

@@ -27,6 +27,7 @@ public sealed class SaveGame
     public double PendingDriftBump { get; set; }
     public List<Commune> Communes { get; set; } = new();
     public List<int[]> Neighbors { get; set; } = new();
+    public List<int[]> Railways { get; set; } = new();
     public List<TrustEdge> Trust { get; set; } = new();
     public List<Project> Projects { get; set; } = new();
     public int NextProjectId { get; set; }

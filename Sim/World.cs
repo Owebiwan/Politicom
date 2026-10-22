@@ -59,6 +59,18 @@ public sealed class World
     public List<PendingSecession> PendingSecessions { get; } = new();
     public List<PendingEvent> PendingEvents { get; } = new();
     public HashSet<string> FiredEvents { get; } = new();
+    /// <summary>Railway lines between communes, each as (smaller id, larger id).</summary>
+    public HashSet<(int A, int B)> Railways { get; } = new();
+
+    public bool Rail(int a, int b) => Railways.Contains(a < b ? (a, b) : (b, a));
+
+    internal void AddRailway(int a, int b)
+    {
+        if (a == b) return;
+        if (!Trust.Connected(a, b)) Trust.Link(a, b, 0.5);
+        Railways.Add(a < b ? (a, b) : (b, a));
+    }
+
     public bool WarCommittee { get; internal set; }
     public bool ForeignTrade { get; internal set; }
     /// <summary>The drift threshold most recently warned about (0 = none), so warnings don't repeat.</summary>
@@ -139,6 +151,13 @@ public sealed class World
             Math.Clamp(0.4 + 0.25 * (1 - a.Values.Distance(b.Values) * 2) + (a.Kind == b.Kind ? 0.05 : 0) + rng.Jitter(0.05), 0.1, 0.9));
 
         var world = new World(scenario, techs, balance, seed, communes, trust);
+        foreach (var line in scenario.Railways)
+        {
+            if (line.Length != 2) throw new InvalidDataException("Each railway is a pair of commune names.");
+            int Id(string name) => communes.FirstOrDefault(c => c.Name == name)?.Id
+                                   ?? throw new InvalidDataException($"Railway names unknown commune '{name}'.");
+            world.AddRailway(Id(line[0]), Id(line[1]));
+        }
         world.RefreshTechShares();
         world.Emit(Severity.Info, scenario.Description);
         return world;
@@ -162,6 +181,7 @@ public sealed class World
         LastDrift = LastDrift,
         PendingDriftBump = PendingDriftBump,
         Communes = _communes,
+        Railways = Railways.Select(r => new[] { r.A, r.B }).ToList(),
         Neighbors = Trust.ExportAdjacency(),
         Trust = Trust.Edges().Select(e => new TrustEdge(e.A, e.B, Trust[e.A, e.B])).ToList(),
         Projects = Projects,
@@ -220,6 +240,7 @@ public sealed class World
             Outcome = s.Outcome,
         };
         w.Rng.State = s.RngState;
+        foreach (var r in s.Railways) w.Railways.Add((Math.Min(r[0], r[1]), Math.Max(r[0], r[1])));
         w.Drift.Restore(s.DriftValue, s.DriftStage);
         w.Projects.AddRange(s.Projects);
         w.PendingSecessions.AddRange(s.PendingSecessions);

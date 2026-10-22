@@ -106,7 +106,7 @@ internal static class EconomySystem
                 if (d.Occupied) continue;
                 double surplus = Stock(d, food) - Reserve(b, d, food);
                 if (surplus <= 0) continue;
-                double generosity = b.NeighborGenerosity * Generosity(d) * w.Trust[d.Id, r.Id];
+                double generosity = b.NeighborGenerosity * Generosity(d) * w.Trust[d.Id, r.Id] * (w.Rail(d.Id, r.Id) ? b.RailAid : 1);
                 if (d.Federated != r.Federated) generosity *= 0.5;
                 double amount = Math.Min(deficit, surplus * generosity);
                 if (amount <= 1e-6) continue;

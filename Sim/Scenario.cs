@@ -22,6 +22,8 @@ public sealed class ScenarioDefinition
     public AllyState Ally { get; set; } = new();
     public List<CommuneDefinition> Communes { get; set; } = new();
     public List<EventDefinition> Events { get; set; } = new();
+    /// <summary>Railway lines at the start, as pairs of commune names. A line also makes the two neighbours.</summary>
+    public List<string[]> Railways { get; set; } = new();
 
     public static ScenarioDefinition Load(string path) => Parse(File.ReadAllText(path));
 

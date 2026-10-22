@@ -35,6 +35,9 @@ public partial class TechTreeView : Control
     /// <summary>Raised when the player clicks a technology.</summary>
     public event Action<string>? TechChosen;
 
+    /// <summary>Raised when the pointer moves onto a technology (or off all of them, with null).</summary>
+    public event Action<string?>? TechHovered;
+
     public override void _Ready()
     {
         MouseFilter = MouseFilterEnum.Stop;
@@ -81,7 +84,7 @@ public partial class TechTreeView : Control
             if (hit != _hover)
             {
                 _hover = hit;
-                TooltipText = hit is null || World is null ? "" : Tooltip(World.Techs[hit]);
+                TechHovered?.Invoke(hit);
                 QueueRedraw();
             }
         }
@@ -188,8 +191,6 @@ public partial class TechTreeView : Control
         return string.Join(" · ", parts);
     }
 
-    private static string Tooltip(TechDefinition t) =>
-        $"{t.Name}\n+ {t.Perk}\n− {t.Risk}\n\n" + string.Join("\n", t.Effects.Describe().Select(d => d.Text));
 }
 
 /// <summary>The tree with a details column: what the selected idea does, who has it, and Circulate.</summary>
@@ -213,6 +214,13 @@ public partial class TechTreePanel : HBoxContainer
         AddThemeConstantOverride("separation", 18);
         _tree = new TechTreeView { World = _world };
         _tree.TechChosen += Show;
+        // Hovering describes a technology at once; moving off returns to the one selected.
+        _tree.TechHovered += id =>
+        {
+            if (id != null) Show(id, preview: true);
+            else if (_tree.Selected is { } selected) Show(selected);
+            else _details.Text = Intro;
+        };
         AddChild(_tree);
 
         var side = new VBoxContainer { CustomMinimumSize = new Vector2(300, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -235,11 +243,13 @@ public partial class TechTreePanel : HBoxContainer
         _result = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(300, 0) };
         side.AddChild(_result);
 
-        _details.Text = "[color=#8b919b]Click a technology to see what it does and who has it.\n\n"
+        _details.Text = Intro;
+    }
+
+    private const string Intro = "[color=#8b919b]Point at a technology to see what it does and who has it; click to keep it here.\n\n"
                         + "Communes discover ideas on their own, shaped by their education, needs and values, and pass them along trust links. "
                         + "The movement can't choose research — only circulate an idea so it spreads faster.\n\n"
                         + "Bars: share of the federation using it. ▲ adds drift, ▼ brakes it. Requirements are the education a commune needs to discover it (half that to adopt it from a neighbour).[/color]";
-    }
 
     /// <summary>Opens the details for a technology, as if it had been clicked.</summary>
     public void Select(string id)
@@ -248,7 +258,10 @@ public partial class TechTreePanel : HBoxContainer
         Show(id);
     }
 
-    private void Show(string id)
+    private void Show(string id) => Show(id, preview: false);
+
+    /// <param name="preview">Hovering: describe it, but keep the Circulate button for the selected one.</param>
+    private void Show(string id, bool preview)
     {
         var t = _world.Techs[id];
         var holders = _world.Communes.Where(c => !c.Occupied && c.Techs.Contains(id)).Select(c => c.Name).ToList();
@@ -267,8 +280,8 @@ public partial class TechTreePanel : HBoxContainer
                 ? $"No commune has it yet. {canDiscover} could discover it now."
                 : $"Used by {holders.Count}: {Esc(string.Join(", ", holders.Take(8)))}{(holders.Count > 8 ? "…" : "")}") +
             (_world.IdeaNudges.TryGetValue(id, out int left) ? $"\n[color=#c4473a]Being circulated: {_world.Turns(left)} left.[/color]" : "");
-        _circulate.Visible = true;
+        _circulate.Visible = !preview || _tree.Selected == id;
         _circulate.Text = $"Circulate this idea ({_world.Balance.CostCirculateIdea:0} influence)";
-        _result.Text = "";
+        if (!preview) _result.Text = "";
     }
 }

@@ -282,8 +282,10 @@ public class SimulationTests
         open.Run(3);
         Assert.True(open.LastExports > 0);
         Assert.True(open.LastImports > 0);
-        Assert.True(open.LastDrift.ForeignTrade > 0);
-        Assert.True(open.Drift.Value > closed.Drift.Value);
+        // Trade's own drift is always there; total drift can still fall, because arms bought abroad
+        // keep the front from losing ground and so cut the wartime-emergency drift.
+        Assert.Equal(open.Balance.TradeDrift, open.LastDrift.ForeignTrade, 6);
+        Assert.Equal(0, closed.LastDrift.ForeignTrade);
         var front = closed.Communes.First(c => c.Front).Id;
         Assert.True(open.Communes[front].Goods >= closed.Communes[front].Goods);
     }
@@ -445,6 +447,25 @@ public class SimulationTests
             new TechDefinition { Id = "a", Prerequisites = new[] { "b" } },
             new TechDefinition { Id = "b", Prerequisites = new[] { "a" } },
         }));
+    }
+
+    [Fact]
+    public void Railways_join_communes_and_help_aid_and_defense()
+    {
+        var w = NewWorld();
+        int reus = w.Communes.Single(c => c.Name == "Reus").Id, caspe = w.Communes.Single(c => c.Name == "Caspe").Id;
+        Assert.True(w.Rail(reus, caspe));
+        Assert.True(w.Trust.Connected(reus, caspe)); // a line makes them neighbours
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(w.Railways, restored.Railways);
+
+        int vic = w.Communes.Single(c => c.Name == "Vic").Id, girona = w.Communes.Single(c => c.Name == "Girona").Id;
+        Assert.False(w.Rail(vic, girona));
+        w.Run(1);
+        var project = w.Apply(new ProposeProject(ProjectKind.Railway, vic, girona));
+        Assert.True(project.Ok, project.Message);
+        Assert.False(w.Apply(new ProposeProject(ProjectKind.Railway, reus, caspe)).Ok); // already joined
     }
 
     [Fact]

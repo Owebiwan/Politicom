@@ -27,7 +27,7 @@
       "offensives": [
         { "name": "The Red Army's first offensive", "tick": 28, "duration": 10, "strength": 4.2 },
         { "name": "The Red winter occupation", "tick": 61, "duration": 18, "strength": 5.6 },
-        { "name": "The final Red offensive", "tick": 106, "duration": 40, "strength": 15 }
+        { "name": "The final Red offensive", "tick": 106, "duration": 40, "strength": 18 }
       ]
     }
   ],
@@ -38,6 +38,16 @@
     "offerInterval": 30,
     "armsGoods": 25
   },
+
+  // Railways of the Katerynoslav region around 1918 (approximate routes): the Kharkiv–Crimea
+  // line, the Catherine railway to the Donbas, and the Chaplyne–Berdiansk line through Huliaipole.
+  "railways": [
+    [ "Pavlohrad", "Synelnykove" ], [ "Synelnykove", "Oleksandrivsk" ], [ "Oleksandrivsk", "Vasylivka" ], [ "Vasylivka", "Melitopol" ],
+    [ "Katerynoslav", "Synelnykove" ], [ "Synelnykove", "Chaplyne" ], [ "Chaplyne", "Yuzivka" ],
+    [ "Chaplyne", "Huliaipole" ], [ "Huliaipole", "Polohy" ], [ "Polohy", "Berdiansk" ],
+    [ "Oleksandrivsk", "Orikhiv" ], [ "Orikhiv", "Polohy" ], [ "Polohy", "Tokmak" ], [ "Tokmak", "Molochansk colonies" ],
+    [ "Mariupol", "Volnovakha" ], [ "Volnovakha", "Yuzivka" ]
+  ],
 
   "events": [
     {

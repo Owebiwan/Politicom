@@ -104,6 +104,8 @@ internal static class ActionSystem
         if (def.TargetsNeeded >= 2 && (a.Target2 is null || Member(w, a.Target2.Value) is null || a.Target2 == a.Target))
             return ActionResult.Fail($"{def.Name} needs two different federated communes.");
         if (a.Kind == ProjectKind.DefensiveCampaign && !w.Federation.Any(c => c.Front)) return ActionResult.Fail("There is no front to defend.");
+        if (a.Kind == ProjectKind.Railway && a.Target is int r1 && a.Target2 is int r2 && w.Rail(r1, r2))
+            return ActionResult.Fail("Those two communes are already joined by rail.");
         if (w.ActiveProjects.Any(p => p.Kind == a.Kind && p.Target == a.Target && p.Target2 == a.Target2))
             return ActionResult.Fail("That project is already under way.");
         if (!Spend(w, b.CostPropose)) return Broke(w, b.CostPropose);

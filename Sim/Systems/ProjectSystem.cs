@@ -135,7 +135,7 @@ internal static class ProjectSystem
             case ProjectKind.Railway:
                 int a1 = p.Target!.Value, a2 = p.Target2!.Value;
                 if (w.Trust.Connected(a1, a2)) w.Trust.Add(a1, a2, 0.1);
-                else w.Trust.Link(a1, a2, 0.55);
+                w.AddRailway(a1, a2);
                 w.TransportBonus = Math.Min(0.6, w.TransportBonus + 0.1);
                 effect = $"{w.Communes[a1].Name} and {w.Communes[a2].Name} are linked; pooled goods travel cheaper. The line's organizers have gained standing.";
                 break;

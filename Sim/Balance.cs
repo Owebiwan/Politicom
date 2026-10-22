@@ -70,6 +70,14 @@ public sealed class Balance
     public double JoinChance { get; set; } = 0.5;
     public int MaxActiveProjects { get; set; } = 3;
 
+    // ── Railways ───────────────────────────────────────────────────────────
+    /// <summary>Multiplier on neighbour aid between communes joined by rail.</summary>
+    public double RailAid { get; set; } = 1.15;
+    /// <summary>Multiplier on militia support between communes joined by rail.</summary>
+    public double RailSupport { get; set; } = 1.25;
+    /// <summary>Multiplier on ideas spreading between communes joined by rail.</summary>
+    public double RailDiffusion { get; set; } = 1.3;
+
     // ── Foreign trade ──────────────────────────────────────────────────────
     /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
     public double TradeShare { get; set; } = 0.3;

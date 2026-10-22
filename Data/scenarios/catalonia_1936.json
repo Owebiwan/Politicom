@@ -15,8 +15,8 @@
     "growth": 0.03,
     "offensives": [
       { "name": "The Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
-      { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 24 },
-      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 40 }
+      { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 36 },
+      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 56 }
     ]
   } ],
 
@@ -122,6 +122,19 @@
           "effects": { "enemyStrength": -1 } }
       ]
     }
+  ],
+
+  // Main railway lines of 1936, between the communes they served (approximate routes).
+  "railways": [
+    [ "Sants textile syndicate", "Barcelona transport collective" ], [ "Sants textile syndicate", "L'Hospitalet" ],
+    [ "Barcelona transport collective", "Poblenou metalworkers" ], [ "Poblenou metalworkers", "Badalona" ],
+    [ "Badalona", "Mataró" ], [ "Mataró", "Girona" ],
+    [ "Barcelona transport collective", "Sabadell" ], [ "Sabadell", "Terrassa" ], [ "Terrassa", "Manresa" ],
+    [ "Manresa", "Cervera" ], [ "Cervera", "Lleida" ],
+    [ "Barcelona transport collective", "Vic" ],
+    [ "L'Hospitalet", "Tarragona" ], [ "Tarragona", "Reus" ], [ "Tarragona", "Tortosa" ],
+    [ "Reus", "Lleida" ], [ "Reus", "Caspe" ],
+    [ "Lleida", "Balaguer" ], [ "Lleida", "Binéfar" ], [ "Binéfar", "Monzón" ], [ "Monzón", "Sariñena" ], [ "Monzón", "Barbastro" ]
   ],
 
   // kind: Agrarian | Industrial | Mixed. Values run -1..1 (collectivist, militant, federalist).

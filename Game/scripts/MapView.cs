@@ -36,6 +36,9 @@ public partial class MapView : Control
     private static readonly Color NeutralLand = new("2e3134");
     private static readonly Color River = new("3b6890");
     private static readonly Color CountryBorder = new("6b7178");
+    private static readonly Color RailBed = new("17130f");
+    private static readonly Color RailTies = new("cbbf9f");
+    private static readonly Color Anarchist = new("c4473a");
     private static readonly Color ProvinceBorder = new("ffffff30");
 
     private int? _hover;
@@ -83,6 +86,109 @@ public partial class MapView : Control
     {
         _layout = null;
         _cells = null;
+        _armies.Clear();
+    }
+
+    // ── Armies ──────────────────────────────────────────────────────────────
+    // The war is simulated as pressure on front communes, not as units. This layer draws that
+    // pressure as armies: one per enemy per front commune, sized by the pressure it brings,
+    // placed on the enemy's side. When a commune falls, the armies against its neighbours emerge
+    // from it and slide forward, so an advance reads as movement.
+
+    private sealed class Army
+    {
+        public Vector2 Position;
+        public Vector2 Target;
+        public float Strength;
+        public float Alpha;
+        public bool Alive;
+    }
+
+    private readonly Dictionary<(int Enemy, int Commune), Army> _armies = new();
+
+    private void UpdateArmies(float delta)
+    {
+        if (World is not { } w) return;
+        var pts = Layout();
+        var members = w.Federation.ToList();
+        var centroid = members.Count > 0 ? members.Aggregate(Vector2.Zero, (s, c) => s + pts[c.Id]) / members.Count : Size / 2;
+        float spacing = MedianSpacing(pts);
+        foreach (var a in _armies.Values) a.Alive = false;
+
+        for (int k = 0; k < w.Enemies.Count; k++)
+        {
+            var e = w.Enemies[k];
+            int enemy = k;
+            var fronts = w.Active.Where(c => c.Fronts.Contains(enemy)).ToList();
+            if (fronts.Count == 0 || e.EffectiveStrength <= 0.01) continue;
+            float perFront = (float)(e.EffectiveStrength * w.Balance.PressureScale / fronts.Count);
+            foreach (var c in fronts)
+            {
+                // Stand between the commune and the enemy: towards the land it has taken, or else outward.
+                var taken = w.Trust.Neighbors(c.Id).Where(n => w.Communes[n].OccupiedBy == enemy).Select(n => pts[n]).ToList();
+                var p = pts[c.Id];
+                var away = (p - centroid).LengthSquared() < 1 ? Vector2.Right : (p - centroid).Normalized();
+                var target = taken.Count > 0 ? p + (taken.Aggregate(Vector2.Zero, (s, v) => s + v) / taken.Count - p) * 0.5f : p + away * spacing * 0.55f;
+                if (!_armies.TryGetValue((k, c.Id), out var army))
+                {
+                    // New front: the army comes out of the land it has just taken.
+                    var from = taken.Count > 0 ? taken.OrderBy(v => v.DistanceSquaredTo(p)).First() : target;
+                    army = _armies[(k, c.Id)] = new Army { Position = from };
+                }
+                army.Target = target;
+                army.Strength = perFront;
+                army.Alive = true;
+            }
+        }
+
+        foreach (var key in _armies.Keys.ToList())
+        {
+            var a = _armies[key];
+            a.Position += (a.Target - a.Position) * Mathf.Min(1, delta * 2.5f);
+            a.Alpha = Mathf.MoveToward(a.Alpha, a.Alive ? 1 : 0, delta * 2);
+            if (!a.Alive && a.Alpha <= 0) _armies.Remove(key);
+        }
+    }
+
+    private static float MedianSpacing(Vector2[] pts)
+    {
+        if (pts.Length < 2) return 40;
+        var nearest = pts.Select((p, i) => pts.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
+        return nearest[nearest.Length / 2];
+    }
+
+    /// <summary>NATO-style infantry symbol: a box with a cross, in the enemy's colour.</summary>
+    private void DrawArmy(Vector2 at, float strength, Color color, float alpha, bool attacking, Vector2 towards, Font font)
+    {
+        float scale = Mathf.Clamp(0.75f + Mathf.Sqrt(strength) * 0.35f, 0.75f, 2f) * Mathf.Sqrt(_zoom);
+        var size = new Vector2(22, 14) * scale;
+        var box = new Rect2(at - size / 2, size);
+        if (attacking)
+        {
+            // Pulse, and point at the commune under attack.
+            float pulse = 0.5f + 0.5f * Mathf.Sin((float)_time * 6);
+            var tip = at + (towards - at) * 0.8f;
+            var dir = (towards - at).Normalized();
+            DrawLine(at, tip, new Color(color, alpha * (0.5f + 0.5f * pulse)), 2.5f * scale, true);
+            DrawColoredPolygon(new[] { tip + dir * 7 * scale, tip + dir.Orthogonal() * 4 * scale, tip - dir.Orthogonal() * 4 * scale },
+                new Color(color, alpha * (0.5f + 0.5f * pulse)));
+        }
+        DrawRect(box, new Color(color.Darkened(0.6f), alpha * 0.9f));
+        DrawRect(box, new Color(color, alpha), false, 1.5f);
+        DrawLine(box.Position, box.End, new Color(color, alpha), 1.2f, true);
+        DrawLine(new Vector2(box.Position.X, box.End.Y), new Vector2(box.End.X, box.Position.Y), new Color(color, alpha), 1.2f, true);
+        DrawString(font, new Vector2(at.X - 20, box.End.Y + 11), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
+    }
+
+    /// <summary>The federation's militia at a front commune: a black-and-red flag sized by its defense.</summary>
+    private void DrawMilitia(Vector2 at, float defense, float alpha)
+    {
+        float scale = Mathf.Clamp(1.05f + Mathf.Sqrt(defense) * 0.35f, 1.05f, 2.1f) * Mathf.Sqrt(_zoom);
+        var size = new Vector2(16, 11) * scale;
+        var box = new Rect2(at - size / 2, size);
+        DrawColoredPolygon(new[] { box.Position, new Vector2(box.End.X, box.Position.Y), new Vector2(box.Position.X, box.End.Y) }, new Color(Anarchist, alpha));
+        DrawColoredPolygon(new[] { new Vector2(box.End.X, box.Position.Y), box.End, new Vector2(box.Position.X, box.End.Y) }, new Color(0.05f, 0.05f, 0.05f, alpha));
+        DrawRect(box, new Color(1, 1, 1, alpha * 0.5f), false, 1);
     }
 
     public MapMode Mode { get; set; } = MapMode.Trust;
@@ -103,7 +209,11 @@ public partial class MapView : Control
     public override void _Process(double delta)
     {
         _time += delta;
-        if (World is { } w && (w.PendingSecessions.Count > 0 || w.Ally.OfferPending)) QueueRedraw();
+        if (World is not { } w) return;
+        UpdateArmies((float)delta);
+        bool moving = _armies.Values.Any(a => a.Position.DistanceSquaredTo(a.Target) > 0.25f || (a.Alpha > 0 && a.Alpha < 1));
+        bool marching = w.ActiveProjects.Any(p => p.Kind == ProjectKind.DefensiveCampaign) || w.OffensiveUnderway;
+        if (moving || marching || w.PendingSecessions.Count > 0 || w.Ally.OfferPending) QueueRedraw();
     }
 
     public override void _GuiInput(InputEvent e)
@@ -195,6 +305,16 @@ public partial class MapView : Control
             foreach (var piece in screen[c.Id]) DrawColoredPolygon(piece, fill);
         }
 
+        // Railways: a dark bed with light cross-ties.
+        foreach (var (a, b) in w.Railways)
+        {
+            var pa = ToScreen(w.Communes[a]);
+            var pb = ToScreen(w.Communes[b]);
+            bool cut = w.Communes[a].Occupied || w.Communes[b].Occupied;
+            DrawLine(pa, pb, new Color(RailBed, cut ? 0.4f : 0.95f), 4.5f, true);
+            DrawDashedLine(pa, pb, new Color(RailTies, cut ? 0.25f : 0.8f), 2, 5);
+        }
+
         if (_geoLayout is { } g2)
         {
             if (Geo!.DrawProvinces)
@@ -243,6 +363,48 @@ public partial class MapView : Control
                 var color = new Color(TrustColor(t), ca.Federated && cb.Federated ? 0.75f : 0.3f);
                 DrawLine(ToScreen(ca), ToScreen(cb), color, 1 + 3 * t, true);
             }
+
+        // Militia columns marching to the front for each defensive campaign.
+        foreach (var project in w.ActiveProjects.Where(p => p.Kind == ProjectKind.DefensiveCampaign))
+        {
+            var fronts = w.Federation.Where(c => c.Front).ToList();
+            if (fronts.Count == 0) continue;
+            foreach (var id in project.Participants)
+            {
+                var from = ToScreen(w.Communes[id]);
+                var front = fronts.OrderBy(f => ToScreen(f).DistanceSquaredTo(from)).First();
+                if (front.Id == id) continue;
+                var to = ToScreen(front);
+                DrawDashedLine(from, to, new Color(Anarchist, 0.35f), 1.5f, 4);
+                for (int i = 0; i < 3; i++)
+                {
+                    float t = (float)((_time * 0.35 + i / 3.0 + id * 0.137) % 1.0);
+                    var at = from.Lerp(to, t);
+                    DrawCircle(at, 3.2f, new Color(0.05f, 0.05f, 0.05f));
+                    DrawCircle(at, 2.2f, Anarchist);
+                }
+            }
+        }
+
+        // Armies on the enemy's side of each front, and the militia facing them.
+        foreach (var ((enemy, commune), army) in _armies)
+        {
+            var c = w.Communes[commune];
+            bool attacking = w.Enemies[enemy].CurrentOffensive != null && !c.Occupied;
+            DrawArmy(ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking, ToScreen(c), font);
+        }
+        var pts = Layout();
+        var members = w.Federation.ToList();
+        if (members.Count > 0)
+        {
+            var centroid = members.Aggregate(Vector2.Zero, (s, c) => s + pts[c.Id]) / members.Count;
+            foreach (var c in w.Active.Where(c => c.Front))
+            {
+                var p = pts[c.Id];
+                var toward = (centroid - p).LengthSquared() < 1 ? Vector2.Left : (centroid - p).Normalized();
+                DrawMilitia(ToScreen(p + toward * MedianSpacing(pts) * 0.32f), (float)c.Defense, 0.95f);
+            }
+        }
 
         // Towns: every marker, but only the labels that fit. The selected and hovered commune
         // win, then larger towns; zooming in makes room for the rest.
@@ -374,7 +536,7 @@ public partial class MapView : Control
         DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
         DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         DrawString(font, new Vector2(14, Size.Y - 14),
-            "Coloured border: front (the bar shows control). Enemy colour: occupied. Dashed yellow: seceded. Pulsing blue: leaving. T: trust links.",
+"Boxes: enemy armies (pressure). Black-red flags: militia (defense). Moving dots: militia columns. Rails: railways. Dashed yellow: seceded. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 

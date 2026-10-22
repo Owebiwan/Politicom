@@ -77,7 +77,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -98,7 +98,14 @@ public partial class Main : Control
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
         int selectAt = Array.IndexOf(args, "--select");
         if (selectAt >= 0 && selectAt + 1 < args.Length) OnCommuneClicked(int.Parse(args[selectAt + 1]), false);
-        for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++) StepTurn();
+        int policyAt = Array.IndexOf(args, "--policy");
+        var policy = policyAt >= 0 && policyAt + 1 < args.Length ? Sim.Ai.Policies.Get(args[policyAt + 1]) : null;
+        for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++)
+        {
+            policy?.Act(_world);
+            StepTurn();
+        }
+        for (int i = 0; i < 40; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); // let armies slide into place
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
@@ -587,7 +594,7 @@ public partial class Main : Control
         {
             var t = _world.Techs.All[i];
             _idea.AddItem(t.Name, i);
-            _idea.SetItemTooltip(i, $"+ {t.Perk}\n− {t.Risk}");
+            _idea.SetItemTooltip(i, $"{t.Name}\n+ {t.Perk}\n− {t.Risk}\n\n" + string.Join("\n", t.Effects.Describe().Select(d => (d.Good ? "+ " : "− ") + d.Text)));
         }
         circulate.AddChild(_idea);
         AddButton(circulate, "Circulate", "Steer what communes discover and adopt for 20 turns.",

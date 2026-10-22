@@ -87,7 +87,7 @@ internal static class WarSystem
         {
             var d = w.Communes[n];
             if (d.Occupied || d.Front) continue;
-            support += w.Trust[c.Id, n] * Militia(b, d) * b.NeighborSupport * (d.Federated ? 1 : 0.3);
+            support += w.Trust[c.Id, n] * Militia(b, d) * b.NeighborSupport * (d.Federated ? 1 : 0.3) * (w.Rail(c.Id, n) ? b.RailSupport : 1);
         }
         double mult = (1 + w.LocalEffect(c, e => e.Defense))
                       * (1 + DriftEffects.Defense(w.Drift.Stage))
