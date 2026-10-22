@@ -546,6 +546,33 @@ public class SimulationTests
         Assert.Equal(300, reloaded.Scenario.EndTick); // the length travels with the save
     }
 
+    [Theory]
+    [InlineData("catalonia_1936")]
+    [InlineData("free_territory_1918")]
+    [InlineData("paris_commune_1871")]
+    public void Historical_scenarios_sit_in_their_era_and_home_state(string id)
+    {
+        var scenario = ScenarioDefinition.Load(DataPaths.Scenario(DataDir, id));
+        var atlas = Global.Atlas.Load(DataDir, scenario.World!);
+        var home = Assert.IsType<Global.AtlasState>(atlas.State(scenario.HomeState!));
+        Assert.InRange(atlas.States.Count, 30, 80);
+        Assert.All(atlas.States, s => Assert.NotEmpty(s.Rings));
+        Assert.NotEmpty(atlas.Borders);
+        // The region lies inside its home state's outline.
+        double lon = scenario.Communes.Average(c => c.Lon), lat = scenario.Communes.Average(c => c.Lat);
+        Assert.Contains(home.Rings, ring => Inside(ring, lon, lat));
+    }
+
+    private static bool Inside(double[][] ring, double x, double y)
+    {
+        bool inside = false;
+        for (int i = 0, j = ring.Length - 1; i < ring.Length; j = i++)
+            if ((ring[i][1] > y) != (ring[j][1] > y) &&
+                x < (ring[j][0] - ring[i][0]) * (y - ring[i][1]) / (ring[j][1] - ring[i][1]) + ring[i][0])
+                inside = !inside;
+        return inside;
+    }
+
     [Fact]
     public void Balance_parameters_can_be_overridden_by_name()
     {

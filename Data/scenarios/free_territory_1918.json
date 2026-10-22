@@ -2,6 +2,8 @@
   "id": "free_territory_1918",
   "name": "Free Territory, Ukraine",
   "description": "November 1918. The Austro-German occupiers are leaving southern Ukraine, and around Huliaipole the peasants have taken the land and formed free soviets. The Revolutionary Insurgent Army is a militia of volunteers. Whites to the south and east, Bolsheviks to the north — sometimes allies, never friends. Hold the Free Territory together until the summer of 1921.",
+  "world": "1918",
+  "homeState": "UKR",
   "startDate": "1918-11-17",
   "endTick": 145,
   "neighborCount": 3,

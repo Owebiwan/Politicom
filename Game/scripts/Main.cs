@@ -77,7 +77,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME] [--clock SECONDS]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME] [--clock SECONDS] [--world] [--mode NAME]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -121,6 +121,13 @@ public partial class Main : Control
             var tree = ShowTechTree();
             if (techAt + 1 < args.Length && !args[techAt + 1].StartsWith("--")) tree.Select(args[techAt + 1]);
         }
+        int modeAt = Array.IndexOf(args, "--mode");
+        if (modeAt >= 0 && modeAt + 1 < args.Length && Enum.TryParse<MapMode>(args[modeAt + 1], true, out var mode))
+        {
+            _mapMode.Select(_mapMode.GetItemIndex((int)mode));
+            _map.Mode = mode;
+        }
+        if (Array.IndexOf(args, "--world") >= 0) ToggleWorldView();
         int tabAt = Array.IndexOf(args, "--tab");
         if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
@@ -178,6 +185,7 @@ public partial class Main : Control
         {
             case Key.C: ToggleCommuneList(); break;
             case Key.K: ShowTechTree(); break;
+            case Key.W: ToggleWorldView(); break;
             case Key.T:
                 _map.ShowTrustLinks = !_map.ShowTrustLinks;
                 _map.QueueRedraw();
@@ -252,6 +260,32 @@ public partial class Main : Control
     private static string Shorten(string text) => text.Length <= 160 ? text : text[..157].TrimEnd() + "…";
 
     private readonly Dictionary<string, GeoData?> _geo = new();
+    private readonly Dictionary<string, Politicom.Sim.Global.Atlas?> _atlases = new();
+
+    /// <summary>The world map of an era, if Data/world has it.</summary>
+    private Politicom.Sim.Global.Atlas? LoadAtlas(string? era)
+    {
+        if (era is null) return null;
+        if (_atlases.TryGetValue(era, out var cached)) return cached;
+        string path = $"res://data/world/{era}.json";
+        Politicom.Sim.Global.Atlas? atlas = null;
+        if (FileAccess.FileExists(path))
+        {
+            try { atlas = Politicom.Sim.Global.Atlas.Parse(ReadData(path)); }
+            catch (Exception e) { GD.PushError($"Could not read {path}: {e.Message}"); }
+        }
+        return _atlases[era] = atlas;
+    }
+
+    private Button _worldButton = null!;
+
+    private void ToggleWorldView()
+    {
+        if (_map.Globe is null) return;
+        if (_map.AtWorldZoom) _map.ShowRegion();
+        else _map.ShowWorld();
+        _worldButton.Text = _map.AtWorldZoom ? "Region" : "World";
+    }
 
     /// <summary>Real geography for a scenario, if Data/geo has it (generated maps don't).</summary>
     private GeoData? LoadGeo(string scenarioId)
@@ -271,6 +305,7 @@ public partial class Main : Control
     {
         _world = world;
         _dayInTurn = 0;
+        _map.Globe = LoadAtlas(world.Scenario.World);
         _map.Geo = world.Scenario.Geography is { } generated
             ? GeoData.From(generated)
             : LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
@@ -578,6 +613,7 @@ public partial class Main : Control
 
         var view = new HBoxContainer();
         side.AddChild(view);
+        _worldButton = AddButton(view, "World", "Zoom out to the whole world, or back to the region (W).", ToggleWorldView);
         AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
         AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show." };

@@ -24,6 +24,10 @@ public sealed class ScenarioDefinition
     public List<EventDefinition> Events { get; set; } = new();
     /// <summary>Railway lines at the start, as pairs of commune names. A line also makes the two neighbours.</summary>
     public List<string[]> Railways { get; set; } = new();
+    /// <summary>The era of the world map this scenario is played on (Data/world/&lt;era&gt;.json), or null.</summary>
+    public string? World { get; set; }
+    /// <summary>The world state the region lies in.</summary>
+    public string? HomeState { get; set; }
     /// <summary>Generated geography (sandbox maps). Historical scenarios load theirs from Data/geo.</summary>
     public Sandbox.GeographyDefinition? Geography { get; set; }
 
@@ -134,5 +138,6 @@ public static class DataPaths
 
     public static string Scenario(string dataDir, string id) => Path.Combine(dataDir, "scenarios", id + ".json");
     public static string Technologies(string dataDir) => Path.Combine(dataDir, "technologies.json");
+    public static string World(string dataDir, string era) => Path.Combine(dataDir, "world", era + ".json");
     public static string SandboxTemplates(string dataDir) => Path.Combine(dataDir, "sandbox", "event_templates.json");
 }

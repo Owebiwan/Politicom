@@ -2,6 +2,8 @@
   "id": "paris_commune_1871",
   "name": "The Paris Commune",
   "description": "18 March 1871. Thiers sent troops to seize the National Guard's cannons on Montmartre; the crowd stopped them, and the government fled to Versailles. Paris governs itself. There is almost no time: the Versailles army is being rebuilt with prisoners returned by Prussia. Each turn is a day. Last as long as you can — and stay a commune while you do.",
+  "world": "1871",
+  "homeState": "FRA",
   "startDate": "1871-03-18",
   "endTick": 71,
   "daysPerTick": 1,

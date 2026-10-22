@@ -2,6 +2,8 @@
   "id": "catalonia_1936",
   "name": "Revolutionary Catalonia",
   "description": "19 July 1936. The military uprising has been defeated in Barcelona by armed workers. Factories, farms and trams are collectivized; columns of militia march on Aragon. You are the movement, not the government. Keep the revolution free — and alive — until 1939.",
+  "world": "1936",
+  "homeState": "ESP",
   "startDate": "1936-07-19",
   "endTick": 135,
   "neighborCount": 3,

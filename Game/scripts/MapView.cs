@@ -6,7 +6,7 @@ using Politicom.Sim;
 
 namespace Politicom.Game;
 
-public enum MapMode { Trust, Education, Values, Wellbeing }
+public enum MapMode { Trust, Education, Values, Wellbeing, Ideology }
 
 /// <summary>
 /// The map. With real geography (<see cref="GeoData"/>), communes sit at their true positions
@@ -211,6 +211,7 @@ public partial class MapView : Control
         _time += delta;
         if (World is not { } w) return;
         UpdateArmies((float)delta);
+        if (AtWorldZoom) QueueRedraw(); // the region marker pulses
         bool moving = _armies.Values.Any(a => a.Position.DistanceSquaredTo(a.Target) > 0.25f || (a.Alpha > 0 && a.Alpha < 1));
         bool marching = w.ActiveProjects.Any(p => p.Kind == ProjectKind.DefensiveCampaign) || w.OffensiveUnderway;
         if (moving || marching || w.PendingSecessions.Count > 0 || w.Ally.OfferPending) QueueRedraw();
@@ -259,7 +260,13 @@ public partial class MapView : Control
                     QueueRedraw();
                 }
                 _mouse = motion.Position;
-                var hit = Hit(motion.Position);
+                var hit = AtWorldZoom ? null : Hit(motion.Position);
+                var hoverState = hit is null ? HitState(motion.Position) : null;
+                if (hoverState != _hoverState)
+                {
+                    _hoverState = hoverState;
+                    QueueRedraw();
+                }
                 if (hit != _hover)
                 {
                     _hover = hit;
@@ -275,15 +282,17 @@ public partial class MapView : Control
     public override void _Draw()
     {
         // A city map (real boundaries, no coast) sits on land; a region sits on the sea.
-        DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : Geo.Territories.Count > 0 ? NeutralLand : Sea);
+        DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : Globe != null || Geo.Territories.Count == 0 ? Sea : NeutralLand);
         if (World is not { } w) return;
         var font = ThemeDB.FallbackFont;
+        bool globe = DrawGlobe(font);
+        bool detail = !AtWorldZoom;
         var cells = Cells();
         var screen = cells.Select(pieces => pieces.Select(piece => piece.Select(ToScreen).ToArray()).ToArray()).ToArray();
 
         if (_geoLayout is { } g)
         {
-            foreach (var land in g.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
+            if (!globe) foreach (var land in g.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
             for (int r = 0; r < g.Land.Count; r++)
             {
                 var ring = Screen(g.Land[r]);
@@ -306,7 +315,7 @@ public partial class MapView : Control
         }
 
         // Railways: a dark bed with light cross-ties.
-        foreach (var (a, b) in w.Railways)
+        if (detail) foreach (var (a, b) in w.Railways)
         {
             var pa = ToScreen(w.Communes[a]);
             var pb = ToScreen(w.Communes[b]);
@@ -363,6 +372,17 @@ public partial class MapView : Control
                 var color = new Color(TrustColor(t), ca.Federated && cb.Federated ? 0.75f : 0.3f);
                 DrawLine(ToScreen(ca), ToScreen(cb), color, 1 + 3 * t, true);
             }
+
+        if (!detail)
+        {
+            DrawRegionMarker();
+            DrawGlobeLabels(font, new List<Rect2>());
+            DrawLegend(font);
+            if (_hoverState is { } hs) DrawStateTooltip(font, hs);
+            DrawBanner(font);
+            return;
+        }
+        if (globe && _zoom < 0.6f) DrawGlobeLabels(font, new List<Rect2>());
 
         // Militia columns marching to the front for each defensive campaign.
         foreach (var project in w.ActiveProjects.Where(p => p.Kind == ProjectKind.DefensiveCampaign))
@@ -452,13 +472,17 @@ public partial class MapView : Control
 
         DrawLegend(font);
         if (_hover is int h) DrawTooltip(font, w, w.Communes[h]);
-        if (Banner is { } banner)
-        {
-            var size = font.GetStringSize(banner, HorizontalAlignment.Left, -1, 28);
-            var at = new Vector2((Size.X - size.X) / 2, 48);
-            DrawRect(new Rect2(at - new Vector2(16, 34), size + new Vector2(32, 20)), new Color(0, 0, 0, 0.75f));
-            DrawString(font, at, banner, HorizontalAlignment.Left, -1, 28, Colors.White);
-        }
+        else if (_hoverState is { } hs) DrawStateTooltip(font, hs);
+        DrawBanner(font);
+    }
+
+    private void DrawBanner(Font font)
+    {
+        if (Banner is not { } banner) return;
+        var size = font.GetStringSize(banner, HorizontalAlignment.Left, -1, 28);
+        var at = new Vector2((Size.X - size.X) / 2, 48);
+        DrawRect(new Rect2(at - new Vector2(16, 34), size + new Vector2(32, 20)), new Color(0, 0, 0, 0.75f));
+        DrawString(font, at, banner, HorizontalAlignment.Left, -1, 28, Colors.White);
     }
 
     private Vector2[] Screen(Vector2[] layout) => layout.Select(ToScreen).ToArray();
@@ -499,6 +523,8 @@ public partial class MapView : Control
                 var hue = balance > 0 ? new Color(0.95f, 0.55f, 0.15f) : new Color(0.6f, 0.4f, 0.95f);
                 var mix = new Color(0.6f, 0.6f, 0.6f).Lerp(hue, Mathf.Clamp(Mathf.Abs(balance) * 4, 0, 1));
                 return mix.Darkened(0.6f * (1 - Mathf.Clamp(total * 1.6f, 0, 1)));
+            case MapMode.Ideology:
+                return Anarchist.Darkened(0.15f); // the federation itself
             case MapMode.Values:
                 return new Color(
                     (float)CommuneValues.To01(c.Values.Collectivism),
@@ -531,6 +557,7 @@ public partial class MapView : Control
             MapMode.Trust => "Trust — rust low, sand middling, green high. Lines: trust between neighbours.",
             MapMode.Education => "Education — orange: practical ahead (expert trap), violet: political ahead. Darker = less educated.",
             MapMode.Values => "Values — red: collectivist, green: federalist, blue: militant.",
+            MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy.",
             _ => "Wellbeing — rust low, sand middling, green high.",
         };
         DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
@@ -829,7 +856,7 @@ public partial class MapView : Control
     /// <summary>Centres the map on a commune at the given zoom.</summary>
     public void FocusOn(int commune, float zoom)
     {
-        _zoom = Mathf.Clamp(zoom, 0.6f, 5f);
+        _zoom = ClampZoom(zoom);
         Cells();
         _pan = -(Layout()[commune] * _fitScale + _fitOffset - Size / 2) * _zoom;
         QueueRedraw();
@@ -837,7 +864,7 @@ public partial class MapView : Control
 
     private void ZoomAt(Vector2 at, float factor)
     {
-        float next = Mathf.Clamp(_zoom * factor, 0.6f, 5f);
+        float next = ClampZoom(_zoom * factor);
         var anchor = (at - Size / 2 - _pan) / _zoom;
         _pan = at - Size / 2 - anchor * next;
         _zoom = next;

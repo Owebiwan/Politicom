@@ -30,6 +30,7 @@ or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`
 | `Data/` | Scenario and technologies as JSON (designers edit these, not code) |
 | `Sim.Cli/` | `politicom` command: play in the terminal, or run headless batches for balancing |
 | `Sim.Tests/` | xUnit tests, including a regression test for the core design dilemma |
+| `Data/world/` | The world map of each era (built by `tools/geo/build_world.py` from Natural Earth and `tools/geo/eras/`) |
 | `Data/geo/`, `tools/geo/` | Real map data per scenario, and the script that builds it (Natural Earth; Paris boundaries ODbL, see `Data/geo/ATTRIBUTION.md`) |
 | `Game/` | Godot 4 (.NET) front end: map, trust graph, drift meter, actions |
 
@@ -120,6 +121,17 @@ trader            68%       31%     1% │    76    54     12    71    53 │   
     defensive campaigns send columns marching from the communes taking part to the front.
 - **A daily clock:** turns are a week long, but while the clock runs the date ticks forward a
   day at a time at the same overall pace, and the turn resolves on its last day.
+- **The world:** the historical scenarios are played on a world map of their era (1871, 1918
+  or 1936).
+  - **Zooming:** from your communes out to the whole planet; the World button or W jumps
+    between the two.
+  - **At world zoom:** every period state is drawn with its borders and name, and a pulsing
+    ring marks your federation. The Ideology map mode colours states by regime.
+  - **Accuracy:** the borders are approximate. They're today's countries grouped into the
+    states of the time, with colonies folded into their empires (`tools/geo/eras/`). For
+    example, interwar Poland is drawn with today's borders.
+  - **Coming next:** the states are scenery for now. Diplomacy, revolutions, wars and rival
+    revolutionary states come in the following phases.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
   always visible. Everything else is in four tabs: Overview, Movement, Commune and Log.
   Clicking a commune opens its tab.
