@@ -25,6 +25,8 @@ public sealed record HoldCommune(int Commune) : PlayerAction;
 public sealed record SendDelegates(string StateId) : PlayerAction;
 /// <summary>Agitate a foreign state's workers: they radicalize, and the state resents it.</summary>
 public sealed record AgitateWorkers(string StateId) : PlayerAction;
+/// <summary>Expose a rival party's cells in a commune and its neighbours.</summary>
+public sealed record ExposeCells(int Commune) : PlayerAction;
 /// <summary>Send arms and organizers to a revolution under way abroad.</summary>
 public sealed record SupportUprising(string StateId) : PlayerAction;
 /// <summary>An appeal to the workers of the world: double the volunteers for a while.</summary>
@@ -61,6 +63,7 @@ internal static class ActionSystem
             AgitateWorkers a => Agitate(w, a),
             InternationalAppeal => Appeal(w),
             SupportUprising a => Support(w, a),
+            ExposeCells a => Expose(w, a),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
     }
@@ -271,6 +274,18 @@ internal static class ActionSystem
         s.Radicalization = Math.Min(1, s.Radicalization + b.AgitateEffect * (1 - s.Radicalization));
         s.Stance = Math.Clamp(s.Stance - 0.04, -1, 1);
         return ActionResult.Done($"Agitators reach the workers of {s.Name}: {s.Radicalization:P0} radicalized. Its government notices.");
+    }
+
+    private static ActionResult Expose(World w, ExposeCells a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        var b = w.Balance;
+        if (!Spend(w, b.CostExpose)) return Broke(w, b.CostExpose);
+        c.PartyInfluence *= 0.4;
+        foreach (var n in w.Trust.Neighbors(c.Id)) w.Communes[n].PartyInfluence *= 0.75;
+        foreach (var r in Global.RivalSystem.Rivals(w).ToList()) r.Stance = Math.Clamp(r.Stance - 0.05, -1, 1);
+        w.Emit(Severity.Info, $"Assemblies in and around {c.Name} debate the party's methods in the open. Its cells lose ground; its patrons abroad are displeased.", c.Id);
+        return ActionResult.Done($"Party cells exposed in {c.Name}.");
     }
 
     private static ActionResult Support(World w, SupportUprising a)

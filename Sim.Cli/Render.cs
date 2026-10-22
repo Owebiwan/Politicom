@@ -138,6 +138,7 @@ internal static class Render
         sb.AppendLine($"    values      collectivism {c.Values.Collectivism:+0.0;-0.0}  militancy {c.Values.Militancy:+0.0;-0.0}  federalism {c.Values.Federalism:+0.0;-0.0}");
         sb.AppendLine($"    education   practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0})  political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})");
         sb.AppendLine($"    economy     food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}/{w.Turn})  goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}/{w.Turn})  wellbeing {c.Wellbeing:P0}");
+        if (c.PartyInfluence > 0.01) sb.AppendLine($"    party cells {c.PartyInfluence:P0} (a rival party's hold here; `expose {c.Id}` breaks it up)");
         sb.AppendLine($"    aid ledger  given {c.AidGiven:0.0}  received {c.AidReceived:0.0}  free-riding {c.FreeRiding:P0}  discontent {c.Discontent:0.00}");
         if (c.Front) sb.AppendLine($"    front       against {string.Join(", ", c.Fronts.Select(k => w.Enemies[k].Name))}: control {c.Control:P0}, defense {c.Defense:0.00} vs pressure {c.Pressure:0.00}");
         if (c.OccupiedBy is int by) sb.AppendLine($"    occupied    by the {w.Enemies[by].Name}");

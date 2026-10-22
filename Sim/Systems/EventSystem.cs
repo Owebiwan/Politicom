@@ -76,6 +76,8 @@ internal static class EventSystem
             w.Ally.OfferInterval = 0;
             w.Ally.OfferPending = false;
         }
+        if (e.PartyInfluence != 0)
+            foreach (var c in w.Federation) c.PartyInfluence = Math.Clamp(c.PartyInfluence + e.PartyInfluence * (1 - c.PartyInfluence), 0, 1);
         if (e.Federate.Length > 0) Global.RevolutionSystem.Federate(w, e.Federate);
         foreach (var (id, delta) in e.Stances)
             if (w.States.FirstOrDefault(s => s.Id == id) is { } state)

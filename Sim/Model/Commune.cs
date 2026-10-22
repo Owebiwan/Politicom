@@ -63,6 +63,8 @@ public sealed class Commune
     public HashSet<string> Techs { get; init; } = new();
     /// <summary>Permanent bonus from completed collectivization projects.</summary>
     public double ProductivityBonus { get; set; }
+    /// <summary>0..1: how far a rival party's cells have taken hold here.</summary>
+    public double PartyInfluence { get; set; }
 
     // Decaying ledgers used to spot free riders.
     public double AidGiven { get; set; }

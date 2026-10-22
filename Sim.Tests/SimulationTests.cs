@@ -718,6 +718,41 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Rival_party_cells_grow_add_drift_and_can_be_exposed()
+    {
+        var w = NewWorld(seed: 6);
+        Assert.Contains(Global.RivalSystem.Rivals(w), r => r.Id == "SUN");
+        var c = w.Communes.Single(x => x.Name == "Vic"); // little political education
+        w.Run(30);
+        Assert.True(c.PartyInfluence > 0.02, $"cells {c.PartyInfluence}");
+        Assert.True(w.LastDrift.PartyCells > 0);
+        double before = c.PartyInfluence;
+        var soviets = w.States.Single(s => s.Id == "SUN");
+        double stance = soviets.Stance;
+        w.Influence = 100;
+        Assert.True(w.Apply(new ExposeCells(c.Id)).Ok);
+        Assert.True(c.PartyInfluence < before * 0.5);
+        Assert.True(soviets.Stance < stance);
+    }
+
+    [Fact]
+    public void Rivals_offer_arms_for_commissars_and_pull_revolutions_their_way()
+    {
+        var w = NewWorld(seed: 6);
+        for (int i = 0; i < 40 && !w.PendingEvents.Any(p => p.Id.StartsWith("rival_offer_")); i++) w.Step();
+        var offer = Assert.Single(w.PendingEvents, p => p.Id.StartsWith("rival_offer_"));
+        double drift = w.Drift.Value, cells = w.Mean(c => c.PartyInfluence);
+        Assert.True(w.Apply(new ChooseEventOption(offer.Id, 0)).Ok);
+        w.Step();
+        Assert.True(w.Mean(c => c.PartyInfluence) > cells + 0.1);
+        Assert.True(w.LastDrift.Events >= w.Balance.RivalAcceptDrift);
+
+        var poland = w.States.Single(s => s.Id == "POL"); // borders the Soviet Union
+        var ireland = w.States.Single(s => s.Id == "IRL");
+        Assert.True(Global.RivalSystem.RevolutionPull(w, poland) > Global.RivalSystem.RevolutionPull(w, ireland));
+    }
+
+    [Fact]
     public void Balance_parameters_can_be_overridden_by_name()
     {
         var b = new Balance();

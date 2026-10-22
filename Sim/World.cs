@@ -337,6 +337,7 @@ public sealed class World
         Global.DiplomacySystem.Run(this);
         Global.RevolutionSystem.Run(this);
         Global.InterstateSystem.Run(this);
+        Global.RivalSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

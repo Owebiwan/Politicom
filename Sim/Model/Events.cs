@@ -46,6 +46,8 @@ public sealed class EventEffects
     public bool EndAllyOffers { get; set; }
     /// <summary>Communes that leave the federation as a result.</summary>
     public string[] Secede { get; set; } = Array.Empty<string>();
+    /// <summary>Added to every commune's party influence (a rival's cells gaining ground).</summary>
+    public double PartyInfluence { get; set; }
     /// <summary>A sister federation whose cities join yours (by state id).</summary>
     public string Federate { get; set; } = "";
     /// <summary>Changes to outside states' stance toward the federation, by state id.</summary>
@@ -73,6 +75,7 @@ public sealed class EventEffects
         if (Secede.Length > 0) parts.Add($"{string.Join(", ", Secede)} leave");
         foreach (var (state, delta) in Stances) parts.Add($"{state} {(delta > 0 ? "warmer" : "cooler")} toward you");
         if (Federate.Length > 0) parts.Add("its cities join your federation");
+        if (PartyInfluence > 0) parts.Add($"party cells +{PartyInfluence * 100:0}%");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);
     }
 }

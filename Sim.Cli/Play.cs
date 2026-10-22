@@ -34,6 +34,8 @@ internal static class Play
           delegates <state>                       send delegates abroad to win a state's sympathy
           agitate <state>                         radicalize a state's workers (its government resents it)
           appeal                                  appeal to the workers of the world: twice the volunteers for a while
+          support <state>                         back a revolution under way abroad
+          expose <commune>                        break up a rival party's cells here and next door
 
           save [file] / load [file] save or restore the game (default politicom-save.json)
           next [n] / Enter          advance n turns          quit
@@ -162,6 +164,8 @@ internal static class Play
         "delegates" => new SendDelegates(State(w, p, 1)),
         "agitate" => new AgitateWorkers(State(w, p, 1)),
         "appeal" => new InternationalAppeal(),
+        "support" => new SupportUprising(State(w, p, 1)),
+        "expose" => new ExposeCells(Commune(w, p, 1)),
         "choose" => w.PendingEvents.Count == 0
             ? throw new ArgumentException("No event is waiting for an answer.")
             : new ChooseEventOption(w.PendingEvents[0].Id, int.Parse(Arg(p, 1)) - 1),

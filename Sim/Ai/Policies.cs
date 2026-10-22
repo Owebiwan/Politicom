@@ -164,6 +164,11 @@ internal static class Helpers
         if (crisis && w.States.Any(s => s.Does(Global.StateActions.Volunteers)) && w.Influence > reserve + w.Balance.CostAppeal)
             w.Apply(new InternationalAppeal());
 
+        // Party cells: expose them where they're strongest once they start to matter.
+        if (w.Tick % 8 == 3 && w.Influence > reserve + w.Balance.CostExpose
+            && w.Federation.OrderByDescending(c => c.PartyInfluence).FirstOrDefault() is { PartyInfluence: > 0.3 } cell)
+            w.Apply(new ExposeCells(cell.Id));
+
         // Revolutions abroad: back a rising under way, and fan the ones close to breaking out.
         foreach (var s in w.States.Where(s => s.Uprising > 0 && s.UprisingSupport == 0))
             if (w.Influence > reserve + w.Balance.CostSupportUprising) w.Apply(new SupportUprising(s.Id));

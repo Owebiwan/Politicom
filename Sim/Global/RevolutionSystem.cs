@@ -40,7 +40,7 @@ public static class RevolutionSystem
 
     /// <summary>Chance a successful revolution goes authoritarian.</summary>
     public static double AuthoritarianChance(World w, WorldState s) =>
-        Math.Clamp(0.25 + 0.45 * w.Drift.Value / 100 - 0.15 * w.States.Count(o => o.Sister) / Math.Max(1.0, w.States.Count / 10.0), 0.1, 0.9);
+        Math.Clamp(0.25 + RivalSystem.RevolutionPull(w, s) + 0.45 * w.Drift.Value / 100 - 0.15 * w.States.Count(o => o.Sister) / Math.Max(1.0, w.States.Count / 10.0), 0.1, 0.9);
 
     private static void Resolve(World w, WorldState s)
     {

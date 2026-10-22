@@ -128,6 +128,18 @@ public sealed class Balance
     /// <summary>Share of a warring state's strength tied up in its own war.</summary>
     public double WarCommitment { get; set; } = 0.6;
 
+    // ── Ideological rivals ─────────────────────────────────────────────────
+    /// <summary>Party cell growth per turn, per unit of rival pressure.</summary>
+    public double PartyGrowth { get; set; } = 0.0008;
+    /// <summary>Party cell decay per turn, per point of political education.</summary>
+    public double PartyFade { get; set; } = 0.012;
+    /// <summary>Drift per turn when party cells hold every commune.</summary>
+    public double PartyDrift { get; set; } = 0.12;
+    public int RivalOfferInterval { get; set; } = 30;
+    public double RivalArms { get; set; } = 30;
+    public double RivalAcceptDrift { get; set; } = 4;
+    public double CostExpose { get; set; } = 8;
+
     // ── Foreign trade ──────────────────────────────────────────────────────
     /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
     public double TradeShare { get; set; } = 0.3;

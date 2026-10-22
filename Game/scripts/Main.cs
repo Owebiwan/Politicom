@@ -785,6 +785,7 @@ public partial class Main : Control
         AddButton(actions, "Practical school", "Productivity and innovation. Watch the expert trap.", () => WithSelected(id => new FundSchool(id, EducationTrack.Practical)));
         AddButton(actions, "Political school", "Cheaper coordination, slower drift, more trust.", () => WithSelected(id => new FundSchool(id, EducationTrack.Political)));
         AddButton(actions, "Pamphlets", "Political education here and next door.", () => WithSelected(id => new CirculatePamphlets(id)));
+        AddButton(actions, "Expose party cells", "Debate a rival party's methods in the open: its cells here and next door lose ground. Its patrons abroad are displeased.", () => WithSelected(id => new ExposeCells(id)));
         AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {
             if (_map.Selected is int a && _map.Secondary is int b) Do(new Mediate(a, b));
@@ -940,6 +941,7 @@ public partial class Main : Control
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
             $"Food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
             $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · discontent {c.Discontent:0.00}\n" +
+            (c.PartyInfluence > 0.01 ? $"[color=#e07a6a]Party cells: {c.PartyInfluence:P0}[/color] — a rival party's hold here, adding drift\n" : "") +
             $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Select(t => w.Techs[t].Name)))}\n" +
             $"Neighbours (trust): {neighbours}";
     }

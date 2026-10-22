@@ -83,11 +83,11 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    51    53      5    82    48 │    33
+passive            0%      100%     0% │    51    53      5    82    48 │    34
 educator           1%       99%     0% │    52    54      6    85    49 │    28
-centralizer        0%        0%   100% │    53    53      4    50    40 │   100
-balanced          66%       34%     0% │    74    53      8    77    53 │    37
-trader            65%       35%     1% │    75    53      8    72    52 │    47
+centralizer        0%        0%   100% │    51    53      4    51    40 │   100
+balanced          65%       35%     0% │    74    53      8    77    53 │    38
+trader            65%       34%     1% │    75    53      8    72    52 │    47
 ```
 
 ## What the player sees
@@ -130,7 +130,6 @@ trader            65%       35%     1% │    75    53      8    72    52 │   
   - **Accuracy:** the borders are approximate. They're today's countries grouped into the
     states of the time, with colonies folded into their empires (`tools/geo/eras/`). For
     example, interwar Poland is drawn with today's borders.
-  - **Coming next:** rival revolutionary states.
 - **The outside world:** every period state has a stance toward the federation, from −1
   (hostile) to +1 (friendly). It starts from its ideology and the scenario's history, for
   example Germany and Italy hostile and Mexico friendly in 1936.
@@ -173,6 +172,18 @@ trader            65%       35%     1% │    75    53      8    72    52 │   
     follow wars.
   - **Display:** wars appear as red dashed lines between capitals on the world map, in
     country tooltips and in the World tab.
+- **Ideological rivals:** authoritarian communist states compete with you for the same
+  workers: the USSR in 1936, Soviet Russia in 1918, and any party that seizes power after a
+  revolution.
+  - **Party cells** grow in your communes where political education is thin and life is hard.
+    They add drift (shown in the drift breakdown and the Commune tab), as the PSUC did in 1937.
+    Political education wears them down, and *Expose party cells* breaks them up here and next
+    door, at the cost of the rival's goodwill.
+  - **Arms for commissars:** now and then the strongest rival offers arms if the militias take
+    its commissars: arms and militarization, plus drift and more party cells. This is separate
+    from the domestic ally's offers (the Republican Government, the Red Army command).
+  - **Revolutions abroad:** a rival nearby makes a winning revolution likelier to end with a
+    party in power, so revolutions become contests between you and them.
   - **Generated maps** get 3–5 neighbouring countries, and a neighbour on an enemy's side can
     back that enemy.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
@@ -351,11 +362,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           25%       75%     0% │    62    49      9    67    47 │    59
-educator          96%        4%     0% │    65    51     13    77    52 │    39
-centralizer        0%        0%   100% │    36    50      3    52    35 │   100
-balanced         100%        0%     0% │    83    52     12    80    57 │    31
-trader            99%        0%     0% │    85    52     12    74    56 │    47
+passive           22%       78%     0% │    62    49      9    67    47 │    60
+educator          96%        4%     0% │    65    51     13    77    51 │    40
+centralizer        0%        0%   100% │    33    50      3    53    35 │   100
+balanced         100%        0%     0% │    83    52     12    79    56 │    33
+trader            97%        0%     2% │    85    52     12    74    56 │    47
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -367,11 +378,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    67    49     10    86    53 │    33
-educator           0%      100%     0% │    70    50     11    90    55 │    21
-centralizer        0%        0%   100% │    34    48      2    54    34 │   100
-balanced          79%        3%    18% │    86    49     11    70    54 │    67
-trader            42%        8%    50% │    81    49     10    64    51 │    77
+passive            0%      100%     0% │    67    49     10    85    53 │    34
+educator           0%      100%     0% │    70    50     11    89    55 │    23
+centralizer        0%        0%   100% │    31    48      2    55    34 │   100
+balanced          73%        4%    24% │    86    49     11    68    54 │    72
+trader            38%        8%    54% │    81    49     10    64    51 │    78
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
