@@ -123,6 +123,23 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Sandbox_maps_have_neighbour_states_that_can_back_the_enemy()
+    {
+        int sponsored = 0;
+        for (ulong seed = 1; seed <= 20; seed++)
+        {
+            var s = Sandbox.Value.Generate(seed, calibrate: false);
+            Assert.InRange(s.States.Count, 2, 5);
+            Assert.Equal(s.States.Select(x => x.Id), s.Geography!.Neighbours.Select(n => n.Id));
+            Assert.All(s.Geography.Neighbours, n => Assert.NotEmpty(n.Rings));
+            var w = World.Create(s, NewWorld().Techs, seed: seed);
+            Assert.Equal(s.States.Count, w.States.Count);
+            if (s.Enemies.Any(e => e.Sponsors.Length > 0)) sponsored++;
+        }
+        Assert.True(sponsored >= 10, $"only {sponsored} of 20 maps had a neighbour backing an enemy");
+    }
+
+    [Fact]
     public void Sandbox_ids_parse()
     {
         Assert.True(SandboxGenerator.TryParseId("sandbox:42", out var seed, out var size));
@@ -321,18 +338,59 @@ public class SimulationTests
     }
 
     [Fact]
-    public void Spreading_the_idea_brings_embargoes()
+    public void Hostile_states_embargo_the_federation_and_trade_suffers()
     {
         var w = NewWorld();
         w.Apply(new SetForeignTrade(true));
+        foreach (var s in w.States) s.Stance = 0.1; // nobody embargoes
         w.Step();
-        double before = w.LastImports / w.LastExports;
-        foreach (var e in w.Enemies) e.Radicalization = 0.4;
-        Assert.Equal(0.6, w.Embargo, 6);
+        Assert.Equal(0, w.Embargo, 6);
+        double open = w.LastImports / w.LastExports;
+        foreach (var s in w.States.Where(s => s.Ideology != Global.Ideology.Communist)) s.Stance = -0.9;
         w.Step();
-        // Trade this turn happened at the 60% embargo: 0.8 goods per grain becomes 0.32.
-        Assert.Equal(w.Balance.TradeRate * 0.4, w.LastImports / w.LastExports, 6);
-        Assert.True(w.LastImports / w.LastExports < before);
+        Assert.True(w.Embargo > 0.5, $"embargo {w.Embargo}");
+        Assert.True(w.LastImports / w.LastExports < open);
+    }
+
+    [Fact]
+    public void Hostile_sponsors_intervene_and_friends_send_arms_and_volunteers()
+    {
+        var w = NewWorld();
+        var nationalists = w.Enemies[0];
+        var italy = w.States.Single(s => s.Id == "ITA");
+        var mexico = w.States.Single(s => s.Id == "MEX");
+        italy.Stance = -0.9;
+        mexico.Stance = 0.8;
+        w.Step();
+        Assert.True(italy.Does(Global.StateActions.Intervention));
+        Assert.True(nationalists.Intervention > 0);
+        Assert.True(mexico.Does(Global.StateActions.ArmsSales) && mexico.Does(Global.StateActions.Volunteers));
+        Assert.True(w.LastArms > 0 && w.VolunteerDefense > 0);
+        Assert.Contains(w.Log, e => e.Text.StartsWith("Kingdom of Italy intervenes"));
+
+        // Hysteresis: a small warming doesn't end the intervention at once.
+        italy.Stance = -0.55;
+        w.Step();
+        Assert.True(italy.Does(Global.StateActions.Intervention));
+    }
+
+    [Fact]
+    public void Delegates_warm_a_state_and_agitation_radicalizes_it()
+    {
+        var w = NewWorld();
+        var britain = w.States.Single(s => s.Id == "GBR");
+        var germany = w.States.Single(s => s.Id == "DEU");
+        double before = britain.Stance, fascistBefore = germany.Stance;
+        Assert.True(w.Apply(new SendDelegates("GBR")).Ok);
+        Assert.True(w.Apply(new SendDelegates("DEU")).Ok);
+        Assert.True(britain.Stance - before > germany.Stance - fascistBefore); // fascists barely listen
+        double rad = britain.Radicalization;
+        Assert.True(w.Apply(new AgitateWorkers("GBR")).Ok);
+        Assert.True(britain.Radicalization > rad);
+        Assert.False(w.Apply(new SendDelegates("XXX")).Ok);
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(britain.Stance, restored.States.Single(s => s.Id == "GBR").Stance);
     }
 
     [Fact]

@@ -46,6 +46,8 @@ public sealed class EventEffects
     public bool EndAllyOffers { get; set; }
     /// <summary>Communes that leave the federation as a result.</summary>
     public string[] Secede { get; set; } = Array.Empty<string>();
+    /// <summary>Changes to outside states' stance toward the federation, by state id.</summary>
+    public Dictionary<string, double> Stances { get; set; } = new();
 
     /// <summary>Short human-readable summary, e.g. "+6 drift, +25 influence".</summary>
     public string Summary(string turn = "week")
@@ -67,6 +69,7 @@ public sealed class EventEffects
         if (MilitarizationTicks > 0) parts.Add($"militarized {MilitarizationTicks} {turn}s");
         if (EndAllyOffers) parts.Add("no more arms offers");
         if (Secede.Length > 0) parts.Add($"{string.Join(", ", Secede)} leave");
+        foreach (var (state, delta) in Stances) parts.Add($"{state} {(delta > 0 ? "warmer" : "cooler")} toward you");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);
     }
 }

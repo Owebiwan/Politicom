@@ -4,6 +4,8 @@
   "description": "November 1918. The Austro-German occupiers are leaving southern Ukraine, and around Huliaipole the peasants have taken the land and formed free soviets. The Revolutionary Insurgent Army is a militia of volunteers. Whites to the south and east, Bolsheviks to the north — sometimes allies, never friends. Hold the Free Territory together until the summer of 1921.",
   "world": "1918",
   "homeState": "UKR",
+  // November 1918: the Entente lands at Odessa to back the Whites; the Bolsheviks are allies of convenience.
+  "stances": { "FRA": -0.65, "GBR": -0.55, "RSF": 0.15, "DEU": 0.0, "POL": -0.45, "ROU": -0.55 },
   "startDate": "1918-11-17",
   "endTick": 145,
   "neighborCount": 3,
@@ -12,6 +14,7 @@
   "enemies": [
     {
       "name": "White Army",
+      "sponsors": ["FRA", "GBR"],
       "color": "#dfe6f0",
       "strength": 1.1,
       "growth": 0.015,

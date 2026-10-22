@@ -15,6 +15,20 @@ public sealed class GeographyDefinition
     public List<RiverDefinition> Rivers { get; set; } = new();
     public List<ProvinceDefinition> Provinces { get; set; } = new();
     public bool DrawProvinces { get; set; }
+    /// <summary>The neighbouring countries around a generated region.</summary>
+    public List<NeighbourDefinition> Neighbours { get; set; } = new();
+}
+
+public sealed class NeighbourDefinition
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Ideology { get; set; } = "";
+    public string Color { get; set; } = "#808080";
+    public double Power { get; set; } = 1;
+    /// <summary>Direction from the region's centre, in radians (east = 0, north = π/2).</summary>
+    public double Angle { get; set; }
+    public List<double[][]> Rings { get; set; } = new();
 }
 
 public sealed class RiverDefinition
@@ -144,6 +158,7 @@ internal static class GeographyGenerator
         string[] provinceNames = { "North", "South", "East", "West", "Upper", "Lower", "Coast", "Hills" };
         var outer = seeds.Skip(inner).ToList();
         var innerSeeds = seeds.Take(inner).ToList();
+        var outerAngles = Enumerable.Range(0, outer.Count).Select(i => Math.Atan2(outer[i].Y - centre.Item2, outer[i].X - centre.Item1)).ToList();
         while (true)
         {
             var all = innerSeeds.Concat(outer).ToList();
@@ -177,6 +192,31 @@ internal static class GeographyGenerator
                 });
             }
             break;
+        }
+
+        // Neighbouring countries: the outer cells, grouped in runs of neighbouring seeds and
+        // clipped to the land, so the region sits among real-looking states.
+        var allSeeds = innerSeeds.Concat(outer).ToList();
+        int groups = 3 + rng.Next(3);
+        int startSeed = rng.Next(outer.Count);
+        for (int g = 0; g < groups; g++)
+        {
+            var neighbour = new NeighbourDefinition { Id = $"N{g + 1}" };
+            var members = Enumerable.Range(0, outer.Count).Where(i => ((i - startSeed + outer.Count) % outer.Count) * groups / outer.Count == g).ToList();
+            foreach (int i in members)
+            {
+                int self = innerSeeds.Count + i;
+                var cell = new List<(double X, double Y)>(boxRing);
+                for (int j = 0; j < allSeeds.Count && cell.Count > 0; j++)
+                    if (j != self) cell = ClipCloser(cell, allSeeds[self], allSeeds[j]);
+                if (cell.Count < 3) continue;
+                var piece = ClipToConvex(land, cell);
+                if (piece.Count >= 3) neighbour.Rings.Add(Ring(piece));
+            }
+            if (neighbour.Rings.Count == 0) continue;
+            double sx = members.Sum(i => Math.Cos(outerAngles[i])), sy = members.Sum(i => Math.Sin(outerAngles[i]));
+            neighbour.Angle = Math.Atan2(sy, sx);
+            geo.Neighbours.Add(neighbour);
         }
         return geo;
     }
@@ -238,6 +278,23 @@ internal static class GeographyGenerator
         var mid = ((a.X + b.X) / 2, (a.Y + b.Y) / 2);
         var normal = (b.X - a.X, b.Y - a.Y);
         return ClipHalfPlane(poly, p => (p.X - mid.Item1) * normal.Item1 + (p.Y - mid.Item2) * normal.Item2);
+    }
+
+    /// <summary>Clips any polygon by a convex one (Sutherland–Hodgman, one edge of the convex polygon at a time).</summary>
+    private static List<(double X, double Y)> ClipToConvex(List<(double X, double Y)> subject, List<(double X, double Y)> convex)
+    {
+        var cx = convex.Average(p => p.X);
+        var cy = convex.Average(p => p.Y);
+        var result = subject;
+        for (int i = 0; i < convex.Count && result.Count > 0; i++)
+        {
+            var a = convex[i];
+            var b = convex[(i + 1) % convex.Count];
+            double Cross((double X, double Y) p) => (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
+            double inside = Math.Sign(Cross((cx, cy)));
+            result = ClipHalfPlane(result, p => -inside * Cross(p));
+        }
+        return result;
     }
 
     private static List<(double X, double Y)> ClipToBox(List<(double X, double Y)> poly, (double X0, double Y0, double X1, double Y1) box)

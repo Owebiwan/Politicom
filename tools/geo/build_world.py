@@ -72,12 +72,16 @@ def main():
                 for a, b in zip(r, r[1:]):
                     owners[tuple(sorted([key(a), key(b)]))].add(code)
         border_edges = []
+        neighbours = collections.defaultdict(set)
         for edge, codes in owners.items():
             if len(codes) < 2:
                 continue
             states = {state_of.get(c) for c in codes}
             if len(states) > 1 and states != {None}:
                 border_edges.append(edge)
+                named = [s for s in states if s]
+                for a in named:
+                    neighbours[a].update(b for b in named if b != a)
         borders = [[[round(x, 3), round(y, 3)] for x, y in simplify(line, TOL)] for line in chain(border_edges)]
 
         out_states = []
@@ -100,6 +104,8 @@ def main():
                 "id": s["id"],
                 "name": s["name"],
                 "ideology": s["ideology"],
+                "power": s.get("power", 1),
+                "neighbours": sorted(neighbours[s["id"]]),
                 "color": s.get("color", PALETTE[i % len(PALETTE)]),
                 "capital": {"name": s.get("capital", capital["name"]), "lon": round(capital["longitude"], 3), "lat": round(capital["latitude"], 3)} if capital else None,
                 "cities": [{"name": c["name"], "lon": round(c["longitude"], 3), "lat": round(c["latitude"], 3), "pop": int(c.get("pop_max") or 0)} for c in cities[:CITIES]],

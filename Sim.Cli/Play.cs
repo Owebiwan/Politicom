@@ -30,6 +30,10 @@ internal static class Play
           arms accept|reject                      answer the government's offer
           hold <commune>                          keep a seceding commune by force (costly)
           choose <n>                              answer the oldest historical event with option n
+          world                                   the outside states: stance, weight, what they're doing
+          delegates <state>                       send delegates abroad to win a state's sympathy
+          agitate <state>                         radicalize a state's workers (its government resents it)
+          appeal                                  appeal to the workers of the world: twice the volunteers for a while
 
           save [file] / load [file] save or restore the game (default politicom-save.json)
           next [n] / Enter          advance n turns          quit
@@ -78,6 +82,9 @@ internal static class Play
                         break;
                     case "show":
                         Console.WriteLine(Render.CommuneDetail(w, w.Communes[Commune(w, parts, 1)]));
+                        break;
+                    case "world":
+                        Console.WriteLine(Render.WorldTable(w));
                         break;
                     case "techs":
                         Console.WriteLine(Render.TechTable(w));
@@ -152,6 +159,9 @@ internal static class Play
         "trade" => new SetForeignTrade(Arg(p, 1) == "on"),
         "arms" => new AnswerAllyOffer(Arg(p, 1) == "accept"),
         "hold" => new HoldCommune(Commune(w, p, 1)),
+        "delegates" => new SendDelegates(State(w, p, 1)),
+        "agitate" => new AgitateWorkers(State(w, p, 1)),
+        "appeal" => new InternationalAppeal(),
         "choose" => w.PendingEvents.Count == 0
             ? throw new ArgumentException("No event is waiting for an answer.")
             : new ChooseEventOption(w.PendingEvents[0].Id, int.Parse(Arg(p, 1)) - 1),
@@ -165,6 +175,16 @@ internal static class Play
 
     private static string Arg(string[] p, int i) =>
         i < p.Length ? p[i].ToLowerInvariant() : throw new ArgumentException("Missing argument. Type `help`.");
+
+    private static string State(World w, string[] p, int i)
+    {
+        string s = string.Join(' ', p.Skip(i));
+        if (s.Length == 0) throw new ArgumentException("Which state? Type `world` for the list.");
+        var match = w.States.Where(x => x.Id.Equals(s, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (match.Count == 0) match = w.States.Where(x => x.Name.Contains(s, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (match.Count == 1) return match[0].Id;
+        throw new ArgumentException(match.Count == 0 ? $"No state '{s}'." : $"'{s}' is ambiguous: {string.Join(", ", match.Select(x => $"{x.Name} [{x.Id}]"))}.");
+    }
 
     private static int Commune(World w, string[] p, int i)
     {

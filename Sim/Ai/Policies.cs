@@ -44,6 +44,7 @@ public sealed class Educator : IPolicy
         Helpers.AnswerEvents(w, e => e.Drift - e.Influence * 0.05);
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
         if (w.Tick % 15 == 7 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
+        Helpers.Diplomacy(w, crisis: w.Federation.Any(c => c.Front && c.Control < 0.5), reserve: 15);
         if (w.Drift.Value > 20 && w.Influence >= w.Balance.CostRecall * DriftEffects.RecallCost(w.Drift.Stage) + 5) w.Apply(new RecallDelegates());
         if (w.Tick % 10 == 3 && Helpers.LeastPolitical(w) is { } t) w.Apply(new ProposeProject(ProjectKind.AteneoNetwork, t.Id));
         Helpers.ReliefForStarving(w);
@@ -112,6 +113,7 @@ public sealed class Balanced : IPolicy
         if (margin < 5 && w.Influence >= b.CostRecall * DriftEffects.RecallCost(w.Drift.Stage)) w.Apply(new RecallDelegates());
 
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
+        Helpers.Diplomacy(w, crisis, reserve: 20);
         Helpers.ReliefForStarving(w);
         if (w.Tick % 20 == 5 && w.TechShare("militia_doctrine") < 0.5) w.Apply(new CirculateIdea("militia_doctrine"));
         if (w.Tick % 20 == 15 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
@@ -141,6 +143,26 @@ public sealed class Trader : IPolicy
 
 internal static class Helpers
 {
+    /// <summary>
+    /// The movement's foreign policy: delegates to the state whose stance matters most right now
+    /// (an intervener, or a powerful state near a threshold), and an appeal for volunteers in a crisis.
+    /// </summary>
+    public static void Diplomacy(World w, bool crisis, double reserve)
+    {
+        if (w.States.Count == 0) return;
+        if (w.Tick % 6 == 2 && w.Influence > reserve + w.Balance.CostDelegates)
+        {
+            var target = w.States
+                .Where(s => s.Ideology != Global.Ideology.Fascist && s.Stance < 0.6)
+                .OrderByDescending(s => s.Weight * (s.Does(Global.StateActions.Intervention) || s.Does(Global.StateActions.Embargo) ? 2 : 1)
+                                        * (Math.Abs(s.Stance + 0.45) < 0.25 || Math.Abs(s.Stance - 0.3) < 0.2 ? 1.5 : 1))
+                .FirstOrDefault();
+            if (target != null) w.Apply(new SendDelegates(target.Id));
+        }
+        if (crisis && w.States.Any(s => s.Does(Global.StateActions.Volunteers)) && w.Influence > reserve + w.Balance.CostAppeal)
+            w.Apply(new InternationalAppeal());
+    }
+
     /// <summary>
     /// The drift brake most worth circulating: one some commune could discover or adopt now,
     /// least widespread first. Null if there is none.

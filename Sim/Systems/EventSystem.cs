@@ -76,6 +76,9 @@ internal static class EventSystem
             w.Ally.OfferInterval = 0;
             w.Ally.OfferPending = false;
         }
+        foreach (var (id, delta) in e.Stances)
+            if (w.States.FirstOrDefault(s => s.Id == id) is { } state)
+                state.Stance = Math.Clamp(state.Stance + delta, -1, 1);
         foreach (var name in e.Secede)
         {
             var c = w.Communes.FirstOrDefault(x => x.Name == name);

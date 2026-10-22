@@ -6,7 +6,7 @@ using Politicom.Sim;
 
 namespace Politicom.Game;
 
-public enum MapMode { Trust, Education, Values, Wellbeing, Ideology }
+public enum MapMode { Trust, Education, Values, Wellbeing, Ideology, Diplomacy, Revolution }
 
 /// <summary>
 /// The map. With real geography (<see cref="GeoData"/>), communes sit at their true positions
@@ -200,6 +200,12 @@ public partial class MapView : Control
     /// <summary>Commune id, and whether shift was held (secondary selection).</summary>
     public event Action<int, bool>? CommuneClicked;
 
+    /// <summary>A country clicked outside the federation.</summary>
+    public event Action<string>? StateClicked;
+
+    /// <summary>The country highlighted on the map (the one open in the World tab).</summary>
+    public string? SelectedState { get; set; }
+
     public override void _Ready()
     {
         MouseFilter = MouseFilterEnum.Stop;
@@ -238,8 +244,14 @@ public partial class MapView : Control
             case InputEventMouseButton { ButtonIndex: MouseButton.Left or MouseButton.Right or MouseButton.Middle } button:
                 if (!button.Pressed)
                     _dragging = false;
-                else if (button.ButtonIndex == MouseButton.Left && Hit(button.Position) is int id)
+                else if (button.ButtonIndex == MouseButton.Left && !AtWorldZoom && Hit(button.Position) is int id)
                     CommuneClicked?.Invoke(id, button.ShiftPressed);
+                else if (button.ButtonIndex == MouseButton.Left && !button.DoubleClick && HitState(button.Position) is { } st)
+                {
+                    StateClicked?.Invoke(st.Id);
+                    _dragging = true; // a click on a country can still start a drag
+                    _dragFrom = button.Position;
+                }
                 else if (button.DoubleClick)
                 {
                     _zoom = 1;
@@ -285,6 +297,9 @@ public partial class MapView : Control
         DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : Globe != null || Geo.Territories.Count == 0 ? Sea : NeutralLand);
         if (World is not { } w) return;
         var font = ThemeDB.FallbackFont;
+        // A generated map's land goes under its neighbouring countries; real maps' land comes from the world layer.
+        if (Generated && _geoLayout is { } g0)
+            foreach (var land in g0.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
         bool globe = DrawGlobe(font);
         bool detail = !AtWorldZoom;
         var cells = Cells();
@@ -525,6 +540,8 @@ public partial class MapView : Control
                 return mix.Darkened(0.6f * (1 - Mathf.Clamp(total * 1.6f, 0, 1)));
             case MapMode.Ideology:
                 return Anarchist.Darkened(0.15f); // the federation itself
+            case MapMode.Diplomacy or MapMode.Revolution:
+                return new Color("a8946a"); // the federation: outside the scale of other states' attitudes
             case MapMode.Values:
                 return new Color(
                     (float)CommuneValues.To01(c.Values.Collectivism),
@@ -558,6 +575,8 @@ public partial class MapView : Control
             MapMode.Education => "Education — orange: practical ahead (expert trap), violet: political ahead. Darker = less educated.",
             MapMode.Values => "Values — red: collectivist, green: federalist, blue: militant.",
             MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy.",
+            MapMode.Diplomacy => "Diplomacy — red hostile, grey neutral, green friendly toward the federation. Click a country for the World tab.",
+            MapMode.Revolution => "Revolution — how radicalized each state's workers are: dark none, bright red near revolt.",
             _ => "Wellbeing — rust low, sand middling, green high.",
         };
         DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));

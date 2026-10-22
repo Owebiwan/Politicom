@@ -84,10 +84,10 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    51    53      8    82    49 │    34
-educator           1%       99%     0% │    52    54      9    85    50 │    28
-centralizer        0%        0%   100% │    53    53      6    51    40 │   100
-balanced          62%       38%     0% │    74    53     12    78    54 │    35
-trader            68%       31%     1% │    76    54     12    71    53 │    50
+educator           1%       99%     0% │    52    54      8    85    50 │    28
+centralizer        0%        0%   100% │    52    53      6    50    40 │   100
+balanced          67%       33%     0% │    74    53     12    77    54 │    36
+trader            65%       34%     1% │    75    53     12    72    53 │    48
 ```
 
 ## What the player sees
@@ -130,8 +130,28 @@ trader            68%       31%     1% │    76    54     12    71    53 │   
   - **Accuracy:** the borders are approximate. They're today's countries grouped into the
     states of the time, with colonies folded into their empires (`tools/geo/eras/`). For
     example, interwar Poland is drawn with today's borders.
-  - **Coming next:** the states are scenery for now. Diplomacy, revolutions, wars and rival
-    revolutionary states come in the following phases.
+  - **Coming next:** revolutions spreading, wars between states, and rival revolutionary
+    states come in the following phases.
+- **The outside world:** every period state has a stance toward the federation, from −1
+  (hostile) to +1 (friendly). It starts from its ideology and the scenario's history, for
+  example Germany and Italy hostile and Mexico friendly in 1936.
+  - **What moves it:** order in the federation reassures governments and disappoints
+    sympathizers; foreign trade warms liberal states; a state whose own workers radicalize
+    fears your example.
+  - **What it leads to:**
+    - below −0.30: an embargo, which sets the trade embargo
+    - above +0.35: arms sales to the front
+    - above +0.50: volunteers
+    - below −0.60: intervention, adding to the enemy it backs (up to +60% of that enemy's strength)
+  - **Weight:** each state's weight is its power, scaled down by distance.
+  - **Volunteers** also come from radicalized workers anywhere, like the International Brigades.
+  - **Your diplomacy:** *send delegates* (warm a state; fascists barely listen), *agitate
+    workers* (radicalize it; its government resents it) and an *international appeal* (double
+    the volunteers for a while).
+  - **Where to see it:** the World tab, the Diplomacy and Revolution map modes, clicking any
+    country, or `world` / `delegates` / `agitate` / `appeal` in the terminal.
+  - **Generated maps** get 3–5 neighbouring countries, and a neighbour on an enemy's side can
+    back that enemy.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
   always visible. Everything else is in four tabs: Overview, Movement, Commune and Log.
   Clicking a commune opens its tab.
@@ -308,11 +328,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           33%       67%     0% │    70    50     19    67    51 │    59
-educator          93%        7%     0% │    67    51     24    79    55 │    38
+passive           22%       78%     0% │    63    49     17    66    49 │    60
+educator          96%        4%     0% │    64    51     25    77    54 │    40
 centralizer        0%        0%   100% │    36    50      5    52    36 │   100
-balanced         100%        0%     0% │    87    52     22    78    60 │    39
-trader           100%        0%     0% │    86    53     22    77    59 │    41
+balanced         100%        0%     0% │    83    52     22    80    59 │    31
+trader            99%        0%     1% │    85    52     22    73    58 │    48
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -325,10 +345,10 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    67    49     18    86    55 │    33
-educator           0%      100%     0% │    70    51     20    90    58 │    21
+educator           1%       99%     0% │    69    50     20    90    57 │    21
 centralizer        0%        0%   100% │    34    48      4    54    35 │   100
-balanced          79%       13%     9% │    86    50     20    73    57 │    60
-trader            34%       11%    55% │    81    50     18    62    53 │    81
+balanced          77%        4%    19% │    86    49     20    70    56 │    67
+trader            41%        7%    52% │    81    49     18    63    53 │    79
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -338,11 +358,11 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    83    67     11    91    63 │    26
-educator           0%      100%     0% │    83    67     12    96    64 │     8
+passive            0%      100%     0% │    82    67     11    91    63 │    26
+educator           0%      100%     0% │    80    67     12    96    64 │     7
 centralizer        0%        0%   100% │    84    64      8    51    52 │   100
-balanced          36%       64%     0% │    96    68     11    93    67 │    17
-trader            36%       64%     0% │    96    68     11    90    66 │    23
+balanced          25%       75%     0% │    96    68     11    93    67 │    16
+trader            44%       56%     0% │    96    68     11    90    66 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

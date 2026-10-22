@@ -32,7 +32,7 @@ internal static class WarSystem
                 w.Emit(Severity.Danger, $"{offensive.Name} begins.");
             e.CurrentOffensive = offensive;
 
-            e.EffectiveStrength = (e.Strength + (offensive?.Strength ?? 0))
+            e.EffectiveStrength = (e.Strength + (offensive?.Strength ?? 0) + e.Intervention)
                                   * (1 - 0.4 * e.Radicalization)
                                   * (1 - Math.Clamp(e.Exhaustion, 0, 0.6));
 
@@ -96,7 +96,8 @@ internal static class WarSystem
                       * (w.Ally.MilitarizationTicks > 0 ? 1 + b.MilitarizationDefense : 1)
                       * (b.ArmsShortageDefense + (1 - b.ArmsShortageDefense) * c.GoodsCoverage)
                       * (1 + b.StockpileDefense * Math.Clamp(c.Goods / (c.Population * b.StockpilePerPop), 0, 1))
-                      * (w.RecallPenaltyTicks > 0 ? 0.9 : 1);
+                      * (w.RecallPenaltyTicks > 0 ? 0.9 : 1)
+                      * (1 + w.VolunteerDefense);
         return (own + support) * mult;
     }
 

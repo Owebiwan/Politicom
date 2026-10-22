@@ -44,6 +44,7 @@ public partial class MapView
             _globe = value;
             _globeLayout = null;
             _globeMesh = null;
+            _meshVerts = null;
             QueueRedraw();
         }
     }
@@ -64,7 +65,6 @@ public partial class MapView
     private GlobeLayout? _globeLayout;
     private Vector2[]? _globeLayoutFor;
     private ArrayMesh? _globeMesh;
-    private MapMode _globeMeshMode;
 
     private GlobeLayout? Globe_Layout()
     {
@@ -72,6 +72,7 @@ public partial class MapView
         var layout = Layout(); // sets _project
         if (_globeLayout != null && ReferenceEquals(_globeLayoutFor, layout)) return _globeLayout;
         _globeMesh = null;
+        _meshVerts = null;
         _globeLayoutFor = layout;
         var g = new GlobeLayout();
         Rect2 Box(Vector2[] pts)
@@ -84,7 +85,10 @@ public partial class MapView
         foreach (var s in Globe.States)
             foreach (var ring in s.Rings)
             {
-                var pts = ring.Select(P).ToArray();
+                // Generated neighbours stop at the edge of the generated area: carry them on past it.
+                var pts = Generated
+                    ? Geo.Extended(ring.Select(p => new Vector2((float)p[0], (float)p[1])).ToArray()).Select(_project).ToArray()
+                    : ring.Select(P).ToArray();
                 g.StateRings.Add((s, pts, Box(pts)));
             }
         foreach (var ring in Globe.Land)
@@ -150,52 +154,73 @@ public partial class MapView
 
     public bool AtWorldZoom => Globe != null && _zoom < DetailZoom;
 
+    /// <summary>A generated map's world: only its neighbours, which end at the edge of the generated area.</summary>
+    private bool Generated => Globe?.Era == "generated";
+
+    // The mesh's geometry is triangulated once; colours are refilled when the map mode changes,
+    // or every turn for the modes that follow the simulation.
+    private Vector2[]? _meshVerts;
+    private int[]? _meshIndices;
+    private int[]? _meshOwner; // per vertex: index into Globe.States, or -1 for plain land
+    private (MapMode Mode, int Tick, string? Selected) _meshKey = (MapMode.Trust, -1, null);
+
     private void BuildGlobeMesh(GlobeLayout g)
     {
         var verts = new List<Vector2>();
-        var colors = new List<Color>();
+        var owners = new List<int>();
         var indices = new List<int>();
-        void Add(Vector2[] ring, Color color)
+        var stateIndex = Globe!.States.Select((s, i) => (s, i)).ToDictionary(x => x.s, x => x.i);
+        void Add(Vector2[] ring, int owner)
         {
             foreach (var piece in Simple(Clean(ring)))
             {
                 var clean = Clean(piece);
                 if (clean.Length < 3) continue;
-                // Most pieces triangulate directly; the odd awkward one is split into convex parts and fanned.
-                var parts = Geometry2D.IsPolygonClockwise(clean) ? new[] { clean.Reverse().ToArray() } : new[] { clean };
-                foreach (var part in parts)
+                var part = Geometry2D.IsPolygonClockwise(clean) ? clean.Reverse().ToArray() : clean;
+                var tri = Geometry2D.TriangulatePolygon(part);
+                if (tri.Length > 0)
                 {
-                    var tri = Geometry2D.TriangulatePolygon(part);
-                    if (tri.Length > 0)
-                    {
-                        int start = verts.Count;
-                        verts.AddRange(part);
-                        colors.AddRange(Enumerable.Repeat(color, part.Length));
-                        indices.AddRange(tri.Select(i => i + start));
-                        continue;
-                    }
-                    foreach (var convex in Geometry2D.DecomposePolygonInConvex(part))
-                    {
-                        int start = verts.Count;
-                        verts.AddRange(convex);
-                        colors.AddRange(Enumerable.Repeat(color, convex.Length));
-                        for (int k = 1; k + 1 < convex.Length; k++) indices.AddRange(new[] { start, start + k, start + k + 1 });
-                    }
+                    int start = verts.Count;
+                    verts.AddRange(part);
+                    owners.AddRange(Enumerable.Repeat(owner, part.Length));
+                    indices.AddRange(tri.Select(i => i + start));
+                    continue;
+                }
+                // The odd awkward piece: split into convex parts and fan them.
+                foreach (var convex in Geometry2D.DecomposePolygonInConvex(part))
+                {
+                    int start = verts.Count;
+                    verts.AddRange(convex);
+                    owners.AddRange(Enumerable.Repeat(owner, convex.Length));
+                    for (int k = 1; k + 1 < convex.Length; k++) indices.AddRange(new[] { start, start + k, start + k + 1 });
                 }
             }
         }
-        foreach (var (line, _) in g.Coasts) Add(line[..^1], WorldLand);
+        foreach (var (line, _) in g.Coasts) Add(line[..^1], -1);
         // Largest first, so enclaves (Lesotho in South Africa) are drawn on top.
-        foreach (var (state, ring, _) in g.StateRings.OrderByDescending(r => r.Box.Area)) Add(ring, StateFill(state));
+        foreach (var (state, ring, _) in g.StateRings.OrderByDescending(r => r.Box.Area)) Add(ring, stateIndex[state]);
+        _meshVerts = verts.ToArray();
+        _meshIndices = indices.ToArray();
+        _meshOwner = owners.ToArray();
+        _meshKey = (Mode, -1, null);
+        _globeMesh = null;
+    }
 
+    private void ColorGlobeMesh()
+    {
+        var key = (Mode, Mode is MapMode.Diplomacy or MapMode.Revolution ? World?.Tick ?? 0 : 0, SelectedState);
+        if (_globeMesh != null && key == _meshKey) return;
+        var fills = Globe!.States.Select(StateFill).ToArray();
+        var colors = new Color[_meshVerts!.Length];
+        for (int i = 0; i < colors.Length; i++) colors[i] = _meshOwner![i] < 0 ? WorldLand : fills[_meshOwner[i]];
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)Mesh.ArrayType.Max);
-        arrays[(int)Mesh.ArrayType.Vertex] = verts.ToArray();
-        arrays[(int)Mesh.ArrayType.Color] = colors.ToArray();
-        arrays[(int)Mesh.ArrayType.Index] = indices.ToArray();
+        arrays[(int)Mesh.ArrayType.Vertex] = _meshVerts;
+        arrays[(int)Mesh.ArrayType.Color] = colors;
+        arrays[(int)Mesh.ArrayType.Index] = _meshIndices!;
         _globeMesh = new ArrayMesh();
         _globeMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
-        _globeMeshMode = Mode;
+        _meshKey = key;
     }
 
     /// <summary>Drops repeated and closing points, which make triangulation fail.</summary>
@@ -210,17 +235,27 @@ public partial class MapView
 
     private Color StateFill(AtlasState s)
     {
+        var sim = World?.States.FirstOrDefault(x => x.Id == s.Id);
+        Color c;
         if (Mode == MapMode.Ideology)
-            return IdeologyColors.TryGetValue(s.Ideology, out var c) ? c : new Color("777777");
-        // Political map: each state's colour, muted so the region stands out.
-        return Color.FromString(s.Color, new Color("777777")).Darkened(0.35f);
+            c = IdeologyColors.TryGetValue(s.Ideology, out var ic) ? ic : new Color("777777");
+        else if (Mode == MapMode.Diplomacy)
+            c = sim is null ? new Color("4a4d52")
+                : sim.Stance < 0 ? new Color("6d6f73").Lerp(new Color("b0392f"), (float)-sim.Stance)
+                : new Color("6d6f73").Lerp(new Color("4f9a5c"), (float)sim.Stance);
+        else if (Mode == MapMode.Revolution)
+            c = sim is null ? new Color("4a4d52") : new Color("3a3233").Lerp(new Color("e0443a"), Mathf.Clamp((float)sim.Radicalization * 2.5f, 0, 1));
+        else // political map: each state's colour, muted so the region stands out
+            c = Color.FromString(s.Color, new Color("777777")).Darkened(0.35f);
+        return s.Id == SelectedState ? c.Lightened(0.25f) : c;
     }
 
     /// <summary>Draws the world under everything else. Returns false if there is no world layer.</summary>
     private bool DrawGlobe(Font font)
     {
         if (Globe_Layout() is not { } g) return false;
-        if (_globeMesh == null || _globeMeshMode != Mode) BuildGlobeMesh(g);
+        if (_meshVerts == null) BuildGlobeMesh(g);
+        ColorGlobeMesh();
 
         // ToScreen is affine: layout * s + o.
         float s = _fitScale * _zoom;
@@ -231,6 +266,19 @@ public partial class MapView
 
         var view = new Rect2(-o / s, Size / s); // the visible area, in layout space
         bool InRegion(Vector2 a, Vector2 b) => _zoom >= DetailZoom && g.Region.HasPoint((a + b) / 2);
+        if (Generated)
+        {
+            // The region draws its own coast; neighbours' borders are drawn except along the artificial edge.
+            const float eps = 0.5f;
+            bool OnEdge(Vector2 a, Vector2 b) =>
+                (Mathf.Abs(a.X - g.Region.Position.X) < eps && Mathf.Abs(b.X - g.Region.Position.X) < eps) ||
+                (Mathf.Abs(a.X - g.Region.End.X) < eps && Mathf.Abs(b.X - g.Region.End.X) < eps) ||
+                (Mathf.Abs(a.Y - g.Region.Position.Y) < eps && Mathf.Abs(b.Y - g.Region.Position.Y) < eps) ||
+                (Mathf.Abs(a.Y - g.Region.End.Y) < eps && Mathf.Abs(b.Y - g.Region.End.Y) < eps);
+            foreach (var (line, box) in g.Borders)
+                if (box.Intersects(view)) DrawCulled(line, WorldBorder, 1.6f, OnEdge);
+            return true;
+        }
         foreach (var (line, box) in g.Coasts)
             if (box.Intersects(view)) DrawCulled(line, WorldCoast, 1.2f, InRegion);
         foreach (var (line, box) in g.Borders)
@@ -302,19 +350,26 @@ public partial class MapView
 
     private void DrawStateTooltip(Font font, AtlasState s)
     {
-        var lines = new[]
+        var sim = World?.States.FirstOrDefault(x => x.Id == s.Id);
+        var lines = new List<string>
         {
             s.Name,
             $"{char.ToUpperInvariant(s.Ideology[0])}{s.Ideology[1..]} · capital {s.Capital?.Name ?? "—"}",
         };
+        if (sim != null)
+        {
+            lines.Add($"{char.ToUpperInvariant(StateText.Stance(sim.Stance)[0])}{StateText.Stance(sim.Stance)[1..]} toward you ({sim.Stance:+0.00;-0.00}) · {StateText.Actions(sim.Actions)}");
+            lines.Add($"Workers radicalized {sim.Radicalization:P0} · weight {sim.Weight:0.0}");
+        }
+        else if (World?.Scenario.HomeState == s.Id) lines.Add("Your federation's own country");
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;
-        float height = lines.Length * 17 + 12;
+        float height = lines.Count * 17 + 12;
         var at = _mouse + new Vector2(16, 16);
         if (at.X + width > Size.X) at.X = _mouse.X - width - 8;
         if (at.Y + height > Size.Y) at.Y = _mouse.Y - height - 8;
         DrawRect(new Rect2(at, new Vector2(width, height)), new Color(0.03f, 0.03f, 0.04f, 0.92f));
         DrawRect(new Rect2(at, new Vector2(width, height)), new Color(1, 1, 1, 0.15f), false, 1);
-        for (int i = 0; i < lines.Length; i++)
+        for (int i = 0; i < lines.Count; i++)
             DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
     }
 }

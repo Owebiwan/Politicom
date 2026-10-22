@@ -21,6 +21,12 @@ public sealed record SetWarCommittee(bool Active) : PlayerAction;
 public sealed record SetForeignTrade(bool Active) : PlayerAction;
 public sealed record AnswerAllyOffer(bool Accept) : PlayerAction;
 public sealed record HoldCommune(int Commune) : PlayerAction;
+/// <summary>Send delegates to win a foreign state's sympathy.</summary>
+public sealed record SendDelegates(string StateId) : PlayerAction;
+/// <summary>Agitate a foreign state's workers: they radicalize, and the state resents it.</summary>
+public sealed record AgitateWorkers(string StateId) : PlayerAction;
+/// <summary>An appeal to the workers of the world: double the volunteers for a while.</summary>
+public sealed record InternationalAppeal : PlayerAction;
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
 public sealed record ChooseEventOption(string EventId, int Option) : PlayerAction;
 
@@ -49,6 +55,9 @@ internal static class ActionSystem
             AnswerAllyOffer a => Ally(w, a),
             HoldCommune a => Hold(w, a),
             ChooseEventOption a => Systems.EventSystem.Choose(w, a.EventId, a.Option),
+            SendDelegates a => Delegates(w, a),
+            AgitateWorkers a => Agitate(w, a),
+            InternationalAppeal => Appeal(w),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
     }
@@ -237,6 +246,42 @@ internal static class ActionSystem
         w.BumpDrift(b.ForceStayDrift);
         w.Emit(Severity.Danger, $"{c.Name} is kept in the federation against its assembly's will. Everyone notices.", c.Id);
         return ActionResult.Done($"{c.Name} held by force.");
+    }
+
+    private static ActionResult Delegates(World w, SendDelegates a)
+    {
+        if (w.States.FirstOrDefault(s => s.Id == a.StateId) is not { } s) return ActionResult.Fail($"No state '{a.StateId}'.");
+        var b = w.Balance;
+        if (!Spend(w, b.CostDelegates)) return Broke(w, b.CostDelegates);
+        // Fascist governments barely listen; everyone listens less the further they already lean.
+        double resistance = s.Ideology == Global.Ideology.Fascist ? 0.3 : 1;
+        s.Stance = Math.Clamp(s.Stance + b.DelegateEffect * resistance * (1 - 0.5 * Math.Max(0, s.Stance)), -1, 1);
+        w.Emit(Severity.Info, $"Delegates of the movement tour {s.Name}: meetings, newspapers, unions. It is now {Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}).");
+        return ActionResult.Done($"Delegates sent to {s.Name}: stance {s.Stance:+0.00;-0.00}.");
+    }
+
+    private static ActionResult Agitate(World w, AgitateWorkers a)
+    {
+        if (w.States.FirstOrDefault(s => s.Id == a.StateId) is not { } s) return ActionResult.Fail($"No state '{a.StateId}'.");
+        var b = w.Balance;
+        if (!Spend(w, b.CostAgitate)) return Broke(w, b.CostAgitate);
+        s.Radicalization = Math.Min(1, s.Radicalization + b.AgitateEffect * (1 - s.Radicalization));
+        s.Stance = Math.Clamp(s.Stance - 0.04, -1, 1);
+        return ActionResult.Done($"Agitators reach the workers of {s.Name}: {s.Radicalization:P0} radicalized. Its government notices.");
+    }
+
+    private static ActionResult Appeal(World w)
+    {
+        var b = w.Balance;
+        if (w.States.Count == 0) return ActionResult.Fail("There is no outside world on this map.");
+        if (w.Tick - w.LastAppealTick < b.AppealCooldown)
+            return ActionResult.Fail($"The last appeal was too recent (wait {w.Turns(b.AppealCooldown - (w.Tick - w.LastAppealTick))}).");
+        if (!Spend(w, b.CostAppeal)) return Broke(w, b.CostAppeal);
+        w.LastAppealTick = w.Tick;
+        w.AppealTicks = b.AppealTicks;
+        foreach (var s in w.States.Where(s => s.Stance > 0.2)) s.Stance = Math.Min(1, s.Stance + 0.05);
+        w.Emit(Severity.Good, $"An appeal to the workers of the world: for {w.Turns(b.AppealTicks)}, twice as many volunteers.");
+        return ActionResult.Done("International appeal made.");
     }
 
     private static Commune? Valid(World w, int id) =>

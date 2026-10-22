@@ -83,6 +83,28 @@ public sealed class Balance
     /// <summary>Multiplier on ideas spreading between communes joined by rail.</summary>
     public double RailDiffusion { get; set; } = 1.3;
 
+    // ── Outside states ─────────────────────────────────────────────────────
+    /// <summary>How fast a state's stance moves toward where its interests put it, per turn.</summary>
+    public double StanceDrift { get; set; } = 0.03;
+    /// <summary>Goods to the front per turn, per unit of a friendly state's weight × stance.</summary>
+    public double ArmsPerWeight { get; set; } = 0.8;
+    /// <summary>Defense bonus per unit of volunteering states' weight × stance (capped).</summary>
+    public double VolunteerPerWeight { get; set; } = 0.04;
+    public double VolunteerCap { get; set; } = 0.3;
+    /// <summary>Volunteers per unit of a state's power × its workers' radicalization.</summary>
+    public double WorkerVolunteers { get; set; } = 0.5;
+    /// <summary>Share of its sponsored enemy's strength added per unit of an intervening state's weight × hostility.</summary>
+    public double InterventionPerWeight { get; set; } = 0.02;
+    /// <summary>Most that interventions can add, as a share of the enemy's own strength.</summary>
+    public double InterventionCap { get; set; } = 0.6;
+    public double DelegateEffect { get; set; } = 0.12;
+    public double AgitateEffect { get; set; } = 0.05;
+    public double CostDelegates { get; set; } = 6;
+    public double CostAgitate { get; set; } = 6;
+    public double CostAppeal { get; set; } = 12;
+    public int AppealTicks { get; set; } = 12;
+    public int AppealCooldown { get; set; } = 20;
+
     // ── Foreign trade ──────────────────────────────────────────────────────
     /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
     public double TradeShare { get; set; } = 0.3;

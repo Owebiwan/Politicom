@@ -29,6 +29,65 @@ public partial class Main : Control
     private CommuneList _communeList = null!;
     private TabContainer _tabs = null!;
     private const int CommuneTab = 2;
+    private const int WorldTab = 3;
+    private RichTextLabel _worldSummary = null!, _stateDetail = null!;
+    private Button _appealButton = null!, _delegatesButton = null!, _agitateButton = null!;
+    private VBoxContainer _stateList = null!;
+    private string? _selectedState;
+
+    private void SelectState(string id)
+    {
+        _selectedState = id;
+        _map.SelectedState = id;
+        _tabs.CurrentTab = WorldTab;
+        Refresh();
+    }
+
+    private void RefreshWorld()
+    {
+        var w = _world;
+        bool any = w.States.Count > 0;
+        _tabs.SetTabHidden(WorldTab, !any);
+        if (!any) return;
+        string Who(Politicom.Sim.Global.StateActions a) =>
+            string.Join(", ", w.States.Where(s => s.Does(a)).OrderByDescending(s => s.Weight).Take(5).Select(s => Esc(s.Name)));
+        var parts = new List<string> { $"Embargo: [b]{w.Embargo:P0}[/b] of the outside world refuses to trade." };
+        if (Who(Politicom.Sim.Global.StateActions.Intervention) is { Length: > 0 } i)
+            parts.Add($"[color=#f07060]Intervening against you:[/color] {i}" + string.Concat(w.Enemies.Where(e => e.Intervention > 0).Select(e => $" (+{e.Intervention:0.0} to the {Esc(e.Name)})")));
+        if (Who(Politicom.Sim.Global.StateActions.ArmsSales) is { Length: > 0 } a) parts.Add($"[color=#70d080]Arms from:[/color] {a} ({w.LastArms:0.0} goods per {w.Turn})");
+        if (Who(Politicom.Sim.Global.StateActions.Volunteers) is { Length: > 0 } v) parts.Add($"[color=#70d080]Volunteers from:[/color] {v} (+{w.VolunteerDefense:P0} defense)");
+        if (w.AppealTicks > 0) parts.Add($"International appeal: {w.Turns(w.AppealTicks)} left.");
+        _worldSummary.Text = string.Join("\n", parts);
+        _appealButton.Text = $"International appeal ({w.Balance.CostAppeal:0})";
+
+        var selected = _selectedState is { } sid ? w.States.FirstOrDefault(s => s.Id == sid) : null;
+        _delegatesButton.Disabled = _agitateButton.Disabled = selected is null;
+        _delegatesButton.Text = $"Send delegates ({w.Balance.CostDelegates:0})";
+        _agitateButton.Text = $"Agitate workers ({w.Balance.CostAgitate:0})";
+        _stateDetail.Text = selected is null
+            ? "[color=#808590]Click a country on the map, or one below.[/color]"
+            : $"[b]{Esc(selected.Name)}[/b] — {Politicom.Sim.Global.StateText.Name(selected.Ideology)}, weight {selected.Weight:0.0} (power {selected.Power:0}, {(selected.Proximity >= 1 ? "a neighbour" : $"{selected.Proximity:P0} interest at this distance")})\n" +
+              $"{Politicom.Sim.Global.StateText.Stance(selected.Stance)} toward you ([b]{selected.Stance:+0.00;-0.00}[/b]) — {Politicom.Sim.Global.StateText.Actions(selected.Actions)}\n" +
+              $"Workers radicalized: {selected.Radicalization:P0}\n" +
+              "[color=#808590]Thresholds: embargo below −0.30, arms above +0.35, volunteers above +0.50, intervention below −0.60. Order in the federation reassures governments and disappoints sympathizers.[/color]";
+
+        foreach (var child in _stateList.GetChildren()) child.QueueFree();
+        foreach (var s in w.States.OrderByDescending(s => s.Weight).Take(12))
+        {
+            var id = s.Id;
+            var row = new Button
+            {
+                Text = $"{s.Name} — {Politicom.Sim.Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}) · {Politicom.Sim.Global.StateText.Actions(s.Actions)}",
+                Flat = true,
+                Alignment = HorizontalAlignment.Left,
+                ToggleMode = true,
+                ButtonPressed = id == _selectedState,
+            };
+            row.AddThemeColorOverride("font_color", s.Stance < -0.3 ? new Color(0.94f, 0.5f, 0.45f) : s.Stance > 0.3 ? new Color(0.55f, 0.85f, 0.6f) : UiTheme.Text);
+            row.Pressed += () => SelectState(id);
+            _stateList.AddChild(row);
+        }
+    }
     private ToastStack _toasts = null!;
     private readonly HashSet<string> _tipsShown = new();
     private ScenarioDefinition _scenario = null!;
@@ -58,6 +117,9 @@ public partial class Main : Control
                 .OrderBy(s => s.StartDate)
                 .ToList();
             if (_scenarios.Count == 0) throw new System.IO.FileNotFoundException("No scenarios in res://data/scenarios.");
+            // The outside states come from the era's world map.
+            foreach (var s in _scenarios)
+                if (s.World is { } era && LoadAtlas(era) is { } atlas) Politicom.Sim.Global.WorldSetup.Attach(s, atlas);
             _scenario = _scenarios.FirstOrDefault(s => s.Id == "catalonia_1936") ?? _scenarios[0];
             _sandbox = SandboxGenerator.Parse(ReadData("res://data/sandbox/event_templates.json"), _techs);
             _world = World.Create(_scenario, _techs, seed: (ulong)DateTime.Now.Ticks);
@@ -304,8 +366,11 @@ public partial class Main : Control
     private void SetWorld(World world)
     {
         _world = world;
+        _selectedState = null;
         _dayInTurn = 0;
-        _map.Globe = LoadAtlas(world.Scenario.World);
+        _map.Globe = LoadAtlas(world.Scenario.World)
+                     ?? (world.Scenario.Geography is { Neighbours.Count: > 0 } g ? Politicom.Sim.Global.Atlas.FromGenerated(g) : null);
+        _map.SelectedState = null;
         _map.Geo = world.Scenario.Geography is { } generated
             ? GeoData.From(generated)
             : LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
@@ -560,6 +625,7 @@ public partial class Main : Control
 
         _map = new MapView { World = _world, SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsStretchRatio = 3 };
         _map.CommuneClicked += OnCommuneClicked;
+        _map.StateClicked += SelectState;
         root.AddChild(_map);
 
         // Top-right of the map, clear of the commune list (bottom-left). They fade after a few seconds.
@@ -716,6 +782,27 @@ public partial class Main : Control
             else Say("Select one commune, then shift-click a neighbour.");
         });
 
+        var worldTab = Tab("World");
+        _worldSummary = AddRich(worldTab);
+        var appeal = new HBoxContainer();
+        worldTab.AddChild(appeal);
+        _appealButton = AddButton(appeal, "International appeal", "Appeal to the workers of the world: twice the volunteers for a while. Sympathetic states warm a little.", () => Do(new InternationalAppeal()));
+        Section(worldTab, "Selected country");
+        _stateDetail = AddRich(worldTab);
+        var stateActions = new HFlowContainer();
+        worldTab.AddChild(stateActions);
+        _delegatesButton = AddButton(stateActions, "Send delegates", "Meetings, newspapers and unions: the state warms toward you. Fascist governments barely listen.", () =>
+        {
+            if (_selectedState is { } id) Do(new SendDelegates(id));
+        });
+        _agitateButton = AddButton(stateActions, "Agitate workers", "Radicalize the state's workers. Its government notices and cools toward you.", () =>
+        {
+            if (_selectedState is { } id) Do(new AgitateWorkers(id));
+        });
+        Section(worldTab, "The powers that matter most to you");
+        _stateList = new VBoxContainer();
+        worldTab.AddChild(_stateList);
+
         var log = Tab("Log");
         _log = AddRich(log);
 
@@ -763,6 +850,7 @@ public partial class Main : Control
         var s = w.Scores;
         _scores.Text = $"Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
 
+        RefreshWorld();
         _warCommittee.SetPressedNoSignal(w.WarCommittee);
         _trade.SetPressedNoSignal(w.ForeignTrade);
         RefreshDecisions();

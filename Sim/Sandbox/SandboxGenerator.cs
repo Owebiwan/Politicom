@@ -240,6 +240,7 @@ public sealed class SandboxGenerator
         var angles = enemyCount == 2 ? new[] { angle1, angle2 } : new[] { angle1 };
         scenario.Geography = GeographyGenerator.Generate(seed, points, defs, spacing, angles,
             cities.OrderByDescending(c => defs[c].Population).First());
+        Neighbours(rng, used, scenario, enemies, angles);
         if (length is int turns) scenario = scenario.WithLength(turns);
         return calibrate ? Calibrate(scenario, seed) : scenario;
     }
@@ -248,6 +249,47 @@ public sealed class SandboxGenerator
     /// A railway network: the cities and towns joined by the shortest connections (a minimum
     /// spanning tree), plus branch lines out to some of the villages near a station.
     /// </summary>
+    private static readonly string[] NeighbourColors = { "#6e7f8f", "#8a7a5e", "#7a8b6a", "#857089", "#6f8a7e", "#8f6e6e" };
+    private static readonly (string Ideology, string Form)[] Regimes =
+    {
+        ("liberal", "Republic of"), ("conservative", "Republic of"), ("fascist", "National State of"),
+        ("monarchy", "Kingdom of"), ("communist", "People's Republic of"), ("liberal", "Confederation of"),
+    };
+
+    /// <summary>
+    /// Names, regimes and power for the neighbouring countries, and the outside states the
+    /// simulation plays. A neighbour lying in an enemy's direction may back that enemy.
+    /// </summary>
+    private static void Neighbours(Rng rng, HashSet<string> used, ScenarioDefinition scenario, List<HostileState> enemies, double[] angles)
+    {
+        var geo = scenario.Geography!;
+        for (int i = 0; i < geo.Neighbours.Count; i++)
+        {
+            var n = geo.Neighbours[i];
+            var (ideology, form) = Pick(rng, Regimes);
+            n.Name = $"{form} {Name(rng, used)}";
+            n.Ideology = ideology;
+            n.Power = 1 + rng.Next(5);
+            n.Color = NeighbourColors[i % NeighbourColors.Length];
+            var parsed = Global.WorldSetup.Parse(ideology);
+            scenario.States.Add(new Global.StateDefinition
+            {
+                Id = n.Id,
+                Name = n.Name,
+                Ideology = parsed,
+                Power = n.Power,
+                Proximity = 1,
+                InitialStance = Math.Round(Global.WorldSetup.BaseStance(parsed) + rng.Jitter(0.2), 2),
+                Neighbours = geo.Neighbours.Where(x => x != n).Select(x => x.Id).ToArray(),
+            });
+            for (int k = 0; k < enemies.Count && k < angles.Length; k++)
+            {
+                double diff = Math.Abs(Math.IEEERemainder(n.Angle - angles[k], 2 * Math.PI));
+                if (diff < Math.PI / 3) enemies[k].Sponsors = enemies[k].Sponsors.Append(n.Id).ToArray();
+            }
+        }
+    }
+
     private static List<string[]> Railways(Rng rng, List<CommuneDefinition> defs, List<(double X, double Y)> points, double spacing)
     {
         var stations = Enumerable.Range(0, defs.Count).Where(i => defs[i].Kind != CommuneKind.Agrarian).ToList();

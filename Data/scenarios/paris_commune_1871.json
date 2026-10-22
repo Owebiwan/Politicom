@@ -4,6 +4,8 @@
   "description": "18 March 1871. Thiers sent troops to seize the National Guard's cannons on Montmartre; the crowd stopped them, and the government fled to Versailles. Paris governs itself. There is almost no time: the Versailles army is being rebuilt with prisoners returned by Prussia. Each turn is a day. Last as long as you can — and stay a commune while you do.",
   "world": "1871",
   "homeState": "FRA",
+  // Bismarck released French prisoners to rebuild Thiers' army and held the forts to the east.
+  "stances": { "DEU": -0.7, "GBR": -0.1, "USA": 0.1, "CHE": 0.2 },
   "startDate": "1871-03-18",
   "endTick": 71,
   "daysPerTick": 1,
@@ -17,13 +19,14 @@
   "enemies": [
     {
       "name": "Versailles army",
+      "sponsors": ["DEU"],
       "color": "#5b8def",
       "strength": 0.2,
       "growth": 0.015,
       "offensives": [
         { "name": "The fighting at Courbevoie and Neuilly", "tick": 15, "duration": 4, "strength": 0.6 },
         { "name": "The assault on Fort Issy", "tick": 46, "duration": 7, "strength": 0.8 },
-        { "name": "Bloody Week", "tick": 64, "duration": 8, "strength": 29 }
+        { "name": "Bloody Week", "tick": 64, "duration": 8, "strength": 28 }
       ]
     }
   ],

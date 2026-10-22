@@ -1,5 +1,6 @@
 using System.Text;
 using Politicom.Sim;
+using Global = Politicom.Sim.Global;
 
 namespace Politicom.Cli;
 
@@ -53,7 +54,17 @@ internal static class Render
         foreach (var e in w.Enemies)
             sb.AppendLine($"Enemy     {e.Name} strength {e.EffectiveStrength:0.0}" + (e.CurrentOffensive is { } o ? Paint($"  ▶ {o.Name.ToUpperInvariant()}", "31;1") : "") +
                           Dim($"   exhaustion {e.Exhaustion:P0}   workers radicalized {e.Radicalization:P0}"));
-        sb.AppendLine(Dim($"          embargo: {w.Embargo:P0} of the outside world refuses to trade (grows as the idea spreads)"));
+        if (w.States.Count == 0)
+            sb.AppendLine(Dim($"          embargo: {w.Embargo:P0} of the outside world refuses to trade (grows as the idea spreads)"));
+        else
+        {
+            string Who(Global.StateActions a) => string.Join(", ", w.States.Where(s => s.Does(a)).OrderByDescending(s => s.Weight).Take(4).Select(s => s.Name));
+            var parts = new List<string> { $"embargo {w.Embargo:P0}" };
+            if (Who(Global.StateActions.Intervention) is { Length: > 0 } i) parts.Add(Paint($"intervening: {i}", "31"));
+            if (Who(Global.StateActions.ArmsSales) is { Length: > 0 } a) parts.Add(Paint($"arms from {a}", "32"));
+            if (Who(Global.StateActions.Volunteers) is { Length: > 0 } v) parts.Add(Paint($"volunteers from {v}", "32"));
+            sb.AppendLine($"World     {string.Join("  ·  ", parts)}");
+        }
         var fronts = w.Active.Where(c => c.Front).ToList();
         if (fronts.Count > 0)
             sb.AppendLine("Front     " + string.Join("  ", fronts.Select(c =>
@@ -137,6 +148,20 @@ internal static class Render
     }
 
     public static string TrustColor(double t) => Paint($"{t:P0}", t >= 0.6 ? "32" : t >= 0.4 ? "33" : "31");
+
+    public static string WorldTable(World w)
+    {
+        if (w.States.Count == 0) return "There is no outside world on this map.";
+        var sb = new StringBuilder();
+        sb.AppendLine(Dim($"{"id",-5} {"state",-36} {"ideology",-24} {"weight",6} {"stance",7}  {"workers",7}  doing"));
+        foreach (var s in w.States.OrderByDescending(s => s.Weight).Take(25))
+        {
+            string stance = $"{s.Stance:+0.00;-0.00}";
+            stance = s.Stance < -0.3 ? Paint(stance, "31") : s.Stance > 0.3 ? Paint(stance, "32") : stance;
+            sb.AppendLine($"{s.Id,-5} {Trunc(s.Name, 36),-36} {Global.StateText.Name(s.Ideology),-24} {s.Weight,6:0.0} {stance,7}  {s.Radicalization,7:P0}  {Global.StateText.Actions(s.Actions)}");
+        }
+        return sb.ToString();
+    }
 
     public static string TechTable(World w)
     {

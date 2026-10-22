@@ -28,6 +28,10 @@ public sealed class ScenarioDefinition
     public string? World { get; set; }
     /// <summary>The world state the region lies in.</summary>
     public string? HomeState { get; set; }
+    /// <summary>Starting stance toward the federation for particular states, overriding their ideology's default.</summary>
+    public Dictionary<string, double> Stances { get; set; } = new();
+    /// <summary>The outside states, filled from the era's world map by <see cref="Global.WorldSetup.Attach"/>.</summary>
+    public List<Global.StateDefinition> States { get; set; } = new();
     /// <summary>Generated geography (sandbox maps). Historical scenarios load theirs from Data/geo.</summary>
     public Sandbox.GeographyDefinition? Geography { get; set; }
 
@@ -43,6 +47,7 @@ public sealed class ScenarioDefinition
         if (Sandbox.SandboxGenerator.TryParseId(baseId, out var seed, out var communes))
             return Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes, length: length);
         var scenario = Load(DataPaths.Scenario(dataDir, baseId));
+        if (scenario.World is { } era) Global.WorldSetup.Attach(scenario, Global.Atlas.Load(dataDir, era));
         return length is int turns ? scenario.WithLength(turns) : scenario;
     }
 

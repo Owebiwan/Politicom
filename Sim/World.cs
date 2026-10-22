@@ -79,7 +79,21 @@ public sealed class World
     public double LastExports { get; internal set; }
     public double LastImports { get; internal set; }
     /// <summary>0..0.9: how much of the outside world refuses to trade, as the idea spreads.</summary>
-    public double Embargo => Math.Clamp(Radicalization * Balance.EmbargoPerRadicalization, 0, 0.9);
+    public double Embargo => States.Count > 0
+        ? Math.Clamp(Global.DiplomacySystem.Embargo(this), 0, 0.9)
+        : Math.Clamp(Radicalization * Balance.EmbargoPerRadicalization, 0, 0.9);
+
+    /// <summary>The outside world's states (empty for maps without a world).</summary>
+    public List<Global.WorldState> States { get; } = new();
+    private readonly Dictionary<string, double> _baselines = new();
+    /// <summary>Where a state's stance settles absent anything else: its starting attitude.</summary>
+    public double Baseline(string stateId) => _baselines.GetValueOrDefault(stateId);
+    /// <summary>Last turn's arms bought from friendly states.</summary>
+    public double LastArms { get; internal set; }
+    /// <summary>This turn's defense bonus from foreign volunteers.</summary>
+    public double VolunteerDefense { get; internal set; }
+    public int AppealTicks { get; internal set; }
+    public int LastAppealTick { get; internal set; } = -999;
     public int RecallPenaltyTicks { get; internal set; }
     public int LastCongressTick { get; internal set; } = -999;
     /// <summary>Technologies the player is circulating, with ticks remaining.</summary>
@@ -151,6 +165,15 @@ public sealed class World
             Math.Clamp(0.4 + 0.25 * (1 - a.Values.Distance(b.Values) * 2) + (a.Kind == b.Kind ? 0.05 : 0) + rng.Jitter(0.05), 0.1, 0.9));
 
         var world = new World(scenario, techs, balance, seed, communes, trust);
+        foreach (var d in scenario.States)
+        {
+            world.States.Add(new Global.WorldState
+            {
+                Id = d.Id, Name = d.Name, Ideology = d.Ideology, Power = d.Power, Proximity = d.Proximity,
+                Neighbours = d.Neighbours, Stance = d.InitialStance,
+            });
+            world._baselines[d.Id] = d.InitialStance;
+        }
         foreach (var line in scenario.Railways)
         {
             if (line.Length != 2) throw new InvalidDataException("Each railway is a pair of commune names.");
@@ -191,6 +214,9 @@ public sealed class World
         FiredEvents = FiredEvents.ToList(),
         WarCommittee = WarCommittee,
         ForeignTrade = ForeignTrade,
+        States = States,
+        AppealTicks = AppealTicks,
+        LastAppealTick = LastAppealTick,
         DriftWarnedAt = DriftWarnedAt,
         RecallPenaltyTicks = RecallPenaltyTicks,
         LastCongressTick = LastCongressTick,
@@ -232,6 +258,8 @@ public sealed class World
             NextProjectId = s.NextProjectId,
             WarCommittee = s.WarCommittee,
             ForeignTrade = s.ForeignTrade,
+            AppealTicks = s.AppealTicks,
+            LastAppealTick = s.LastAppealTick,
             DriftWarnedAt = s.DriftWarnedAt,
             RecallPenaltyTicks = s.RecallPenaltyTicks,
             LastCongressTick = s.LastCongressTick,
@@ -240,6 +268,8 @@ public sealed class World
             Outcome = s.Outcome,
         };
         w.Rng.State = s.RngState;
+        w.States.AddRange(s.States);
+        foreach (var d in s.Scenario.States) w._baselines[d.Id] = d.InitialStance;
         foreach (var r in s.Railways) w.Railways.Add((Math.Min(r[0], r[1]), Math.Max(r[0], r[1])));
         w.Drift.Restore(s.DriftValue, s.DriftStage);
         w.Projects.AddRange(s.Projects);
@@ -267,6 +297,7 @@ public sealed class World
         EducationSystem.Run(this);
         ResearchSystem.Run(this);
         ProjectSystem.Run(this);
+        Global.DiplomacySystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

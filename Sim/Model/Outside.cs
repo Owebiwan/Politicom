@@ -25,6 +25,10 @@ public sealed class HostileState
     /// <summary>Wear from occupying communes that have no head to cut off.</summary>
     public double Exhaustion { get; set; }
     public List<Offensive> Offensives { get; set; } = new();
+    /// <summary>States that intervene on this enemy's side when hostile enough (e.g. Germany and Italy for the Nationalists).</summary>
+    public string[] Sponsors { get; set; } = Array.Empty<string>();
+    /// <summary>Strength added this turn by intervening states; recomputed every turn.</summary>
+    [JsonInclude] public double Intervention { get; internal set; }
     [JsonInclude] public Offensive? CurrentOffensive { get; internal set; }
     [JsonInclude] public double EffectiveStrength { get; internal set; }
 }

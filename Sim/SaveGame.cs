@@ -36,6 +36,9 @@ public sealed class SaveGame
     public List<string> FiredEvents { get; set; } = new();
     public bool WarCommittee { get; set; }
     public bool ForeignTrade { get; set; }
+    public List<Global.WorldState> States { get; set; } = new();
+    public int AppealTicks { get; set; }
+    public int LastAppealTick { get; set; } = -999;
     public double DriftWarnedAt { get; set; }
     public int RecallPenaltyTicks { get; set; }
     public int LastCongressTick { get; set; }
