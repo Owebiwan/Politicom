@@ -106,6 +106,18 @@ public class SimulationTests
         Assert.Equal(-499, World.LoadJson(json, w.Techs).Year);
     }
 
+    [Fact]
+    public void Embargoes_starting_together_make_one_line_in_the_log()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1200");
+        var w = World.Create(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "FRANCE", 1, calibrate: false), NewWorld().Techs);
+        w.Run(20);
+        var lines = w.Log.Where(e => e.Text.Contains("embargo the federation") || e.Text.Contains("embargoes the federation")).ToList();
+        Assert.NotEmpty(lines);
+        Assert.Equal(lines.Count, lines.Select(e => e.Tick).Distinct().Count());
+        Assert.True(w.States.Count(s => s.Does(Sim.Global.StateActions.Embargo)) > lines.Count);
+    }
+
     [Theory]
     [MemberData(nameof(Eras))]
     public void Open_starts_are_valid_for_every_playable_state(string era)

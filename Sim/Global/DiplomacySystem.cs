@@ -13,6 +13,7 @@ internal static class DiplomacySystem
         var b = w.Balance;
         double order = w.Drift.Value / 100;
 
+        _newEmbargoes.Clear();
         foreach (var s in w.States)
         {
             double target = w.Baseline(s.Id);
@@ -46,6 +47,11 @@ internal static class DiplomacySystem
                 + b.ContagionRate * (voice * (1 + w.SocietyEffect(t => t.Contagion)) * s.Proximity * 0.5 + b.SisterContagion * sisters) * (1 - s.Repression)
                 - b.RepressionRate * s.Radicalization, 0, 1);
         }
+
+        // Embargoes often start together (a whole bloc at once): one line in the log, not twenty.
+        if (_newEmbargoes.Count > 0)
+            w.Emit(Severity.Info, _newEmbargoes.Count == 1 ? $"{_newEmbargoes[0]} embargoes the federation."
+                : $"{string.Join(", ", _newEmbargoes.Take(_newEmbargoes.Count - 1))} and {_newEmbargoes[^1]} embargo the federation.");
 
         // Interventions strengthen the enemy they sponsor (or the main enemy), as a share of that
         // enemy's own strength: a foreign legion adds to an army, it doesn't replace one.
@@ -101,7 +107,9 @@ internal static class DiplomacySystem
         if (!doing && on)
         {
             s.Actions |= action;
-            if (Newsworthy(s, action)) w.Emit(action == StateActions.Intervention ? Severity.Danger : Severity.Info, started);
+            if (!Newsworthy(s, action)) { }
+            else if (action == StateActions.Embargo) _newEmbargoes.Add(s.Name);
+            else w.Emit(action == StateActions.Intervention ? Severity.Danger : Severity.Info, started);
         }
         else if (doing && off)
         {
@@ -109,6 +117,9 @@ internal static class DiplomacySystem
             if (Newsworthy(s, action)) w.Emit(Severity.Info, stopped);
         }
     }
+
+    [ThreadStatic] private static List<string>? _embargoBuffer;
+    private static List<string> _newEmbargoes => _embargoBuffer ??= new List<string>();
 
     /// <summary>Whether the log should mention it: far-off states' embargoes matter little and would flood it.</summary>
     private static bool Newsworthy(WorldState s, StateActions action) =>
