@@ -101,14 +101,18 @@ internal static class DiplomacySystem
         if (!doing && on)
         {
             s.Actions |= action;
-            if (s.Weight >= 0.4) w.Emit(action == StateActions.Intervention ? Severity.Danger : Severity.Info, started);
+            if (Newsworthy(s, action)) w.Emit(action == StateActions.Intervention ? Severity.Danger : Severity.Info, started);
         }
         else if (doing && off)
         {
             s.Actions &= ~action;
-            if (s.Weight >= 0.4) w.Emit(Severity.Info, stopped);
+            if (Newsworthy(s, action)) w.Emit(Severity.Info, stopped);
         }
     }
+
+    /// <summary>Whether the log should mention it: far-off states' embargoes matter little and would flood it.</summary>
+    private static bool Newsworthy(WorldState s, StateActions action) =>
+        s.Weight >= 0.4 && (action != StateActions.Embargo || s.Proximity >= 0.3);
 
     /// <summary>The world's embargo: the share of outside weight refusing to trade.</summary>
     public static double Embargo(World w)

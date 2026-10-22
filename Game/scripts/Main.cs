@@ -958,7 +958,7 @@ public partial class Main : Control
         RefreshProjects();
 
         var recent = w.Log.TakeLast(30).Reverse().Select(ev =>
-            $"[color=#808590]{_world.Format(ev.Date, "d MMM yy")}[/color] [color={SeverityColor(ev.Severity)}]{Esc(ev.Text)}[/color]");
+            $"[color=#808590]{_world.Format(ev.Date, "d MMM yyyy")}[/color] [color={SeverityColor(ev.Severity)}]{Esc(ev.Text)}[/color]");
         _log.Text = string.Join("\n", recent);
         _seenEvents = w.Log.Count;
 
