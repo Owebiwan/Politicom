@@ -203,6 +203,20 @@ public partial class Main : Control
         }
         if (Array.IndexOf(args, "--world") >= 0) ToggleWorldView();
         if (Array.IndexOf(args, "--norelief") >= 0) _reliefToggle.ButtonPressed = false;
+        int pickerAt = Array.IndexOf(args, "--picker");
+        if (pickerAt >= 0 && pickerAt + 1 < args.Length)
+            ShowCountryMap(OpenEras.Where(HasAtlas).ToArray(), Math.Max(0, Array.IndexOf(OpenEras.Where(HasAtlas).ToArray(), args[pickerAt + 1])), 1, 104);
+        // --click X,Y (fractions of the window): a real mouse press and release, for testing input paths.
+        for (int i = 0; i + 1 < args.Length; i++)
+        {
+            if (args[i] != "--click") continue;
+            var xy = args[i + 1].Split(',').Select(v => float.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            var clickAt = GetViewport().GetFinalTransform() * (GetViewport().GetVisibleRect().Size * new Vector2(xy[0], xy[1])); // window coordinates
+            for (int f = 0; f < 3; f++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            GetViewport().PushInput(new InputEventMouseMotion { Position = clickAt, GlobalPosition = clickAt });
+            GetViewport().PushInput(new InputEventMouseButton { Position = clickAt, GlobalPosition = clickAt, ButtonIndex = MouseButton.Left, Pressed = true, ButtonMask = MouseButtonMask.Left });
+            GetViewport().PushInput(new InputEventMouseButton { Position = clickAt, GlobalPosition = clickAt, ButtonIndex = MouseButton.Left, Pressed = false });
+        }
         int tabAt = Array.IndexOf(args, "--tab");
         if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
@@ -598,6 +612,8 @@ public partial class Main : Control
         controls.AddChild(seed);
         var openLength = LengthPicker(104, "week", LongerTooltip + " Generation takes a few seconds.");
         controls.AddChild(openLength);
+        AddButton(controls, "On the map…", "Choose the country on a world map of the era.", () =>
+            ShowCountryMap(eras, era.Selected, ulong.TryParse(seed.Text, out var mapSeed) ? mapSeed : NewSeed(), openLength.GetSelectedId()));
         controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
         var play = AddButton(controls, "Play", "", () =>
         {
@@ -609,6 +625,70 @@ public partial class Main : Control
         play.CustomMinimumSize = new Vector2(110, 40);
         box.AddChild(controls);
         return box;
+    }
+
+    /// <summary>The open start's world map: hover a country to see it, click to choose it, then Play.</summary>
+    private void ShowCountryMap(string[] eras, int eraIndex, ulong seed, int turns)
+    {
+        var content = new VBoxContainer();
+        content.AddThemeConstantOverride("separation", 10);
+        var top = new HBoxContainer();
+        top.AddThemeConstantOverride("separation", 10);
+        content.AddChild(top);
+        var era = new OptionButton();
+        foreach (var e in eras) era.AddItem(OpenStartGenerator.EraName(e));
+        era.Select(eraIndex);
+        top.AddChild(era);
+        var hint = new Label { Text = "Click a country in colour to start there. Grey ones have too few cities on the map. Scroll or pinch to zoom, drag to move.", Modulate = new Color(1, 1, 1, 0.6f) };
+        top.AddChild(hint);
+
+        var picker = new StatePicker { CustomMinimumSize = new Vector2(1180, 560) };
+        content.AddChild(picker);
+
+        var bottom = new HBoxContainer();
+        bottom.AddThemeConstantOverride("separation", 16);
+        content.AddChild(bottom);
+        var info = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        info.AddThemeFontSizeOverride("normal_font_size", 14);
+        info.AddThemeFontSizeOverride("bold_font_size", 16);
+        bottom.AddChild(info);
+        var play = AddButton(bottom, "Play", "", () => { });
+        play.CustomMinimumSize = new Vector2(150, 40);
+        play.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        play.Disabled = true;
+
+        Politicom.Sim.Global.Atlas Current() => LoadAtlas(eras[era.Selected])!;
+        string Describe(string? id)
+        {
+            if (id is null || Current().State(id) is not { } st)
+                return "[color=#9aa0a8]Point at a country.[/color]";
+            var playable = OpenStartGenerator.Playable(Current()).Any(x => x.Id == id);
+            var ideology = Politicom.Sim.Global.StateText.Name(Politicom.Sim.Global.WorldSetup.Parse(st.Ideology));
+            return $"[b]{Esc(st.Name)}[/b]  [color=#9aa0a8]{ideology} · power {st.Power:0}" +
+                   (st.Capital is { } c ? $" · capital {Esc(c.Name)}" : "") + "[/color]\n" +
+                   (playable
+                       ? $"The movement holds its largest cities, from {Esc(string.Join(", ", st.Cities.Where(x => st.Capital is null || x.Name != st.Capital.Name).Take(4).Select(x => x.Name)))}… The government holds the capital."
+                       : "[color=#9aa0a8]Too few cities on this map to play here.[/color]");
+        }
+        void Refresh()
+        {
+            var atlas = Current();
+            picker.SetAtlas(atlas, OpenStartGenerator.Playable(atlas).Select(x => x.Id));
+            play.Disabled = picker.Selected is null;
+            play.Text = picker.Selected is { } id && atlas.State(id) is { } st ? $"Play {Politicom.Sim.Global.StateText.Country(st.Name)}" : "Play";
+            info.Text = Describe(picker.Hovered ?? picker.Selected);
+        }
+        picker.StateHovered += id => info.Text = Describe(id ?? picker.Selected);
+        picker.StateChosen += _ => Refresh();
+        era.ItemSelected += _ => Refresh();
+        play.Pressed += () =>
+        {
+            if (picker.Selected is not { } id) return;
+            StartScenario(OpenStartGenerator.Generate(Current(), _sandbox!, id, seed, length: turns == 104 ? null : turns));
+        };
+        Refresh();
+
+        ShowOverlay("Where does the movement rise?", "", content, 1240, ("Back", ShowIntro));
     }
 
     private static ulong NewSeed() => (ulong)Random.Shared.Next(1, 1_000_000);

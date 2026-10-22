@@ -12,14 +12,14 @@ public partial class MapView
 {
     public bool ShowRelief { get; set; } = true;
 
-    private const string ReliefDir = "res://data/relief/";
+    internal const string ReliefDir = "res://data/relief/";
     private const int OverviewWidth = 5400, TileWidth = 900, TileDeg = 30;
     private static readonly Color ReliefTint = new(1, 1, 1, 0.8f);
     private static ImageTexture? _reliefWorld;
     private static bool _reliefWorldTried;
     private static readonly Dictionary<(int Col, int Row), ImageTexture?> ReliefTiles = new();
 
-    private static ImageTexture? LoadShade(string path)
+    internal static ImageTexture? LoadShade(string path)
     {
         if (!FileAccess.FileExists(path)) return null;
         var image = new Image();

@@ -143,7 +143,11 @@ choose.
 - **Which countries:** any with at least 6 cities on the map besides the capital. There are
   dozens per era.
 - **Godot:** use the Open world row in the scenario picker. Choose an era, a country, a seed and a
-  length.
+  length, or press **On the map…** to choose the country on a world map of the era:
+  - **Hover** a country to see its regime, capital and the cities the movement would hold.
+  - **Click** a country in colour to choose it, then **Play**. Grey countries have too few
+    cities to play.
+  - **Change era** from the same screen; zoom and drag as on the main map.
 - **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7), and
   `open:-500:ACHAEMENID` or `open:1:ROMAN` for the early eras. A state's id is in
   `Data/world/<era>.json`.
