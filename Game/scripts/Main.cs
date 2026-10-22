@@ -195,9 +195,26 @@ public partial class Main : Control
 
     private static string Shorten(string text) => text.Length <= 160 ? text : text[..157].TrimEnd() + "…";
 
+    private readonly Dictionary<string, GeoData?> _geo = new();
+
+    /// <summary>Real geography for a scenario, if Data/geo has it (generated maps don't).</summary>
+    private GeoData? LoadGeo(string scenarioId)
+    {
+        if (_geo.TryGetValue(scenarioId, out var cached)) return cached;
+        string path = $"res://data/geo/{scenarioId}.json";
+        GeoData? geo = null;
+        if (FileAccess.FileExists(path))
+        {
+            try { geo = GeoData.Parse(ReadData(path)); }
+            catch (Exception e) { GD.PushError($"Could not read {path}: {e.Message}"); }
+        }
+        return _geo[scenarioId] = geo;
+    }
+
     private void SetWorld(World world)
     {
         _world = world;
+        _map.Geo = LoadGeo(world.Scenario.Id);
         _tipsShown.Clear();
         _communeList.World = world;
         _map.World = _driftMeter.World = _history.World = world;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Politicom.Sim;
@@ -8,9 +9,12 @@ namespace Politicom.Game;
 public enum MapMode { Trust, Education, Values, Wellbeing }
 
 /// <summary>
-/// The map. Each commune is a territory (a Voronoi cell rounded off at the federation's edge),
-/// filled by the map mode over a tint for its kind of land. Occupied land takes the occupier's
-/// colour; front borders are drawn in the enemy's colour; the trust network is an overlay.
+/// The map. With real geography (<see cref="GeoData"/>), communes sit at their true positions
+/// over sea, land, rivers and borders, and each territory is a Voronoi cell clipped to the land
+/// and to the federation's outline (or a real boundary, as for Paris). Generated maps without
+/// geography fall back to relaxed positions and rounded cells. Territories are filled by the map
+/// mode over a tint for the land; occupied land takes the occupier's colour; front borders are
+/// drawn in the enemy's colour; the trust network is an overlay.
 /// </summary>
 public partial class MapView : Control
 {
@@ -27,6 +31,11 @@ public partial class MapView : Control
     private static readonly Color Danger = new(0.92f, 0.3f, 0.25f);
     private static readonly Color Warn = new(0.95f, 0.75f, 0.25f);
     private static readonly Color Decision = new(0.3f, 0.85f, 0.95f);
+    private static readonly Color Sea = new("122030");
+    private static readonly Color Coast = new("3a5a78");
+    private static readonly Color NeutralLand = new("2e3134");
+    private static readonly Color River = new("3b6890");
+    private static readonly Color CountryBorder = new("6b7178");
 
     private int? _hover;
     private Vector2 _mouse;
@@ -46,13 +55,33 @@ public partial class MapView : Control
         {
             if (ReferenceEquals(value, _world)) return;
             _world = value;
-            _layout = null;
-            _cells = null;
+            Invalidate();
             _zoom = 1;
             _pan = Vector2.Zero;
             _hover = null;
             QueueRedraw();
         }
+    }
+
+    private GeoData? _geo;
+
+    /// <summary>Real geography for the current scenario, or null for a generated map.</summary>
+    public GeoData? Geo
+    {
+        get => _geo;
+        set
+        {
+            if (ReferenceEquals(value, _geo)) return;
+            _geo = value;
+            Invalidate();
+            QueueRedraw();
+        }
+    }
+
+    private void Invalidate()
+    {
+        _layout = null;
+        _cells = null;
     }
 
     public MapMode Mode { get; set; } = MapMode.Trust;
@@ -134,37 +163,63 @@ public partial class MapView : Control
 
     public override void _Draw()
     {
-        DrawRect(new Rect2(Vector2.Zero, Size), Background);
+        // A city map (real boundaries, no coast) sits on land; a region sits on the sea.
+        DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : Geo.Territories.Count > 0 ? NeutralLand : Sea);
         if (World is not { } w) return;
         var font = ThemeDB.FallbackFont;
         var cells = Cells();
-        var screen = cells.Select(cell => cell.Select(ToScreen).ToArray()).ToArray();
+        var screen = cells.Select(pieces => pieces.Select(piece => piece.Select(ToScreen).ToArray()).ToArray()).ToArray();
+
+        if (_geoLayout is { } g)
+        {
+            foreach (var land in g.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
+            for (int r = 0; r < g.Land.Count; r++)
+            {
+                var ring = Screen(g.Land[r]);
+                var raw = Geo!.Land[r];
+                for (int k = 0; k < ring.Length; k++)
+                {
+                    int n = (k + 1) % ring.Length;
+                    if (!Geo.OnBounds(raw[k], raw[n])) DrawLine(ring[k], ring[n], Coast, 1.3f, true);
+                }
+            }
+            foreach (var lake in g.Lakes) DrawColoredPolygon(Screen(lake), Sea);
+        }
 
         // Territories
         foreach (var c in w.Communes)
         {
-            var poly = screen[c.Id];
-            if (poly.Length < 3) continue;
             var fill = Fill(w, c);
             if (c.Id == _hover) fill = fill.Lightened(0.12f);
-            DrawColoredPolygon(poly, fill);
+            foreach (var piece in screen[c.Id]) DrawColoredPolygon(piece, fill);
         }
+
+        if (_geoLayout is { } g2)
+        {
+            float riverWidth = 1.4f * Mathf.Sqrt(_zoom);
+            foreach (var (_, points) in g2.Rivers) DrawPolyline(Screen(points), River, riverWidth, true);
+            foreach (var border in g2.Borders)
+            {
+                var b = Screen(border);
+                for (int k = 0; k + 1 < b.Length; k++) DrawDashedLine(b[k], b[k + 1], CountryBorder, 1.2f, 5);
+            }
+        }
+
         foreach (var c in w.Communes)
-            if (screen[c.Id].Length >= 3) Outline(screen[c.Id], Border, 1.5f);
+            foreach (var piece in screen[c.Id]) Outline(piece, Border, 1.5f);
 
         // Overlays on the borders: fronts, secession, selection
         foreach (var c in w.Communes)
-        {
-            var poly = screen[c.Id];
-            if (poly.Length < 3) continue;
-            if (c.OccupiedBy is int by) Outline(poly, new Color(EnemyColor(w, by), 0.7f), 1.5f);
-            else if (c.Front) Outline(poly, EnemyColor(w, c.Fronts.Min()), 3);
-            if (!c.Occupied && !c.Federated) DashedOutline(poly, Warn, 2);
-            if (w.PendingSecessions.Any(s => s.Commune == c.Id))
-                Outline(poly, new Color(Decision, 0.55f + 0.45f * Mathf.Sin((float)_time * 5)), 3);
-        }
-        if (Secondary is int sec && screen[sec].Length >= 3) DashedOutline(screen[sec], Highlight, 2);
-        if (Selected is int sel && screen[sel].Length >= 3) Outline(screen[sel], Highlight, 3.5f);
+            foreach (var piece in screen[c.Id])
+            {
+                if (c.OccupiedBy is int by) Outline(piece, new Color(EnemyColor(w, by), 0.7f), 1.5f);
+                else if (c.Front) Outline(piece, EnemyColor(w, c.Fronts.Min()), 3);
+                if (!c.Occupied && !c.Federated) DashedOutline(piece, Warn, 2);
+                if (w.PendingSecessions.Any(s => s.Commune == c.Id))
+                    Outline(piece, new Color(Decision, 0.55f + 0.45f * Mathf.Sin((float)_time * 5)), 3);
+            }
+        if (Secondary is int sec) foreach (var piece in screen[sec]) DashedOutline(piece, Highlight, 2);
+        if (Selected is int sel) foreach (var piece in screen[sel]) Outline(piece, Highlight, 3.5f);
 
         if (ShowTrustLinks)
             foreach (var (a, b) in w.Trust.Edges())
@@ -177,7 +232,8 @@ public partial class MapView : Control
                 DrawLine(ToScreen(ca), ToScreen(cb), color, 1 + 3 * t, true);
             }
 
-        // Towns, front meters and names
+        // Towns: every marker, but only the labels that fit. The selected and hovered commune
+        // win, then larger towns; zooming in makes room for the rest.
         foreach (var c in w.Communes)
         {
             var p = ToScreen(c);
@@ -194,11 +250,22 @@ public partial class MapView : Control
                 DrawCircle(p, r, c.Kind == CommuneKind.Industrial ? new Color("e9e4d8") : new Color("cfd6c4"));
                 if (c.Starving) DrawCircle(p + new Vector2(r + 2, -r - 2), 3.5f, Warn);
             }
-
+        }
+        var taken = new List<Rect2>();
+        var order = w.Communes.OrderByDescending(c => c.Id == Selected || c.Id == _hover).ThenByDescending(c => c.Population);
+        foreach (var c in order)
+        {
+            var p = ToScreen(c);
+            float r = Marker(c);
             var labelAt = p + new Vector2(r + 5, 4);
+            var size = font.GetStringSize(c.Name, HorizontalAlignment.Left, -1, 12);
+            var rect = new Rect2(labelAt - new Vector2(0, size.Y - 3), size + new Vector2(0, c.Front && !c.Occupied ? 9 : 0));
+            bool always = c.Id == Selected || c.Id == _hover;
+            if (!always && taken.Any(t => t.Intersects(rect))) continue;
+            taken.Add(rect);
+
             DrawStringOutline(font, labelAt, c.Name, HorizontalAlignment.Left, -1, 12, 4, Border);
             DrawString(font, labelAt, c.Name, HorizontalAlignment.Left, -1, 12, c.Occupied ? Muted : Label);
-
             if (c.Front && !c.Occupied)
             {
                 // Control meter under the name: held part light, lost part in the enemy's colour.
@@ -219,6 +286,8 @@ public partial class MapView : Control
             DrawString(font, at, banner, HorizontalAlignment.Left, -1, 28, Colors.White);
         }
     }
+
+    private Vector2[] Screen(Vector2[] layout) => layout.Select(ToScreen).ToArray();
 
     /// <summary>Territory colour: the map mode over a tint for the kind of land; occupied land takes the occupier's colour.</summary>
     private Color Fill(World w, Commune c)
@@ -320,23 +389,24 @@ public partial class MapView : Control
             DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
     }
 
-    private (float Scale, Vector2 Offset) Fit()
-    {
-        if (World is not { } w) return (1, Vector2.Zero);
-        float maxX = (float)w.Communes.Max(c => c.X);
-        float maxY = (float)w.Communes.Max(c => c.Y);
-        float scale = Mathf.Min((Size.X - 2 * Margin - 120) / maxX, (Size.Y - 2 * Margin) / maxY);
-        var offset = new Vector2((Size.X - maxX * scale - 120) / 2, (Size.Y - maxY * scale) / 2);
-        return (scale, offset);
-    }
+    // ── Projection ──────────────────────────────────────────────────────────
+    // With geography: an equirectangular projection (longitude scaled by the cosine of the mean
+    // latitude), fitted so the federation and a margin of its surroundings fill the pane.
+    // Without: the normalised positions from the simulation, fitted the same way.
 
     private Vector2[]? _layout;
     private Vector2 _layoutSize;
+    private Func<Vector2, Vector2> _project = v => v; // lon/lat (or normalised position) → layout space
+
+    /// <summary>Real geography projected into layout space, cached with the layout.</summary>
+    /// <param name="LandFill">Land as simple polygons that can be filled; <paramref name="Land"/> keeps the original coastline for outlines and clipping.</param>
+    private sealed record GeoLayout(List<Vector2[]> Land, List<Vector2[]> LandFill, List<Vector2[]> Lakes, List<Vector2[]> Borders, List<(string Name, Vector2[] Points)> Rivers);
+    private GeoLayout? _geoLayout;
 
     private Vector2 ToScreen(Commune c) => ToScreen(Layout()[c.Id]);
 
-    // Fit: territories reach beyond their towns, so after computing them the whole map is scaled
-    // to fit the pane (labels need room on the right, the legend at the bottom).
+    // Fit for generated maps: their rounded territories reach beyond their towns, so after
+    // computing them the map is scaled to fit. Geographic maps are fitted by the projection.
     private float _fitScale = 1;
     private Vector2 _fitOffset;
 
@@ -344,52 +414,171 @@ public partial class MapView : Control
 
     private Vector2 ToLayout(Vector2 screen) => ((screen - Size / 2 - _pan) / _zoom + Size / 2 - _fitOffset) / _fitScale;
 
-    private void FitToTerritories(Vector2[][] cells)
+    private Rect2 Drawable => new(16, 16, Size.X - 16 - 110, Size.Y - 16 - LegendHeight - 8);
+
+    private Vector2[] Layout()
     {
-        var all = cells.SelectMany(c => c).ToArray();
+        if (_layout != null && _layoutSize == Size) return _layout;
+        var w = World!;
+        _layoutSize = Size;
+        _cells = null;
+        _fitScale = 1;
+        _fitOffset = Vector2.Zero;
+
+        if (Geo is { } geo)
+        {
+            float k = Mathf.Cos(Mathf.DegToRad((float)w.Communes.Average(c => c.Latitude)));
+            Vector2 Raw(Vector2 lonLat) => new(lonLat.X * k, -lonLat.Y);
+            var anchors = w.Communes.Select(c => Raw(new Vector2((float)c.Longitude, (float)c.Latitude)))
+                .Concat(geo.Territories.Values.SelectMany(t => t.Select(Raw))).ToArray();
+            var (scale, offset) = FitBox(anchors, margin: geo.Territories.Count > 0 ? 0.06f : 0.22f);
+            _project = v => (Raw(v) - offset) * scale + Drawable.Position;
+            var positions = w.Communes.Select(c => _project(new Vector2((float)c.Longitude, (float)c.Latitude))).ToArray();
+            var land = geo.Land.Select(r => r.Select(_project).ToArray()).ToList();
+            _geoLayout = new GeoLayout(
+                land,
+                land.SelectMany(Simple).ToList(),
+                geo.Lakes.Select(r => r.Select(_project).ToArray()).ToList(),
+                geo.Borders.Select(r => r.Select(_project).ToArray()).ToList(),
+                geo.Rivers.Select(r => (r.Name, r.Points.Select(_project).ToArray())).ToList());
+            return _layout = positions;
+        }
+
+        _geoLayout = null;
+        var home = w.Communes.Select(c => new Vector2((float)c.X, (float)c.Y)).ToArray();
+        var (s, o) = FitBox(home, margin: 0.04f);
+        home = home.Select(v => (v - o) * s + Drawable.Position).ToArray();
+        // Generated maps have no geography to respect, so crowded towns are pushed apart.
+        var p = (Vector2[])home.Clone();
+        for (int iter = 0; iter < 300; iter++)
+        {
+            for (int i = 0; i < p.Length; i++)
+                for (int j = i + 1; j < p.Length; j++)
+                {
+                    var d = p[j] - p[i];
+                    float min = Radius(w.Communes[i]) + Radius(w.Communes[j]) + 44;
+                    float len = d.Length();
+                    if (len >= min) continue;
+                    var dir = len < 0.01f ? Vector2.Right.Rotated(i * 2.4f) : d / len;
+                    var push = dir * (min - len) * 0.5f;
+                    p[i] -= push;
+                    p[j] += push;
+                }
+            for (int i = 0; i < p.Length; i++) p[i] += (home[i] - p[i]) * 0.012f;
+        }
+        return _layout = p;
+    }
+
+    /// <summary>
+    /// Simplified coastlines can cross themselves slightly, which the triangulator rejects.
+    /// Clipping a polygon against a large rectangle runs it through Clipper, which returns
+    /// simple polygons that always triangulate.
+    /// </summary>
+    private static IEnumerable<Vector2[]> Simple(Vector2[] ring)
+    {
+        var min = new Vector2(ring.Min(p => p.X), ring.Min(p => p.Y)) - Vector2.One;
+        var max = new Vector2(ring.Max(p => p.X), ring.Max(p => p.Y)) + Vector2.One;
+        var box = new[] { min, new Vector2(max.X, min.Y), max, new Vector2(min.X, max.Y) };
+        return Geometry2D.IntersectPolygons(ring, box).Where(p => p.Length >= 3);
+    }
+
+    /// <summary>Scale and origin that fit the points, plus a relative margin, into the drawable area.</summary>
+    private (float Scale, Vector2 Origin) FitBox(Vector2[] points, float margin)
+    {
+        var min = new Vector2(points.Min(p => p.X), points.Min(p => p.Y));
+        var max = new Vector2(points.Max(p => p.X), points.Max(p => p.Y));
+        var pad = (max - min) * margin;
+        min -= pad;
+        max += pad;
+        var extent = max - min;
+        var area = Drawable;
+        float scale = Mathf.Min(area.Size.X / Mathf.Max(extent.X, 1e-6f), area.Size.Y / Mathf.Max(extent.Y, 1e-6f));
+        // Centre the box in the area.
+        var origin = min - (area.Size / scale - extent) / 2;
+        return (scale, origin);
+    }
+
+    private void FitToTerritories(Vector2[][][] cells)
+    {
+        var all = cells.SelectMany(c => c).SelectMany(p => p).ToArray();
         if (all.Length == 0) return;
         var min = new Vector2(all.Min(p => p.X), all.Min(p => p.Y));
         var max = new Vector2(all.Max(p => p.X), all.Max(p => p.Y));
-        var area = new Rect2(16, 16, Size.X - 16 - 110, Size.Y - 16 - LegendHeight - 8);
+        var area = Drawable;
         var extent = max - min;
         _fitScale = Mathf.Min(1, Mathf.Min(area.Size.X / extent.X, area.Size.Y / extent.Y));
         _fitOffset = area.Position + (area.Size - extent * _fitScale) / 2 - min * _fitScale;
     }
 
-    private Vector2[][]? _cells;
-    private Vector2[]? _cellsFor;
+    // ── Territories ─────────────────────────────────────────────────────────
+
+    private Vector2[][][]? _cells;
 
     /// <summary>
-    /// Territories in layout space. Each starts as a disk around its commune — which gives the
-    /// federation a rounded outer edge — and is clipped by the perpendicular bisector with every
-    /// other commune, so neighbours share exact borders. O(n²) half-plane clips: instant for 40.
+    /// Each commune's territory, as one or more polygons in layout space. Real boundaries are used
+    /// where the scenario has them. Otherwise each starts as a disk around its commune and is
+    /// clipped by the perpendicular bisector with every other commune, so neighbours share exact
+    /// borders; with geography it is then clipped to the land and to the federation's outline
+    /// (the communes' convex hull, rounded outward), so coasts are real and the edge is smooth.
     /// </summary>
-    private Vector2[][] Cells()
+    private Vector2[][][] Cells()
     {
         var pts = Layout();
-        if (_cells != null && ReferenceEquals(_cellsFor, pts)) return _cells;
+        if (_cells != null) return _cells;
+        var w = World!;
         var nearest = pts.Select((p, i) => pts.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
-        float reach = nearest[nearest.Length / 2] * 1.3f;
-        var cells = new Vector2[pts.Length][];
+        float median = nearest[nearest.Length / 2];
+        float reach = median * (Geo != null ? 2.2f : 1.3f);
+
+        Vector2[]? outline = null;
+        if (Geo != null)
+        {
+            var hull = Geometry2D.ConvexHull(pts);
+            var grown = Geometry2D.OffsetPolygon(hull, median * 0.9f, Geometry2D.PolyJoinType.Round);
+            outline = grown.Count > 0 ? grown.OrderByDescending(Area).First() : hull;
+        }
+
+        var cells = new Vector2[pts.Length][][];
         for (int i = 0; i < pts.Length; i++)
         {
+            if (Geo != null && Geo.Territories.TryGetValue(w.Communes[i].Name, out var real))
+            {
+                cells[i] = new[] { real.Select(_project).ToArray() };
+                continue;
+            }
             var poly = Enumerable.Range(0, 48).Select(k => pts[i] + Vector2.Right.Rotated(k * Mathf.Tau / 48) * reach).ToList();
             for (int j = 0; j < pts.Length && poly.Count > 0; j++)
                 if (j != i) poly = ClipToward(poly, pts[i], pts[j]);
-            cells[i] = poly.ToArray();
+            var pieces = new List<Vector2[]> { poly.ToArray() };
+            if (outline != null && _geoLayout != null)
+            {
+                pieces = pieces.SelectMany(p => Geometry2D.IntersectPolygons(p, outline)).ToList();
+                pieces = pieces.SelectMany(p => _geoLayout.Land.SelectMany(land => Geometry2D.IntersectPolygons(p, land))).ToList();
+                foreach (var lake in _geoLayout.Lakes)
+                    pieces = pieces.SelectMany(p => Geometry2D.ClipPolygons(p, lake)).ToList();
+                // Clipping can return holes (clockwise); with these shapes they are slivers, so drop them.
+                pieces = pieces.Where(p => p.Length >= 3 && !Geometry2D.IsPolygonClockwise(p) && Area(p) > 4).ToList();
+            }
+            cells[i] = pieces.Where(p => p.Length >= 3).ToArray();
         }
-        _cellsFor = pts;
-        FitToTerritories(cells);
+        if (Geo == null) FitToTerritories(cells);
         return _cells = cells;
     }
 
+    private static float Area(Vector2[] poly)
+    {
+        float a = 0;
+        for (int i = 0; i < poly.Length; i++) a += poly[i].Cross(poly[(i + 1) % poly.Length]);
+        return Mathf.Abs(a) / 2;
+    }
+
     /// <summary>Sutherland–Hodgman: keep the part of the polygon closer to <paramref name="a"/> than to <paramref name="b"/>.</summary>
-    private static System.Collections.Generic.List<Vector2> ClipToward(System.Collections.Generic.List<Vector2> poly, Vector2 a, Vector2 b)
+    private static List<Vector2> ClipToward(List<Vector2> poly, Vector2 a, Vector2 b)
     {
         var normal = b - a;
         var mid = (a + b) / 2;
         float Side(Vector2 p) => (p - mid).Dot(normal);
-        var result = new System.Collections.Generic.List<Vector2>(poly.Count + 2);
+        var result = new List<Vector2>(poly.Count + 2);
         for (int k = 0; k < poly.Count; k++)
         {
             var cur = poly[k];
@@ -427,37 +616,6 @@ public partial class MapView : Control
         QueueRedraw();
     }
 
-    /// <summary>
-    /// Geographic positions, relaxed so dense clusters (Barcelona) don't overlap: overlapping
-    /// communes push apart while a weak spring keeps each near its real location.
-    /// </summary>
-    private Vector2[] Layout()
-    {
-        if (_layout != null && _layoutSize == Size) return _layout;
-        var w = World!;
-        var (scale, offset) = Fit();
-        var home = w.Communes.Select(c => offset + new Vector2((float)c.X, (float)c.Y) * scale).ToArray();
-        var p = (Vector2[])home.Clone();
-        for (int iter = 0; iter < 300; iter++)
-        {
-            for (int i = 0; i < p.Length; i++)
-                for (int j = i + 1; j < p.Length; j++)
-                {
-                    var d = p[j] - p[i];
-                    float min = Radius(w.Communes[i]) + Radius(w.Communes[j]) + 44;
-                    float len = d.Length();
-                    if (len >= min) continue;
-                    var dir = len < 0.01f ? Vector2.Right.Rotated(i * 2.4f) : d / len;
-                    var push = dir * (min - len) * 0.5f;
-                    p[i] -= push;
-                    p[j] += push;
-                }
-            for (int i = 0; i < p.Length; i++) p[i] += (home[i] - p[i]) * 0.012f;
-        }
-        _layoutSize = Size;
-        return _layout = p;
-    }
-
     private static float Radius(Commune c) => 5 + Mathf.Sqrt((float)c.Population) * 1.2f;
 
     /// <summary>Town marker size: small, growing gently with population.</summary>
@@ -470,7 +628,7 @@ public partial class MapView : Control
         var p = ToLayout(at);
         var cells = Cells();
         for (int i = 0; i < cells.Length; i++)
-            if (cells[i].Length >= 3 && Geometry2D.IsPointInPolygon(p, cells[i])) return i;
+            if (cells[i].Any(piece => Geometry2D.IsPointInPolygon(p, piece))) return i;
         return null;
     }
 }

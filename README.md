@@ -30,6 +30,7 @@ or `--scenario paris_commune_1871`. Scenarios are pure JSON in `Data/scenarios/`
 | `Data/` | Scenario and technologies as JSON (designers edit these, not code) |
 | `Sim.Cli/` | `politicom` command: play in the terminal, or run headless batches for balancing |
 | `Sim.Tests/` | xUnit tests, including a regression test for the core design dilemma |
+| `Data/geo/`, `tools/geo/` | Real map data per scenario, and the script that builds it (Natural Earth; Paris boundaries ODbL, see `Data/geo/ATTRIBUTION.md`) |
 | `Game/` | Godot 4 (.NET) front end: map, trust graph, drift meter, actions |
 
 ## Quick start
@@ -90,8 +91,13 @@ trader            64%       35%     1% │    76    54     12    71    53 │   
 
 ## What the player sees
 
-- **The map:** each commune is a territory (a Voronoi cell, rounded off at the federation's
-  edge), coloured by the map mode over a tint for its land: farmland, mixed or industry.
+- **The map:** each historical scenario is drawn on real geography: sea, coastlines, rivers
+  and (for Catalonia) the French border. Communes sit at their true positions. Each commune's
+  territory is its share of the land, clipped to the coast and the federation's outline. Paris
+  uses the real arrondissement boundaries. The territories are coloured by the map mode over a
+  tint for their land: farmland, mixed or industry. Generated sandbox maps have no geography
+  and use rounded territories instead. Dense clusters such as Barcelona show their biggest
+  labels first; zoom in for the rest.
   - Occupied land takes the occupier's colour, and front borders are drawn in the enemy's colour.
   - A small bar under each front commune's name shows how much of it is still held.
   - Seceded communes are greyed with a dashed border, and the selection is outlined in gold.
