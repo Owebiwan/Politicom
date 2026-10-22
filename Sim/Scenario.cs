@@ -48,6 +48,8 @@ public sealed class ScenarioDefinition
         var (baseId, length) = SplitLength(id);
         if (Sandbox.SandboxGenerator.TryParseId(baseId, out var seed, out var communes))
             return Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes, length: length);
+        if (Open.OpenStartGenerator.TryParseId(baseId, out var openEra, out var stateId, out var openSeed))
+            return Open.OpenStartGenerator.Generate(Global.Atlas.Load(dataDir, openEra), Sandbox.SandboxGenerator.Load(dataDir), stateId, openSeed, length: length);
         var scenario = Load(DataPaths.Scenario(dataDir, baseId));
         if (scenario.World is { } era) Global.WorldSetup.Attach(scenario, Global.Atlas.Load(dataDir, era));
         return length is int turns ? scenario.WithLength(turns) : scenario;

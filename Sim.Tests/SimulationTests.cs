@@ -27,6 +27,7 @@ public class SimulationTests
         "free_territory_1918",
         "paris_commune_1871",
         "sandbox:7",
+        "open:1936:ARG:3",
     };
 
     [Theory]
@@ -64,6 +65,42 @@ public class SimulationTests
     }
 
     private static readonly Lazy<SandboxGenerator> Sandbox = new(() => SandboxGenerator.Load(DataDir));
+
+    [Theory]
+    [InlineData("1871")]
+    [InlineData("1918")]
+    [InlineData("1936")]
+    public void Open_starts_are_valid_for_every_playable_state(string era)
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, era);
+        var techs = NewWorld().Techs;
+        var playable = Sim.Open.OpenStartGenerator.Playable(atlas).ToList();
+        Assert.True(playable.Count >= 10, $"only {playable.Count} playable states in {era}");
+        foreach (var state in playable)
+        {
+            var scenario = Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, state.Id, 1, calibrate: false);
+            Assert.InRange(scenario.Communes.Count, 6, 26);
+            Assert.Equal(scenario.Communes.Count, scenario.Communes.Select(c => c.Name).Distinct().Count());
+            Assert.Contains(scenario.Communes, c => c.FrontOf.Length > 0);
+            Assert.DoesNotContain(scenario.States, s => s.Id == state.Id);
+            var w = World.Create(scenario, techs, seed: 1);
+            Assert.All(w.Communes, c => Assert.NotEmpty(w.Trust.Neighbors(c.Id)));
+        }
+    }
+
+    [Fact]
+    public void Open_starts_are_deterministic_and_ids_parse()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1918");
+        string Json(ScenarioDefinition s) => System.Text.Json.JsonSerializer.Serialize(s);
+        Assert.Equal(Json(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "DEU", 5, calibrate: false)),
+                     Json(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "DEU", 5, calibrate: false)));
+        Assert.True(Sim.Open.OpenStartGenerator.TryParseId("open:1936:ARG", out var era, out var id, out var seed));
+        Assert.Equal(("1936", "ARG", 1UL), (era, id, seed));
+        Assert.True(Sim.Open.OpenStartGenerator.TryParseId("open:1871:ITA:9", out _, out _, out seed));
+        Assert.Equal(9UL, seed);
+        Assert.False(Sim.Open.OpenStartGenerator.TryParseId("sandbox:7", out _, out _, out _));
+    }
 
     [Fact]
     public void Sandbox_maps_are_deterministic_per_seed()

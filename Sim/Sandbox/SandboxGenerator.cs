@@ -319,7 +319,7 @@ public sealed class SandboxGenerator
     /// player survives about <see cref="TargetSurvival"/> of a few quick games: every map is
     /// winnable, none is a walkover. Deterministic: the trial games are seeded from the map seed.
     /// </summary>
-    private ScenarioDefinition Calibrate(ScenarioDefinition scenario, ulong seed)
+    internal ScenarioDefinition Calibrate(ScenarioDefinition scenario, ulong seed)
     {
         double lo = Math.Log(0.25), hi = Math.Log(4);
         for (int step = 0; step < CalibrationSteps; step++)
@@ -356,7 +356,7 @@ public sealed class SandboxGenerator
         return copy;
     }
 
-    private List<EventDefinition> PickEvents(Rng rng, string region, string city, List<CommuneDefinition> defs, List<HostileState> enemies)
+    internal List<EventDefinition> PickEvents(Rng rng, string region, string city, List<CommuneDefinition> defs, List<HostileState> enemies)
     {
         var villages = defs.Where(c => c.Kind == CommuneKind.Agrarian && c.FrontOf.Length == 0).Select(c => c.Name).ToList();
         if (villages.Count == 0) villages = defs.Where(c => c.FrontOf.Length == 0).Select(c => c.Name).ToList();
@@ -388,7 +388,7 @@ public sealed class SandboxGenerator
         return events.OrderBy(e => e.Tick).ToList();
     }
 
-    private static Offensive Offensive(Rng rng, string enemy, DateOnly start, int tick, int duration, double strength)
+    internal static Offensive Offensive(Rng rng, string enemy, DateOnly start, int tick, int duration, double strength)
     {
         string season = start.AddDays(7 * tick).Month switch
         {
@@ -431,7 +431,7 @@ public sealed class SandboxGenerator
         return cities;
     }
 
-    private static string Name(Rng rng, HashSet<string> used)
+    internal static string Name(Rng rng, HashSet<string> used)
     {
         while (true)
         {
@@ -446,7 +446,7 @@ public sealed class SandboxGenerator
         if (!c.Techs.Contains(tech)) c.Techs = c.Techs.Append(tech).ToArray();
     }
 
-    private static T Pick<T>(Rng rng, T[] items) => items[rng.Next(items.Length)];
+    internal static T Pick<T>(Rng rng, T[] items) => items[rng.Next(items.Length)];
 
     private static double Dist((double X, double Y) a, (double X, double Y) b) => Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
 

@@ -52,7 +52,8 @@ static int Usage()
               List every balance parameter and its default.
 
         Scenarios: catalonia_1936 (default), free_territory_1918, paris_commune_1871,
-                   sandbox:SEED[:COMMUNES] for a generated map. A bare "sandbox" uses --seed;
+                   sandbox:SEED[:COMMUNES] for a generated map; open:ERA:STATE[:SEED] for the
+                   movement in any state of an era's world map (e.g. open:1936:ARG). A bare "sandbox" uses --seed;
                    in batch it generates a fresh map for every game.
 
         Policies: passive, educator, centralizer, balanced, trader

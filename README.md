@@ -90,6 +90,38 @@ balanced          65%       35%     0% │    74    53      8    77    53 │   
 trader            65%       34%     1% │    75    53      8    72    52 │    47
 ```
 
+## Open world
+
+You can start the movement in any country on an era's world map: 1871, 1918 or 1936 for now.
+This is alternate history, with the anarchist movement rising wherever you choose.
+
+- **Communes:** the country's largest cities on its home territory, up to 26. The largest are
+  industrial and the rest are mixed or agrarian.
+- **Commune values:** seeded from the regime. Education is lower in earlier eras.
+- **The enemy:** the country's own government, holding the capital. The communes nearest the
+  capital start on the front.
+- **Backers:** hostile neighbours can back the government.
+- **The rest of the world:** plays on as usual.
+- **Difficulty:** calibrated like a sandbox map.
+- **Which countries:** any with at least 6 cities on the map besides the capital. There are
+  dozens per era.
+- **Godot:** use the Open world row in the scenario picker. Choose an era, a country, a seed and a
+  length.
+- **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7). A state's id is
+  its ISO code in `Data/world/<era>.json`.
+
+Balanced AI over 100 games each (survived/destroyed/became a state); the centralizer becomes a
+state in every one:
+
+| Start            | survived | destroyed |
+|------------------|---------:|----------:|
+| Argentina 1936   |      63% |       37% |
+| Britain 1936     |      65% |       35% |
+| Soviet Union 1936|      63% |       37% |
+| Germany 1918     |      46% |       54% |
+| United States 1918 |    67% |       33% |
+| Italy 1871       |      78% |       22% |
+
 ## What the player sees
 
 - **The map:** each historical scenario is drawn on real geography: sea, coastlines, rivers

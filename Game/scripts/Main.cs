@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using Politicom.Sim;
 using Politicom.Sim.Sandbox;
+using Politicom.Sim.Open;
 
 namespace Politicom.Game;
 
@@ -450,6 +451,11 @@ public partial class Main : Control
             list.AddChild(new HSeparator());
         }
         if (_sandbox != null) list.AddChild(SandboxRow());
+        if (_sandbox != null && OpenEras.Any(e => LoadAtlas(e) != null))
+        {
+            list.AddChild(new HSeparator());
+            list.AddChild(OpenWorldRow());
+        }
 
         // Four scenarios don't fit on a small screen with the rules above them: let the list scroll.
         var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(PickerWidth - 56, 470), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
@@ -473,6 +479,11 @@ public partial class Main : Control
         var (baseId, length) = ScenarioDefinition.SplitLength(id);
         if (SandboxGenerator.TryParseId(baseId, out var seed, out var size) && _sandbox != null)
             return _sandbox.Generate(seed, size, length: length);
+        if (OpenStartGenerator.TryParseId(baseId, out var era, out var stateId, out var openSeed) && _sandbox != null && LoadAtlas(era) is { } atlas)
+        {
+            try { return OpenStartGenerator.Generate(atlas, _sandbox, stateId, openSeed, length: length); }
+            catch (ArgumentException e) { GD.PushWarning(e.Message); return null; }
+        }
         var found = _scenarios.FirstOrDefault(s => s.Id == baseId);
         return found is null || length is not int turns ? found : found.WithLength(turns);
     }
@@ -533,6 +544,61 @@ public partial class Main : Control
             ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
             int turns = sandboxLength.GetSelectedId();
             StartScenario(_sandbox!.Generate(value, size.GetSelectedId(), length: turns == 104 ? null : turns));
+        });
+        play.CustomMinimumSize = new Vector2(110, 40);
+        box.AddChild(controls);
+        return box;
+    }
+
+    private static readonly string[] OpenEras = { "1871", "1918", "1936" };
+
+    /// <summary>The Open world row: an era, any country on its map, a seed and a length.</summary>
+    private Control OpenWorldRow()
+    {
+        var box = new VBoxContainer();
+        var text = new RichTextLabel
+        {
+            BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(820, 0),
+            Text = "[b]Open world[/b]  [color=#9aa0a8]any country · its own cities as communes · its government as the enemy[/color]\n"
+                   + "The movement rises wherever you choose. Hostile neighbours may back the government; the rest of the world goes on around you.",
+        };
+        text.AddThemeFontSizeOverride("normal_font_size", 14);
+        text.AddThemeFontSizeOverride("bold_font_size", 16);
+        box.AddChild(text);
+
+        var controls = new HBoxContainer();
+        controls.AddThemeConstantOverride("separation", 8);
+        var eras = OpenEras.Where(e => LoadAtlas(e) != null).ToArray();
+        var era = new OptionButton();
+        foreach (var e in eras) era.AddItem(e);
+        controls.AddChild(era);
+        var country = new OptionButton { CustomMinimumSize = new Vector2(260, 0), FitToLongestItem = false };
+        var ids = new List<string>();
+        void FillCountries()
+        {
+            country.Clear();
+            ids.Clear();
+            foreach (var s in OpenStartGenerator.Playable(LoadAtlas(eras[era.Selected])!))
+            {
+                country.AddItem(s.Name);
+                ids.Add(s.Id);
+            }
+        }
+        FillCountries();
+        era.ItemSelected += _ => FillCountries();
+        controls.AddChild(country);
+        controls.AddChild(new Label { Text = "Seed" });
+        var seed = new LineEdit { Text = NewSeed().ToString(), CustomMinimumSize = new Vector2(110, 0), MaxLength = 12 };
+        controls.AddChild(seed);
+        var openLength = LengthPicker(104, "week", LongerTooltip + " Generation takes a few seconds.");
+        controls.AddChild(openLength);
+        controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        var play = AddButton(controls, "Play", "", () =>
+        {
+            if (country.Selected < 0) return;
+            ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
+            int turns = openLength.GetSelectedId();
+            StartScenario(OpenStartGenerator.Generate(LoadAtlas(eras[era.Selected])!, _sandbox!, ids[country.Selected], value, length: turns == 104 ? null : turns));
         });
         play.CustomMinimumSize = new Vector2(110, 40);
         box.AddChild(controls);

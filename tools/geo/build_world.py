@@ -23,7 +23,7 @@ from build_geo import simplify, area, rings  # noqa: E402
 
 TOL = 0.03          # degrees: about 3 km, plenty at world scale
 MIN_AREA = 0.02     # square degrees: drop specks (but always keep a state's largest piece)
-CITIES = 12
+CITIES = 40
 PALETTE = ["#7a8b6a", "#8a7a5e", "#6e7f8f", "#8f6e6e", "#6f8a7e", "#857089", "#8a8a62", "#5f7f6a",
            "#7f6a58", "#6a7896", "#93806a", "#6f8f8f", "#8b6f7c", "#76875a"]
 
