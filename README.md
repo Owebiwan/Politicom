@@ -168,6 +168,18 @@ Balanced AI over 100 games each. The centralizer becomes a state in (almost) eve
 
 The sandbox (fresh maps) averages 70%.
 
+## Relief
+
+Real maps (the historical scenarios, open starts and the world view) are shaded with
+**topographic relief** from Natural Earth (public domain).
+- **What it shows:** the Pyrenees, the Andes and the Alps stand out under the political and
+  map-mode colours, while flat ground and sea are untouched.
+- **Detail:** a world overview is used when zoomed out. Closer in, 30° tiles at about 3.7 km a
+  pixel load as needed.
+- **Turning it off:** use the **Relief** switch next to Trust links, or press **R**.
+- **Building it:** `tools/geo/build_relief.py` builds the tiles (about 9 MB); see
+  `tools/geo/README.md`.
+
 ## What the player sees
 
 - **The map:** each historical scenario is drawn on real geography: sea, coastlines, rivers

@@ -212,6 +212,7 @@ public partial class MapView : Control
     {
         MouseFilter = MouseFilterEnum.Stop;
         ClipContents = true;
+        TextureFilter = TextureFilterEnum.LinearWithMipmaps; // the relief is stretched far beyond its pixels
     }
 
     public override void _Process(double delta)
@@ -340,6 +341,7 @@ public partial class MapView : Control
             if (c.Id == _hover) fill = fill.Lightened(0.12f);
             foreach (var piece in screen[c.Id]) FillPolygon(piece, fill);
         }
+        DrawRelief();
 
         // Railways: a dark bed with light cross-ties.
         if (detail) foreach (var (a, b) in w.Railways)

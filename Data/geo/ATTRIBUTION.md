@@ -11,6 +11,8 @@
   licence. Distributing a build that contains them means distributing it under GPL-3.0 terms,
   or replacing these files.
 - Land, lakes, rivers, land borders and provinces: **Natural Earth** (naturalearthdata.com), public domain.
+- Shaded relief (`Data/relief/`): **Natural Earth "Shaded Relief, High Resolution"** (SR_HR),
+  public domain, converted to transparent shade tiles.
 - Paris arrondissement boundaries (`paris_commune_1871.json`, `territories`): **Ville de Paris,
   "Arrondissements"**, opendata.paris.fr, licensed under the Open Database License (ODbL)
   1.0. This file is a simplified derivative of that database and is shared under the same

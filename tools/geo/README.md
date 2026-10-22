@@ -71,6 +71,26 @@ cd - && python3 tools/geo/build_history.py /tmp/hb /tmp/geo-src Data/world
   1776; modern states are liberal unless listed.
 - **Fixes:** a small table corrects known slips in the source (China in 1400 is the Ming).
 
+## Relief
+
+`build_relief.py` turns Natural Earth's high-resolution shaded relief into the shade tiles in
+`Data/relief/`: grey and alpha, so mountains darken and catch the light while flat ground and
+sea stay clear. It needs numpy.
+
+```sh
+curl -fLO https://naciscdn.org/naturalearth/10m/raster/SR_HR.zip && unzip SR_HR.zip
+python3 -m venv /tmp/venv && /tmp/venv/bin/pip install numpy
+/tmp/venv/bin/python tools/geo/build_relief.py SR_HR.tif Data/relief
+```
+
+- **The world overview** (5400 × 2700) is drawn when zoomed out.
+- **The 30° tiles** (900 px, about 3.7 km a pixel, each with a one-pixel border from its
+  neighbours so they join without seams) are loaded as the view needs them. Tiles of open sea
+  are left out.
+- **Smoothing:** the source is averaged down and lightly blurred, so it shades smoothly when a
+  region map stretches it.
+- **Generated sandbox maps** have invented coasts, so they get no relief.
+
 ## Sources and licences
 
 - **historical-basemaps** (github.com/aourednik/historical-basemaps): historical borders.

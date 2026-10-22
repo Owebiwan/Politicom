@@ -102,6 +102,7 @@ public partial class Main : Control
     private ScenarioDefinition _scenario = null!;
     private List<ScenarioDefinition> _scenarios = new();
     private SandboxGenerator? _sandbox;
+    private CheckButton _reliefToggle = null!;
     private TechCatalog _techs = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
@@ -201,6 +202,7 @@ public partial class Main : Control
             _map.Mode = mode;
         }
         if (Array.IndexOf(args, "--world") >= 0) ToggleWorldView();
+        if (Array.IndexOf(args, "--norelief") >= 0) _reliefToggle.ButtonPressed = false;
         int tabAt = Array.IndexOf(args, "--tab");
         if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
@@ -259,6 +261,7 @@ public partial class Main : Control
             case Key.C: ToggleCommuneList(); break;
             case Key.K: ShowTechTree(); break;
             case Key.W: ToggleWorldView(); break;
+            case Key.R: _reliefToggle.ButtonPressed = !_reliefToggle.ButtonPressed; break;
             case Key.T:
                 _map.ShowTrustLinks = !_map.ShowTrustLinks;
                 _map.QueueRedraw();
@@ -787,6 +790,13 @@ public partial class Main : Control
             _map.QueueRedraw();
         };
         view.AddChild(links);
+        _reliefToggle = new CheckButton { Text = "Relief", ButtonPressed = true, TooltipText = "Shade mountains and hills on the map (R)." };
+        _reliefToggle.Toggled += on =>
+        {
+            _map.ShowRelief = on;
+            _map.QueueRedraw();
+        };
+        view.AddChild(_reliefToggle);
 
         _influence = AddLabel(side);
         _influence.MouseFilter = MouseFilterEnum.Stop;
