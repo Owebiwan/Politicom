@@ -82,10 +82,10 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    52    53      8    82    49 │    35
-educator           1%       99%     0% │    53    54      9    85    50 │    30
-centralizer        0%        0%   100% │    54    53      6    50    41 │   100
-balanced          66%       34%     0% │    75    53     12    77    54 │    37
-trader            63%       36%     1% │    76    54     12    72    53 │    49
+educator           1%       99%     0% │    53    54      9    85    50 │    29
+centralizer        0%        0%   100% │    54    53      6    51    41 │   100
+balanced          61%       39%     0% │    74    53     12    77    54 │    37
+trader            60%       39%     1% │    76    54     11    72    53 │    50
 ```
 
 ## What the player sees
@@ -123,7 +123,7 @@ Whether trade pays depends on the scenario (compare `balanced` and `trader` in t
 below):
 - **Paris:** it helps (39% survival vs 28%). In the short siege the arms come in time and the drift doesn't.
 - **Catalonia:** it pays off in a different way. Survival is the same, but final drift is lower
-  (54 vs 70), because better-armed fronts mean fewer emergencies and less time with a war committee.
+  (54 vs 69), because better-armed fronts mean fewer emergencies and less time with a war committee.
 - **Free Territory:** the drift piles up over the long war, and the trader becomes a state 61% of the time.
 
 ## Historical events
@@ -197,11 +197,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           26%       74%     0% │    64    50     16    66    49 │    65
-educator          94%        6%     0% │    66    51     22    73    53 │    60
+passive           29%       71%     0% │    67    50     17    65    49 │    67
+educator          93%        7%     0% │    66    51     22    73    53 │    61
 centralizer        0%        0%   100% │    36    50      5    52    36 │   100
-balanced          99%        0%     0% │    87    51     19    68    56 │    70
-trader            99%        0%     1% │    84    52     19    73    57 │    54
+balanced          99%        1%     0% │    86    51     19    68    56 │    69
+trader            99%        0%     1% │    84    52     19    74    57 │    54
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -213,11 +213,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    62    50     16    86    54 │    32
+passive            0%      100%     0% │    63    50     17    86    54 │    33
 educator           0%      100%     0% │    64    51     17    90    55 │    23
 centralizer        0%        0%   100% │    34    48      4    53    35 │   100
-balanced          65%       19%    16% │    84    49     19    73    56 │    62
-trader            24%       15%    61% │    80    49     16    64    52 │    80
+balanced          73%       12%    15% │    85    49     19    73    56 │    63
+trader            25%       17%    58% │    80    49     16    65    53 │    78
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but

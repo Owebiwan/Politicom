@@ -304,6 +304,58 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Receiving_aid_reads_as_free_riding_only_for_individualists()
+    {
+        var w = NewWorld();
+        var comrade = w.Communes[0];
+        var loner = w.Communes[1];
+        comrade.Values = new CommuneValues(1, 0, 0);
+        loner.Values = new CommuneValues(-1, 0, 0);
+        foreach (var c in new[] { comrade, loner })
+        {
+            c.AidReceived = c.Population * 4;
+            c.PoliticalEducation = 0;
+        }
+        w.Step();
+        Assert.True(comrade.FreeRiding < 0.01, $"collectivist in need flagged: {comrade.FreeRiding}");
+        Assert.True(loner.FreeRiding > 0.3, $"individualist taking aid not flagged: {loner.FreeRiding}");
+    }
+
+    [Fact]
+    public void A_commune_seceding_through_an_event_does_not_secede_twice()
+    {
+        var w = NewWorld();
+        var c = w.Communes[9];
+        w.PendingSecessions.Add(new PendingSecession(c.Id, w.Tick + 2));
+        Systems.EventSystem.Apply(w, new EventEffects { Secede = new[] { c.Name } });
+        Assert.Empty(w.PendingSecessions);
+        w.Run(3);
+        Assert.Single(w.Log, e => e.Commune == c.Id && e.Text.Contains("leaves the federation"));
+    }
+
+    [Fact]
+    public void Ideas_spread_only_to_communes_with_half_the_education_to_use_them()
+    {
+        var w = NewWorld();
+        var mandate = w.Techs["imperative_mandate"]; // needs political education to adopt
+        var c = w.Communes[0];
+        c.PoliticalEducation = mandate.MinPolitical * 0.4;
+        Assert.False(Systems.ResearchSystem.CanAdopt(c, mandate));
+        c.PoliticalEducation = mandate.MinPolitical * 0.6;
+        Assert.True(Systems.ResearchSystem.CanAdopt(c, mandate));
+    }
+
+    [Fact]
+    public void Mass_secession_dissolves_the_federation_rather_than_destroying_it()
+    {
+        var w = NewWorld();
+        foreach (var c in w.Communes.Skip(3)) c.Federated = false;
+        w.Step();
+        Assert.Equal(Outcome.Destroyed, w.Outcome);
+        Assert.Contains(w.Log, e => e.Text.Contains("dissolved"));
+    }
+
+    [Fact]
     public void Mediation_raises_trust_and_costs_influence()
     {
         var w = NewWorld();

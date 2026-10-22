@@ -15,8 +15,8 @@
     "growth": 0.03,
     "offensives": [
       { "name": "The Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
-      { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 16 },
-      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 30 }
+      { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 24 },
+      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 40 }
     ]
   } ],
 

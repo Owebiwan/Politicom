@@ -318,7 +318,11 @@ public sealed class World
         else if (Federation.Count() < Balance.CollapseFraction * InitialCommuneCount)
         {
             Outcome = Outcome.Destroyed;
-            Emit(Severity.Danger, "Too few free communes remain. The federation has been destroyed.");
+            int occupied = _communes.Count(c => c.Occupied);
+            int seceded = _communes.Count(c => !c.Occupied && !c.Federated);
+            Emit(Severity.Danger, seceded > occupied
+                ? "Most communes have gone their own way. They are still free, but the federation has dissolved."
+                : "Too few free communes remain. The federation has been destroyed.");
         }
         else if (Tick >= Scenario.EndTick)
         {

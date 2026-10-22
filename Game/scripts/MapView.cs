@@ -29,7 +29,24 @@ public partial class MapView : Control
     private bool _dragging;
     private Vector2 _dragFrom;
 
-    public World? World { get; set; }
+    private World? _world;
+
+    /// <summary>Setting a new world (another scenario, a loaded save) discards the cached layout and view.</summary>
+    public World? World
+    {
+        get => _world;
+        set
+        {
+            if (ReferenceEquals(value, _world)) return;
+            _world = value;
+            _layout = null;
+            _zoom = 1;
+            _pan = Vector2.Zero;
+            _hover = null;
+            QueueRedraw();
+        }
+    }
+
     public MapMode Mode { get; set; } = MapMode.Trust;
     public int? Selected { get; set; }
     public int? Secondary { get; set; }

@@ -14,6 +14,11 @@ internal static class FederationSystem
         foreach (var s in w.PendingSecessions.ToList())
         {
             var c = w.Communes[s.Commune];
+            if (!c.InFederation)
+            {
+                w.PendingSecessions.Remove(s); // already gone (an event, or occupation)
+                continue;
+            }
             if (c.Discontent < b.SecessionThreshold - 0.05)
             {
                 w.PendingSecessions.Remove(s);

@@ -82,6 +82,7 @@ internal static class EventSystem
             if (c is { InFederation: true })
             {
                 c.Federated = false;
+                w.PendingSecessions.RemoveAll(s => s.Commune == c.Id);
                 foreach (var p in w.ActiveProjects) p.Participants.Remove(c.Id);
                 w.Emit(Severity.Warning, $"{c.Name} leaves the federation.", c.Id);
             }

@@ -83,6 +83,8 @@ public partial class Main : Control
         int at = Array.IndexOf(args, "--screenshot");
         if (at < 0 || at + 1 >= args.Length) return;
         string path = args[at + 1];
+        // Let the default map draw first, as it does behind the intro, so switching exercises the real path.
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         int scenarioAt = Array.IndexOf(args, "--scenario");
         if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && FindScenario(args[scenarioAt + 1]) is { } chosen)
         {
@@ -319,6 +321,8 @@ public partial class Main : Control
         {
             Outcome.Survived => ("The federation endured", $"Free communes still governed themselves in {w.Date:MMMM yyyy}."),
             Outcome.BecameState => ("You won the war and lost the revolution", "Hierarchy drift reached its final threshold. A state crystallized out of the councils, commissars and police."),
+            _ when w.Communes.Count(c => !c.Occupied && !c.Federated) > w.Communes.Count(c => c.Occupied)
+                => ("The federation has dissolved", "Most communes went their own way. They are still free, but there is no federation left to hold together."),
             _ => ("The federation has been destroyed", "Too few free communes remain for a federation."),
         };
         _map.Banner = title;
@@ -720,7 +724,8 @@ public partial class Main : Control
         try
         {
             var world = World.LoadJson(FileAccess.GetFileAsString(SavePath), _techs);
-            _scenario = _scenarios.FirstOrDefault(s => s.Id == world.Scenario.Id) ?? _scenario;
+            // The world's own copy of the scenario has been mutated by play, so look up (or regenerate) the original.
+            _scenario = FindScenario(world.Scenario.Id) ?? _scenario;
             CloseOverlay();
             SetWorld(world);
             Say($"Loaded {world.Turn} {world.Tick} ({world.Date:d MMMM yyyy}).");

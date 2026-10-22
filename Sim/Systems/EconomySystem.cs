@@ -197,8 +197,10 @@ internal static class EconomySystem
     }
 
     /// <summary>
-    /// Free riders take more than they give. Individualist communes with little political
-    /// education are likeliest to; labor-time accounting and (grimly) police reduce it.
+    /// Free riders take more than they give. Whether taking reads as free-riding depends on values:
+    /// a collectivist commune that receives grain because its factories can't grow any is a comrade
+    /// in need, while an individualist one taking the same is resented. Political education,
+    /// labor-time accounting and (grimly) police reduce it.
     /// </summary>
     private static void Ledgers(World w)
     {
@@ -210,7 +212,7 @@ internal static class EconomySystem
             c.AidReceived *= 0.95;
             double net = Math.Clamp((c.AidReceived - c.AidGiven) / (c.Population * 2), 0, 1);
             double individualism = 1 - CommuneValues.To01(c.Values.Collectivism);
-            c.FreeRiding = net * (0.4 + 0.6 * individualism) * (1 - 0.5 * c.PoliticalEducation) * (1 - accounting) * stage;
+            c.FreeRiding = net * individualism * (1 - 0.5 * c.PoliticalEducation) * (1 - accounting) * stage;
         }
     }
 

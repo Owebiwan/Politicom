@@ -146,7 +146,7 @@ internal static class ActionSystem
         var members = w.Federation.ToList();
         int adoptions = 0;
         foreach (var t in w.Techs.All.Where(t => w.TechShare(t.Id) >= 0.25))
-            foreach (var c in members.Where(c => !c.Techs.Contains(t.Id) && t.Prerequisites.All(c.Techs.Contains)))
+            foreach (var c in members.Where(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(c, t)))
                 if (w.Rng.Chance(0.35 * (0.4 + c.PracticalEducation)))
                 {
                     c.Techs.Add(t.Id);

@@ -50,7 +50,7 @@ internal static class ResearchSystem
                 {
                     if (dst.Techs.Contains(id)) continue;
                     var t = w.Techs[id];
-                    if (dst.PracticalEducation < t.MinPractical * 0.5 || !t.Prerequisites.All(dst.Techs.Contains)) continue;
+                    if (!CanAdopt(dst, t)) continue;
                     double p = b.DiffusionRate * trust * (0.4 + dst.PracticalEducation) * boost * (w.IdeaNudges.ContainsKey(id) ? 2 : 1);
                     if (w.Rng.Chance(p)) adoptions.Add((dst, id));
                 }
@@ -69,6 +69,13 @@ internal static class ResearchSystem
                 $"{t.Name} is now used by most of the federation." + (t.Effects.DriftPerTick > 0 ? $" Risk: {t.Risk}" : ""));
         }
     }
+
+    /// <summary>
+    /// Adopting an idea someone else developed is easier than discovering it: half the education
+    /// on both tracks. Used for diffusion along trust links and for congresses.
+    /// </summary>
+    internal static bool CanAdopt(Commune c, TechDefinition t) =>
+        t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical * 0.5 && c.PoliticalEducation >= t.MinPolitical * 0.5;
 
     internal static bool CanDiscover(Commune c, TechDefinition t) =>
         t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical && c.PoliticalEducation >= t.MinPolitical;
