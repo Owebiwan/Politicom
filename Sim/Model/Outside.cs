@@ -45,7 +45,12 @@ public sealed record PendingSecession(int Commune, int Deadline);
 
 public enum Severity { Info, Good, Warning, Danger, Decision }
 
-public sealed record GameEvent(int Tick, DateOnly Date, Severity Severity, string Text, int? Commune = null);
+/// <param name="Pause">The front ends should stop the clock for this, as they do for decisions.</param>
+public sealed record GameEvent(int Tick, DateOnly Date, Severity Severity, string Text, int? Commune = null, bool Pause = false)
+{
+    /// <summary>Whether a running clock should stop: every decision, and events flagged to pause.</summary>
+    public bool StopsTheClock => Pause || Severity == Severity.Decision;
+}
 
 public enum Outcome { Ongoing, Survived, Destroyed, BecameState }
 

@@ -149,8 +149,8 @@ public partial class Main : Control
         _world.Step();
         // Like a Paradox popup: pause when the movement has a decision to make.
         var fresh = _world.Log.Skip(_seenEvents).ToList();
-        if (fresh.Any(e => e.Severity == Severity.Decision)) SetSpeed(0);
-        foreach (var e in fresh.Where(e => e.Severity is Severity.Danger or Severity.Decision))
+        if (fresh.Any(e => e.StopsTheClock)) SetSpeed(0);
+        foreach (var e in fresh.Where(e => e.Severity == Severity.Danger || e.StopsTheClock))
             _toasts.Show(Shorten(e.Text), e.Severity == Severity.Decision ? new Color(0.38f, 0.85f, 0.95f) : new Color(0.95f, 0.4f, 0.35f));
         Refresh();
         ShowTips();
@@ -663,7 +663,7 @@ public partial class Main : Control
             $"Values: collectivism {c.Values.Collectivism:+0.0;-0.0}, militancy {c.Values.Militancy:+0.0;-0.0}, federalism {c.Values.Federalism:+0.0;-0.0}\n" +
             $"Education: practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0}), political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})" +
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
-            $"Food {c.Food:0} (+{c.FoodProduced:0.0}) · goods {c.Goods:0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
+            $"Food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
             $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · discontent {c.Discontent:0.00}\n" +
             $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Select(t => w.Techs[t].Name)))}\n" +
             $"Neighbours (trust): {neighbours}";
@@ -685,7 +685,8 @@ public partial class Main : Control
             string target = p.Target is int a ? $" — {w.Communes[a].Name}" + (p.Target2 is int b ? $" ↔ {w.Communes[b].Name}" : "") : "";
             row.AddChild(new Label
             {
-                Text = $"#{p.Id} {p.Definition.Name}{target}: {p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}",
+                Text = $"#{p.Id} {p.Definition.Name}{target}: {p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}"
+                       + (p.ProjectedFinish(w.Tick) is int t ? (t > p.Deadline ? $" — on pace for {w.Turn} {t}: LATE" : $" — on pace for {w.Turn} {t}") : " — stalled"),
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
                 CustomMinimumSize = new Vector2(420, 0),
             });

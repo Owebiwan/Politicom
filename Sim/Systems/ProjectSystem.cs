@@ -27,6 +27,7 @@ internal static class ProjectSystem
             foreach (var c in participants) c.Goods -= 0.3 * b.ContributionBase * Math.Sqrt(c.Population);
 
             if (p.Progress >= p.Work) Complete(w, p);
+            else if (w.Tick >= p.Deadline && !p.Extended && p.Progress >= 0.75 * p.Work) Extend(w, p);
             else if (w.Tick >= p.Deadline) Fail(w, p);
         }
     }
@@ -167,6 +168,15 @@ internal static class ProjectSystem
         w.Emit(Severity.Good, $"{p.Definition.Name} completed with {participants.Count} communes. {effect}");
     }
 
+    /// <summary>Projects run late. One extension for a project that is most of the way there.</summary>
+    private static void Extend(World w, Project p)
+    {
+        p.Extended = true;
+        p.Deadline = w.Tick + (int)Math.Ceiling(0.25 * w.Balance.ProjectDeadlineFactor * p.Definition.ExpectedWeeks);
+        w.Emit(Severity.Warning, $"The {p.Definition.Name.ToLowerInvariant()} is running late ({p.Progress:0}/{p.Work:0}). " +
+                                 $"Its participants give it until {w.Turn} {p.Deadline} — once.");
+    }
+
     private static void Fail(World w, Project p)
     {
         p.Status = ProjectStatus.Failed;
@@ -174,7 +184,10 @@ internal static class ProjectSystem
         foreach (var a in participants)
             foreach (var c in participants)
                 if (a < c) w.Trust.Add(a, c, -w.Balance.BrokenCommitmentTrustLoss * 0.5);
-        w.Emit(Severity.Warning, $"{p.Definition.Name} collapses unfinished ({p.Progress:0}/{p.Work:0}). Too few communes would commit.");
+        string why = participants.Count * 2 < p.Invited.Count
+            ? "Too few communes would commit."
+            : $"{p.LastOverhead:P0} of the effort was lost to coordinating {participants.Count} communes.";
+        w.Emit(Severity.Warning, $"{p.Definition.Name} collapses unfinished ({p.Progress:0}/{p.Work:0}). {why}");
     }
 
     /// <summary>Who gets asked to join.</summary>

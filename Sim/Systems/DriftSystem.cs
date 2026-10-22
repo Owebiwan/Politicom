@@ -24,12 +24,22 @@ internal static class DriftSystem
 
         var before = w.Drift.Stage;
         var changed = w.Drift.Apply(d.Net, b.StageHysteresis);
+        // A warning a few points before each threshold, while there is still time to recall delegates.
+        // Once per threshold: it re-arms only after drift falls well back, so hovering doesn't nag.
+        if (w.Drift.Value < w.DriftWarnedAt - 9) w.DriftWarnedAt = 0;
+        foreach (var t in DriftTracker.Thresholds)
+            if (w.DriftWarnedAt < t && w.Drift.Value >= t - 3 && w.Drift.Value < t && w.Drift.Stage < DriftStage.State)
+            {
+                w.DriftWarnedAt = t;
+                w.Emit(Severity.Warning, $"Hierarchy drift is nearing {t:0} ({w.Drift.Value:0.0}). " +
+                    (t >= 100 ? "At 100 a state crystallizes and the revolution is over." : $"{DriftEffects.Name((DriftStage)(Array.IndexOf(DriftTracker.Thresholds, t) + 1))} will form unless it is pushed back."), pause: true);
+            }
         if (changed is { } stage && stage != DriftStage.State)
         {
             bool rising = stage > before;
             w.Emit(rising ? Severity.Danger : Severity.Good,
                 (rising ? $"Hierarchy hardens: {DriftEffects.Name(stage)}. " : $"Self-management restored: back to {DriftEffects.Name(stage)}. ")
-                + DriftEffects.Describe(stage));
+                + DriftEffects.Describe(stage), pause: rising);
         }
     }
 

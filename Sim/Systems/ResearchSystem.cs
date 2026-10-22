@@ -29,7 +29,7 @@ internal static class ResearchSystem
             bool first = !w.Communes.Any(o => o.Techs.Contains(tech.Id));
             c.Techs.Add(tech.Id);
             if (first)
-                w.Emit(Severity.Info, $"{c.Name} develops {tech.Name}. {tech.Perk} — but {Lower(tech.Risk)}", c.Id);
+                w.Emit(Severity.Info, $"{c.Name} develops {tech.Name}. {tech.Perk}. Risk: {Lower(tech.Risk)}", c.Id);
         }
     }
 

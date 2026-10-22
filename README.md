@@ -83,9 +83,9 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    52    53      8    82    49 │    35
 educator           1%       99%     0% │    53    54      9    85    50 │    29
-centralizer        0%        0%   100% │    54    53      6    51    41 │   100
-balanced          61%       39%     0% │    74    53     12    77    54 │    37
-trader            60%       39%     1% │    76    54     11    72    53 │    50
+centralizer        0%        0%   100% │    53    53      6    51    41 │   100
+balanced          61%       39%     0% │    74    53     12    77    54 │    36
+trader            64%       35%     1% │    76    54     12    71    53 │    50
 ```
 
 ## What the player sees
@@ -103,6 +103,12 @@ trader            60%       39%     1% │    76    54     11    72    53 │   
 - **Tips:** one-time hints the first time something important happens, such as the front
   losing ground, famine, the expert trap, a commune voting to leave, the first drift stage,
   or influence full and unspent.
+- **Pauses:** the clock stops for decisions, for a warning 3 points before each drift
+  threshold (once per threshold), and when a new stage forms, so the key moments aren't missed.
+- **Project pace:** each project shows when it will finish at the current pace, marked LATE
+  if that misses its deadline. A project at 75% or more when its deadline arrives gets one
+  extension instead of collapsing. Failures say why: too few communes committed, or too much
+  effort lost to coordination.
 - **Tooltips:** hover the drift meter, influence or scores for an explanation. Esc closes the
   results screen and the commune list.
 
@@ -121,9 +127,9 @@ capitalist states needs currency, which brings markets and accounts back in.
 
 Whether trade pays depends on the scenario (compare `balanced` and `trader` in the tables
 below):
-- **Paris:** it helps (39% survival vs 28%). In the short siege the arms come in time and the drift doesn't.
+- **Paris:** it's roughly even (30% survival vs 29%). The arms arrive in time and the drift has little time to build.
 - **Catalonia:** it pays off in a different way. Survival is the same, but final drift is lower
-  (54 vs 69), because better-armed fronts mean fewer emergencies and less time with a war committee.
+  (50 vs 59), because better-armed fronts mean fewer emergencies and less time with a war committee.
 - **Free Territory:** the drift piles up over the long war, and the trader becomes a state 61% of the time.
 
 ## Historical events
@@ -200,8 +206,8 @@ policy       survived destroyed  state │  surv   QoL spread  free total │ dr
 passive           29%       71%     0% │    67    50     17    65    49 │    67
 educator          93%        7%     0% │    66    51     22    73    53 │    61
 centralizer        0%        0%   100% │    36    50      5    52    36 │   100
-balanced          99%        1%     0% │    86    51     19    68    56 │    69
-trader            99%        0%     1% │    84    52     19    74    57 │    54
+balanced         100%        0%     0% │    88    51     19    72    58 │    59
+trader            99%        0%     1% │    86    52     19    74    58 │    50
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -217,7 +223,7 @@ passive            0%      100%     0% │    63    50     17    86    54 │   
 educator           0%      100%     0% │    64    51     17    90    55 │    23
 centralizer        0%        0%   100% │    34    48      4    53    35 │   100
 balanced          73%       12%    15% │    85    49     19    73    56 │    63
-trader            25%       17%    58% │    80    49     16    65    53 │    78
+trader            24%       18%    58% │    80    49     17    65    53 │    77
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -227,11 +233,11 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    83    67     11    91    63 │    27
+passive            0%      100%     0% │    83    67     11    91    63 │    26
 educator           0%      100%     0% │    83    67     11    96    64 │     8
 centralizer        0%        0%   100% │    83    64      8    51    51 │   100
-balanced          28%       72%     0% │    96    68     11    93    67 │    17
-trader            39%       61%     0% │    96    68     11    90    66 │    24
+balanced          29%       71%     0% │    96    68     11    93    67 │    17
+trader            30%       70%     0% │    96    68     11    90    66 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

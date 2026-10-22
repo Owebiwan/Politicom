@@ -64,7 +64,8 @@ internal static class Render
 
         foreach (var p in w.ActiveProjects)
             sb.AppendLine($"Project   #{p.Id} {p.Definition.Name}{Target(w, p)}  {Bar(p.Progress, p.Work, 20, "36")} {p.Progress:0}/{p.Work:0}  " +
-                          $"{p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}");
+                          $"{p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}" +
+                          Projection(w, p));
 
         foreach (var pending in w.PendingEvents)
         {
@@ -76,9 +77,22 @@ internal static class Render
         if (w.Ally.OfferPending)
             sb.AppendLine(Paint($"DECISION  The {w.Ally.Name} offers arms for militarization. → `arms accept` / `arms reject` (expires {w.Turn} {w.Ally.OfferExpires})", "36;1"));
         foreach (var sec in w.PendingSecessions)
+        {
+            string neighbours = string.Join(", ", w.Trust.Neighbors(sec.Commune).Where(n => w.Communes[n].InFederation)
+                .OrderBy(n => w.Trust[sec.Commune, n]).Take(4).Select(n => $"{w.Communes[n].Name} [{n}] {w.Trust[sec.Commune, n]:P0}"));
             sb.AppendLine(Paint($"DECISION  {w.Communes[sec.Commune].Name} [{sec.Commune}] will leave in {w.Turn} {sec.Deadline}. → `mediate {sec.Commune} <neighbour>` or `hold {sec.Commune}`", "36;1"));
+            sb.AppendLine($"          least-trusted neighbours: {neighbours}");
+        }
         return sb.ToString();
     }
+
+    /// <summary>"— on pace for week 31", in red if that misses the deadline.</summary>
+    public static string Projection(World w, Project p) => p.ProjectedFinish(w.Tick) switch
+    {
+        null => Paint(" — stalled", "31"),
+        int t when t > p.Deadline => Paint($" — on pace for {w.Turn} {t}: LATE", "31"),
+        int t => Dim($" — on pace for {w.Turn} {t}"),
+    };
 
     public static string Target(World w, Project p) =>
         p.Target is { } a ? $" ({w.Communes[a].Name}" + (p.Target2 is { } b ? $" ↔ {w.Communes[b].Name}" : "") + ")" : "";
@@ -100,7 +114,7 @@ internal static class Render
                     c.ExpertGap > 0.1 ? Paint("experts", "35") : null,
                     w.PendingSecessions.Any(s => s.Commune == c.Id) ? Paint("LEAVING", "36;1") : null,
                 }.Where(x => x != null));
-            sb.AppendLine($"{c.Id,3} {Trunc(c.Name, 32),-32} {c.Kind,-10} {c.Population,4:0} {c.Food,5:0} {c.Goods,5:0} {c.Wellbeing,5:P0} {c.PracticalEducation,4:0.00} {c.PoliticalEducation,4:0.00} " +
+            sb.AppendLine($"{c.Id,3} {Trunc(c.Name, 32),-32} {c.Kind,-10} {c.Population,4:0} {Math.Max(0, c.Food),5:0} {Math.Max(0, c.Goods),5:0} {c.Wellbeing,5:P0} {c.PracticalEducation,4:0.00} {c.PoliticalEducation,4:0.00} " +
                           $"{w.Trust.AverageTrust(c.Id),5:P0} {c.Discontent,4:0.00}  {status}");
         }
         return sb.ToString();
@@ -112,7 +126,7 @@ internal static class Render
         sb.AppendLine(Bold($"[{c.Id}] {c.Name}") + Dim($" — {c.Kind}, {c.Population:0}k people") + (c.Description.Length > 0 ? $"\n    {c.Description}" : ""));
         sb.AppendLine($"    values      collectivism {c.Values.Collectivism:+0.0;-0.0}  militancy {c.Values.Militancy:+0.0;-0.0}  federalism {c.Values.Federalism:+0.0;-0.0}");
         sb.AppendLine($"    education   practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0})  political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})");
-        sb.AppendLine($"    economy     food {c.Food:0} (+{c.FoodProduced:0.0}/{w.Turn})  goods {c.Goods:0} (+{c.GoodsProduced:0.0}/{w.Turn})  wellbeing {c.Wellbeing:P0}");
+        sb.AppendLine($"    economy     food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}/{w.Turn})  goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}/{w.Turn})  wellbeing {c.Wellbeing:P0}");
         sb.AppendLine($"    aid ledger  given {c.AidGiven:0.0}  received {c.AidReceived:0.0}  free-riding {c.FreeRiding:P0}  discontent {c.Discontent:0.00}");
         if (c.Front) sb.AppendLine($"    front       against {string.Join(", ", c.Fronts.Select(k => w.Enemies[k].Name))}: control {c.Control:P0}, defense {c.Defense:0.00} vs pressure {c.Pressure:0.00}");
         if (c.OccupiedBy is int by) sb.AppendLine($"    occupied    by the {w.Enemies[by].Name}");

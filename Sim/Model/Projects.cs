@@ -48,7 +48,9 @@ public sealed class Project
     public int? Target { get; init; }
     public int? Target2 { get; init; }
     public int StartedTick { get; init; }
-    public int Deadline { get; init; }
+    [JsonInclude] public int Deadline { get; internal set; }
+    /// <summary>Whether the one allowed extension has been used.</summary>
+    [JsonInclude] public bool Extended { get; internal set; }
     public double Work { get; init; }
     [JsonInclude] public double Progress { get; internal set; }
     public HashSet<int> Invited { get; init; } = new();
@@ -59,6 +61,10 @@ public sealed class Project
     /// <summary>Effective effort last tick (used as militia support by defensive campaigns).</summary>
     [JsonInclude] public double LastOutput { get; internal set; }
     [JsonInclude] public ProjectStatus Status { get; internal set; } = ProjectStatus.Active;
+
+    /// <summary>Turn the project will finish at last turn's pace, or null if it has stalled.</summary>
+    public int? ProjectedFinish(int now) =>
+        LastOutput <= 1e-6 ? null : now + (int)Math.Ceiling((Work - Progress) / LastOutput);
 
     [JsonIgnore] public bool Active => Status == ProjectStatus.Active;
 }

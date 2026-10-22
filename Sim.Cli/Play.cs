@@ -104,10 +104,10 @@ internal static class Play
                         {
                             w.Step();
                             // Like a Paradox popup: stop fast-forwarding when a decision is needed.
-                            if (w.Log.Skip(shown).Any(e => e.Severity == Severity.Decision)) break;
+                            if (w.Log.Skip(shown).Any(e => e.StopsTheClock)) break;
                         }
                         PrintNewEvents(w, ref shown);
-                        Console.WriteLine(Render.Status(w));
+                        if (w.Outcome == Outcome.Ongoing) Console.WriteLine(Render.Status(w)); // the game-over block prints it otherwise
                         break;
                     default:
                         var action = ParseAction(w, cmd, parts);

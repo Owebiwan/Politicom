@@ -9,7 +9,7 @@
       "name": "Crop rotation and irrigation",
       "category": "Agricultural",
       "perk": "More grain from the same land",
-      "risk": "Nothing much — some ideas are just good.",
+      "risk": "None to speak of. Some ideas are just good.",
       "minPractical": 0.12,
       "affinity": { "agrarian": 3 },
       "effects": { "foodProduction": 0.15 }

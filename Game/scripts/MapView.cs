@@ -254,7 +254,7 @@ public partial class MapView : Control
             $"{c.Kind}, {c.Population:0}k · {status}",
             $"Trust {w.Trust.AverageTrust(c.Id):P0} · wellbeing {c.Wellbeing:P0}",
             $"Education: practical {c.PracticalEducation:0.00}, political {c.PoliticalEducation:0.00}",
-            $"Food {c.Food:0} · goods {c.Goods:0}" + (c.Starving ? " · STARVING" : ""),
+            $"Food {Math.Max(0, c.Food):0} · goods {Math.Max(0, c.Goods):0}" + (c.Starving ? " · STARVING" : ""),
             $"Discontent {c.Discontent:0.00}" + (c.FreeRiding > 0.2 ? $" · free-riding {c.FreeRiding:P0}" : ""),
         };
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;

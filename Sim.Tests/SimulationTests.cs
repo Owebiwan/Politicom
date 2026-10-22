@@ -356,6 +356,21 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Drift_warns_before_a_threshold_and_stops_the_clock_when_a_stage_forms()
+    {
+        var w = NewWorld();
+        w.Apply(new SetWarCommittee(true));
+        w.Apply(new SetForeignTrade(true));
+        while (w.Drift.Stage == DriftStage.Free && w.Outcome == Outcome.Ongoing) w.Step();
+        var warning = Assert.Single(w.Log, e => e.Text.StartsWith("Hierarchy drift is nearing 25"));
+        var hardens = Assert.Single(w.Log, e => e.Text.StartsWith("Hierarchy hardens"));
+        Assert.True(warning.StopsTheClock);
+        Assert.True(hardens.StopsTheClock);
+        Assert.True(warning.Tick < hardens.Tick);
+        Assert.False(w.Log.First(e => e.Text.StartsWith("A war committee")).StopsTheClock); // ordinary warnings don't
+    }
+
+    [Fact]
     public void Mediation_raises_trust_and_costs_influence()
     {
         var w = NewWorld();

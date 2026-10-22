@@ -61,6 +61,8 @@ public sealed class World
     public HashSet<string> FiredEvents { get; } = new();
     public bool WarCommittee { get; internal set; }
     public bool ForeignTrade { get; internal set; }
+    /// <summary>The drift threshold most recently warned about (0 = none), so warnings don't repeat.</summary>
+    public double DriftWarnedAt { get; internal set; }
     /// <summary>Last turn's trade: food sold and goods bought.</summary>
     public double LastExports { get; internal set; }
     public double LastImports { get; internal set; }
@@ -169,6 +171,7 @@ public sealed class World
         FiredEvents = FiredEvents.ToList(),
         WarCommittee = WarCommittee,
         ForeignTrade = ForeignTrade,
+        DriftWarnedAt = DriftWarnedAt,
         RecallPenaltyTicks = RecallPenaltyTicks,
         LastCongressTick = LastCongressTick,
         IdeaNudges = IdeaNudges,
@@ -209,6 +212,7 @@ public sealed class World
             NextProjectId = s.NextProjectId,
             WarCommittee = s.WarCommittee,
             ForeignTrade = s.ForeignTrade,
+            DriftWarnedAt = s.DriftWarnedAt,
             RecallPenaltyTicks = s.RecallPenaltyTicks,
             LastCongressTick = s.LastCongressTick,
             TransportBonus = s.TransportBonus,
@@ -287,8 +291,8 @@ public sealed class World
         return list.Count == 0 ? 0 : list.Average(f);
     }
 
-    internal void Emit(Severity severity, string text, int? commune = null) =>
-        _log.Add(new GameEvent(Tick, Date, severity, text, commune));
+    internal void Emit(Severity severity, string text, int? commune = null, bool pause = false) =>
+        _log.Add(new GameEvent(Tick, Date, severity, text, commune, pause));
 
     /// <summary>One-off drift from an event; applied in this tick's drift update.</summary>
     internal void BumpDrift(double amount) => PendingDriftBump += amount;
