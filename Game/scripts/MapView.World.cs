@@ -121,16 +121,54 @@ public partial class MapView
         return _globeLayout = g;
     }
 
-    /// <summary>Smallest zoom: the whole world fits the map pane.</summary>
+    /// <summary>
+    /// What the view may show, in layout space: the whole world, or for generated maps (whose
+    /// neighbours run off to infinity) the generated area. Null when there's nothing to bound.
+    /// </summary>
+    private Rect2? Bounds
+    {
+        get
+        {
+            if (Globe_Layout() is { } g && !Generated) return g.Extent;
+            if (Geo is null) return null;
+            var a = _project(Geo.Bounds.Position);
+            var b = _project(Geo.Bounds.End);
+            return new Rect2(a, Vector2.Zero).Expand(b);
+        }
+    }
+
+    /// <summary>Smallest zoom: the bounded area just fills the map pane.</summary>
     private float MinZoom
     {
         get
         {
-            if (Globe_Layout() is not { } g) return 0.6f;
-            var area = Drawable;
-            float fit = Mathf.Min(area.Size.X / (g.Extent.Size.X * _fitScale), area.Size.Y / (g.Extent.Size.Y * _fitScale));
-            return Mathf.Min(0.6f, fit * 0.95f);
+            if (Bounds is not { } r) return 0.6f;
+            var area = new Rect2(Vector2.Zero, Size);
+            float fit = Mathf.Min(area.Size.X / (r.Size.X * _fitScale), area.Size.Y / (r.Size.Y * _fitScale));
+            // Fit the whole world in view (letterboxed along one axis), but never zoom out past it.
+            return Mathf.Min(fit, 1);
         }
+    }
+
+    /// <summary>
+    /// Keeps the view on the map: along an axis where the map is larger than the pane, no edge
+    /// may come inside it; where it's smaller, the map is centred.
+    /// </summary>
+    private void ClampView()
+    {
+        if (Bounds is not { } r) return;
+        _zoom = Mathf.Max(_zoom, MinZoom);
+        var tl = ToScreen(r.Position);
+        var br = ToScreen(r.End);
+        var shift = Vector2.Zero;
+        for (int axis = 0; axis < 2; axis++)
+        {
+            float lo = tl[axis], hi = br[axis], size = Size[axis];
+            if (hi - lo <= size) shift[axis] = (size - (hi - lo)) / 2 - lo;
+            else if (lo > 0) shift[axis] = -lo;
+            else if (hi < size) shift[axis] = size - hi;
+        }
+        _pan += shift;
     }
 
     private float ClampZoom(float z) => Mathf.Clamp(z, MinZoom, MaxZoom);
@@ -141,6 +179,7 @@ public partial class MapView
         if (Globe_Layout() is not { } g) return;
         _zoom = MinZoom;
         _pan = -(g.Extent.GetCenter() * _fitScale + _fitOffset - Size / 2) * _zoom;
+        ClampView();
         QueueRedraw();
     }
 
@@ -149,6 +188,7 @@ public partial class MapView
     {
         _zoom = 1;
         _pan = Vector2.Zero;
+        ClampView();
         QueueRedraw();
     }
 

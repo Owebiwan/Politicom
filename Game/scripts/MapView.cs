@@ -251,6 +251,7 @@ public partial class MapView : Control
                     {
                         _zoom = 1;
                         _pan = Vector2.Zero;
+                        ClampView();
                         QueueRedraw();
                         break;
                     }
@@ -277,6 +278,7 @@ public partial class MapView : Control
                     if (_dragMoved)
                     {
                         _pan += motion.Position - _dragFrom;
+                        ClampView();
                         QueueRedraw();
                     }
                     _dragFrom = motion.Position;
@@ -908,6 +910,7 @@ public partial class MapView : Control
     {
         Cells();
         _pan = -(Layout()[commune] * _fitScale + _fitOffset - Size / 2) * _zoom;
+        ClampView();
         QueueRedraw();
     }
 
@@ -917,6 +920,7 @@ public partial class MapView : Control
         _zoom = ClampZoom(zoom);
         Cells();
         _pan = -(Layout()[commune] * _fitScale + _fitOffset - Size / 2) * _zoom;
+        ClampView();
         QueueRedraw();
     }
 
@@ -926,6 +930,7 @@ public partial class MapView : Control
         var anchor = (at - Size / 2 - _pan) / _zoom;
         _pan = at - Size / 2 - anchor * next;
         _zoom = next;
+        ClampView();
         QueueRedraw();
     }
 
