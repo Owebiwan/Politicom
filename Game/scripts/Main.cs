@@ -238,7 +238,7 @@ public partial class Main : Control
     {
         var w = _world;
         var date = w.Date.AddDays(_dayInTurn);
-        _header.Text = $"{w.Scenario.Name} · {date:d MMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
+        _header.Text = $"{w.Scenario.Name} · {w.Format(date, "d MMM yyyy")} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
                        + (SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
     }
 
@@ -334,6 +334,8 @@ public partial class Main : Control
 
     private readonly Dictionary<string, GeoData?> _geo = new();
     private readonly Dictionary<string, Politicom.Sim.Global.Atlas?> _atlases = new();
+
+    private static bool HasAtlas(string era) => FileAccess.FileExists($"res://data/world/{era}.json");
 
     /// <summary>The world map of an era, if Data/world has it.</summary>
     private Politicom.Sim.Global.Atlas? LoadAtlas(string? era)
@@ -452,7 +454,7 @@ public partial class Main : Control
             list.AddChild(new HSeparator());
         }
         if (_sandbox != null) list.AddChild(SandboxRow());
-        if (_sandbox != null && OpenEras.Any(e => LoadAtlas(e) != null))
+        if (_sandbox != null && OpenEras.Any(HasAtlas))
         {
             list.AddChild(new HSeparator());
             list.AddChild(OpenWorldRow());
@@ -551,7 +553,7 @@ public partial class Main : Control
         return box;
     }
 
-    private static readonly string[] OpenEras = { "1871", "1918", "1936" };
+    private static string[] OpenEras => OpenStartGenerator.Eras;
 
     /// <summary>The Open world row: an era, any country on its map, a seed and a length.</summary>
     private Control OpenWorldRow()
@@ -569,9 +571,9 @@ public partial class Main : Control
 
         var controls = new HBoxContainer();
         controls.AddThemeConstantOverride("separation", 8);
-        var eras = OpenEras.Where(e => LoadAtlas(e) != null).ToArray();
+        var eras = OpenEras.Where(HasAtlas).ToArray(); // each map loads when its era is picked
         var era = new OptionButton();
-        foreach (var e in eras) era.AddItem(e);
+        foreach (var e in eras) era.AddItem(OpenStartGenerator.EraName(e));
         controls.AddChild(era);
         var country = new OptionButton { CustomMinimumSize = new Vector2(260, 0), FitToLongestItem = false };
         var ids = new List<string>();
@@ -624,7 +626,7 @@ public partial class Main : Control
         var s = w.Scores;
         (string title, string verdict) = w.Outcome switch
         {
-            Outcome.Survived => ("The federation endured", $"Free communes still governed themselves in {w.Date:MMMM yyyy}."),
+            Outcome.Survived => ("The federation endured", $"Free communes still governed themselves in {w.Format(w.Date, "MMMM yyyy")}."),
             Outcome.BecameState => ("You won the war and lost the revolution", "Hierarchy drift reached its final threshold. A state crystallized out of the councils, commissars and police."),
             _ when w.Communes.Count(c => !c.Occupied && !c.Federated) > w.Communes.Count(c => c.Occupied)
                 => ("The federation has dissolved", "Most communes went their own way. They are still free, but there is no federation left to hold together."),
@@ -956,7 +958,7 @@ public partial class Main : Control
         RefreshProjects();
 
         var recent = w.Log.TakeLast(30).Reverse().Select(ev =>
-            $"[color=#808590]{ev.Date:d MMM yy}[/color] [color={SeverityColor(ev.Severity)}]{Esc(ev.Text)}[/color]");
+            $"[color=#808590]{_world.Format(ev.Date, "d MMM yy")}[/color] [color={SeverityColor(ev.Severity)}]{Esc(ev.Text)}[/color]");
         _log.Text = string.Join("\n", recent);
         _seenEvents = w.Log.Count;
 
@@ -1074,7 +1076,7 @@ public partial class Main : Control
             return;
         }
         file.StoreString(_world.SaveJson());
-        Say($"Saved {_world.Turn} {_world.Tick} ({_world.Date:d MMMM yyyy}).");
+        Say($"Saved {_world.Turn} {_world.Tick} ({_world.Format(_world.Date, "d MMMM yyyy")}).");
     }
 
     private void LoadGame()
@@ -1091,7 +1093,7 @@ public partial class Main : Control
             _scenario = FindScenario(world.Scenario.Id) ?? _scenario;
             CloseOverlay();
             SetWorld(world);
-            Say($"Loaded {world.Turn} {world.Tick} ({world.Date:d MMMM yyyy}).");
+            Say($"Loaded {world.Turn} {world.Tick} ({world.Format(world.Date, "d MMMM yyyy")}).");
         }
         catch (Exception e)
         {

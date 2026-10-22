@@ -9,7 +9,7 @@ public static class TechLevelSystem
 {
     /// <summary>A state's starting level: large, liberal and fascist industrial states lead.</summary>
     public static double Initial(StateDefinition d) =>
-        Math.Clamp(0.2 + 0.05 * d.Power + d.Ideology switch { Ideology.Liberal => 0.1, Ideology.Fascist => 0.05, _ => 0 }, 0, 0.9);
+        Math.Clamp(0.2 + 0.05 * d.Power + d.Ideology switch { Ideology.Liberal => 0.1, Ideology.Fascist => 0.05, Ideology.Empire => 0.05, Ideology.Tribal => -0.1, _ => 0 }, 0, 0.9);
 
     internal static void Run(World w)
     {

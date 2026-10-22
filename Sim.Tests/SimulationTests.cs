@@ -66,16 +66,54 @@ public class SimulationTests
 
     private static readonly Lazy<SandboxGenerator> Sandbox = new(() => SandboxGenerator.Load(DataDir));
 
+    public static TheoryData<string> Eras()
+    {
+        var data = new TheoryData<string>();
+        foreach (var e in Sim.Open.OpenStartGenerator.Eras) data.Add(e);
+        return data;
+    }
+
     [Theory]
-    [InlineData("1871")]
-    [InlineData("1918")]
-    [InlineData("1936")]
+    [MemberData(nameof(Eras))]
+    public void Every_era_map_has_states_with_outlines_capitals_and_cities(string era)
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, era);
+        Assert.InRange(atlas.States.Count, 40, 200);
+        Assert.All(atlas.States, s => Assert.NotEmpty(s.Rings));
+        // Peoples of the interior (Aboriginal Australia) have no modern towns inside their lands.
+        Assert.True(atlas.States.Count(s => s.Capital != null && s.Cities.Count > 0) >= atlas.States.Count * 0.7);
+        Assert.Equal(atlas.States.Count, atlas.States.Select(s => s.Id).Distinct().Count());
+        Assert.All(atlas.States, s => Assert.All(s.Neighbours, n => Assert.NotNull(atlas.State(n))));
+        Assert.Contains(atlas.States, s => s.Neighbours.Count > 0);
+    }
+
+    [Fact]
+    public void Ancient_starts_count_years_before_christ()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "-500");
+        var state = Sim.Open.OpenStartGenerator.Playable(atlas).First();
+        var scenario = Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, state.Id, 1, calibrate: false);
+        var w = World.Create(scenario, NewWorld().Techs);
+        Assert.Equal(-500, w.Year);
+        Assert.EndsWith("500 BC", w.Format(w.Date, "MMMM yyyy"));
+        w.Run(60);
+        Assert.Equal(-499, w.Year);
+        // The ancient tree is live; the industrial one is far in the future.
+        Assert.Contains(w.LiveTechs, t => t.Id == "village_moots");
+        Assert.False(w.Reached(w.Techs["open_assemblies"]));
+        Assert.Equal("AD 800", Ages.Year(800));
+        var json = w.SaveJson();
+        Assert.Equal(-499, World.LoadJson(json, w.Techs).Year);
+    }
+
+    [Theory]
+    [MemberData(nameof(Eras))]
     public void Open_starts_are_valid_for_every_playable_state(string era)
     {
         var atlas = Sim.Global.Atlas.Load(DataDir, era);
         var techs = NewWorld().Techs;
         var playable = Sim.Open.OpenStartGenerator.Playable(atlas).ToList();
-        Assert.True(playable.Count >= 10, $"only {playable.Count} playable states in {era}");
+        Assert.True(playable.Count >= 8, $"only {playable.Count} playable states in {era}");
         foreach (var state in playable)
         {
             var scenario = Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, state.Id, 1, calibrate: false);

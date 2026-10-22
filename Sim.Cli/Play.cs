@@ -95,7 +95,7 @@ internal static class Play
                         break;
                     case "log":
                         int n = parts.Length > 1 ? int.Parse(parts[1]) : 15;
-                        foreach (var e in w.Log.TakeLast(n)) Console.WriteLine(Render.Event(e));
+                        foreach (var e in w.Log.TakeLast(n)) Console.WriteLine(Render.Event(e, w.Scenario.YearOffset));
                         break;
                     case "save":
                         string saveTo = parts.Length > 1 ? parts[1] : DefaultSave;
@@ -180,7 +180,7 @@ internal static class Play
 
     private static void PrintNewEvents(World w, ref int shown)
     {
-        for (; shown < w.Log.Count; shown++) Console.WriteLine(Render.Event(w.Log[shown]));
+        for (; shown < w.Log.Count; shown++) Console.WriteLine(Render.Event(w.Log[shown], w.Scenario.YearOffset));
     }
 
     private static string Arg(string[] p, int i) =>

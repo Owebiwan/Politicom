@@ -8,6 +8,15 @@ public sealed class ScenarioDefinition
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
     public DateOnly StartDate { get; set; }
+    /// <summary>
+    /// Added to the calendar year for display and for the technology eras. DateOnly can't hold
+    /// years before AD 1, so an ancient start runs on a stand-in calendar shifted by this much.
+    /// </summary>
+    public int YearOffset { get; set; }
+
+    /// <summary>The start date and year offset for a historical year (negative = BC).</summary>
+    public static (DateOnly Date, int Offset) Calendar(int year, int month, int day) =>
+        year >= 1000 ? (new DateOnly(year, month, day), 0) : (new DateOnly(2001, month, day), year - 2001);
     public int EndTick { get; set; }
     /// <summary>Calendar days per turn. 7 for most scenarios; shorter for sieges like Paris 1871.</summary>
     public int DaysPerTick { get; set; } = 7;

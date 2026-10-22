@@ -601,7 +601,7 @@ public partial class MapView : Control
             MapMode.Education => "Education — orange: practical ahead (expert trap), violet: political ahead. Darker = less educated.",
             MapMode.Values => "Values — red: collectivist, green: federalist, blue: militant.",
             MapMode.Culture => "Culture — dark where the movement's ideas are thin, gold where deep. Abroad: violet where a state's own culture resists yours.",
-            MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy.",
+            MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy, bronze empire, gold theocracy, green stateless peoples.",
             MapMode.Diplomacy => "Diplomacy — red hostile, grey neutral, green friendly toward the federation. Click a country for the World tab.",
             MapMode.Revolution => "Revolution — how radicalized each state's workers are: dark none, bright red near revolt.",
             _ => "Wellbeing — rust low, sand middling, green high.",

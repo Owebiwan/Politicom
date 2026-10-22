@@ -92,8 +92,22 @@ trader            65%       34%     1% │    75    53      8    72    52 │   
 
 ## Open world
 
-You can start the movement in any country on an era's world map: 1871, 1918 or 1936 for now.
-This is alternate history, with the anarchist movement rising wherever you choose.
+You can start the movement in any country, in any of 16 eras from 500 BC to AD 2000:
+500 BC, AD 1, 500, 800, 1000, 1200, 1400, 1500, 1650, 1783, 1815, 1871, 1918, 1936, 1960 and
+2000. This is alternate history, with an anarchist movement rising wherever and whenever you
+choose.
+
+- **Maps:** 1871, 1918 and 1936 are hand-made from today's countries (Natural Earth). The
+  other eras come from **historical-basemaps (GPL-3.0)**, so a build that ships them is under
+  GPL terms; see `Data/geo/ATTRIBUTION.md`.
+- **Cities:** they carry modern names everywhere, so the communes of Rome in AD 1 are Milan,
+  Lyon and Lisbon.
+- **Earlier regimes:** the early eras add three: **empires** (they conquer, and fight each
+  other), **theocracies** (most hostile to the movement, their faith the strongest rival
+  culture) and **stateless peoples** (they neither blockade nor send armies, and are
+  sometimes sympathetic).
+- **Dates:** years before Christ count down ("July 500 BC"). Technology eras follow the
+  calendar, so in 500 BC the tree is the ancient one.
 
 - **Communes:** the country's largest cities on its home territory, up to 26. The largest are
   industrial and the rest are mixed or agrarian.
@@ -107,20 +121,24 @@ This is alternate history, with the anarchist movement rising wherever you choos
   dozens per era.
 - **Godot:** use the Open world row in the scenario picker. Choose an era, a country, a seed and a
   length.
-- **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7). A state's id is
-  its ISO code in `Data/world/<era>.json`.
+- **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7), and
+  `open:-500:ACHAEMENID` or `open:1:ROMAN` for the early eras. A state's id is in
+  `Data/world/<era>.json`.
+- **Calibration:** open starts are calibrated on 20 trial games, because real maps vary more
+  than generated ones. Generation takes about 4 seconds.
 
-Balanced AI over 200 games each. Each map is calibrated on 12 trial games, so individual
-maps vary. The centralizer becomes a state in (almost) every game.
+Balanced AI over 100 games each. The centralizer becomes a state in (almost) every game.
 
-| Start              | survived | destroyed |
-|--------------------|---------:|----------:|
-| Argentina 1936     |      64% |       37% |
-| Britain 1936       |      55% |       45% |
-| Germany 1918       |      64% |       37% |
-| United States 1918 |      55% |       46% |
-| France 1871        |      59% |       42% |
-| Italy 1871         |      57% |       44% |
+| Start                    | survived | destroyed |
+|--------------------------|---------:|----------:|
+| Greek city-states 500 BC |      42% |       58% |
+| Roman Empire AD 1        |      69% |       31% |
+| Han AD 1                 |      55% |       45% |
+| Inca Empire 1500         |      45% |       55% |
+| France 1650              |      71% |       29% |
+| Argentina 1936           |      58% |       42% |
+| Argentina 1960           |      65% |       35% |
+| Brazil 2000              |      67% |       33% |
 
 ## What the player sees
 

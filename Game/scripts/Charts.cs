@@ -115,8 +115,8 @@ public partial class HistoryChart : Control
             lx += 22 + font.GetStringSize(label, HorizontalAlignment.Left, -1, FontSize).X;
         }
         string format = w.Scenario.DaysPerTick < 7 ? "d MMM yyyy" : "MMM yyyy";
-        DrawString(font, new Vector2(0, Size.Y - 2), w.Scenario.StartDate.ToString(format), HorizontalAlignment.Left, -1, FontSize, Palette.Text);
-        string last = w.DateAt(end).ToString(format);
+        DrawString(font, new Vector2(0, Size.Y - 2), w.Format(w.Scenario.StartDate, format), HorizontalAlignment.Left, -1, FontSize, Palette.Text);
+        string last = w.Format(w.DateAt(end), format);
         DrawString(font, new Vector2(Size.X - font.GetStringSize(last, HorizontalAlignment.Left, -1, FontSize).X, Size.Y - 2), last, HorizontalAlignment.Left, -1, FontSize, Palette.Text);
     }
 

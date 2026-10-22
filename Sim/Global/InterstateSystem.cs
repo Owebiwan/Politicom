@@ -36,7 +36,7 @@ public static class InterstateSystem
     /// <summary>How hostile two regimes are to each other, 0..1.</summary>
     public static double Hostility(Ideology a, Ideology b)
     {
-        if (a == b) return a == Ideology.Fascist ? 0.2 : 0;
+        if (a == b) return a switch { Ideology.Fascist => 0.2, Ideology.Empire => 0.4, Ideology.Theocracy => 0.3, Ideology.Tribal => 0.15, _ => 0 };
         if (a > b) (a, b) = (b, a);
         return (a, b) switch
         {
@@ -48,6 +48,17 @@ public static class InterstateSystem
             (_, Ideology.Libertarian) => 0.6,
             (Ideology.Conservative, Ideology.Fascist) => 0.3,
             (Ideology.Fascist, Ideology.Monarchy) => 0.3,
+            // The earlier ages: empires conquer, faiths crusade, free peoples are raided.
+            (Ideology.Libertarian, Ideology.Empire) => 0.6,
+            (Ideology.Libertarian, Ideology.Theocracy) => 0.8,
+            (Ideology.Libertarian, Ideology.Tribal) => 0.05,
+            (Ideology.Communist, Ideology.Empire or Ideology.Theocracy) => 0.5,
+            (Ideology.Monarchy, Ideology.Empire) => 0.4,
+            (Ideology.Empire, Ideology.Tribal) => 0.5,
+            (Ideology.Empire, Ideology.Theocracy) => 0.35,
+            (Ideology.Monarchy, Ideology.Tribal) => 0.3,
+            (Ideology.Tribal, Ideology.Theocracy) => 0.4,
+            (Ideology.Monarchy, Ideology.Theocracy) => 0.25,
             _ => 0.15,
         };
     }

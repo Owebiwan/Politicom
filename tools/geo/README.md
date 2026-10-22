@@ -44,7 +44,37 @@ Borders are traced from the edges neighbouring countries share, so borders insid
 (India within the British Empire) disappear without any polygon union. Each state's cities
 list its home country first, then its colonies.
 
+## Historical eras
+
+`build_history.py` builds the eras before and after the hand-made ones (500 BC to AD 1815,
+1960, 2000) from **historical-basemaps** snapshots:
+
+```sh
+mkdir -p /tmp/hb && cd /tmp/hb
+for f in bc500 bc1 500 800 1000 1200 1400 1500 1650 1783 1815 1960 2000; do
+  curl -fLO "https://raw.githubusercontent.com/aourednik/historical-basemaps/master/geojson/world_$f.geojson"
+done
+cd - && python3 tools/geo/build_history.py /tmp/hb /tmp/geo-src Data/world
+```
+
+- **States:** features grouped by the state that rules them (`SUBJECTO`), so colonies belong
+  to their empire. The largest 150 polities are kept (plus a few famous small ones such as Rome
+  and Venice); the rest are drawn as neutral land.
+- **Cities:** Natural Earth populated places inside each outline, or within about 35 km of it
+  (the source's coasts are coarse). They carry **modern names**: Istanbul, not Byzantion.
+- **Capitals:** from a table of seats of power where the largest modern city is wrong (Lisbon
+  for Portugal, not São Paulo); otherwise the largest city.
+- **Power:** from area, scaled down for stateless peoples (land is not armies).
+- **Ideology:** from the era and the name: empires, caliphates and khanates are `empire`;
+  papal, caliphal and monastic states are `theocracy`; hunter-gatherers, pastoralists and
+  peoples are `tribal` (also by region before contact); republics are `conservative` before
+  1776; modern states are liberal unless listed.
+- **Fixes:** a small table corrects known slips in the source (China in 1400 is the Ming).
+
 ## Sources and licences
+
+- **historical-basemaps** (github.com/aourednik/historical-basemaps): historical borders.
+  GNU GPL v3.0. See `Data/geo/ATTRIBUTION.md`.
 
 - **Natural Earth** (naturalearthdata.com): land, lakes, rivers, land borders, provinces. Public domain.
 - **City of Paris, "Arrondissements"** (opendata.paris.fr): arrondissement boundaries.

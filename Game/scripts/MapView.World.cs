@@ -30,6 +30,9 @@ public partial class MapView
         ["communist"] = new("a0392f"),
         ["monarchy"] = new("7b5f8f"),
         ["libertarian"] = new("c4473a"),
+        ["empire"] = new("a0703a"),
+        ["tribal"] = new("5f7f55"),
+        ["theocracy"] = new("c9b26b"),
     };
 
     private Atlas? _globe;

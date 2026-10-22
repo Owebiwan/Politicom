@@ -49,7 +49,9 @@ public sealed class World
     public int Tick { get; private set; }
     public DateOnly Date => DateAt(Tick);
     /// <summary>The calendar year, which gates the technologies of each age.</summary>
-    public int Year => Date.Year;
+    public int Year => Date.Year + Scenario.YearOffset;
+    /// <summary>A date in this game's calendar, e.g. Format(Date, "MMMM yyyy") → "March 499 BC".</summary>
+    public string Format(DateOnly date, string format) => Ages.Format(date, Scenario.YearOffset, format);
 
     /// <summary>Common knowledge by now: no longer a choice, not shown, and it satisfies prerequisites.</summary>
     public bool CommonKnowledge(TechDefinition t) => t.Until is int until && Year >= until;
@@ -482,7 +484,7 @@ public sealed class World
         else if (Tick >= Scenario.EndTick)
         {
             Outcome = Outcome.Survived;
-            Emit(Severity.Good, $"The federation endured to {Date:MMMM yyyy}.");
+            Emit(Severity.Good, $"The federation endured to {Format(Date, "MMMM yyyy")}.");
         }
     }
 

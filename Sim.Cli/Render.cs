@@ -13,7 +13,7 @@ internal static class Render
     public static string Dim(string t) => Paint(t, "2");
     public static string Bold(string t) => Paint(t, "1");
 
-    public static string Event(GameEvent e)
+    public static string Event(GameEvent e, int yearOffset = 0)
     {
         string tag = e.Severity switch
         {
@@ -23,7 +23,7 @@ internal static class Render
             Severity.Decision => Paint("?", "36;1"),
             _ => Dim("·"),
         };
-        return $"{Dim(e.Date.ToString("dd MMM yyyy"))} {tag} {e.Text}";
+        return $"{Dim(Ages.Format(e.Date, yearOffset, "dd MMM yyyy"))} {tag} {e.Text}";
     }
 
     public static string Bar(double value, double max, int width, string code)
@@ -36,7 +36,7 @@ internal static class Render
     {
         var sb = new StringBuilder();
         sb.AppendLine();
-        sb.AppendLine(Bold($"══ {w.Scenario.Name} · {w.Date:dd MMMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick} ══"));
+        sb.AppendLine(Bold($"══ {w.Scenario.Name} · {w.Format(w.Date, "dd MMMM yyyy")} · {w.Turn} {w.Tick}/{w.Scenario.EndTick} ══"));
         sb.AppendLine($"Influence {Bold($"{w.Influence:0}")} (+{w.InfluenceRegen:0.0}/{w.Turn})   Federation {w.Federation.Count()}/{w.InitialCommuneCount}   " +
                       $"Occupied {w.Communes.Count(c => c.Occupied)}   Seceded {w.Communes.Count(c => !c.Occupied && !c.Federated)}" +
                       (w.WarCommittee ? Paint("   WAR COMMITTEE SITTING", "33") : "") +

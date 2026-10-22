@@ -319,7 +319,7 @@ public sealed class SandboxGenerator
     /// player survives about <see cref="TargetSurvival"/> of a few quick games: every map is
     /// winnable, none is a walkover. Deterministic: the trial games are seeded from the map seed.
     /// </summary>
-    internal ScenarioDefinition Calibrate(ScenarioDefinition scenario, ulong seed)
+    internal ScenarioDefinition Calibrate(ScenarioDefinition scenario, ulong seed, int games = CalibrationGames)
     {
         double lo = Math.Log(0.25), hi = Math.Log(4);
         for (int step = 0; step < CalibrationSteps; step++)
@@ -327,7 +327,7 @@ public sealed class SandboxGenerator
             double mid = (lo + hi) / 2;
             var trial = Scaled(scenario, Math.Exp(mid));
             int survived = 0;
-            for (int g = 0; g < CalibrationGames; g++)
+            for (int g = 0; g < games; g++)
             {
                 var w = World.Create(trial, _techs, seed: seed * 7919 + (ulong)g);
                 var policy = new Ai.Balanced();
@@ -338,7 +338,7 @@ public sealed class SandboxGenerator
                 }
                 if (w.Outcome == Outcome.Survived) survived++;
             }
-            if (survived / (double)CalibrationGames >= TargetSurvival) lo = mid; // too easy: stronger enemies
+            if (survived / (double)games >= TargetSurvival) lo = mid; // too easy: stronger enemies
             else hi = mid;
         }
         return Scaled(scenario, Math.Exp((lo + hi) / 2));

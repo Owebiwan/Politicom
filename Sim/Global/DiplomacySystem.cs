@@ -19,7 +19,7 @@ internal static class DiplomacySystem
             switch (s.Ideology)
             {
                 // A federation that looks orderly reassures governments that fear chaos...
-                case Ideology.Liberal or Ideology.Conservative or Ideology.Monarchy:
+                case Ideology.Liberal or Ideology.Conservative or Ideology.Monarchy or Ideology.Empire or Ideology.Theocracy:
                     target += 0.4 * order;
                     if (w.ForeignTrade && !s.Does(StateActions.Embargo)) target += 0.1;
                     break;
@@ -33,7 +33,7 @@ internal static class DiplomacySystem
                     break;
             }
             // Governments whose own workers are radicalizing fear the example.
-            if (s.Ideology is not (Ideology.Communist or Ideology.Libertarian)) target -= 0.5 * s.Radicalization;
+            if (s.Ideology is not (Ideology.Communist or Ideology.Libertarian or Ideology.Tribal)) target -= 0.5 * s.Radicalization;
 
             s.Stance = Math.Clamp(s.Stance + (target - s.Stance) * b.StanceDrift, -1, 1);
             Decide(w, s);
@@ -77,8 +77,9 @@ internal static class DiplomacySystem
     private static void Decide(World w, WorldState s)
     {
         // Any government can intervene against a revolution (the Entente did in Russia), except revolutionary ones.
-        bool right = s.Ideology is not (Ideology.Communist or Ideology.Libertarian);
-        bool canEmbargo = s.Ideology is not (Ideology.Communist or Ideology.Libertarian);
+        // Stateless peoples neither blockade nor send armies.
+        bool right = s.Ideology is not (Ideology.Communist or Ideology.Libertarian or Ideology.Tribal);
+        bool canEmbargo = s.Ideology is not (Ideology.Communist or Ideology.Libertarian or Ideology.Tribal);
         Toggle(w, s, StateActions.Embargo, canEmbargo && s.Stance < -0.3, s.Stance > -0.2,
             $"{s.Name} embargoes the federation.", $"{s.Name} lifts its embargo.");
         Toggle(w, s, StateActions.ArmsSales, !s.Does(StateActions.Embargo) && s.Stance > 0.35, s.Stance < 0.25,

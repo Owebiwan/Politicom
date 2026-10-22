@@ -15,6 +15,14 @@ public static class OpenStartGenerator
     public const string IdPrefix = "open";
     private const int MaxCommunes = 26, MinCommunes = 6, EndTick = 104;
 
+    /// <summary>The world maps an open start can use, oldest first.</summary>
+    public static readonly string[] Eras =
+        { "-500", "1", "500", "800", "1000", "1200", "1400", "1500", "1650", "1783", "1815", "1871", "1918", "1936", "1960", "2000" };
+
+    /// <summary>"500 BC", "AD 800", "1871".</summary>
+    public static string EraName(string era) =>
+        int.TryParse(era, out int y) ? y < 0 ? $"{-y} BC" : y < 1000 ? $"AD {y}" : $"{y}" : era;
+
     public static string Id(string era, string stateId, ulong seed) => $"{IdPrefix}:{era}:{stateId}:{seed}";
 
     /// <summary>Parses "open:ERA:STATE" or "open:ERA:STATE:SEED".</summary>
@@ -66,13 +74,13 @@ public static class OpenStartGenerator
                 Federalism = Math.Round(Math.Clamp(fed + rng.Jitter(0.35), -1, 1), 2),
                 Practical = Math.Round(Math.Clamp(0.05 + 0.15 * eraEducation + (kind == CommuneKind.Industrial ? 0.05 : 0) + rng.Jitter(0.04), 0.03, 0.6), 2),
                 Political = Math.Round(Math.Clamp(0.1 + 0.12 * eraEducation + rng.Jitter(0.05), 0.03, 0.5), 2),
-                Techs = kind == CommuneKind.Industrial ? new[] { "collective_workshops" } : Array.Empty<string>(),
+                Techs = kind == CommuneKind.Industrial ? new[] { year >= 1830 ? "collective_workshops" : year >= 1000 ? "craft_workshops" : "household_crafts" } : Array.Empty<string>(),
             });
         }
 
         // ── The enemy: the government, from the capital; the communes nearest it are the front ──
         string enemyName = $"{country} government forces";
-        var start = new DateOnly(year, 1 + rng.Next(12), 1 + rng.Next(28));
+        var (start, yearOffset) = ScenarioDefinition.Calendar(year, 1 + rng.Next(12), 1 + rng.Next(28));
         double strength = 3.0 * (0.7 + 0.12 * state.Power);
         var enemy = new HostileState
         {
@@ -94,9 +102,10 @@ public static class OpenStartGenerator
         {
             Id = Id(atlas.Era, stateId, seed),
             Name = $"The {country} Commune",
-            Description = $"{start:MMMM yyyy}. Strikes and risings have spread across {country}: workers and peasants hold {defs[0].Name} and the towns around it, " +
-                          $"and the government in {capital.Name} is gathering its forces. Hold the federation together for two years. (Open start: {state.Name}, {atlas.Era}.)",
+            Description = $"{Ages.Format(start, yearOffset, "MMMM yyyy")}. Strikes and risings have spread across {country}: workers and peasants hold {defs[0].Name} and the towns around it, " +
+                          $"and the government in {capital.Name} is gathering its forces. Hold the federation together for two years. (Open start: {state.Name}, {EraName(atlas.Era)}.)",
             StartDate = start,
+            YearOffset = yearOffset,
             EndTick = EndTick,
             NeighborCount = 3,
             NeighborRadiusKm = 30,
@@ -110,7 +119,7 @@ public static class OpenStartGenerator
         scenario.Events = sandbox.PickEvents(rng, country, defs[0].Name, defs, scenario.Enemies);
         WorldSetup.Attach(scenario, atlas);
         if (length is int turns) scenario = scenario.WithLength(turns);
-        return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL) : scenario;
+        return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario; // real maps vary more than generated ones
     }
 
     /// <summary>The cities that become communes: the home cities, minus the capital the government holds.</summary>
@@ -157,6 +166,9 @@ public static class OpenStartGenerator
         Ideology.Fascist => (0.5, 0.7, 0.3),
         Ideology.Monarchy => (0.4, 0.5, 0.2),
         Ideology.Conservative => (0.4, 0.4, 0.3),
+        Ideology.Empire => (0.4, 0.6, 0.2),
+        Ideology.Tribal => (0.7, 0.4, 0.6),
+        Ideology.Theocracy => (0.5, 0.4, 0.2),
         Ideology.Communist => (0.6, 0.4, 0.4),
         _ => (0.35, 0.25, 0.4),
     };

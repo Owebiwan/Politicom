@@ -2,7 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Politicom.Sim.Global;
 
-public enum Ideology { Liberal, Conservative, Fascist, Communist, Monarchy, Libertarian }
+/// <summary>Regimes. Empire, Tribal and Theocracy are for the earlier ages.</summary>
+public enum Ideology { Liberal, Conservative, Fascist, Communist, Monarchy, Libertarian, Empire, Tribal, Theocracy }
 
 /// <summary>A state as the scenario starts it: from the era's world map plus scenario overrides.</summary>
 public sealed class StateDefinition
@@ -75,6 +76,9 @@ public sealed class WorldState
         Ideology.Fascist => 1.0,
         Ideology.Communist => 0.9,
         Ideology.Monarchy => 0.8,
+        Ideology.Empire => 0.8,
+        Ideology.Theocracy => 1.0,
+        Ideology.Tribal => 0.3,
         Ideology.Conservative => 0.6,
         Ideology.Liberal => 0.5,
         _ => 0,
@@ -95,6 +99,9 @@ public static class StateText
         Ideology.Fascist => "Fascist",
         Ideology.Communist => "Authoritarian communist",
         Ideology.Monarchy => "Monarchy",
+        Ideology.Empire => "Empire",
+        Ideology.Tribal => "Stateless peoples",
+        Ideology.Theocracy => "Theocracy",
         _ => "Libertarian",
     };
 
@@ -149,6 +156,9 @@ public static class WorldSetup
         Ideology.Conservative => -0.3,
         Ideology.Fascist => -0.75,
         Ideology.Monarchy => -0.35,
+        Ideology.Empire => -0.45,
+        Ideology.Theocracy => -0.6,
+        Ideology.Tribal => 0.15, // no state to defend: curious, sometimes kin
         Ideology.Communist => 0.1,
         _ => 0.8,
     };

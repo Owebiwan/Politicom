@@ -96,7 +96,16 @@ public static class Ages
 
     public static string Name(int year) => All[Index(year)].Name;
 
-    public static string Year(int year) => year < 0 ? $"{-year} BC" : $"{year}";
+    public static string Year(int year) => year < 0 ? $"{-year} BC" : year < 1000 ? $"AD {year}" : $"{year}";
+
+    /// <summary>Formats a date whose year is shifted by <paramref name="offset"/> (see ScenarioDefinition.YearOffset).</summary>
+    public static string Format(DateOnly date, int offset, string format)
+    {
+        if (offset == 0) return date.ToString(format, System.Globalization.CultureInfo.InvariantCulture);
+        int year = date.Year + offset;
+        string text = date.ToString(format.Replace("yyyy", "'§'").Replace("yy", "'§'"), System.Globalization.CultureInfo.InvariantCulture);
+        return text.Replace("§", Year(year));
+    }
 }
 
 public sealed class TechCatalog

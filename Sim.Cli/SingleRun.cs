@@ -19,7 +19,7 @@ internal static class SingleRun
             policy.Act(world);
             world.Step();
             for (; printed < world.Log.Count; printed++)
-                if (world.Log[printed].Severity != Severity.Info) Console.WriteLine(Render.Event(world.Log[printed]));
+                if (world.Log[printed].Severity != Severity.Info) Console.WriteLine(Render.Event(world.Log[printed], world.Scenario.YearOffset));
             series.AppendLine(Row(world));
         }
 
