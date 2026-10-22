@@ -37,6 +37,7 @@ public sealed class SaveGame
     public bool WarCommittee { get; set; }
     public bool ForeignTrade { get; set; }
     public List<Global.WorldState> States { get; set; } = new();
+    public List<Global.War> Wars { get; set; } = new();
     public int AppealTicks { get; set; }
     public int LastAppealTick { get; set; } = -999;
     public double DriftWarnedAt { get; set; }

@@ -5,6 +5,11 @@
   "world": "1936",
   "homeState": "ESP",
   // Historical attitudes in July 1936; everything else starts from its ideology.
+  // Wars history starts (weeks from 19 July 1936).
+  "wars": [
+    { "name": "The Second Sino-Japanese War", "tick": 51, "duration": 400, "sideA": ["JPN"], "sideB": ["CHN"] },
+    { "name": "The Second World War", "tick": 163, "duration": 300, "sideA": ["DEU", "ITA"], "sideB": ["POL", "GBR", "FRA", "AUS", "NZL", "CAN", "ZAF"] }
+  ],
   "stances": { "MEX": 0.55, "SUN": 0.3, "FRA": 0.0, "GBR": -0.25, "USA": -0.05, "DEU": -0.85, "ITA": -0.85, "PRT": -0.8 },
   "startDate": "1936-07-19",
   "endTick": 135,

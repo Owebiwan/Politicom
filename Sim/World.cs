@@ -85,6 +85,7 @@ public sealed class World
 
     /// <summary>The outside world's states (empty for maps without a world).</summary>
     public List<Global.WorldState> States { get; } = new();
+    public List<Global.War> Wars { get; } = new();
     private readonly Dictionary<string, double> _baselines = new();
     /// <summary>Where a state's stance settles absent anything else: its starting attitude.</summary>
     public double Baseline(string stateId) => _baselines.GetValueOrDefault(stateId);
@@ -249,6 +250,7 @@ public sealed class World
         WarCommittee = WarCommittee,
         ForeignTrade = ForeignTrade,
         States = States,
+        Wars = Wars,
         AppealTicks = AppealTicks,
         LastAppealTick = LastAppealTick,
         DriftWarnedAt = DriftWarnedAt,
@@ -303,6 +305,7 @@ public sealed class World
         };
         w.Rng.State = s.RngState;
         w.States.AddRange(s.States);
+        w.Wars.AddRange(s.Wars);
         foreach (var d in s.Scenario.States) w._baselines[d.Id] = d.InitialStance;
         foreach (var r in s.Railways) w.Railways.Add((Math.Min(r[0], r[1]), Math.Max(r[0], r[1])));
         w.Drift.Restore(s.DriftValue, s.DriftStage);
@@ -333,6 +336,7 @@ public sealed class World
         ProjectSystem.Run(this);
         Global.DiplomacySystem.Run(this);
         Global.RevolutionSystem.Run(this);
+        Global.InterstateSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

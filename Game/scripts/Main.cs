@@ -57,6 +57,9 @@ public partial class Main : Control
         if (Who(Politicom.Sim.Global.StateActions.ArmsSales) is { Length: > 0 } a) parts.Add($"[color=#70d080]Arms from:[/color] {a} ({w.LastArms:0.0} goods per {w.Turn})");
         if (Who(Politicom.Sim.Global.StateActions.Volunteers) is { Length: > 0 } v) parts.Add($"[color=#70d080]Volunteers from:[/color] {v} (+{w.VolunteerDefense:P0} defense)");
         if (w.AppealTicks > 0) parts.Add($"International appeal: {w.Turns(w.AppealTicks)} left.");
+        string Names(IEnumerable<string> ids) => string.Join(", ", ids.Select(id => Esc(w.States.FirstOrDefault(s => s.Id == id)?.Name ?? id)));
+        foreach (var war in w.Wars.Where(x => !x.Over).Take(4))
+            parts.Add($"[color=#e0a040]{Esc(war.Name)}[/color]: {Names(war.SideA)} against {Names(war.SideB)}");
         _worldSummary.Text = string.Join("\n", parts);
         _appealButton.Text = $"International appeal ({w.Balance.CostAppeal:0})";
 

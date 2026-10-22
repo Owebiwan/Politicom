@@ -52,7 +52,7 @@ internal static class DiplomacySystem
         foreach (var s in w.States.Where(s => s.Does(StateActions.Intervention)))
         {
             var enemy = w.Enemies.FirstOrDefault(e => e.Sponsors.Contains(s.Id)) ?? w.Enemies.FirstOrDefault();
-            if (enemy != null) support[enemy] = support.GetValueOrDefault(enemy) + s.Weight * -s.Stance;
+            if (enemy != null) support[enemy] = support.GetValueOrDefault(enemy) + s.Weight * -s.Stance * InterstateSystem.Available(w, s);
         }
         foreach (var e in w.Enemies)
             e.Intervention = e.Strength * Math.Min(b.InterventionCap, b.InterventionPerWeight * support.GetValueOrDefault(e));
@@ -66,7 +66,7 @@ internal static class DiplomacySystem
 
         // Volunteers come from friendly governments, and from radicalized workers anywhere, like the
         // International Brigades. A hostile government stops most of them at the border.
-        double volunteers = w.States.Where(s => s.Does(StateActions.Volunteers)).Sum(s => s.Weight * s.Stance)
+        double volunteers = w.States.Where(s => s.Does(StateActions.Volunteers)).Sum(s => s.Weight * s.Stance * InterstateSystem.Available(w, s))
                             + w.States.Sum(s => b.WorkerVolunteers * s.Power * s.Radicalization * (s.Stance < -0.6 ? 0.3 : 1));
         w.VolunteerDefense = Math.Min(b.VolunteerCap, b.VolunteerPerWeight * volunteers * (w.AppealTicks > 0 ? 2 : 1));
         if (w.AppealTicks > 0) w.AppealTicks--;

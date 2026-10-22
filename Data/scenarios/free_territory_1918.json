@@ -5,6 +5,12 @@
   "world": "1918",
   "homeState": "UKR",
   // November 1918: the Entente lands at Odessa to back the Whites; the Bolsheviks are allies of convenience.
+  // Wars history starts (weeks from 17 November 1918).
+  "wars": [
+    { "name": "The Polish–Soviet War", "tick": 12, "duration": 95, "sideA": ["RSF"], "sideB": ["POL"] },
+    { "name": "The Hungarian–Romanian War", "tick": 23, "duration": 16, "sideA": ["ROU", "CSK"], "sideB": ["HUN"] },
+    { "name": "The Greco-Turkish War", "tick": 26, "duration": 200, "sideA": ["GRC"], "sideB": ["OTT"] }
+  ],
   "stances": { "FRA": -0.65, "GBR": -0.55, "RSF": 0.15, "DEU": 0.0, "POL": -0.45, "ROU": -0.55 },
   "startDate": "1918-11-17",
   "endTick": 145,

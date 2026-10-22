@@ -118,6 +118,16 @@ public sealed class Balance
     public int FederateDelay { get; set; } = 6;
     public int FederateCities { get; set; } = 5;
 
+    // ── Wars between states ────────────────────────────────────────────────
+    /// <summary>Chance per turn of war between two neighbours, per point of ideological hostility.</summary>
+    public double WarChance { get; set; } = 0.0004;
+    public double WearinessRate { get; set; } = 0.012;
+    public double PeaceChance { get; set; } = 0.06;
+    /// <summary>Radicalization per turn per point of war weariness.</summary>
+    public double WarRadicalization { get; set; } = 0.0012;
+    /// <summary>Share of a warring state's strength tied up in its own war.</summary>
+    public double WarCommitment { get; set; } = 0.6;
+
     // ── Foreign trade ──────────────────────────────────────────────────────
     /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
     public double TradeShare { get; set; } = 0.3;

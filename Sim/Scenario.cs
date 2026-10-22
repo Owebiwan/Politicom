@@ -32,6 +32,8 @@ public sealed class ScenarioDefinition
     public Dictionary<string, double> Stances { get; set; } = new();
     /// <summary>The outside states, filled from the era's world map by <see cref="Global.WorldSetup.Attach"/>.</summary>
     public List<Global.StateDefinition> States { get; set; } = new();
+    /// <summary>Wars between states that history starts on given turns.</summary>
+    public List<Global.ScriptedWar> Wars { get; set; } = new();
     /// <summary>Generated geography (sandbox maps). Historical scenarios load theirs from Data/geo.</summary>
     public Sandbox.GeographyDefinition? Geography { get; set; }
 

@@ -55,6 +55,8 @@ public sealed class WorldState
     public int Uprising { get; set; }
     /// <summary>Extra chance of success from the movement's support for an uprising under way.</summary>
     public double UprisingSupport { get; set; }
+    /// <summary>0..1: how worn down by war it is.</summary>
+    public double Weariness { get; set; }
     /// <summary>Revolutions that have won here.</summary>
     public int RevolutionCount { get; set; }
     /// <summary>Its cities have joined the federation.</summary>

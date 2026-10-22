@@ -687,6 +687,37 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Scripted_wars_start_wear_states_down_and_end()
+    {
+        var w = World.Load(DataDir, "catalonia_1936@500", seed: 2);
+        w.Run(52);
+        var war = Assert.Single(w.Wars, x => x.Name == "The Second Sino-Japanese War");
+        var china = w.States.Single(s => s.Id == "CHN");
+        Assert.True(china.Weariness > 0);
+        Assert.Equal(1 - w.Balance.WarCommitment, Global.InterstateSystem.Available(w, china), 6);
+        war.EarliestPeace = w.Tick;
+        foreach (var s in w.States.Where(s => war.Involves(s.Id))) s.Weariness = 1;
+        for (int i = 0; i < 200 && !war.Over; i++) w.Step();
+        Assert.True(war.Over);
+        Assert.Contains(w.Log, e => e.Text.StartsWith("The Second Sino-Japanese War ends"));
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(w.Wars.Count, restored.Wars.Count);
+    }
+
+    [Fact]
+    public void Free_federations_never_start_wars()
+    {
+        Assert.Equal(1, Global.InterstateSystem.Hostility(Global.Ideology.Fascist, Global.Ideology.Communist));
+        var w = World.Load(DataDir, "catalonia_1936@500", seed: 4);
+        foreach (var s in w.States.Where(s => s.Power >= 5)) s.Ideology = Global.Ideology.Libertarian;
+        w.Balance.WarChance = 0.05;
+        w.Run(60);
+        var big = w.States.Where(s => s.Power >= 5).Select(s => s.Id).ToHashSet();
+        Assert.DoesNotContain(w.Wars.Where(x => x.StartTick > 0 && !x.Name.StartsWith("The Second")), x => big.Contains(x.SideA[0]));
+    }
+
+    [Fact]
     public void Balance_parameters_can_be_overridden_by_name()
     {
         var b = new Balance();

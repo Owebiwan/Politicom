@@ -390,6 +390,7 @@ public partial class MapView : Control
 
         if (!detail)
         {
+            DrawWars();
             DrawRegionMarker();
             DrawGlobeLabels(font, new List<Rect2>());
             DrawLegend(font);

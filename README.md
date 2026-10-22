@@ -83,11 +83,11 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    51    53      5    82    48 │    34
+passive            0%      100%     0% │    51    53      5    82    48 │    33
 educator           1%       99%     0% │    52    54      6    85    49 │    28
-centralizer        0%        0%   100% │    52    53      4    50    40 │   100
-balanced          67%       33%     0% │    74    53      8    77    53 │    36
-trader            65%       34%     1% │    75    53      8    72    52 │    48
+centralizer        0%        0%   100% │    53    53      4    50    40 │   100
+balanced          66%       34%     0% │    74    53      8    77    53 │    37
+trader            65%       35%     1% │    75    53      8    72    52 │    47
 ```
 
 ## What the player sees
@@ -130,7 +130,7 @@ trader            65%       34%     1% │    75    53      8    72    52 │   
   - **Accuracy:** the borders are approximate. They're today's countries grouped into the
     states of the time, with colonies folded into their empires (`tools/geo/eras/`). For
     example, interwar Poland is drawn with today's borders.
-  - **Coming next:** wars between states, and rival revolutionary states.
+  - **Coming next:** rival revolutionary states.
 - **The outside world:** every period state has a stance toward the federation, from −1
   (hostile) to +1 (friendly). It starts from its ideology and the scenario's history, for
   example Germany and Italy hostile and Mexico friendly in 1936.
@@ -163,6 +163,16 @@ trader            65%       34%     1% │    75    53      8    72    52 │   
   - **Spread** now counts the world's workers and revolutions won.
   - **How often:** these happen in long games. In 500-week Catalonia, an education-focused
     player sees about two revolutions win per game.
+- **Wars between states:** history starts some wars, and others break out in play.
+  - **Scripted:** the Sino-Japanese War (1937) and the Second World War (September 1939) in
+    long Catalonia games; the Polish–Soviet, Hungarian–Romanian and Greco-Turkish wars after 1918.
+  - **Random:** wars break out between hostile neighbours, more often between opposed regimes,
+    and like-minded powers may join. Free federations never start them.
+  - **Effects:** borders don't change, but a state at war can spare only 40% of its strength
+    for intervening against you, and war weariness radicalizes its workers, so revolutions
+    follow wars.
+  - **Display:** wars appear as red dashed lines between capitals on the world map, in
+    country tooltips and in the World tab.
   - **Generated maps** get 3–5 neighbouring countries, and a neighbour on an enemy's side can
     back that enemy.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
@@ -341,11 +351,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           22%       78%     0% │    63    49      9    66    47 │    60
-educator          96%        4%     0% │    64    51     13    77    51 │    40
+passive           25%       75%     0% │    62    49      9    67    47 │    59
+educator          96%        4%     0% │    65    51     13    77    52 │    39
 centralizer        0%        0%   100% │    36    50      3    52    35 │   100
-balanced         100%        0%     0% │    83    52     11    80    56 │    31
-trader            99%        0%     1% │    85    52     11    73    55 │    48
+balanced         100%        0%     0% │    83    52     12    80    57 │    31
+trader            99%        0%     0% │    85    52     12    74    56 │    47
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -358,10 +368,10 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    67    49     10    86    53 │    33
-educator           1%       99%     0% │    69    50     10    90    55 │    21
+educator           0%      100%     0% │    70    50     11    90    55 │    21
 centralizer        0%        0%   100% │    34    48      2    54    34 │   100
-balanced          77%        4%    19% │    86    49     10    70    54 │    67
-trader            41%        7%    52% │    81    49     10    63    51 │    79
+balanced          79%        3%    18% │    86    49     11    70    54 │    67
+trader            42%        8%    50% │    81    49     10    64    51 │    77
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -373,9 +383,9 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    82    67      7    91    62 │    26
 educator           0%      100%     0% │    80    67      7    96    62 │     7
-centralizer        0%        0%   100% │    84    64      5    51    51 │   100
-balanced          25%       75%     0% │    96    68      7    93    66 │    16
-trader            44%       56%     0% │    96    68      7    90    65 │    23
+centralizer        0%        0%   100% │    83    64      5    51    51 │   100
+balanced          30%       70%     0% │    96    68      7    93    66 │    16
+trader            48%       52%     0% │    96    68      7    90    65 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

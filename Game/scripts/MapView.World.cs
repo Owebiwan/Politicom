@@ -309,6 +309,23 @@ public partial class MapView
         Flush();
     }
 
+    /// <summary>Wars under way: a red dashed line between the capitals of the warring states.</summary>
+    private void DrawWars()
+    {
+        if (World is not { } w || Globe is null || w.Wars.Count == 0) return;
+        Vector2? Capital(string id) => Globe.State(id)?.Capital is { } c ? ToScreen(_project(new Vector2((float)c.Lon, (float)c.Lat))) : null;
+        var war = new Color("e0443a");
+        foreach (var x in w.Wars.Where(x => !x.Over))
+            foreach (var a in x.SideA)
+                foreach (var b in x.SideB)
+                    if (Capital(a) is { } pa && Capital(b) is { } pb)
+                    {
+                        DrawDashedLine(pa, pb, new Color(war, 0.75f), 2, 7);
+                        DrawCircle(pa, 3, war);
+                        DrawCircle(pb, 3, war);
+                    }
+    }
+
     /// <summary>At world zoom the region is a speck: mark it with a pulsing ring.</summary>
     private void DrawRegionMarker()
     {
@@ -363,6 +380,10 @@ public partial class MapView
         if (sim != null)
         {
             lines.Add($"{char.ToUpperInvariant(StateText.Stance(sim.Stance)[0])}{StateText.Stance(sim.Stance)[1..]} toward you ({sim.Stance:+0.00;-0.00}) · {StateText.Actions(sim.Actions)}");
+            var wars = World!.Wars.Where(x => !x.Over && x.Involves(sim.Id)).ToList();
+            if (wars.Count > 0)
+                lines.Add("At war with " + string.Join(", ", wars.SelectMany(x => x.Enemies(sim.Id)).Distinct()
+                    .Select(id => World.States.FirstOrDefault(o => o.Id == id)?.Name ?? id)) + $" · weariness {sim.Weariness:P0}");
             lines.Add($"Workers radicalized {sim.Radicalization:P0} · weight {sim.Weight:0.0}"
                       + (sim.Uprising > 0 ? $" · REVOLUTION under way ({World!.Turns(sim.Uprising)})" : ""));
         }

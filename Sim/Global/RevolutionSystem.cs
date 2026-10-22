@@ -35,7 +35,7 @@ public static class RevolutionSystem
 
     /// <summary>Chance a rising succeeds: radical workers win, strong and repressive states hold.</summary>
     public static double SuccessChance(World w, WorldState s) =>
-        Math.Clamp(0.2 + s.Radicalization - 0.05 * s.Power - 0.5 * s.Repression + s.UprisingSupport
+        Math.Clamp(0.1 + s.Radicalization - 0.07 * s.Power - 0.5 * s.Repression + s.UprisingSupport
                    + 0.08 * w.States.Count(o => o.Sister && s.Neighbours.Contains(o.Id)), 0.05, 0.9);
 
     /// <summary>Chance a successful revolution goes authoritarian.</summary>
