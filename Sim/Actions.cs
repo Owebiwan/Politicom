@@ -49,11 +49,11 @@ public static class CulturalWorks
         _ => "Songs, theatre and posters: a lot of culture here, and the neighbours warm to it.",
     };
 
-    public static string Name(CulturalWorkKind kind) => kind switch
+    public static string Name(CulturalWorkKind kind, int year = 2000) => kind switch
     {
-        CulturalWorkKind.Newspaper => "Found a newspaper",
-        CulturalWorkKind.SchoolMovement => "Start a school movement",
-        _ => "Back an art movement",
+        CulturalWorkKind.Newspaper => year < 1450 ? "Send out storytellers" : year < 1700 ? "Print broadsheets" : "Found a newspaper",
+        CulturalWorkKind.SchoolMovement => year < 1450 ? "Open a school of the commons" : "Start a school movement",
+        _ => year < 1450 ? "Hold festivals and songs" : "Back an art movement",
     };
 }
 
@@ -246,7 +246,9 @@ internal static class ActionSystem
                 Raise(c, 0.12);
                 foreach (var n in neighbours) Raise(w.Communes[n], 0.06 * w.Trust[c.Id, n]);
                 foreach (var e in w.Enemies) e.Radicalization = Math.Min(1, e.Radicalization + 0.01);
-                text = $"A new paper is printed in {c.Name} and read well beyond it.";
+                text = w.Year < 1450 ? $"Storytellers carry the federation's news out from {c.Name}, from market to market."
+                     : w.Year < 1700 ? $"Broadsheets printed in {c.Name} are read aloud in every tavern around it."
+                     : $"A new paper is printed in {c.Name} and read well beyond it.";
                 break;
             case CulturalWorkKind.SchoolMovement:
                 Raise(c, 0.08);

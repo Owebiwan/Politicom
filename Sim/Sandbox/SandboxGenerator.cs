@@ -41,14 +41,22 @@ public sealed class SandboxGenerator
     };
 
     // Calibration: the balanced AI should survive about this often on every generated map.
-    private const double TargetSurvival = 0.65;
+    private const double TargetSurvival = 0.55;
     private const int CalibrationGames = 12;
     private const int CalibrationSteps = 6;
 
-    private readonly List<(string Window, string Json)> _templates;
+    private readonly List<Template> _templates;
+
+    /// <summary>An event template, for the years From..To (any age when it spans all of history).</summary>
+    private sealed record Template(string Window, int From, int To, string Json)
+    {
+        public bool Fits(int year) => From <= year && year <= To;
+        /// <summary>Made for a particular age, rather than any.</summary>
+        public bool Specific => To - From < 5000;
+    }
     private readonly TechCatalog _techs;
 
-    private SandboxGenerator(List<(string, string)> templates, TechCatalog techs)
+    private SandboxGenerator(List<Template> templates, TechCatalog techs)
     {
         _templates = templates;
         _techs = techs;
@@ -59,7 +67,16 @@ public sealed class SandboxGenerator
     {
         using var doc = JsonDocument.Parse(templatesJson, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
         var templates = doc.RootElement.GetProperty("templates").EnumerateArray()
-            .Select(t => (t.GetProperty("window").GetString() ?? "mid", t.GetProperty("event").GetRawText()))
+            .Select(t =>
+            {
+                int from = -100000, to = 100000;
+                if (t.TryGetProperty("eras", out var eras))
+                {
+                    from = eras[0].GetInt32();
+                    to = eras[1].GetInt32();
+                }
+                return new Template(t.GetProperty("window").GetString() ?? "mid", from, to, t.GetProperty("event").GetRawText());
+            })
             .ToList();
         if (templates.Count < EventsPerMap)
             throw new InvalidDataException($"Sandbox needs at least {EventsPerMap} event templates, found {templates.Count}.");
@@ -235,7 +252,7 @@ public sealed class SandboxGenerator
             Ally = ally,
             Communes = defs,
         };
-        scenario.Events = PickEvents(rng, region, city, defs, enemies);
+        scenario.Events = PickEvents(rng, start.Year, region, city, defs, enemies);
         scenario.Railways = Railways(rng, defs, points, spacing);
         var angles = enemyCount == 2 ? new[] { angle1, angle2 } : new[] { angle1 };
         scenario.Geography = GeographyGenerator.Generate(seed, points, defs, spacing, angles,
@@ -321,7 +338,7 @@ public sealed class SandboxGenerator
     /// </summary>
     internal ScenarioDefinition Calibrate(ScenarioDefinition scenario, ulong seed, int games = CalibrationGames)
     {
-        double lo = Math.Log(0.25), hi = Math.Log(4);
+        double lo = Math.Log(0.1), hi = Math.Log(4);
         for (int step = 0; step < CalibrationSteps; step++)
         {
             double mid = (lo + hi) / 2;
@@ -341,7 +358,8 @@ public sealed class SandboxGenerator
             if (survived / (double)games >= TargetSurvival) lo = mid; // too easy: stronger enemies
             else hi = mid;
         }
-        return Scaled(scenario, Math.Exp((lo + hi) / 2));
+        // The strongest enemy that passed, not the midpoint: survival can fall off a cliff between the two.
+        return Scaled(scenario, Math.Exp(lo));
     }
 
     private static ScenarioDefinition Scaled(ScenarioDefinition scenario, double multiplier)
@@ -356,15 +374,19 @@ public sealed class SandboxGenerator
         return copy;
     }
 
-    internal List<EventDefinition> PickEvents(Rng rng, string region, string city, List<CommuneDefinition> defs, List<HostileState> enemies)
+    internal List<EventDefinition> PickEvents(Rng rng, int year, string region, string city, List<CommuneDefinition> defs, List<HostileState> enemies, string? heroName = null)
     {
         var villages = defs.Where(c => c.Kind == CommuneKind.Agrarian && c.FrontOf.Length == 0).Select(c => c.Name).ToList();
         if (villages.Count == 0) villages = defs.Where(c => c.FrontOf.Length == 0).Select(c => c.Name).ToList();
         string hero = $"{Pick(rng, FirstNames)} {Name(rng, new HashSet<string>())}";
-        var chosen = _templates.OrderBy(_ => rng.NextDouble()).Take(EventsPerMap).ToList();
+        if (heroName != null) hero = heroName;
+        // Templates of the map's age, those made for it twice as likely (weighted sampling without replacement).
+        var chosen = _templates.Where(t => t.Fits(year))
+            .Select(t => (t, key: Math.Pow(rng.NextDouble(), t.Specific ? 0.5 : 1)))
+            .OrderByDescending(x => x.key).Take(EventsPerMap).Select(x => x.t).ToList();
         var events = new List<EventDefinition>();
         var ticks = new HashSet<int>();
-        foreach (var (window, json) in chosen)
+        foreach (var (window, _, _, json) in chosen)
         {
             int tick = window switch
             {
@@ -383,6 +405,9 @@ public sealed class SandboxGenerator
             var ev = JsonSerializer.Deserialize<EventDefinition>(text, Json.Options)
                      ?? throw new InvalidDataException("Bad sandbox event template.");
             ev.Tick = tick;
+            static string Cap(string s) => s.Length == 0 ? s : char.ToUpperInvariant(s[0]) + s[1..];
+            ev.Title = Cap(ev.Title);
+            ev.Text = Cap(ev.Text);
             events.Add(ev);
         }
         return events.OrderBy(e => e.Tick).ToList();

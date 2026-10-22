@@ -85,7 +85,7 @@ internal static class ResearchSystem
     private static void Diffuse(World w)
     {
         var b = w.Balance;
-        double boost = 1 + w.SocietyEffect(e => e.Diffusion) + w.TransportBonus;
+        double boost = (1 + w.SocietyEffect(e => e.Diffusion) + w.TransportBonus) * w.CommunicationSpeed;
         var adoptions = new List<(Commune C, string Tech)>();
         foreach (var (i, j) in w.Trust.Edges())
         {

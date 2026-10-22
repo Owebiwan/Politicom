@@ -45,14 +45,16 @@ public static class RivalSystem
             Id = $"rival_offer_{rival.Id}_{w.Tick}",
             Tick = w.Tick + 1,
             Title = $"{rival.Name} offers arms",
-            Text = $"Advisers from {country} offer tanks and aircraft for the front — if the militias accept their commissars and the party gets a free hand.",
+            Text = w.Year >= 1914
+                ? $"Advisers from {country} offer tanks and aircraft for the front — if the militias accept their commissars and the party gets a free hand."
+                : $"Envoys from {country} offer arms and drillmasters for the front — if the militias accept their overseers and the elect get a free hand.",
             DefaultOption = 1,
             Options =
             {
                 new EventOption
                 {
                     Label = "Accept the arms",
-                    Description = "The front gets modern weapons. The party gets its commissars.",
+                    Description = w.Year >= 1914 ? "The front gets modern weapons. The party gets its commissars." : "The front gets arms. The elect get their overseers.",
                     Effects = new EventEffects
                     {
                         GoodsToFront = b.RivalArms, MilitarizationTicks = 8, Drift = b.RivalAcceptDrift,

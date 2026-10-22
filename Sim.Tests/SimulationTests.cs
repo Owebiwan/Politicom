@@ -133,6 +133,9 @@ public class SimulationTests
         string Json(ScenarioDefinition s) => System.Text.Json.JsonSerializer.Serialize(s);
         Assert.Equal(Json(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "DEU", 5, calibrate: false)),
                      Json(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "DEU", 5, calibrate: false)));
+        // Stable across processes: a fixed fingerprint, not just equal within one run.
+        Assert.Equal(0xcbf29ce484222325UL, Sim.Open.OpenStartGenerator.StableHash(""));
+        Assert.Equal(0xaf63dc4c8601ec8cUL, Sim.Open.OpenStartGenerator.StableHash("a"));
         Assert.True(Sim.Open.OpenStartGenerator.TryParseId("open:1936:ARG", out var era, out var id, out var seed));
         Assert.Equal(("1936", "ARG", 1UL), (era, id, seed));
         Assert.True(Sim.Open.OpenStartGenerator.TryParseId("open:1871:ITA:9", out _, out _, out seed));

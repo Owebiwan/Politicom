@@ -124,7 +124,7 @@ internal static class WarSystem
     private static void Contagion(World w)
     {
         var b = w.Balance;
-        double press = (1 + w.SocietyEffect(t => t.Contagion)) * (1 + b.CultureContagion * CultureSystem.Mean(w));
+        double press = (1 + w.SocietyEffect(t => t.Contagion)) * (1 + b.CultureContagion * CultureSystem.Mean(w)) * w.CommunicationSpeed;
         double meanPolitical = w.Mean(c => c.PoliticalEducation);
         for (int k = 0; k < w.Enemies.Count; k++)
         {

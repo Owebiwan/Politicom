@@ -27,7 +27,7 @@ public static class RevolutionSystem
             {
                 s.Uprising = b.UprisingTicks;
                 s.UprisingSupport = 0;
-                w.Emit(Severity.Decision, $"Revolution in {s.Name}! Its workers have risen. The outcome will be decided in {w.Turns(b.UprisingTicks)}; " +
+                w.Emit(Severity.Decision, $"Revolution in {s.Name}! Its {(w.Year < 1789 ? "commons" : "workers")} have risen. The outcome will be decided in {w.Turns(b.UprisingTicks)}; " +
                                           "you can send support from the World tab.", pause: true);
             }
         }
@@ -59,11 +59,17 @@ public static class RevolutionSystem
         if (w.Rng.Chance(AuthoritarianChance(w, s)))
         {
             s.Ideology = Ideology.Communist;
-            s.Name = $"Workers' Republic of {country}";
+            // Before parties there were the elect, the saints and the dictators of the commons.
+            (s.Name, string who) = w.Year switch
+            {
+                < 1500 => ($"Brotherhood of {country}", "a brotherhood of the elect takes power in its name"),
+                < 1789 => ($"Commonwealth of {country}", "a council of saints takes power in its name"),
+                _ => ($"Workers' Republic of {country}", "a party takes power in its name"),
+            };
             s.Stance = 0.2;
             w.SetBaseline(s.Id, 0.2);
-            w.Emit(Severity.Warning, $"The revolution wins in {country} — and a party takes power in its name: the {s.Name}. " +
-                                     "A new rival for the loyalty of the world's workers.", pause: true);
+            w.Emit(Severity.Warning, $"The revolution wins in {country} — and {who}: the {s.Name}. " +
+                                     $"A new rival for the loyalty of the world's {(w.Year < 1789 ? "commons" : "workers")}.", pause: true);
             return;
         }
         s.Ideology = Ideology.Libertarian;

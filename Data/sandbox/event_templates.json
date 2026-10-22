@@ -5,9 +5,11 @@
   //   {region}  the region's name        {city}   its largest commune
   //   {village} a random farming commune  {hero}   a popular commander
   //   {enemy}   the main enemy            {enemy2} the second enemy (or the main one)
+  // "eras": [from, to] limits a template to years in that range (negative = BC); templates
+  // made for the map's age are picked twice as often as ones that suit any age.
   "templates": [
     {
-      "window": "early",
+      "window": "early", "eras": [1789, 9999],
       "event": {
         "id": "conscription",
         "title": "Raising an army",
@@ -22,7 +24,7 @@
       }
     },
     {
-      "window": "early",
+      "window": "early", "eras": [1789, 9999],
       "event": {
         "id": "coalition",
         "title": "Ministries in {city}",
@@ -37,7 +39,7 @@
       }
     },
     {
-      "window": "early",
+      "window": "early", "eras": [1600, 9999],
       "event": {
         "id": "bank",
         "title": "The bank in {city}",
@@ -116,7 +118,7 @@
       }
     },
     {
-      "window": "late",
+      "window": "late", "eras": [1789, 9999],
       "event": {
         "id": "emergency_committee",
         "title": "A committee of public safety?",
@@ -144,6 +146,25 @@
             "effects": { "enemy": "{enemy2}", "enemyStrength": -1 } }
         ]
       }
-    }
+    },
+
+    // ── Other ages ──
+    {"window": "early", "eras": [-10000, 600], "event": {"id": "temple_granaries", "title": "The temple granaries of {city}", "text": "The priests of {city} hold the grain stores, and say the gods allotted them. The assemblies could open them to all, or let the priests go on keeping the accounts.", "defaultOption": 0, "options": [{"label": "Open the granaries", "description": "Grain for every household. The priests flee to the {enemy}.", "effects": {"drift": -1, "wellbeing": 0.06, "enemy": "{enemy}", "enemyStrength": 0.4}}, {"label": "Let the priests keep them", "description": "Orderly rations, and a caste that keeps the records.", "effects": {"drift": 4, "goodsToFront": 15}}]}},
+    {"window": "early", "eras": [-10000, 1500], "event": {"id": "slaves", "title": "The slaves of {city}", "text": "Thousands in {city} are slaves of the households that remain. They ask whether the revolution is theirs too.", "defaultOption": 0, "options": [{"label": "Free them all, and arm those who will fight", "description": "The ranks swell. Some former masters go over to the {enemy}.", "effects": {"drift": -1, "enemy": "{enemy}", "enemyStrength": -1.2, "trust": -0.04}}, {"label": "Free them slowly, household by household", "description": "Fewer quarrels now; the old hierarchy lingers.", "effects": {"drift": 4, "influence": 5}}]}},
+    {"window": "mid", "eras": [-10000, 500], "event": {"id": "debt_tablets", "title": "The debt tablets", "text": "In {village} the creditors' tablets record what every family owes. A crowd has gathered at the archive.", "defaultOption": 0, "options": [{"label": "Burn them", "description": "Every debt cancelled. The creditors run to the {enemy}.", "effects": {"drift": -2, "wellbeing": 0.08, "trust": 0.03, "communes": ["{village}"], "enemy": "{enemy}", "enemyStrength": 0.3}}, {"label": "Keep them, and write down new terms", "description": "Order in the accounts — and in who keeps them.", "effects": {"drift": 3, "influence": 10}}]}},
+    {"window": "mid", "eras": [-10000, 1000], "event": {"id": "oracle", "title": "The oracle speaks", "text": "Pilgrims bring word that the oracle has spoken about the rising. Its priests offer to proclaim the federation favoured by the gods, if it honours them.", "defaultOption": 0, "options": [{"label": "Accept the oracle's blessing", "description": "Doubters are won over; the priests gain a voice in the assemblies.", "effects": {"drift": 4, "influence": 15}}, {"label": "Decide for ourselves", "description": "No gods above the assemblies. Some are troubled by it.", "effects": {"drift": -1, "influence": -5, "politicalEducation": 0.02}}]}},
+    {"window": "late", "eras": [-10000, 1000], "event": {"id": "deserters", "title": "Deserters from the {enemy}", "text": "A whole cohort of the {enemy} has mutinied and asks to join the federation, officers and all.", "defaultOption": 0, "options": [{"label": "Take them in as they are", "description": "Trained soldiers, with their officers and their discipline.", "effects": {"drift": 5, "enemy": "{enemy}", "enemyStrength": -1.5}}, {"label": "Take the soldiers, dismiss the officers", "description": "The men elect their own delegates; some go home.", "effects": {"drift": -1, "enemy": "{enemy}", "enemyStrength": -0.7}}]}},
+    {"window": "early", "eras": [500, 1500], "event": {"id": "crusade", "title": "A crusade is preached against {region}", "text": "Preachers call the faithful to crush the heretics of {region}, promising salvation and plunder. Volunteers flock to the {enemy}.", "defaultOption": 0, "options": [{"label": "Send our own preachers to the crusaders' villages", "description": "Many who came for land stay home once they hear what the communes offer.", "effects": {"influence": -15, "enemy": "{enemy}", "enemyStrength": -0.5}}, {"label": "Fortify and wait", "description": "The crusade comes, as crusades do.", "effects": {"enemy": "{enemy}", "enemyStrength": 1.2, "goodsToFront": 15}}]}},
+    {"window": "mid", "eras": [1100, 1850], "event": {"id": "enclosure", "title": "Fences around the commons", "text": "A lord's men have fenced the common pasture near {village} for sheep. The villagers ask the federation what to do.", "defaultOption": 0, "options": [{"label": "Tear the fences down", "description": "The commons are open again. The lord rides to the {enemy}.", "effects": {"drift": -1, "wellbeing": 0.05, "communes": ["{village}"], "enemy": "{enemy}", "enemyStrength": 0.3}}, {"label": "Buy the land for the village", "description": "No bloodshed; the federation's purse is lighter.", "effects": {"influence": -15, "trust": 0.02}}]}},
+    {"window": "mid", "eras": [500, 1650], "event": {"id": "heresy", "title": "Heretics in {city}", "text": "A sect in {city} preaches that all goods are common and every believer a priest. The moderate assemblies want them gone.", "defaultOption": 0, "options": [{"label": "Hold an open disputation", "description": "Arguments, not stakes. Everyone learns something.", "effects": {"influence": -5, "politicalEducation": 0.03, "trust": -0.01}}, {"label": "Expel them", "description": "Quiet returns — and the habit of deciding who may speak.", "effects": {"drift": 4, "trust": -0.05}}]}},
+    {"window": "mid", "eras": [1000, 1800], "event": {"id": "guild_masters", "title": "The guild masters of {city}", "text": "The masters of {city}'s guilds offer the federation their workshops' output, if the old rules on apprentices and journeymen stand.", "defaultOption": 0, "options": [{"label": "Let the journeymen run the guilds", "description": "Equals at the bench; some masters leave.", "effects": {"drift": -2, "trust": 0.03, "goodsToFront": -5}}, {"label": "Keep the masters' rules", "description": "Steady output, and a ladder of ranks.", "effects": {"drift": 3, "goodsToFront": 20}}]}},
+    {"window": "mid", "eras": [-10000, 1850], "event": {"id": "plague", "title": "Plague in {village}", "text": "Pestilence has broken out in {village}. People are fleeing along the roads, and other communes want to close them.", "defaultOption": 0, "options": [{"label": "Share food and care, keep the roads open", "description": "Solidarity, at a cost in lives and stores.", "effects": {"influence": -10, "wellbeing": -0.05}}, {"label": "Close the roads", "description": "The plague is contained, and so is {village}.", "effects": {"wellbeing": -0.1, "trust": -0.06, "communes": ["{village}"]}}]}},
+    {"window": "mid", "eras": [1480, 1820], "event": {"id": "inquisition", "title": "The Inquisition comes to {city}", "text": "Inquisitors have arrived in {city} with a list of names: preachers, printers and organizers of the federation.", "defaultOption": 0, "options": [{"label": "Hide the accused", "description": "The assemblies close ranks around them.", "effects": {"influence": -10, "trust": 0.03, "enemy": "{enemy}", "enemyStrength": 0.3}}, {"label": "Hand over the foreigners on the list", "description": "The inquisitors leave. Everyone remembers who gave the names.", "effects": {"drift": 5, "trust": -0.1}}]}},
+    {"window": "early", "eras": [1500, 1830], "event": {"id": "colonial_levy", "title": "Levies for the colonies", "text": "Royal agents in {city} demand men and grain for the colonies overseas, and offer the federation a truce if it pays.", "defaultOption": 0, "options": [{"label": "Refuse", "description": "Not a man, not a sack.", "effects": {"enemy": "{enemy}", "enemyStrength": 0.5, "wellbeing": 0.03}}, {"label": "Pay, for a truce", "description": "A breathing space, bought with grain and young men.", "effects": {"drift": 4, "wellbeing": -0.05, "enemy": "{enemy}", "enemyStrength": -1}}]}},
+    {"window": "mid", "eras": [1450, 1900], "event": {"id": "printing_press", "title": "A press in {city}", "text": "Printers in {city} offer their press to the movement. The question is who decides what it prints.", "defaultOption": 0, "options": [{"label": "Any assembly may print", "description": "A flood of broadsheets, many of them quarrelling.", "effects": {"drift": -1, "politicalEducation": 0.03, "influence": -5}}, {"label": "A committee decides what is printed", "description": "One clear voice. And an editorial office.", "effects": {"drift": 4, "influence": 15}}]}},
+    {"window": "late", "eras": [1300, 1800], "event": {"id": "mercenaries", "title": "Mercenaries offer their pikes", "text": "A company of mercenaries, between contracts, offers to fight the {enemy} — for silver, and for the right to plunder what they take.", "defaultOption": 0, "options": [{"label": "Hire them", "description": "Veterans at the front. Paid men answer to paymasters.", "effects": {"drift": 6, "influence": -10, "enemy": "{enemy}", "enemyStrength": -2}}, {"label": "Send them away", "description": "The communes fight their own war.", "effects": {"drift": -1}}]}},
+    {"window": "mid", "eras": [1950, 9999], "event": {"id": "television", "title": "The television station in {city}", "text": "Workers have occupied the television station in {city}. The federation can broadcast to the whole country — if it decides who speaks.", "defaultOption": 0, "options": [{"label": "Every assembly gets airtime", "description": "Rambling, contradictory, alive.", "effects": {"drift": -2, "influence": -5, "politicalEducation": 0.03}}, {"label": "A committee runs the station", "description": "Professional broadcasts, a single message.", "effects": {"drift": 5, "influence": 20}}]}},
+    {"window": "mid", "eras": [1945, 9999], "event": {"id": "welfare_offer", "title": "The welfare state's offer", "text": "The government in the capital offers pensions, health care and an amnesty to every commune that returns to the national administration.", "defaultOption": 0, "options": [{"label": "Refuse together", "description": "The communes stay as they are, and trust each other more for it.", "effects": {"trust": 0.03, "wellbeing": -0.03}}, {"label": "Negotiate the benefits for everyone", "description": "Real gains, through ministries and their paperwork.", "effects": {"drift": 6, "wellbeing": 0.08, "influence": 10}}]}},
+    {"window": "late", "eras": [1950, 9999], "event": {"id": "the_bomb", "title": "The bomb", "text": "Foreign governments hint that the {enemy} may be given weapons of mass destruction if the federation holds out. Panic spreads.", "defaultOption": 0, "options": [{"label": "Call their bluff", "description": "The assemblies hold their nerve. Some communes waver.", "effects": {"wellbeing": -0.05, "trust": -0.02}}, {"label": "Ask the world's workers to stop the shipments", "description": "Dockers and railway workers abroad refuse to load the weapons.", "effects": {"influence": -20, "enemy": "{enemy}", "enemyStrength": -0.8}}]}}
   ]
 }

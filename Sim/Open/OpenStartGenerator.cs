@@ -47,7 +47,7 @@ public static class OpenStartGenerator
         var picked = CommuneCities(state);
         if (picked.Count < MinCommunes)
             throw new ArgumentException($"{state.Name} has too few cities on the map to play ({picked.Count}).");
-        var rng = new Rng(seed ^ (ulong)stateId.GetHashCode(StringComparison.Ordinal) ^ 0x0BE2C0FFEEUL);
+        var rng = new Rng(seed ^ StableHash(atlas.Era + ":" + stateId) ^ 0x0BE2C0FFEEUL);
         int year = int.TryParse(atlas.Era, out var y) ? y : 1900;
         string country = StateText.Country(state.Name);
         var ideology = WorldSetup.Parse(state.Ideology);
@@ -79,9 +79,11 @@ public static class OpenStartGenerator
         }
 
         // ── The enemy: the government, from the capital; the communes nearest it are the front ──
-        string enemyName = $"{country} government forces";
+        string enemyName = EnemyName(year, ideology, state.Name, country);
         var (start, yearOffset) = ScenarioDefinition.Calendar(year, 1 + rng.Next(12), 1 + rng.Next(28));
-        double strength = 3.0 * (0.7 + 0.12 * state.Power);
+        // An army sized to the rising it faces: a few small towns don't meet the force a whole country's cities do.
+        double size = Math.Clamp(defs.Sum(d => d.Population) / 250.0, 0.3, 1.5);
+        double strength = 3.0 * (0.7 + 0.12 * state.Power) * size;
         var enemy = new HostileState
         {
             Name = enemyName,
@@ -102,8 +104,8 @@ public static class OpenStartGenerator
         {
             Id = Id(atlas.Era, stateId, seed),
             Name = $"The {country} Commune",
-            Description = $"{Ages.Format(start, yearOffset, "MMMM yyyy")}. Strikes and risings have spread across {country}: workers and peasants hold {defs[0].Name} and the towns around it, " +
-                          $"and the government in {capital.Name} is gathering its forces. Hold the federation together for two years. (Open start: {state.Name}, {EraName(atlas.Era)}.)",
+            Description = $"{Ages.Format(start, yearOffset, "MMMM yyyy")}. {Rising(year, ideology, state.Name, country, defs[0].Name, capital.Name)} " +
+                          $"Hold the federation together for two years. (Open start: {state.Name}, {EraName(atlas.Era)}.)",
             StartDate = start,
             YearOffset = yearOffset,
             EndTick = EndTick,
@@ -116,7 +118,8 @@ public static class OpenStartGenerator
             Communes = defs,
         };
         scenario.Geography = Geography(state, defs);
-        scenario.Events = sandbox.PickEvents(rng, country, defs[0].Name, defs, scenario.Enemies);
+        string? hero = year < 1789 ? $"the {(year < 500 ? "war leader" : "captain")} of {defs[Math.Min(defs.Count - 1, 1 + rng.Next(Math.Max(1, defs.Count - 1)))].Name}" : null;
+        scenario.Events = sandbox.PickEvents(rng, year, country, defs[0].Name, defs, scenario.Enemies, hero);
         WorldSetup.Attach(scenario, atlas);
         if (length is int turns) scenario = scenario.WithLength(turns);
         return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario; // real maps vary more than generated ones
@@ -159,6 +162,66 @@ public static class OpenStartGenerator
             Land = land.Count >= 3 ? new List<double[][]> { land.Select(p => new[] { Math.Round(p.Item1, 4), Math.Round(p.Item2, 4) }).ToArray() } : new(),
             DrawProvinces = false,
         };
+    }
+
+    /// <summary>FNV-1a: the same in every process (string.GetHashCode is randomized per run).</summary>
+    internal static ulong StableHash(string s)
+    {
+        ulong h = 14695981039346656037UL;
+        foreach (char c in s)
+        {
+            h ^= c;
+            h *= 1099511628211UL;
+        }
+        return h;
+    }
+
+    /// <summary>"the Roman Empire", "France": a state's name as it reads inside a sentence.</summary>
+    internal static string Proper(string name)
+    {
+        string[] titles = { "Empire", "Caliphate", "Sultanate", "Khanate", "Khaganate", "Kingdom", "Emirate", "Emirates", "states", "kingdoms",
+                            "Dynasty", "Union", "Confederation", "Republic", "Order", "Horde", "Khanates", "city-states", "peoples", "Islands" };
+        string[] lead = { "Kingdom", "Principality", "Duchy", "Grand", "Sultanate", "Emirate", "Republic", "Empire", "Caliphate", "Union" };
+        var words = name.Split(' ');
+        bool titled = words.Length > 1 && (titles.Contains(words[^1]) || lead.Contains(words[0]));
+        return titled && !name.StartsWith("The ") ? "the " + name : name;
+    }
+
+    /// <summary>The government's forces, named for the age: legions and royal hosts before there were "government forces".</summary>
+    internal static string EnemyName(int year, Ideology ideology, string stateName, string country)
+    {
+        if (year >= 1789 && ideology is not (Ideology.Tribal or Ideology.Theocracy or Ideology.Empire)) return $"{country} government forces";
+        string of = Proper(stateName);
+        return ideology switch
+        {
+            Ideology.Tribal => $"war bands of {of}",
+            Ideology.Theocracy => $"holy army of {of}",
+            Ideology.Empire => year >= 1789 ? $"imperial forces of {of}" : $"imperial army of {of}",
+            _ => year < 1450 ? $"royal host of {of}" : $"royal army of {of}",
+        };
+    }
+
+    /// <summary>How the rising is described, by age.</summary>
+    internal static string Rising(int year, Ideology ideology, string stateName, string country, string city, string capital)
+    {
+        string of = Proper(stateName);
+        string rulers = ideology switch
+        {
+            Ideology.Tribal => $"the war chiefs at {capital} are calling their warriors together",
+            Ideology.Theocracy => $"the priests in {capital} are calling the faithful to arms",
+            _ when year < 500 => $"the rulers in {capital} are mustering their army",
+            _ when year < 1450 => $"the lords in {capital} are gathering their knights",
+            _ when year < 1789 => $"the court in {capital} is raising an army",
+            _ => $"the government in {capital} is gathering its forces",
+        };
+        string who = year switch
+        {
+            < 500 => $"Slaves, peasants and craftsmen have risen across {of}: they hold {city} and the towns around it",
+            < 1450 => $"A rising of the commons has spread across {of}: peasants and townsfolk hold {city} and the towns around it",
+            < 1789 => $"The commons of {of} have risen against the crown: they hold {city} and the towns around it",
+            _ => $"Strikes and risings have spread across {country}: workers and peasants hold {city} and the towns around it",
+        };
+        return $"{who}, and {rulers}.";
     }
 
     private static (double Coll, double Mil, double Fed) BaseValues(Ideology i) => i switch

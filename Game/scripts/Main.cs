@@ -869,7 +869,7 @@ public partial class Main : Control
         AddButton(actions, "Pamphlets", "Political education here and next door.", () => WithSelected(id => new CirculatePamphlets(id)));
         AddButton(actions, "Expose party cells", "Debate a rival party's methods in the open: its cells here and next door lose ground. Its patrons abroad are displeased.", () => WithSelected(id => new ExposeCells(id)));
         foreach (var kind in Enum.GetValues<CulturalWorkKind>())
-            AddButton(actions, CulturalWorks.Name(kind), CulturalWorks.Describe(kind) + $" Costs {_world.Balance.CostCulturalWork:0} influence; a commune takes {_world.Balance.CulturalWorkCooldown} weeks to take one up.",
+            AddButton(actions, CulturalWorks.Name(kind, _world.Year), CulturalWorks.Describe(kind) + $" Costs {_world.Balance.CostCulturalWork:0} influence; a commune takes {_world.Balance.CulturalWorkCooldown} weeks to take one up.",
                 () => WithSelected(id => new FoundCulturalWork(id, kind)));
         AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {

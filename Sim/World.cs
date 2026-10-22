@@ -50,6 +50,12 @@ public sealed class World
     public DateOnly Date => DateAt(Tick);
     /// <summary>The calendar year, which gates the technologies of each age.</summary>
     public int Year => Date.Year + Scenario.YearOffset;
+    /// <summary>
+    /// How fast ideas travel in this age: by word of mouth before the printing press, by print and
+    /// post before the telegraph. Scales contagion and the spread of techniques.
+    /// </summary>
+    public double CommunicationSpeed => Year < 1450 ? 0.6 : Year < 1800 ? 0.8 : 1;
+
     /// <summary>A date in this game's calendar, e.g. Format(Date, "MMMM yyyy") → "March 499 BC".</summary>
     public string Format(DateOnly date, string format) => Ages.Format(date, Scenario.YearOffset, format);
 

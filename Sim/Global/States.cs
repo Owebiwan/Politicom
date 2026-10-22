@@ -126,7 +126,7 @@ public static class StateText
     public static string Country(string name)
     {
         foreach (var prefix in new[] { "Kingdom of ", "Empire of ", "Federal State of ", "Republic of ", "Union of ", "Principality of ",
-                                       "National State of ", "People's Republic of ", "Confederation of ", "Free Communes of ", "Workers' Republic of ",
+                                       "National State of ", "People's Republic of ", "Confederation of ", "Free Communes of ", "Workers' Republic of ", "Brotherhood of ", "Commonwealth of ",
                                        "Khedivate of ", "Democratic Republic of ", "United States of ", "Kingdom of Serbs, Croats and Slovenes" })
             if (name.StartsWith(prefix)) return prefix.StartsWith("Kingdom of Serbs") ? "Yugoslavia" : name[prefix.Length..];
         name = name.Replace(" (Versailles)", "");

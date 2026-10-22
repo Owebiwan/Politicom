@@ -109,6 +109,29 @@ choose.
 - **Dates:** years before Christ count down ("July 500 BC"). Technology eras follow the
   calendar, so in 500 BC the tree is the ancient one.
 
+**Each age plays like itself:**
+- **The enemy:** it's named for its age: the imperial army of the Roman Empire, the royal
+  host of France, the holy army of a theocracy, the war bands of a stateless people. From 1789
+  on, it's government forces. It's sized to the rising it faces, so a handful of small towns
+  don't meet a whole country's army.
+- **The rising:** it's told in the age's terms: slaves and craftsmen in antiquity, a rising
+  of the commons against the lords in the Middle Ages, the commons against the crown in the
+  early modern age.
+- **Dilemmas:** event templates carry an era range, and ones made for the map's age come up
+  twice as often:
+  - **Antiquity:** temple granaries, freeing the slaves, the debt tablets, an oracle, a
+    mutinous cohort.
+  - **Middle Ages:** a crusade, enclosure of the commons, heretics, the guild masters, plague.
+  - **Early modern:** the Inquisition, colonial levies, a printing press, mercenaries.
+  - **After 1945:** the television station, the welfare state's offer, the bomb.
+  - **Modern dilemmas:** ministries, the bank and committees of public safety appear only
+    from their own times.
+- **Revolutions abroad:** before 1500 an authoritarian revolution makes a Brotherhood of the
+  elect; before 1789, a Commonwealth of saints; after that, a Workers' Republic.
+- **Cultural works:** storytellers before print, broadsheets before newspapers.
+- **Communication:** ideas travel at 60% speed before the printing press (1450) and 80%
+  before 1800, slowing both contagion and the spread of techniques.
+
 - **Communes:** the country's largest cities on its home territory, up to 26. The largest are
   industrial and the rest are mixed or agrarian.
 - **Commune values:** seeded from the regime. Education is lower in earlier eras.
@@ -124,21 +147,26 @@ choose.
 - **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7), and
   `open:-500:ACHAEMENID` or `open:1:ROMAN` for the early eras. A state's id is in
   `Data/world/<era>.json`.
-- **Calibration:** open starts are calibrated on 20 trial games, because real maps vary more
-  than generated ones. Generation takes about 4 seconds.
+- **Calibration:** the enemy's strength is set to the strongest level at which the balanced AI
+  survives at least 55% of trial games: 20 games for open starts, because real maps vary more
+  than generated ones, and 12 for sandbox maps. Generation takes about 4 seconds.
+  Individual maps still vary, roughly 30–90%.
 
 Balanced AI over 100 games each. The centralizer becomes a state in (almost) every game.
 
 | Start                    | survived | destroyed |
 |--------------------------|---------:|----------:|
-| Greek city-states 500 BC |      42% |       58% |
-| Roman Empire AD 1        |      69% |       31% |
-| Han AD 1                 |      55% |       45% |
-| Inca Empire 1500         |      45% |       55% |
-| France 1650              |      71% |       29% |
-| Argentina 1936           |      58% |       42% |
-| Argentina 1960           |      65% |       35% |
-| Brazil 2000              |      67% |       33% |
+| Greek city-states 500 BC |      32% |       68% |
+| Roman Empire AD 1        |      80% |       20% |
+| Han AD 1                 |      46% |       54% |
+| France 1200              |      50% |       50% |
+| Inca Empire 1500         |      89% |       11% |
+| France 1650              |      58% |       42% |
+| Russian Empire 1815      |      76% |       24% |
+| Argentina 1936           |      70% |       30% |
+| Brazil 2000              |      65% |       35% |
+
+The sandbox (fresh maps) averages 70%.
 
 ## What the player sees
 
