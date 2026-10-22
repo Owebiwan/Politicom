@@ -31,6 +31,35 @@ public sealed record ExposeCells(int Commune) : PlayerAction;
 public sealed record SupportUprising(string StateId) : PlayerAction;
 /// <summary>An appeal to the workers of the world: double the volunteers for a while.</summary>
 public sealed record InternationalAppeal : PlayerAction;
+/// <summary>Ask the communes to put their science into one line of technology (null = balanced).</summary>
+public sealed record SetResearchFocus(string? Category) : PlayerAction;
+
+public enum CulturalWorkKind { Newspaper, SchoolMovement, ArtMovement }
+
+public static class CulturalWorks
+{
+    /// <summary>Turns before a commune can take up another cultural work (a set number of weeks).</summary>
+    public static int Cooldown(World w) => (int)Math.Ceiling(w.Balance.CulturalWorkCooldown / w.Weeks);
+
+    /// <summary>What each cultural work does, for the UI.</summary>
+    public static string Describe(CulturalWorkKind kind) => kind switch
+    {
+        CulturalWorkKind.Newspaper => "A newspaper: culture here and in neighbouring communes, and its pages reach the enemy's workers.",
+        CulturalWorkKind.SchoolMovement => "A school movement: culture and political education here and around it.",
+        _ => "Songs, theatre and posters: a lot of culture here, and the neighbours warm to it.",
+    };
+
+    public static string Name(CulturalWorkKind kind) => kind switch
+    {
+        CulturalWorkKind.Newspaper => "Found a newspaper",
+        CulturalWorkKind.SchoolMovement => "Start a school movement",
+        _ => "Back an art movement",
+    };
+}
+
+/// <summary>Found a cultural work in a commune: it builds cultural influence there and around it.</summary>
+public sealed record FoundCulturalWork(int Commune, CulturalWorkKind Kind) : PlayerAction;
+
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
 public sealed record ChooseEventOption(string EventId, int Option) : PlayerAction;
 
@@ -64,6 +93,8 @@ internal static class ActionSystem
             InternationalAppeal => Appeal(w),
             SupportUprising a => Support(w, a),
             ExposeCells a => Expose(w, a),
+            SetResearchFocus a => Focus(w, a),
+            FoundCulturalWork a => CulturalWork(w, a),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
     }
@@ -162,8 +193,8 @@ internal static class ActionSystem
         w.LastCongressTick = w.Tick;
         var members = w.Federation.ToList();
         int adoptions = 0;
-        foreach (var t in w.Techs.All.Where(t => w.TechShare(t.Id) >= 0.25))
-            foreach (var c in members.Where(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(c, t)))
+        foreach (var t in w.LiveTechs.Where(t => w.TechShare(t.Id) >= 0.25))
+            foreach (var c in members.Where(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(w, c, t)))
                 if (w.Rng.Chance(0.35 * (0.4 + c.PracticalEducation)))
                 {
                     c.Techs.Add(t.Id);
@@ -183,6 +214,59 @@ internal static class ActionSystem
         w.IdeaNudges[a.TechId] = w.Balance.IdeaNudgeTicks;
         var t = w.Techs[a.TechId];
         return ActionResult.Done($"Pamphlets and speakers promote {t.Name} for {w.Turns(w.Balance.IdeaNudgeTicks)}.");
+    }
+
+    private static ActionResult Focus(World w, SetResearchFocus a)
+    {
+        if (a.Category is { } line && !w.Techs.Categories.Contains(line)) return ActionResult.Fail($"Unknown line of technology '{line}'.");
+        if (w.ResearchFocus == a.Category) return ActionResult.Done("The research focus is unchanged.");
+        w.ResearchFocus = a.Category;
+        string text = a.Category is null
+            ? "The movement asks the communes to research whatever they need most."
+            : $"The movement asks the communes to put their science into {a.Category.ToLowerInvariant()} techniques.";
+        w.Emit(Severity.Info, text);
+        return ActionResult.Done(text);
+    }
+
+    private static ActionResult CulturalWork(World w, FoundCulturalWork a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        var b = w.Balance;
+        int cooldown = CulturalWorks.Cooldown(w);
+        if (w.Tick - c.LastCulturalWork < cooldown)
+            return ActionResult.Fail($"{c.Name} is still taking up its last cultural work (wait {w.Turns(cooldown - (w.Tick - c.LastCulturalWork))}).");
+        if (!Spend(w, b.CostCulturalWork)) return Broke(w, b.CostCulturalWork);
+        c.LastCulturalWork = w.Tick;
+        void Raise(Commune x, double amount) => x.Culture = Math.Min(1, x.Culture + amount * (1 - x.Culture));
+        var neighbours = w.Trust.Neighbors(c.Id).Where(n => !w.Communes[n].Occupied).ToList();
+        string text;
+        switch (a.Kind)
+        {
+            case CulturalWorkKind.Newspaper:
+                Raise(c, 0.12);
+                foreach (var n in neighbours) Raise(w.Communes[n], 0.06 * w.Trust[c.Id, n]);
+                foreach (var e in w.Enemies) e.Radicalization = Math.Min(1, e.Radicalization + 0.01);
+                text = $"A new paper is printed in {c.Name} and read well beyond it.";
+                break;
+            case CulturalWorkKind.SchoolMovement:
+                Raise(c, 0.08);
+                c.PoliticalEducation = Math.Min(1, c.PoliticalEducation + 0.03 * (1 - c.PoliticalEducation));
+                foreach (var n in neighbours)
+                {
+                    var d = w.Communes[n];
+                    Raise(d, 0.04 * w.Trust[c.Id, n]);
+                    d.PoliticalEducation = Math.Min(1, d.PoliticalEducation + 0.015 * w.Trust[c.Id, n] * (1 - d.PoliticalEducation));
+                }
+                text = $"Free schools open in {c.Name}: evening classes, reading circles, a school for the children.";
+                break;
+            default:
+                Raise(c, 0.2);
+                foreach (var n in neighbours) w.Trust.Add(c.Id, n, 0.02);
+                text = $"{c.Name} sings: new songs, street theatre and posters celebrate the revolution.";
+                break;
+        }
+        w.Emit(Severity.Good, text, c.Id);
+        return ActionResult.Done(text);
     }
 
     private static ActionResult Recall(World w)

@@ -34,7 +34,8 @@ internal static class WarSystem
 
             e.EffectiveStrength = (e.Strength + (offensive?.Strength ?? 0) + e.Intervention)
                                   * (1 - 0.4 * e.Radicalization)
-                                  * (1 - Math.Clamp(e.Exhaustion, 0, 0.6));
+                                  * (1 - Math.Clamp(e.Exhaustion, 0, 0.6))
+                                  * Global.TechLevelSystem.EnemyEdge(w, e);
 
             int enemy = k;
             var fronts = w.Active.Where(c => c.Fronts.Contains(enemy)).ToList();
@@ -123,7 +124,7 @@ internal static class WarSystem
     private static void Contagion(World w)
     {
         var b = w.Balance;
-        double press = 1 + w.SocietyEffect(t => t.Contagion);
+        double press = (1 + w.SocietyEffect(t => t.Contagion)) * (1 + b.CultureContagion * CultureSystem.Mean(w));
         double meanPolitical = w.Mean(c => c.PoliticalEducation);
         for (int k = 0; k < w.Enemies.Count; k++)
         {

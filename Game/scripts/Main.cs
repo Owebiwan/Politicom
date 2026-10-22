@@ -74,7 +74,8 @@ public partial class Main : Control
             ? "[color=#808590]Click a country on the map, or one below.[/color]"
             : $"[b]{Esc(selected.Name)}[/b] — {Politicom.Sim.Global.StateText.Name(selected.Ideology)}, weight {selected.Weight:0.0} (power {selected.Power:0}, {(selected.Proximity >= 1 ? "a neighbour" : $"{selected.Proximity:P0} interest at this distance")})\n" +
               $"{Politicom.Sim.Global.StateText.Stance(selected.Stance)} toward you ([b]{selected.Stance:+0.00;-0.00}[/b]) — {Politicom.Sim.Global.StateText.Actions(selected.Actions)}\n" +
-              $"Workers radicalized: {selected.Radicalization:P0}" + (selected.Repression > 0.05 ? $" · repression {selected.Repression:P0}" : "") + "\n" +
+              $"Workers radicalized: {selected.Radicalization:P0}" + (selected.Repression > 0.05 ? $" · repression {selected.Repression:P0}" : "") +
+              $" · technology {selected.TechLevel:P0} · its culture resists yours {selected.CulturalWeight:P0}\n" +
               (selected.Uprising > 0 ? $"[color=#f2c94c][b]Revolution under way[/b]: decided in {w.Turns(selected.Uprising)}, success chance {Politicom.Sim.Global.RevolutionSystem.SuccessChance(w, selected):P0}, of which a party seizes power {Politicom.Sim.Global.RevolutionSystem.AuthoritarianChance(w, selected):P0}.[/color]\n" : "") +
               (selected.Sister ? (selected.Federated ? "[color=#e07a6a]A sister federation, now part of yours.[/color]\n" : "[color=#e07a6a]A sister federation.[/color]\n") : "") +
               "[color=#808590]Thresholds: embargo below −0.30, arms above +0.35, volunteers above +0.50, intervention below −0.60. Order in the federation reassures governments and disappoints sympathizers.[/color]";
@@ -845,8 +846,9 @@ public partial class Main : Control
         for (int i = 0; i < _world.Techs.All.Count; i++)
         {
             var t = _world.Techs.All[i];
+            if (_world.CommonKnowledge(t)) continue;
             _idea.AddItem(t.Name, i);
-            _idea.SetItemTooltip(i, $"{t.Name}\n+ {t.Perk}\n− {t.Risk}\n\n" + string.Join("\n", t.Effects.Describe().Select(d => (d.Good ? "+ " : "− ") + d.Text)));
+            _idea.SetItemTooltip(_idea.ItemCount - 1, $"{t.Name}\n+ {t.Perk}\n− {t.Risk}\n\n" + string.Join("\n", t.Effects.Describe().Select(d => (d.Good ? "+ " : "− ") + d.Text)));
         }
         circulate.AddChild(_idea);
         AddButton(circulate, "Circulate", "Steer what communes discover and adopt for 20 turns.",
@@ -864,6 +866,9 @@ public partial class Main : Control
         AddButton(actions, "Political school", "Cheaper coordination, slower drift, more trust.", () => WithSelected(id => new FundSchool(id, EducationTrack.Political)));
         AddButton(actions, "Pamphlets", "Political education here and next door.", () => WithSelected(id => new CirculatePamphlets(id)));
         AddButton(actions, "Expose party cells", "Debate a rival party's methods in the open: its cells here and next door lose ground. Its patrons abroad are displeased.", () => WithSelected(id => new ExposeCells(id)));
+        foreach (var kind in Enum.GetValues<CulturalWorkKind>())
+            AddButton(actions, CulturalWorks.Name(kind), CulturalWorks.Describe(kind) + $" Costs {_world.Balance.CostCulturalWork:0} influence; a commune takes {_world.Balance.CulturalWorkCooldown} weeks to take one up.",
+                () => WithSelected(id => new FoundCulturalWork(id, kind)));
         AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {
             if (_map.Selected is int a && _map.Secondary is int b) Do(new Mediate(a, b));
@@ -934,6 +939,7 @@ public partial class Main : Control
             return $"[b][color={e.Color}]■[/color] {Esc(e.Name)}[/b]: strength {e.EffectiveStrength:0.0}"
                    + (e.CurrentOffensive is { } o ? $"  [color=#f07060][b]{Esc(o.Name)}[/b][/color]" : "")
                    + $" · exhaustion {e.Exhaustion:P0} · its workers radicalized {e.Radicalization:P0}"
+                   + (Politicom.Sim.Global.TechLevelSystem.EnemyEdge(w, e) is var edge and > 1.005 ? $" · [color=#f07060]+{edge - 1:P0} from better weapons[/color]" : "")
                    + $"\nFront: {(fronts.Any() ? string.Join(", ", fronts) : "none")}";
         });
         _enemy.Text = string.Join("\n", lines)
@@ -1019,8 +1025,9 @@ public partial class Main : Control
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
             $"Food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
             $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · discontent {c.Discontent:0.00}\n" +
+            $"Culture {c.Culture:P0} · science {c.Science:0.00} a {w.Turn}" + (w.Tick - c.LastCulturalWork < CulturalWorks.Cooldown(w) ? " · taking up a cultural work" : "") + "\n" +
             (c.PartyInfluence > 0.01 ? $"[color=#e07a6a]Party cells: {c.PartyInfluence:P0}[/color] — a rival party's hold here, adding drift\n" : "") +
-            $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Select(t => w.Techs[t].Name)))}\n" +
+            $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Where(t => !w.CommonKnowledge(w.Techs[t])).Select(t => w.Techs[t].Name)))}\n" +
             $"Neighbours (trust): {neighbours}";
     }
 

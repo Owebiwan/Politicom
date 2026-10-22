@@ -59,10 +59,26 @@ public sealed class WorldState
     public double Weariness { get; set; }
     /// <summary>Revolutions that have won here.</summary>
     public int RevolutionCount { get; set; }
+    /// <summary>0..1: how advanced its industry and science are, within the age.</summary>
+    public double TechLevel { get; set; }
     /// <summary>Its cities have joined the federation.</summary>
     public bool Federated { get; set; }
     /// <summary>A libertarian revolution won here: a sister federation.</summary>
     [JsonIgnore] public bool Sister => Ideology == Ideology.Libertarian;
+
+    /// <summary>
+    /// 0..1: how strongly its own culture (nation, church, party) resists the movement's ideas
+    /// among its workers. Strong, ideological states resist most.
+    /// </summary>
+    [JsonIgnore] public double CulturalWeight => Math.Clamp(Power / 10 * Ideology switch
+    {
+        Ideology.Fascist => 1.0,
+        Ideology.Communist => 0.9,
+        Ideology.Monarchy => 0.8,
+        Ideology.Conservative => 0.6,
+        Ideology.Liberal => 0.5,
+        _ => 0,
+    }, 0, 1);
 
     /// <summary>Power that counts toward the federation, given distance.</summary>
     [JsonIgnore] public double Weight => Power * Proximity;

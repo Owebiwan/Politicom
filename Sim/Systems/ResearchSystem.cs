@@ -11,9 +11,58 @@ internal static class ResearchSystem
         foreach (var key in w.IdeaNudges.Keys.ToList())
             if (--w.IdeaNudges[key] <= 0) w.IdeaNudges.Remove(key);
 
+        Produce(w);
         Discover(w);
+        Breakthrough(w);
         Diffuse(w);
         AnnounceWidespread(w);
+    }
+
+    /// <summary>
+    /// Science: each commune's research, from its people, its practical education and the
+    /// institutions it holds. Trade with more advanced states and sister federations add to it.
+    /// </summary>
+    private static void Produce(World w)
+    {
+        var b = w.Balance;
+        foreach (var c in w.Communes)
+            c.Science = c.InFederation ? Math.Sqrt(c.Population) * (0.2 + c.PracticalEducation) * (1 + w.LocalEffect(c, e => e.Science)) / 10 : 0;
+        double contacts = 0;
+        if (w.ForeignTrade && w.States.Count > 0)
+        {
+            var partners = w.States.Where(s => !s.Sister && !s.Does(Global.StateActions.Embargo)).ToList();
+            double weight = partners.Sum(s => s.Weight);
+            if (weight > 0) contacts += b.TradeScience * partners.Sum(s => s.Weight * s.TechLevel) / weight;
+        }
+        contacts += b.SisterScience * w.States.Count(s => s.Sister);
+        w.LastScience = w.Communes.Sum(c => c.Science) * (1 + contacts) * w.Weeks;
+        w.Science += w.LastScience;
+    }
+
+    /// <summary>The science needed for the next breakthrough: each one costs more.</summary>
+    public static double BreakthroughCost(World w) => w.Balance.BreakthroughCost * (1 + w.Balance.BreakthroughGrowth * w.Breakthroughs);
+
+    /// <summary>
+    /// When enough science has accumulated, the commune with the most research makes a
+    /// discovery in the line the movement has asked for. Without a focus, nobody organizes the
+    /// research: science still speeds discoveries, but no breakthroughs come of it.
+    /// </summary>
+    private static void Breakthrough(World w)
+    {
+        double cost = BreakthroughCost(w);
+        if (w.ResearchFocus is null || w.Science < cost) return;
+        var options = w.Federation
+            .SelectMany(c => w.LiveTechs.Where(t => !c.Techs.Contains(t.Id) && CanDiscover(w, c, t)).Select(t => (c, t)))
+            .ToList();
+        if (options.Any(o => o.t.Category == w.ResearchFocus)) options = options.Where(o => o.t.Category == w.ResearchFocus).ToList();
+        if (options.Count == 0) return; // science keeps accumulating until something is within reach
+        var weights = options.Select(o => o.c.Science * Weight(w, o.c, o.t) * Openness(w, o.c, o.t)).ToList();
+        var (commune, tech) = w.Rng.PickWeighted(options, weights);
+        w.Science -= cost;
+        w.Breakthroughs++;
+        bool first = !w.Communes.Any(o => o.Techs.Contains(tech.Id));
+        commune.Techs.Add(tech.Id);
+        w.Emit(Severity.Good, $"Breakthrough: {commune.Name}'s researchers {(first ? "develop" : "work out")} {tech.Name}. {tech.Perk}. Risk: {Lower(tech.Risk)}", commune.Id);
     }
 
     private static void Discover(World w)
@@ -21,8 +70,8 @@ internal static class ResearchSystem
         var b = w.Balance;
         foreach (var c in w.Active)
         {
-            if (!w.Rng.Chance(b.DiscoveryRate * (0.25 + c.PracticalEducation))) continue;
-            var candidates = w.Techs.All.Where(t => !c.Techs.Contains(t.Id) && CanDiscover(c, t)).ToList();
+            if (!w.Rng.Chance(b.DiscoveryRate * (0.25 + c.PracticalEducation) * (1 + w.LocalEffect(c, e => e.Science)))) continue;
+            var candidates = w.LiveTechs.Where(t => !c.Techs.Contains(t.Id) && CanDiscover(w, c, t)).ToList();
             if (candidates.Count == 0) continue;
             var weights = candidates.Select(t => Weight(w, c, t) * Openness(w, c, t)).ToList();
             var tech = w.Rng.PickWeighted(candidates, weights);
@@ -50,7 +99,7 @@ internal static class ResearchSystem
                 {
                     if (dst.Techs.Contains(id)) continue;
                     var t = w.Techs[id];
-                    if (!CanAdopt(dst, t)) continue;
+                    if (!CanAdopt(w, dst, t)) continue;
                     double p = b.DiffusionRate * trust * (0.4 + dst.PracticalEducation) * boost * (w.IdeaNudges.ContainsKey(id) ? 2 : 1)
                                * (w.Rail(src.Id, dst.Id) ? b.RailDiffusion : 1) * Openness(w, dst, t);
                     if (w.Rng.Chance(p)) adoptions.Add((dst, id));
@@ -63,7 +112,7 @@ internal static class ResearchSystem
     private static void AnnounceWidespread(World w)
     {
         w.RefreshTechShares();
-        foreach (var t in w.Techs.All)
+        foreach (var t in w.LiveTechs)
         {
             if (w.TechShare(t.Id) < 0.5 || !w.WidespreadTechs.Add(t.Id)) continue;
             w.Emit(t.Effects.DriftPerTick > 0 ? Severity.Warning : Severity.Good,
@@ -75,8 +124,8 @@ internal static class ResearchSystem
     /// Adopting an idea someone else developed is easier than discovering it: half the education
     /// on both tracks. Used for diffusion along trust links and for congresses.
     /// </summary>
-    internal static bool CanAdopt(Commune c, TechDefinition t) =>
-        t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical * 0.5 && c.PoliticalEducation >= t.MinPolitical * 0.5;
+    internal static bool CanAdopt(World w, Commune c, TechDefinition t) =>
+        w.Reached(t) && !w.CommonKnowledge(t) && t.Prerequisites.All(p => w.Knows(c, p)) && c.PracticalEducation >= t.MinPractical * 0.5 && c.PoliticalEducation >= t.MinPolitical * 0.5;
 
     /// <summary>
     /// A commune that has taken a line's free path (holds a technology there that brakes drift
@@ -93,8 +142,8 @@ internal static class ResearchSystem
         return 1;
     }
 
-    internal static bool CanDiscover(Commune c, TechDefinition t) =>
-        t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical && c.PoliticalEducation >= t.MinPolitical;
+    internal static bool CanDiscover(World w, Commune c, TechDefinition t) =>
+        w.Reached(t) && !w.CommonKnowledge(t) && t.Prerequisites.All(p => w.Knows(c, p)) && c.PracticalEducation >= t.MinPractical && c.PoliticalEducation >= t.MinPolitical;
 
     private static double Weight(World w, Commune c, TechDefinition t)
     {
@@ -109,7 +158,8 @@ internal static class ResearchSystem
                  + a.Militant * CommuneValues.To01(c.Values.Militancy)
                  + a.Federalist * CommuneValues.To01(c.Values.Federalism)
                  + a.Collectivist * CommuneValues.To01(c.Values.Collectivism)
-                 + (w.IdeaNudges.ContainsKey(t.Id) ? w.Balance.IdeaNudgeWeight : 0);
+                 + (w.IdeaNudges.ContainsKey(t.Id) ? w.Balance.IdeaNudgeWeight : 0)
+                 + (w.ResearchFocus == t.Category ? w.Balance.FocusWeight : 0);
     }
 
     private static string Lower(string s) => s.Length == 0 ? s : char.ToLowerInvariant(s[0]) + s[1..];

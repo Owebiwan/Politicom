@@ -53,9 +53,10 @@ public sealed class DriftBreakdown
     public double Events { get; set; }
     public double PoliticalEducationBrake { get; set; }
     public double TechnologyBrake { get; set; }
+    public double CultureBrake { get; set; }
 
     [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects;
-    [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake;
+    [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake + CultureBrake;
     [JsonIgnore] public double Net => Pressure - Brakes + Events;
 
     public IEnumerable<(string Label, double Value)> Items()
@@ -72,6 +73,7 @@ public sealed class DriftBreakdown
         yield return ("One-off events", Events);
         yield return ("Political education", -PoliticalEducationBrake);
         yield return ("Mandates, recall, rotation", -TechnologyBrake);
+        yield return ("A culture of freedom", -CultureBrake);
     }
 }
 

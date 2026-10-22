@@ -287,6 +287,9 @@ public partial class MapView
             c = sim is null ? new Color("4a4d52")
                 : sim.Stance < 0 ? new Color("6d6f73").Lerp(new Color("b0392f"), (float)-sim.Stance)
                 : new Color("6d6f73").Lerp(new Color("4f9a5c"), (float)sim.Stance);
+        else if (Mode == MapMode.Culture)
+            // Rival cultures: how strongly each state's nation, church or party resists the movement's ideas.
+            c = sim is null ? new Color("4a4d52") : new Color("4a4d52").Lerp(new Color("6a4c93"), Mathf.Clamp((float)sim.CulturalWeight * 1.5f, 0, 1));
         else if (Mode == MapMode.Revolution)
             c = sim is null ? new Color("4a4d52") : new Color("3a3233").Lerp(new Color("e0443a"), Mathf.Clamp((float)sim.Radicalization * 2.5f, 0, 1));
         else // political map: each state's colour, muted so the region stands out

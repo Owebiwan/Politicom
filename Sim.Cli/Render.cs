@@ -167,15 +167,18 @@ internal static class Render
     public static string TechTable(World w)
     {
         var sb = new StringBuilder();
+        sb.AppendLine($"Science {w.LastScience:0.0} a {w.Turn} · next breakthrough {w.Science:0}/{w.BreakthroughCost:0} · focus {w.ResearchFocus ?? "balanced"} · "
+                      + $"{w.Techs.All.Count(w.CommonKnowledge)} techniques of earlier ages are common knowledge");
         foreach (var category in w.Techs.Categories)
         {
             sb.AppendLine(Bold(category.ToUpperInvariant()));
-            foreach (var t in w.Techs.All.Where(t => t.Category == category).OrderBy(t => w.Techs.Depth(t.Id)))
+            foreach (var t in w.LiveTechs.Where(t => t.Category == category).OrderBy(t => t.Era).ThenBy(t => w.Techs.Depth(t.Id)))
             {
                 double share = w.TechShare(t.Id);
                 string nudge = w.IdeaNudges.TryGetValue(t.Id, out var n) ? Paint($" circulating {w.Turns(n)}", "36") : "";
                 string indent = new string(' ', 2 * w.Techs.Depth(t.Id));
-                sb.AppendLine($"  {indent}{t.Id,-24} {Bar(share, 1, 10, "36")} {share,4:P0}  {Bold(t.Name)}{nudge}");
+                string era = w.Reached(t) ? "" : Paint($" from {Ages.Year(t.Era)}", "33");
+                sb.AppendLine($"  {indent}{t.Id,-24} {Bar(share, 1, 10, "36")} {share,4:P0}  {Bold(t.Name)}{nudge}{era}");
                 sb.AppendLine(Dim($"  {indent}{"",24}   + {t.Perk}.  − {t.Risk}.") +
                               (t.Effects.DriftPerTick > 0 ? Paint($" (drift +{t.Effects.DriftPerTick:0.00})", "31") : "") +
                               (t.Effects.DriftBrake > 0 ? Paint($" (brake −{t.Effects.DriftBrake:0.00})", "32") : ""));

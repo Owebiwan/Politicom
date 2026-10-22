@@ -6,7 +6,7 @@ using Politicom.Sim;
 
 namespace Politicom.Game;
 
-public enum MapMode { Trust, Education, Values, Wellbeing, Ideology, Diplomacy, Revolution }
+public enum MapMode { Trust, Education, Values, Wellbeing, Ideology, Diplomacy, Revolution, Culture }
 
 /// <summary>
 /// The map. With real geography (<see cref="GeoData"/>), communes sit at their true positions
@@ -565,6 +565,9 @@ public partial class MapView : Control
                 return Anarchist.Darkened(0.15f); // the federation itself
             case MapMode.Diplomacy or MapMode.Revolution:
                 return new Color("a8946a"); // the federation: outside the scale of other states' attitudes
+            case MapMode.Culture:
+                // Dark slate where the movement's ideas are thin, warm gold where they run deep.
+                return new Color("39404a").Lerp(new Color("f2c94c"), Mathf.Clamp((float)c.Culture * 2.5f, 0, 1));
             case MapMode.Values:
                 return new Color(
                     (float)CommuneValues.To01(c.Values.Collectivism),
@@ -597,6 +600,7 @@ public partial class MapView : Control
             MapMode.Trust => "Trust — rust low, sand middling, green high. Lines: trust between neighbours.",
             MapMode.Education => "Education — orange: practical ahead (expert trap), violet: political ahead. Darker = less educated.",
             MapMode.Values => "Values — red: collectivist, green: federalist, blue: militant.",
+            MapMode.Culture => "Culture — dark where the movement's ideas are thin, gold where deep. Abroad: violet where a state's own culture resists yours.",
             MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy.",
             MapMode.Diplomacy => "Diplomacy — red hostile, grey neutral, green friendly toward the federation. Click a country for the World tab.",
             MapMode.Revolution => "Revolution — how radicalized each state's workers are: dark none, bright red near revolt.",

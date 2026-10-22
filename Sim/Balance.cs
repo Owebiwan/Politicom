@@ -199,6 +199,39 @@ public sealed class Balance
     /// <summary>Destroyed when fewer than this share of communes remain free and federated.</summary>
     public double CollapseFraction { get; set; } = 0.3;
 
+    // ── Science, culture and technology levels ─────────────────────────────
+    /// <summary>Science for the first breakthrough; each later one costs BreakthroughGrowth more.</summary>
+    public double BreakthroughCost { get; set; } = 100;
+    public double BreakthroughGrowth { get; set; } = 0.2;
+    /// <summary>Extra discovery weight for technologies in the research focus.</summary>
+    public double FocusWeight { get; set; } = 3;
+    /// <summary>Science bonus from trade, times the trading partners' mean technology level.</summary>
+    public double TradeScience { get; set; } = 0.3;
+    public double SisterScience { get; set; } = 0.1;
+    /// <summary>Starting culture as a share of political education.</summary>
+    public double StartCulture { get; set; } = 0.3;
+    public double CultureRate { get; set; } = 0.012;
+    public double CultureSpread { get; set; } = 0.03;
+    public double CultureDecay { get; set; } = 0.006;
+    /// <summary>Drift brake per turn at full culture across the federation.</summary>
+    public double CultureDriftBrake { get; set; } = 0.05;
+    /// <summary>Trust gained per turn between neighbours at full culture.</summary>
+    public double CultureTrust { get; set; } = 0.002;
+    /// <summary>Contagion multiplier at full culture.</summary>
+    public double CultureContagion { get; set; } = 0.6;
+    /// <summary>How much culture keeps rival parties' cells out (1 = completely at full culture).</summary>
+    public double CultureResistsParty { get; set; } = 0.6;
+    /// <summary>How much a state's own culture resists contagion among its workers, at full weight.</summary>
+    public double RivalCultureResistance { get; set; } = 0.4;
+    public double CostCulturalWork { get; set; } = 12;
+    public int CulturalWorkCooldown { get; set; } = 8;
+    public double StateTechGrowth { get; set; } = 0.0015;
+    public double EnemyTechGrowth { get; set; } = 0.003;
+    /// <summary>How the federation's technology level compares with an enemy's (it moves on a smaller scale).</summary>
+    public double FederationTechScale { get; set; } = 2;
+    public double TechEdge { get; set; } = 0.8;
+    public double TechEdgeCap { get; set; } = 0.2;
+
     // ── Influence (player resource) ────────────────────────────────────────
     public double StartInfluence { get; set; } = 25;
     public double InfluenceBase { get; set; } = 1.0;

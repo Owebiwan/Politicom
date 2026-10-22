@@ -19,6 +19,7 @@ internal static class DriftSystem
             Events = w.PendingDriftBump,
             PoliticalEducationBrake = b.PoliticalBrake * w.Mean(c => c.PoliticalEducation),
             TechnologyBrake = w.SocietyEffect(e => e.DriftBrake),
+            CultureBrake = b.CultureDriftBrake * CultureSystem.Mean(w) * w.Weeks,
         };
         w.PendingDriftBump = 0;
         w.LastDrift = d;

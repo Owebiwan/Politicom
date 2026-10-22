@@ -23,7 +23,8 @@ public static class RivalSystem
         // Party cells grow where political education is thin and life is hard; education wears them down.
         foreach (var c in w.Federation)
         {
-            double grow = b.PartyGrowth * pressure * (1 - c.PoliticalEducation) * (c.Starving || c.Front ? 1.5 : 1);
+            double grow = b.PartyGrowth * pressure * (1 - c.PoliticalEducation) * (c.Starving || c.Front ? 1.5 : 1)
+                          * (1 - b.CultureResistsParty * c.Culture);
             double fade = b.PartyFade * c.PoliticalEducation;
             c.PartyInfluence = Math.Clamp(c.PartyInfluence + grow * (1 - c.PartyInfluence) - fade * c.PartyInfluence, 0, 1);
         }

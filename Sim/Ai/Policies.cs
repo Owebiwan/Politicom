@@ -48,6 +48,8 @@ public sealed class Educator : IPolicy
         Helpers.Diplomacy(w, crisis: w.Federation.Any(c => c.Front && c.Control < 0.5), reserve: 15);
         if (w.Drift.Value > 20 && w.Influence >= w.Balance.CostRecall * DriftEffects.RecallCost(w.Drift.Stage) + 5) w.Apply(new RecallDelegates());
         if (w.Tick % 10 == 3 && Helpers.LeastPolitical(w) is { } t) w.Apply(new ProposeProject(ProjectKind.AteneoNetwork, t.Id));
+        if (w.ResearchFocus != "Organizational") w.Apply(new SetResearchFocus("Organizational"));
+        if (w.Tick % 5 == 2 && w.Influence > 25) Helpers.CulturalWork(w, CulturalWorkKind.SchoolMovement);
         Helpers.ReliefForStarving(w);
         while (w.Influence > 20)
         {
@@ -71,6 +73,7 @@ public sealed class Centralizer : IPolicy
         Helpers.AnswerEvents(w, e => e.EnemyStrength * 3 - e.Influence * 0.1);
         foreach (var s in w.PendingSecessions.ToList()) w.Apply(new HoldCommune(s.Commune));
         if (!w.IdeaNudges.ContainsKey("federal_statistics")) w.Apply(new CirculateIdea("federal_statistics"));
+        if (w.ResearchFocus != "Military") w.Apply(new SetResearchFocus("Military"));
         if (w.Tick % 15 == 2) w.Apply(new ProposeProject(ProjectKind.Collectivization));
         if (w.OffensiveUnderway || w.Tick % 12 == 0) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
         w.Apply(new SponsorCongress());
@@ -120,6 +123,11 @@ public sealed class Balanced : IPolicy
         if (w.Tick % 20 == 5 && w.TechShare("militia_doctrine") < 0.5) w.Apply(new CirculateIdea("militia_doctrine"));
         if (w.Tick % 20 == 15 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
         if (w.Tick % 16 == 8 && w.Influence > 40) w.Apply(new SponsorCongress());
+
+        // Science to the front in a crisis, to the drift brakes when drift is close to a threshold.
+        string focus = crisis ? "Military" : margin < 10 ? "Organizational" : w.Federation.Any(c => c.Starving) ? "Agricultural" : "Industrial";
+        if (focus != w.ResearchFocus) w.Apply(new SetResearchFocus(focus));
+        if (w.Tick % 6 == 1 && w.Influence > 35) Helpers.CulturalWork(w, crisis ? CulturalWorkKind.Newspaper : CulturalWorkKind.ArtMovement);
 
         while (w.Influence > 25)
         {
@@ -178,6 +186,14 @@ internal static class Helpers
             w.Apply(new AgitateWorkers(ripe.Id));
     }
 
+    /// <summary>A cultural work where culture is thinnest (and the work isn't still being taken up).</summary>
+    public static void CulturalWork(World w, CulturalWorkKind kind)
+    {
+        var c = w.Federation.Where(c => w.Tick - c.LastCulturalWork >= CulturalWorks.Cooldown(w))
+                            .OrderBy(c => c.Culture - (kind == CulturalWorkKind.Newspaper && c.Front ? 0.3 : 0)).FirstOrDefault();
+        if (c != null) w.Apply(new FoundCulturalWork(c.Id, kind));
+    }
+
     /// <summary>Accept a sister federation's offer to federate.</summary>
     public static void AcceptFederation(World w)
     {
@@ -196,7 +212,7 @@ internal static class Helpers
     public static string? NextBrake(World w) =>
         w.Techs.All
             .Where(t => t.Effects.DriftBrake > 0 && w.TechShare(t.Id) < 0.6 && !w.IdeaNudges.ContainsKey(t.Id))
-            .Where(t => w.Federation.Any(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(c, t)))
+            .Where(t => w.Federation.Any(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(w, c, t)))
             .OrderBy(t => w.TechShare(t.Id)).ThenByDescending(t => t.Effects.DriftBrake)
             .Select(t => t.Id).FirstOrDefault();
 

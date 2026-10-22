@@ -27,6 +27,10 @@ public sealed class HostileState
     public List<Offensive> Offensives { get; set; } = new();
     /// <summary>States that intervene on this enemy's side when hostile enough (e.g. Germany and Italy for the Nationalists).</summary>
     public string[] Sponsors { get; set; } = Array.Empty<string>();
+    /// <summary>0..1: how modern its army and industry are. It advances every turn; falling behind it costs the federation.</summary>
+    public double TechLevel { get; set; } = 0.5;
+    /// <summary>Its technology level when the game started.</summary>
+    public double TechStart { get; set; }
     /// <summary>Strength added this turn by intervening states; recomputed every turn.</summary>
     [JsonInclude] public double Intervention { get; internal set; }
     [JsonInclude] public Offensive? CurrentOffensive { get; internal set; }

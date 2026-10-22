@@ -468,9 +468,9 @@ public class SimulationTests
         var c = w.Communes[0];
         c.Techs.UnionWith(mandate.Prerequisites);
         c.PoliticalEducation = mandate.MinPolitical * 0.4;
-        Assert.False(Systems.ResearchSystem.CanAdopt(c, mandate));
+        Assert.False(Systems.ResearchSystem.CanAdopt(w, c, mandate));
         c.PoliticalEducation = mandate.MinPolitical * 0.6;
-        Assert.True(Systems.ResearchSystem.CanAdopt(c, mandate));
+        Assert.True(Systems.ResearchSystem.CanAdopt(w, c, mandate));
     }
 
     [Fact]
@@ -561,7 +561,7 @@ public class SimulationTests
     public void The_tech_tree_has_real_chains_and_no_cycles()
     {
         var techs = NewWorld().Techs;
-        Assert.InRange(techs.All.Count, 20, 40);
+        Assert.InRange(techs.All.Count, 90, 110);
         Assert.Equal(5, techs.Categories.Count);
         Assert.All(techs.Categories, cat => Assert.Contains(techs.All, t => t.Category == cat && techs.Depth(t.Id) >= 1));
         Assert.True(techs.Categories.Count(cat => techs.All.Any(t => t.Category == cat && techs.Depth(t.Id) >= 2)) >= 4);
@@ -572,6 +572,110 @@ public class SimulationTests
             new TechDefinition { Id = "a", Prerequisites = new[] { "b" } },
             new TechDefinition { Id = "b", Prerequisites = new[] { "a" } },
         }));
+    }
+
+    [Fact]
+    public void Every_age_has_techniques_in_every_line()
+    {
+        var techs = NewWorld().Techs;
+        foreach (var (age, from) in Ages.All)
+            foreach (var line in techs.Categories)
+                Assert.True(techs.All.Any(t => t.Category == line && Ages.Name(t.Era) == age), $"No {line} technique in the {age} age");
+        Assert.All(techs.All, t => Assert.True(t.Until is null || t.Until > t.Era, t.Id));
+        // A technique never needs one that comes later than itself.
+        Assert.All(techs.All, t => Assert.All(t.Prerequisites, p => Assert.True(techs[p].Era <= t.Era, $"{t.Id} needs later {p}")));
+    }
+
+    [Fact]
+    public void Technologies_ahead_of_the_era_stay_locked_and_old_ones_are_common_knowledge()
+    {
+        var w = NewWorld(); // Catalonia, 1936
+        var c = w.Communes[0];
+        c.PracticalEducation = c.PoliticalEducation = 1;
+        c.Techs.UnionWith(new[] { "radio", "telegraph" });
+        var tv = w.Techs["television"]; // 1950
+        Assert.False(w.CanDiscover(c, tv));
+        Assert.True(w.CommonKnowledge(w.Techs["writing"]));
+        Assert.False(w.CanDiscover(c, w.Techs["writing"]));
+        Assert.DoesNotContain(w.LiveTechs, t => t.Id == "writing");
+        // Prerequisites that are common knowledge count as known.
+        var phone = w.Techs["telephone"];
+        Assert.True(w.CanDiscover(c, phone));
+        Assert.True(w.Knows(c, "printing_press"));
+    }
+
+    [Fact]
+    public void Science_brings_breakthroughs_in_the_focus_line()
+    {
+        var w = NewWorld();
+        w.Apply(new SetResearchFocus("Agricultural"));
+        Assert.Equal("Agricultural", w.ResearchFocus);
+        var before = w.Communes.Sum(c => c.Techs.Count(t => w.Techs[t].Category == "Agricultural"));
+        w.Run(40);
+        Assert.True(w.LastScience > 0);
+        Assert.True(w.Breakthroughs >= 1);
+        Assert.Contains(w.Log, e => e.Text.StartsWith("Breakthrough"));
+        Assert.All(w.Log.Where(e => e.Text.StartsWith("Breakthrough")), e => Assert.Contains(w.Techs.All.Where(t => t.Category == "Agricultural"), t => e.Text.Contains(t.Name)));
+        Assert.False(w.Apply(new SetResearchFocus("Alchemy")).Ok);
+    }
+
+    [Fact]
+    public void Without_a_research_focus_science_brings_no_breakthroughs()
+    {
+        var w = NewWorld();
+        w.Run(40);
+        Assert.Equal(0, w.Breakthroughs);
+        Assert.True(w.Science > w.BreakthroughCost); // it accumulates, waiting for organized research
+    }
+
+    [Fact]
+    public void Practical_education_raises_science()
+    {
+        var low = NewWorld();
+        var high = NewWorld();
+        foreach (var c in high.Communes) c.PracticalEducation += 0.3;
+        low.Step();
+        high.Step();
+        Assert.True(high.LastScience > low.LastScience * 1.3);
+    }
+
+    [Fact]
+    public void Culture_brakes_drift_and_cultural_works_build_it()
+    {
+        var w = NewWorld();
+        var c = w.Federation.First();
+        double before = c.Culture;
+        w.Influence = 100;
+        Assert.True(w.Apply(new FoundCulturalWork(c.Id, CulturalWorkKind.ArtMovement)).Ok);
+        Assert.True(c.Culture > before + 0.1);
+        Assert.False(w.Apply(new FoundCulturalWork(c.Id, CulturalWorkKind.Newspaper)).Ok); // still taking up the last one
+
+        var bare = NewWorld();
+        var cultured = NewWorld();
+        foreach (var x in bare.Communes) x.Culture = 0;
+        foreach (var x in cultured.Communes) x.Culture = 0.8;
+        bare.Step();
+        cultured.Step();
+        Assert.Equal(0, bare.LastDrift.CultureBrake, 3);
+        Assert.True(cultured.LastDrift.CultureBrake > 0.02);
+        Assert.True(cultured.Drift.Value < bare.Drift.Value);
+    }
+
+    [Fact]
+    public void The_enemy_modernizes_and_a_stagnant_federation_falls_behind()
+    {
+        var w = NewWorld();
+        var e = w.Enemies[0];
+        double start = e.TechLevel;
+        foreach (var c in w.Communes) c.Techs.Clear(); // no research at all
+        for (int i = 0; i < 60; i++)
+        {
+            foreach (var c in w.Communes) c.Techs.Clear();
+            w.Step();
+        }
+        Assert.True(e.TechLevel > start + 0.1);
+        Assert.True(Sim.Global.TechLevelSystem.EnemyEdge(w, e) > 1.05);
+        Assert.All(w.States, s => Assert.InRange(s.TechLevel, 0.01, 1));
     }
 
     [Fact]

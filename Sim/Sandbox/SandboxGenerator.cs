@@ -41,8 +41,8 @@ public sealed class SandboxGenerator
     };
 
     // Calibration: the balanced AI should survive about this often on every generated map.
-    private const double TargetSurvival = 0.7;
-    private const int CalibrationGames = 10;
+    private const double TargetSurvival = 0.65;
+    private const int CalibrationGames = 12;
     private const int CalibrationSteps = 6;
 
     private readonly List<(string Window, string Json)> _templates;

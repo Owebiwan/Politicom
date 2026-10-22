@@ -48,8 +48,47 @@ public sealed class World
 
     public int Tick { get; private set; }
     public DateOnly Date => DateAt(Tick);
+    /// <summary>The calendar year, which gates the technologies of each age.</summary>
+    public int Year => Date.Year;
+
+    /// <summary>Common knowledge by now: no longer a choice, not shown, and it satisfies prerequisites.</summary>
+    public bool CommonKnowledge(TechDefinition t) => t.Until is int until && Year >= until;
+    /// <summary>The world has reached the technology's era, so it can be discovered.</summary>
+    public bool Reached(TechDefinition t) => t.Era <= Year;
+    /// <summary>The technologies of this game: not yet common knowledge. Later ones are shown but locked.</summary>
+    public IEnumerable<TechDefinition> LiveTechs => Techs.All.Where(t => !CommonKnowledge(t));
+    /// <summary>Whether a commune can build on a technology: it holds it, or everyone knows it.</summary>
+    public bool Knows(Commune c, string id) => c.Techs.Contains(id) || CommonKnowledge(Techs[id]);
+
+    /// <summary>Line the movement asks the communes to put their science into (null = balanced).</summary>
+    public string? ResearchFocus { get; internal set; }
+    /// <summary>Science accumulated toward the next breakthrough.</summary>
+    public double Science { get; internal set; }
+    /// <summary>Science produced last turn, across the federation.</summary>
+    public double LastScience { get; internal set; }
+    public int Breakthroughs { get; internal set; }
+    /// <summary>Science the next breakthrough needs.</summary>
+    public double BreakthroughCost => ResearchSystem.BreakthroughCost(this);
+    /// <summary>The federation's technology level when the game started, for comparing with the world's.</summary>
+    public double TechLevelStart { get; internal set; }
+    /// <summary>
+    /// The federation's technology level, 0..1: the share of this age's reached technologies the
+    /// average commune holds.
+    /// </summary>
+    public double TechLevel
+    {
+        get
+        {
+            var reached = LiveTechs.Where(Reached).Select(t => t.Id).ToList();
+            var members = Federation.ToList();
+            if (reached.Count == 0 || members.Count == 0) return 0;
+            return members.Average(c => reached.Count(c.Techs.Contains)) / reached.Count;
+        }
+    }
     public DateOnly DateAt(int tick) => Scenario.StartDate.AddDays(Scenario.DaysPerTick * tick);
     /// <summary>What one turn is called in this scenario: "week", "day" or "turn".</summary>
+    /// <summary>A turn's length in weeks: slow processes (science, culture, modernization) scale with it.</summary>
+    public double Weeks => Scenario.DaysPerTick / 7.0;
     public string Turn => Scenario.DaysPerTick switch { 7 => "week", 1 => "day", _ => "turn" };
     public string Turns(int n) => $"{n} {Turn}{(n == 1 ? "" : "s")}";
     public double Influence { get; internal set; }
@@ -205,7 +244,7 @@ public sealed class World
             world.States.Add(new Global.WorldState
             {
                 Id = d.Id, Name = d.Name, Ideology = d.Ideology, Power = d.Power, Proximity = d.Proximity,
-                Neighbours = d.Neighbours, Stance = d.InitialStance,
+                Neighbours = d.Neighbours, Stance = d.InitialStance, TechLevel = Global.TechLevelSystem.Initial(d),
             });
             world._baselines[d.Id] = d.InitialStance;
         }
@@ -217,6 +256,9 @@ public sealed class World
             world.AddRailway(Id(line[0]), Id(line[1]));
         }
         world.RefreshTechShares();
+        foreach (var c in world._communes) c.Culture = balance.StartCulture * c.PoliticalEducation;
+        world.TechLevelStart = world.TechLevel;
+        foreach (var e in world.Enemies) e.TechStart = e.TechLevel;
         world.Emit(Severity.Info, scenario.Description);
         return world;
     }
@@ -259,6 +301,11 @@ public sealed class World
         IdeaNudges = IdeaNudges,
         TransportBonus = TransportBonus,
         WidespreadTechs = WidespreadTechs.ToList(),
+        ResearchFocus = ResearchFocus,
+        Science = Science,
+        LastScience = LastScience,
+        Breakthroughs = Breakthroughs,
+        TechLevelStart = TechLevelStart,
         Scores = Scores,
         Outcome = Outcome,
         InitialCommuneCount = InitialCommuneCount,
@@ -300,6 +347,11 @@ public sealed class World
             RecallPenaltyTicks = s.RecallPenaltyTicks,
             LastCongressTick = s.LastCongressTick,
             TransportBonus = s.TransportBonus,
+            ResearchFocus = s.ResearchFocus,
+            Science = s.Science,
+            LastScience = s.LastScience,
+            Breakthroughs = s.Breakthroughs,
+            TechLevelStart = s.TechLevelStart,
             Scores = s.Scores,
             Outcome = s.Outcome,
         };
@@ -333,11 +385,13 @@ public sealed class World
         EconomySystem.Run(this);
         EducationSystem.Run(this);
         ResearchSystem.Run(this);
+        CultureSystem.Run(this);
         ProjectSystem.Run(this);
         Global.DiplomacySystem.Run(this);
         Global.RevolutionSystem.Run(this);
         Global.InterstateSystem.Run(this);
         Global.RivalSystem.Run(this);
+        Global.TechLevelSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
@@ -361,7 +415,8 @@ public sealed class World
     public double SocietyEffect(Func<TechEffects, double> effect)
     {
         double sum = 0;
-        foreach (var t in Techs.All) sum += effect(t.Effects) * TechShare(t.Id);
+        foreach (var t in Techs.All)
+            if (!CommonKnowledge(t)) sum += effect(t.Effects) * TechShare(t.Id);
         return sum;
     }
 
@@ -369,12 +424,13 @@ public sealed class World
     public double LocalEffect(Commune c, Func<TechEffects, double> effect)
     {
         double sum = 0;
-        foreach (var id in c.Techs) sum += effect(Techs[id].Effects);
+        foreach (var id in c.Techs)
+            if (Techs[id] is var t && !CommonKnowledge(t)) sum += effect(t.Effects);
         return sum;
     }
 
     /// <summary>Whether a commune has the prerequisites and education to discover a technology itself.</summary>
-    public bool CanDiscover(Commune c, TechDefinition t) => ResearchSystem.CanDiscover(c, t);
+    public bool CanDiscover(Commune c, TechDefinition t) => ResearchSystem.CanDiscover(this, c, t);
 
     public EventDefinition EventDefinition(string id) => Scenario.Events.First(e => e.Id == id);
 

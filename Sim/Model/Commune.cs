@@ -65,6 +65,12 @@ public sealed class Commune
     public double ProductivityBonus { get; set; }
     /// <summary>0..1: how far a rival party's cells have taken hold here.</summary>
     public double PartyInfluence { get; set; }
+    /// <summary>0..1: cultural influence of the movement's ideas here (the press, schools, songs).</summary>
+    public double Culture { get; set; }
+    /// <summary>Turn of the last cultural work founded here.</summary>
+    public int LastCulturalWork { get; set; } = -999;
+    /// <summary>Research produced last turn.</summary>
+    [JsonInclude] public double Science { get; internal set; }
 
     // Decaying ledgers used to spot free riders.
     public double AidGiven { get; set; }

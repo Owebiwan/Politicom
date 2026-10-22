@@ -21,7 +21,8 @@ internal static class TrustSystem
             double delta = -b.ValueFrictionRate * a.Values.Distance(c.Values) * 2 * mediation
                            - b.FreeRideTrustLoss * (a.FreeRiding + c.FreeRiding)
                            - erosion
-                           + b.TrustBaselinePull * (0.5 - t);
+                           + b.TrustBaselinePull * (0.5 - t)
+                           + b.CultureTrust * (a.Culture + c.Culture) / 2;
             w.Trust.Add(i, j, delta);
         }
     }

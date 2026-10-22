@@ -110,17 +110,17 @@ This is alternate history, with the anarchist movement rising wherever you choos
 - **Terminal:** `--scenario open:1936:ARG` (or `open:1936:ARG:7` for seed 7). A state's id is
   its ISO code in `Data/world/<era>.json`.
 
-Balanced AI over 100 games each (survived/destroyed/became a state); the centralizer becomes a
-state in every one:
+Balanced AI over 200 games each. Each map is calibrated on 12 trial games, so individual
+maps vary. The centralizer becomes a state in (almost) every game.
 
-| Start            | survived | destroyed |
-|------------------|---------:|----------:|
-| Argentina 1936   |      63% |       37% |
-| Britain 1936     |      65% |       35% |
-| Soviet Union 1936|      63% |       37% |
-| Germany 1918     |      46% |       54% |
-| United States 1918 |    67% |       33% |
-| Italy 1871       |      78% |       22% |
+| Start              | survived | destroyed |
+|--------------------|---------:|----------:|
+| Argentina 1936     |      64% |       37% |
+| Britain 1936       |      55% |       45% |
+| Germany 1918       |      64% |       37% |
+| United States 1918 |      55% |       46% |
+| France 1871        |      59% |       42% |
+| Italy 1871         |      57% |       44% |
 
 ## What the player sees
 
@@ -267,46 +267,92 @@ below):
 
 ## The tech tree
 
-28 technologies sit in five lines of development (Organizational, Agricultural, Industrial,
-Military, Communication), in chains of two to four steps. Some need two lines at once:
-- **Heavy industry:** war industry and electrification.
-- **General staff:** mobile columns and war industry.
+There are 98 technologies in five lines of development: Organizational, Agricultural,
+Industrial, Military and Communication. They span seven ages: Ancient, Classical, Medieval,
+Early modern, Industrial, Modern and Contemporary.
+
+- **Era (`era`):** the year from which a technique can be discovered. Later ones are shown
+  dimmed with their year and stay locked until the calendar reaches them.
+- **Common knowledge (`until`):** older techniques become common knowledge by a given year.
+  Pre-industrial ones are common knowledge by 1850. They no longer appear in the tree, cost
+  nothing and count as known for prerequisites. So a game in 1936 plays the industrial,
+  modern and contemporary tree; a start in an earlier age plays its early tree (ancient maps are still to come).
+- **Chains:** each line runs from the first techniques to the latest, for example the
+  Organizational line: village moots → sortition → guild self-government → open assemblies →
+  imperative mandate → rotating delegates → consensus process. Some techniques need two lines
+  at once, such as heavy industry (war industry and electrification).
 
 Every line has an **efficient path** that adds drift and a **free path** that brakes it at
-some cost:
+some cost, in every age:
 
-| Line | Free path |
+| Line | Free path (industrial and modern) |
 |---|---|
-| Organizational | Imperative mandate, rotating delegates |
-| Agricultural | Communal land councils |
-| Industrial | Workers' control |
-| Military | Elected officers |
-| Communication | Wall newspapers |
+| Organizational | Imperative mandate, rotating delegates, consensus process |
+| Agricultural | Communal land councils, agroecology |
+| Industrial | Workers' control, cooperative networks |
+| Military | Elected officers, defence committees, civil resistance |
+| Communication | Wall newspapers, free radio, free software |
 
 A commune on a line's free path resists that line's centralizing technologies: it discovers
-and adopts them at about a third of the usual rate (`PathResistance`). So circulating a brake
-early decides which way a line develops.
-
-Almost every technology cuts both ways, adding drift or slowing decisions. The data is in
+and adopts them at about a third of the usual rate (`PathResistance`). The data is in
 `Data/technologies.json`.
 
-The movement can't choose research:
-- **Discovery:** communes discover ideas from their own education, needs and values.
-- **Spread:** ideas pass along trust links to neighbours with half the education needed.
-- **Circulate:** the only lever is to circulate an idea so it spreads faster.
+### Science
 
-Communes with little education stay on the first step, so the deeper tree opens up through
-schooling.
+- **Where science comes from:** each commune produces it from its people, its practical
+  education and the institutions it holds, such as libraries, scribes, academies and popular
+  universities.
+- **Who adds to it:** trade with more advanced states and sister federations.
+- **Breakthroughs:** science accumulates. When it reaches the cost of the next breakthrough,
+  the commune with the most research discovers something. Each breakthrough costs 20% more.
+  Breakthroughs need the movement to organize research with a focus. Without one, science
+  only speeds the communes' own discoveries, so science is a lever, not a free win.
+- **Research focus:** the movement still can't pick a technique, but it can set a focus on
+  one line. Breakthroughs then come in that line, and communes lean toward it when they
+  discover on their own.
+- **Spread:** ideas still spread along trust links, and the movement can circulate one.
+
+### Culture
+
+Each commune has a **culture**: how deeply the movement's ideas have taken root.
+- **Growth:** culture grows from political education and from cultural techniques (the press,
+  cinema, preachers, popular universities). It spreads to trusted neighbours and fades if
+  nothing feeds it.
+- **Cultural works:** the player can found three, each costing influence, with a commune
+  taking 8 weeks to take one up:
+  - **A newspaper:** culture here and next door, and its pages reach the enemy's workers.
+  - **A school movement:** culture and political education.
+  - **An art movement:** songs, theatre and posters. A lot of culture, and the neighbours warm
+    to it.
+- **Effects:** culture brakes drift ("a culture of freedom" in the drift breakdown), builds
+  trust, keeps rival parties' cells out and makes contagion abroad stronger.
+- **Rival cultures:** abroad, every state's own culture resists the movement's ideas among its
+  workers, most of all in large fascist, communist and monarchist states.
+- **Map:** the **Culture** map mode shows both.
+
+### Technology between states
+
+- **States:** every state has a technology level that rises with its size, faster at peace.
+- **The enemy:** it modernizes as the war goes on, faster when better-armed sponsors
+  intervene.
+- **Falling behind:** if the federation's own technology level rises less, the enemy gains up
+  to 20% strength ("+N% from better weapons" in the Overview). Keeping up cancels this, but
+  research can't make the enemy weaker than it started.
+
+All slow processes (science, culture, modernization) scale with turn length, so Paris's daily
+turns don't run seven times faster.
 
 **In Godot,** the **Technologies** button (or K) opens the tree:
-- **Nodes:** each shows how widely the idea has spread, whether it adds drift (▲) or brakes
-  it (▼), and the education it needs. Locked nodes are ideas no commune can reach yet.
-- **Chains:** hover or click a node to light up the chain leading to it.
-- **Details:** pointing at a node describes it in the side column: perk, risk, effects in
-  plain language, who has it and what it leads to. Clicking keeps it there, with a
-  **Circulate** button.
+- **Columns:** grouped by age, with the current age marked.
+- **Side column:** science, the next breakthrough and the research focus picker.
+- **Nodes:** each shows its spread, its drift (▲) or brake (▼), and the education it needs.
+- **Details:** hover or click a node to light up its chain and see its effects, its era and
+  who has it.
 
-**In the terminal,** `techs` lists the tree by category and depth.
+**In the terminal:**
+- `techs` lists the live tree.
+- `focus military` (or `focus balanced`) sets the research focus.
+- `paper`, `schools` and `art <commune>` found cultural works.
 
 ## Game length
 
@@ -394,11 +440,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           22%       78%     0% │    62    49      9    67    47 │    60
-educator          96%        4%     0% │    65    51     13    77    51 │    40
-centralizer        0%        0%   100% │    33    50      3    53    35 │   100
-balanced         100%        0%     0% │    83    52     12    79    56 │    33
-trader            97%        0%     2% │    85    52     12    74    56 │    47
+passive           30%       70%     0% │    61    49     10    66    47 │    60
+educator          93%        7%     0% │    63    51     16    77    52 │    37
+centralizer        0%        0%   100% │    34    50      3    52    35 │   100
+balanced         100%        0%     0% │    83    52     14    81    57 │    29
+trader            96%        0%     4% │    85    52     13    72    56 │    48
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -410,11 +456,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    67    49     10    85    53 │    34
-educator           0%      100%     0% │    70    50     11    89    55 │    23
-centralizer        0%        0%   100% │    31    48      2    55    34 │   100
-balanced          73%        4%    24% │    86    49     11    68    54 │    72
-trader            38%        8%    54% │    81    49     10    64    51 │    78
+passive            0%      100%     0% │    67    49     11    86    53 │    33
+educator           0%      100%     0% │    65    51     11    90    54 │    20
+centralizer        0%        0%   100% │    32    48      2    55    34 │   100
+balanced          70%        0%    30% │    86    49     12    67    54 │    73
+trader            43%        1%    56% │    81    49     11    64    51 │    77
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -425,10 +471,10 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    82    67      7    91    62 │    26
-educator           0%      100%     0% │    80    67      7    96    62 │     7
-centralizer        0%        0%   100% │    83    64      5    51    51 │   100
+educator           0%      100%     0% │    79    67      7    96    62 │     6
+centralizer        0%        0%   100% │    84    64      5    51    51 │   100
 balanced          30%       70%     0% │    96    68      7    93    66 │    16
-trader            48%       52%     0% │    96    68      7    90    65 │    23
+trader            44%       56%     0% │    96    68      7    90    65 │    22
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

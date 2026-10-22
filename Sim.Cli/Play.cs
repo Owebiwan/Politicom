@@ -36,6 +36,8 @@ internal static class Play
           appeal                                  appeal to the workers of the world: twice the volunteers for a while
           support <state>                         back a revolution under way abroad
           expose <commune>                        break up a rival party's cells here and next door
+          focus <line|balanced>                   put the communes' science into one line of technology
+          paper|schools|art <commune>             found a newspaper, a school movement or an art movement (culture)
 
           save [file] / load [file] save or restore the game (default politicom-save.json)
           next [n] / Enter          advance n turns          quit
@@ -166,6 +168,10 @@ internal static class Play
         "appeal" => new InternationalAppeal(),
         "support" => new SupportUprising(State(w, p, 1)),
         "expose" => new ExposeCells(Commune(w, p, 1)),
+        "focus" => new SetResearchFocus(p.Length < 2 || p[1] == "balanced" ? null : w.Techs.Categories.FirstOrDefault(c => c.StartsWith(p[1], StringComparison.OrdinalIgnoreCase)) ?? p[1]),
+        "paper" => new FoundCulturalWork(Commune(w, p, 1), CulturalWorkKind.Newspaper),
+        "schools" => new FoundCulturalWork(Commune(w, p, 1), CulturalWorkKind.SchoolMovement),
+        "art" => new FoundCulturalWork(Commune(w, p, 1), CulturalWorkKind.ArtMovement),
         "choose" => w.PendingEvents.Count == 0
             ? throw new ArgumentException("No event is waiting for an answer.")
             : new ChooseEventOption(w.PendingEvents[0].Id, int.Parse(Arg(p, 1)) - 1),

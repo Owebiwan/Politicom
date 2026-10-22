@@ -23,6 +23,10 @@ public sealed class TechEffects
     public double FreeRiding { get; set; }
     public double PoliticalEducation { get; set; }
     public double Influence { get; set; }
+    /// <summary>Research output of holders, as a fraction (libraries, scribes, academies).</summary>
+    public double Science { get; set; }
+    /// <summary>Cultural output of holders, as a fraction (the press, songs, theatre).</summary>
+    public double Culture { get; set; }
 
     /// <summary>Plain-language effects, strengths first and costs last, e.g. "Food +15%", "Drift +0.06/turn".</summary>
     public IEnumerable<(string Text, bool Good)> Describe()
@@ -37,6 +41,8 @@ public sealed class TechEffects
         if (Diffusion != 0) yield return ($"Ideas spread {Pct(Diffusion)}", Diffusion > 0);
         if (Contagion != 0) yield return ($"Contagion across the lines {Pct(Contagion)}", Contagion > 0);
         if (FreeRiding != 0) yield return ($"Free-riding {Pct(-FreeRiding)}", FreeRiding > 0);
+        if (Science != 0) yield return ($"Science {Pct(Science)} (holders)", Science > 0);
+        if (Culture != 0) yield return ($"Culture {Pct(Culture)} (holders)", Culture > 0);
         if (Influence != 0) yield return ($"Influence {(Influence > 0 ? "+" : "−")}{Math.Abs(Influence):0.0}/turn", Influence > 0);
         if (DriftBrake != 0) yield return ($"Drift brake −{DriftBrake:0.00}/turn", true);
         if (GoodsUpkeep != 0) yield return ($"Goods upkeep +{GoodsUpkeep:0.00} per head (holders)", false);
@@ -64,8 +70,33 @@ public sealed class TechDefinition
     public string[] Prerequisites { get; set; } = Array.Empty<string>();
     public double MinPractical { get; set; }
     public double MinPolitical { get; set; }
+    /// <summary>Year from which it can be discovered (negative = BC).</summary>
+    public int Era { get; set; } = -10000;
+    /// <summary>Year from which it is common knowledge: no longer a choice, and no longer shown. Null = never.</summary>
+    public int? Until { get; set; }
     public TechAffinity Affinity { get; set; } = new();
     public TechEffects Effects { get; set; } = new();
+}
+
+/// <summary>The ages the tree is grouped by.</summary>
+public static class Ages
+{
+    public static readonly (string Name, int From)[] All =
+    {
+        ("Ancient", -10000), ("Classical", -500), ("Medieval", 500), ("Early modern", 1450),
+        ("Industrial", 1750), ("Modern", 1900), ("Contemporary", 1960),
+    };
+
+    public static int Index(int year)
+    {
+        int i = 0;
+        while (i + 1 < All.Length && year >= All[i + 1].From) i++;
+        return i;
+    }
+
+    public static string Name(int year) => All[Index(year)].Name;
+
+    public static string Year(int year) => year < 0 ? $"{-year} BC" : $"{year}";
 }
 
 public sealed class TechCatalog

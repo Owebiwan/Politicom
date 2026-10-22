@@ -46,6 +46,11 @@ public sealed class SaveGame
     public Dictionary<string, int> IdeaNudges { get; set; } = new();
     public double TransportBonus { get; set; }
     public List<string> WidespreadTechs { get; set; } = new();
+    public string? ResearchFocus { get; set; }
+    public double Science { get; set; }
+    public double LastScience { get; set; }
+    public int Breakthroughs { get; set; }
+    public double TechLevelStart { get; set; }
     public Scores Scores { get; set; } = new();
     public Outcome Outcome { get; set; }
     public int InitialCommuneCount { get; set; }
