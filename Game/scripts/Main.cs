@@ -77,7 +77,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -100,6 +100,12 @@ public partial class Main : Control
         if (selectAt >= 0 && selectAt + 1 < args.Length) OnCommuneClicked(int.Parse(args[selectAt + 1]), false);
         for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++) StepTurn();
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
+        int techAt = Array.IndexOf(args, "--techs");
+        if (techAt >= 0)
+        {
+            var tree = ShowTechTree();
+            if (techAt + 1 < args.Length && !args[techAt + 1].StartsWith("--")) tree.Select(args[techAt + 1]);
+        }
         int tabAt = Array.IndexOf(args, "--tab");
         if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
@@ -137,6 +143,7 @@ public partial class Main : Control
         switch (key.Keycode)
         {
             case Key.C: ToggleCommuneList(); break;
+            case Key.K: ShowTechTree(); break;
             case Key.T:
                 _map.ShowTrustLinks = !_map.ShowTrustLinks;
                 _map.QueueRedraw();
@@ -164,6 +171,20 @@ public partial class Main : Control
         Refresh();
         ShowTips();
         OnOutcome();
+    }
+
+    private TechTreePanel ShowTechTree()
+    {
+        var panel = new TechTreePanel(_world, action =>
+        {
+            var result = _world.Apply(action);
+            Refresh();
+            return result;
+        });
+        ShowOverlay("Technologies",
+            "Communes discover ideas from their own education, needs and values, and pass them along trust links. Most cut both ways.",
+            panel, 1500, ("Close", CloseOverlay));
+        return panel;
     }
 
     private void ToggleCommuneList()
@@ -488,6 +509,7 @@ public partial class Main : Control
         var view = new HBoxContainer();
         side.AddChild(view);
         AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
+        AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show." };
         foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {mode}", (int)mode);
         _mapMode.ItemSelected += index =>

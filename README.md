@@ -152,6 +152,33 @@ below):
   (50 vs 59), because better-armed fronts mean fewer emergencies and less time with a war committee.
 - **Free Territory:** the drift piles up over the long war, and the trader becomes a state 61% of the time.
 
+## The tech tree
+
+24 technologies sit in five lines of development (Organizational, Agricultural, Industrial,
+Military, Communication), in chains of two to four steps. Some need two lines at once:
+- **Heavy industry:** war industry and electrification.
+- **General staff:** mobile columns and war industry.
+
+Almost every technology cuts both ways, adding drift or slowing decisions. The data is in
+`Data/technologies.json`.
+
+The movement can't choose research:
+- **Discovery:** communes discover ideas from their own education, needs and values.
+- **Spread:** ideas pass along trust links to neighbours with half the education needed.
+- **Circulate:** the only lever is to circulate an idea so it spreads faster.
+
+Communes with little education stay on the first step, so the deeper tree opens up through
+schooling.
+
+**In Godot,** the **Technologies** button (or K) opens the tree:
+- **Nodes:** each shows how widely the idea has spread, whether it adds drift (▲) or brakes
+  it (▼), and the education it needs. Locked nodes are ideas no commune can reach yet.
+- **Chains:** hover or click a node to light up the chain leading to it.
+- **Details:** clicking also shows its effects, who has it, what it leads to, and a
+  **Circulate** button.
+
+**In the terminal,** `techs` lists the tree by category and depth.
+
 ## Historical events
 
 Catalonia has six scripted decisions in its `events` list:

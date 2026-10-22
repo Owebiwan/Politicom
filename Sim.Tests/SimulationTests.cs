@@ -339,6 +339,7 @@ public class SimulationTests
         var w = NewWorld();
         var mandate = w.Techs["imperative_mandate"]; // needs political education to adopt
         var c = w.Communes[0];
+        c.Techs.UnionWith(mandate.Prerequisites);
         c.PoliticalEducation = mandate.MinPolitical * 0.4;
         Assert.False(Systems.ResearchSystem.CanAdopt(c, mandate));
         c.PoliticalEducation = mandate.MinPolitical * 0.6;
@@ -427,6 +428,23 @@ public class SimulationTests
         int before = Holders();
         w.Run(60);
         Assert.True(Holders() > before);
+    }
+
+    [Fact]
+    public void The_tech_tree_has_real_chains_and_no_cycles()
+    {
+        var techs = NewWorld().Techs;
+        Assert.InRange(techs.All.Count, 20, 40);
+        Assert.Equal(5, techs.Categories.Count);
+        Assert.All(techs.Categories, cat => Assert.Contains(techs.All, t => t.Category == cat && techs.Depth(t.Id) >= 1));
+        Assert.True(techs.Categories.Count(cat => techs.All.Any(t => t.Category == cat && techs.Depth(t.Id) >= 2)) >= 4);
+        Assert.Contains(techs.All, t => t.Prerequisites.Length >= 2); // some techs need two lines
+        Assert.Equal(3, techs.Depth("agronomy_stations"));
+        Assert.Throws<InvalidDataException>(() => new TechCatalog(new[]
+        {
+            new TechDefinition { Id = "a", Prerequisites = new[] { "b" } },
+            new TechDefinition { Id = "b", Prerequisites = new[] { "a" } },
+        }));
     }
 
     [Fact]

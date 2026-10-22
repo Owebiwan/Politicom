@@ -141,16 +141,25 @@ internal static class Render
     public static string TechTable(World w)
     {
         var sb = new StringBuilder();
-        foreach (var t in w.Techs.All)
+        foreach (var category in w.Techs.Categories)
         {
-            double share = w.TechShare(t.Id);
-            string nudge = w.IdeaNudges.TryGetValue(t.Id, out var n) ? Paint($" circulating {w.Turns(n)}", "36") : "";
-            sb.AppendLine($"{t.Id,-24} {Bar(share, 1, 10, "36")} {share,4:P0}  {Bold(t.Name)}{nudge}");
-            sb.AppendLine(Dim($"{"",24}   + {t.Perk}.  − {t.Risk}") + (t.Effects.DriftPerTick > 0 ? Paint($" (drift +{t.Effects.DriftPerTick:0.00})", "31") : "") +
-                          (t.Effects.DriftBrake > 0 ? Paint($" (brake −{t.Effects.DriftBrake:0.00})", "32") : ""));
+            sb.AppendLine(Bold(category.ToUpperInvariant()));
+            foreach (var t in w.Techs.All.Where(t => t.Category == category).OrderBy(t => w.Techs.Depth(t.Id)))
+            {
+                double share = w.TechShare(t.Id);
+                string nudge = w.IdeaNudges.TryGetValue(t.Id, out var n) ? Paint($" circulating {w.Turns(n)}", "36") : "";
+                string indent = new string(' ', 2 * w.Techs.Depth(t.Id));
+                sb.AppendLine($"  {indent}{t.Id,-24} {Bar(share, 1, 10, "36")} {share,4:P0}  {Bold(t.Name)}{nudge}");
+                sb.AppendLine(Dim($"  {indent}{"",24}   + {t.Perk}.  − {t.Risk}.") +
+                              (t.Effects.DriftPerTick > 0 ? Paint($" (drift +{t.Effects.DriftPerTick:0.00})", "31") : "") +
+                              (t.Effects.DriftBrake > 0 ? Paint($" (brake −{t.Effects.DriftBrake:0.00})", "32") : ""));
+                if (t.Prerequisites.Length > 0)
+                    sb.AppendLine(Dim($"  {indent}{"",24}   after {string.Join(", ", t.Prerequisites.Select(p => w.Techs[p].Name))}"));
+            }
         }
         return sb.ToString();
     }
+
 
     private static string Trunc(string s, int n) => s.Length <= n ? s : s[..(n - 1)] + "…";
 }

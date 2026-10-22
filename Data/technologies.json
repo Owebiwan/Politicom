@@ -3,85 +3,29 @@
   // centralization is free. "Local" effects (production, defense, goods upkeep, political
   // education) apply to communes that hold the tech; everything else scales with the share
   // of the federation that holds it.
+  //
+  // Five lines of development, each in chains of two to four steps. Communes discover what
+  // their education, needs and values lead them to; the movement can only circulate ideas.
   "technologies": [
+
+    // ── Organizational ──────────────────────────────────────────────────────
     {
-      "id": "crop_rotation",
-      "name": "Crop rotation and irrigation",
-      "category": "Agricultural",
-      "perk": "More grain from the same land",
-      "risk": "None to speak of. Some ideas are just good.",
-      "minPractical": 0.12,
-      "affinity": { "agrarian": 3 },
-      "effects": { "foodProduction": 0.15 }
-    },
-    {
-      "id": "mechanized_agriculture",
-      "name": "Mechanized agriculture",
-      "category": "Agricultural",
-      "perk": "Frees labor for education and industry",
-      "risk": "Needs fuel and machinery from coordinated production.",
-      "prerequisites": [ "crop_rotation" ],
-      "minPractical": 0.35,
-      "affinity": { "agrarian": 2 },
-      "effects": { "foodProduction": 0.35, "goodsUpkeep": 0.1, "driftPerTick": 0.05 }
-    },
-    {
-      "id": "collective_workshops",
-      "name": "Collective workshops",
-      "category": "Industrial",
-      "perk": "Self-managed shops share tools and methods",
-      "risk": "Workshop delegates start to speak for the whole trade.",
-      "minPractical": 0.15,
-      "affinity": { "industrial": 3, "collectivist": 1 },
-      "effects": { "goodsProduction": 0.2, "driftPerTick": 0.01 }
-    },
-    {
-      "id": "war_industry",
-      "name": "War industry conversion",
-      "category": "Industrial",
-      "perk": "Factories turn out arms for the front",
-      "risk": "Factory committees answer to a war production board.",
-      "prerequisites": [ "collective_workshops" ],
-      "minPractical": 0.3,
-      "affinity": { "industrial": 2, "militant": 1.5 },
-      "effects": { "goodsProduction": 0.1, "defense": 0.15, "driftPerTick": 0.08 }
-    },
-    {
-      "id": "militia_doctrine",
-      "name": "Militia and guerrilla doctrine",
-      "category": "Military",
-      "perk": "Very strong home defense; occupied communes keep fighting",
-      "risk": "Little help for offensive campaigns.",
-      "minPractical": 0.1,
-      "affinity": { "militant": 4 },
-      "effects": { "defense": 0.4 }
-    },
-    {
-      "id": "libertarian_press",
-      "name": "Libertarian press",
-      "category": "Communication",
-      "perk": "Contagion and trust spread faster",
-      "risk": "Newspapers become hubs; editors gain informal power.",
-      "minPolitical": 0.2,
-      "affinity": { "industrial": 1, "federalist": 1 },
-      "effects": { "diffusion": 0.3, "contagion": 0.5, "trustGrowth": 0.2, "influence": 0.5, "driftPerTick": 0.06 }
-    },
-    {
-      "id": "telegraph_radio",
-      "name": "Telegraph and radio",
-      "category": "Communication",
-      "perk": "Coordination costs scale more slowly",
-      "risk": "Communes at network hubs gain outsized influence.",
-      "minPractical": 0.3,
-      "affinity": { "industrial": 1, "federalist": 1 },
-      "effects": { "coordination": 0.3, "diffusion": 0.2, "driftPerTick": 0.07 }
+      "id": "open_assemblies",
+      "name": "Open assemblies",
+      "category": "Organizational",
+      "perk": "Everyone can speak, and decisions bind only those who make them",
+      "risk": "Long meetings: federal decisions slow down",
+      "minPolitical": 0.12,
+      "affinity": { "collectivist": 2, "federalist": 1 },
+      "effects": { "driftBrake": 0.04, "coordination": -0.05, "trustGrowth": 0.1 }
     },
     {
       "id": "imperative_mandate",
       "name": "Imperative mandate and recall",
       "category": "Organizational",
       "perk": "Strong brake on hierarchy drift",
-      "risk": "Federal decisions become slower.",
+      "risk": "Federal decisions become slower",
+      "prerequisites": [ "open_assemblies" ],
       "minPolitical": 0.35,
       "affinity": { "federalist": 1, "collectivist": 1 },
       "effects": { "driftBrake": 0.12, "coordination": -0.15 }
@@ -91,17 +35,41 @@
       "name": "Rotating delegates",
       "category": "Organizational",
       "perk": "Prevents permanent leaders",
-      "risk": "Loses experienced negotiators and commanders.",
-      "minPolitical": 0.3,
+      "risk": "Loses experienced negotiators and commanders",
+      "prerequisites": [ "imperative_mandate" ],
+      "minPolitical": 0.4,
       "affinity": { "collectivist": 1 },
-      "effects": { "driftBrake": 0.08, "defense": -0.1 }
+      "effects": { "driftBrake": 0.1, "defense": -0.1 }
+    },
+    {
+      "id": "ateneo_libraries",
+      "name": "Ateneo libraries",
+      "category": "Organizational",
+      "perk": "Political education spreads faster",
+      "risk": "Lecturers can become an intelligentsia — but rarely do",
+      "minPolitical": 0.15,
+      "affinity": { "industrial": 1, "collectivist": 0.5 },
+      "effects": { "politicalEducation": 0.3, "influence": 0.3, "driftBrake": 0.03 }
+    },
+    {
+      "id": "rationalist_schools",
+      "name": "Rationalist schools",
+      "category": "Organizational",
+      "perk": "Ferrer's Modern School: children taught to reason, not obey",
+      "risk": "Trained teachers become a profession with its own interests",
+      "prerequisites": [ "ateneo_libraries" ],
+      "minPolitical": 0.3,
+      "minPractical": 0.25,
+      "affinity": { "collectivist": 1, "industrial": 0.5 },
+      "effects": { "politicalEducation": 0.35, "influence": 0.4, "driftBrake": 0.04, "driftPerTick": 0.02 }
     },
     {
       "id": "labor_time_accounting",
       "name": "Labor-time accounting",
       "category": "Organizational",
       "perk": "Less free-riding, fairer exchange",
-      "risk": "Accounting bodies can bureaucratize.",
+      "risk": "Accounting bodies can bureaucratize",
+      "prerequisites": [ "collective_workshops" ],
       "minPractical": 0.25,
       "minPolitical": 0.2,
       "affinity": { "industrial": 1, "collectivist": 1 },
@@ -112,21 +80,204 @@
       "name": "Federal statistics bureau",
       "category": "Organizational",
       "perk": "Large projects get much easier",
-      "risk": "The strongest single driver of technocratic drift.",
+      "risk": "The strongest single driver of technocratic drift",
       "prerequisites": [ "labor_time_accounting" ],
       "minPractical": 0.4,
       "affinity": { "federalist": 2 },
       "effects": { "coordination": 0.45, "driftPerTick": 0.15 }
     },
+
+    // ── Agricultural ───────────────────────────────────────────────────────
     {
-      "id": "ateneo_libraries",
-      "name": "Ateneo libraries",
-      "category": "Organizational",
-      "perk": "Political education spreads faster",
-      "risk": "Lecturers can become an intelligentsia — but rarely do.",
+      "id": "crop_rotation",
+      "name": "Crop rotation",
+      "category": "Agricultural",
+      "perk": "More grain from the same land",
+      "risk": "None to speak of. Some ideas are just good",
+      "minPractical": 0.12,
+      "affinity": { "agrarian": 3 },
+      "effects": { "foodProduction": 0.15 }
+    },
+    {
+      "id": "seed_cooperatives",
+      "name": "Seed cooperatives",
+      "category": "Agricultural",
+      "perk": "Villages pool seed and tools; bad harvests hurt less",
+      "risk": "Whoever keeps the seed store keeps a ledger of who owes what",
+      "prerequisites": [ "crop_rotation" ],
+      "minPractical": 0.12,
       "minPolitical": 0.15,
-      "affinity": { "industrial": 1, "collectivist": 0.5 },
-      "effects": { "politicalEducation": 0.3, "influence": 0.3, "driftBrake": 0.03 }
+      "affinity": { "agrarian": 2, "collectivist": 1.5 },
+      "effects": { "foodProduction": 0.1, "trustGrowth": 0.15, "freeRiding": 0.15, "driftPerTick": 0.01 }
+    },
+    {
+      "id": "irrigation_works",
+      "name": "Irrigation works",
+      "category": "Agricultural",
+      "perk": "Dry land made fertile",
+      "risk": "Water councils decide who gets the scarce water",
+      "prerequisites": [ "crop_rotation" ],
+      "minPractical": 0.22,
+      "affinity": { "agrarian": 2, "federalist": 0.5 },
+      "effects": { "foodProduction": 0.2, "goodsUpkeep": 0.04, "driftPerTick": 0.02 }
+    },
+    {
+      "id": "mechanized_agriculture",
+      "name": "Mechanized agriculture",
+      "category": "Agricultural",
+      "perk": "Frees labor for education and industry",
+      "risk": "Needs fuel and machinery from coordinated production",
+      "prerequisites": [ "irrigation_works" ],
+      "minPractical": 0.35,
+      "affinity": { "agrarian": 2 },
+      "effects": { "foodProduction": 0.3, "goodsUpkeep": 0.1, "driftPerTick": 0.05 }
+    },
+    {
+      "id": "agronomy_stations",
+      "name": "Agronomy stations",
+      "category": "Agricultural",
+      "perk": "Experimental farms spread new methods quickly",
+      "risk": "Agronomists start telling assemblies what to plant",
+      "prerequisites": [ "mechanized_agriculture" ],
+      "minPractical": 0.45,
+      "affinity": { "agrarian": 1.5, "federalist": 1 },
+      "effects": { "foodProduction": 0.15, "diffusion": 0.2, "driftPerTick": 0.06 }
+    },
+
+    // ── Industrial ─────────────────────────────────────────────────────────
+    {
+      "id": "collective_workshops",
+      "name": "Collective workshops",
+      "category": "Industrial",
+      "perk": "Self-managed shops share tools and methods",
+      "risk": "Workshop delegates start to speak for the whole trade",
+      "minPractical": 0.15,
+      "affinity": { "industrial": 3, "collectivist": 1 },
+      "effects": { "goodsProduction": 0.2, "driftPerTick": 0.01 }
+    },
+    {
+      "id": "electrification",
+      "name": "Electrification",
+      "category": "Industrial",
+      "perk": "Power for workshops and pumps alike",
+      "risk": "A grid needs a board to run it",
+      "prerequisites": [ "collective_workshops" ],
+      "minPractical": 0.3,
+      "affinity": { "industrial": 2, "federalist": 1 },
+      "effects": { "goodsProduction": 0.15, "foodProduction": 0.05, "goodsUpkeep": 0.04, "driftPerTick": 0.04 }
+    },
+    {
+      "id": "war_industry",
+      "name": "War industry conversion",
+      "category": "Industrial",
+      "perk": "Factories turn out arms for the front",
+      "risk": "Factory committees answer to a war production board",
+      "prerequisites": [ "collective_workshops" ],
+      "minPractical": 0.3,
+      "affinity": { "industrial": 2, "militant": 1.5 },
+      "effects": { "goodsProduction": 0.1, "defense": 0.15, "driftPerTick": 0.08 }
+    },
+    {
+      "id": "heavy_industry",
+      "name": "Heavy industry",
+      "category": "Industrial",
+      "perk": "Steel, engines and munitions on a large scale",
+      "risk": "Needs planners and managers — and they know it",
+      "prerequisites": [ "war_industry", "electrification" ],
+      "minPractical": 0.45,
+      "affinity": { "industrial": 2, "federalist": 1 },
+      "effects": { "goodsProduction": 0.3, "defense": 0.1, "goodsUpkeep": 0.05, "driftPerTick": 0.12 }
+    },
+
+    // ── Military ───────────────────────────────────────────────────────────
+    {
+      "id": "militia_doctrine",
+      "name": "Militia doctrine",
+      "category": "Military",
+      "perk": "Very strong home defense; occupied communes keep fighting",
+      "risk": "Little help for offensive campaigns",
+      "minPractical": 0.1,
+      "affinity": { "militant": 4 },
+      "effects": { "defense": 0.4 }
+    },
+    {
+      "id": "guerrilla_network",
+      "name": "Guerrilla network",
+      "category": "Military",
+      "perk": "Partisan bands harry the enemy's rear",
+      "risk": "Bands answer to no one, which makes them hard to coordinate",
+      "prerequisites": [ "militia_doctrine" ],
+      "minPractical": 0.12,
+      "minPolitical": 0.15,
+      "affinity": { "militant": 3, "collectivist": 0.5 },
+      "effects": { "defense": 0.15, "contagion": 0.2, "coordination": -0.05 }
+    },
+    {
+      "id": "mobile_columns",
+      "name": "Mobile columns",
+      "category": "Military",
+      "perk": "Militias that can move to where the front is breaking",
+      "risk": "Column leaders become famous, and fame is power",
+      "prerequisites": [ "militia_doctrine" ],
+      "minPractical": 0.22,
+      "affinity": { "militant": 2.5, "federalist": 1 },
+      "effects": { "defense": 0.25, "driftPerTick": 0.05 }
+    },
+    {
+      "id": "general_staff",
+      "name": "General staff",
+      "category": "Military",
+      "perk": "Planned campaigns across every front",
+      "risk": "An officer corps in all but name: the military road to a state",
+      "prerequisites": [ "mobile_columns", "war_industry" ],
+      "minPractical": 0.35,
+      "affinity": { "militant": 2, "federalist": 1 },
+      "effects": { "defense": 0.4, "coordination": 0.1, "driftPerTick": 0.15 }
+    },
+
+    // ── Communication ──────────────────────────────────────────────────────
+    {
+      "id": "libertarian_press",
+      "name": "Libertarian press",
+      "category": "Communication",
+      "perk": "Contagion and trust spread faster",
+      "risk": "Newspapers become hubs; editors gain informal power",
+      "minPolitical": 0.2,
+      "affinity": { "industrial": 1, "federalist": 1 },
+      "effects": { "diffusion": 0.3, "contagion": 0.5, "trustGrowth": 0.2, "influence": 0.5, "driftPerTick": 0.06 }
+    },
+    {
+      "id": "worker_correspondents",
+      "name": "Worker correspondents",
+      "category": "Communication",
+      "perk": "Every workshop and village writes for the papers",
+      "risk": "Editors still choose what runs",
+      "prerequisites": [ "libertarian_press" ],
+      "minPolitical": 0.25,
+      "minPractical": 0.15,
+      "affinity": { "collectivist": 1.5, "industrial": 0.5 },
+      "effects": { "contagion": 0.3, "trustGrowth": 0.1, "driftBrake": 0.04, "driftPerTick": 0.01 }
+    },
+    {
+      "id": "telegraph",
+      "name": "Telegraph network",
+      "category": "Communication",
+      "perk": "Coordination costs scale more slowly",
+      "risk": "Communes at network hubs gain outsized influence",
+      "minPractical": 0.28,
+      "affinity": { "industrial": 1, "federalist": 1.5 },
+      "effects": { "coordination": 0.25, "diffusion": 0.15, "driftPerTick": 0.05 }
+    },
+    {
+      "id": "radio",
+      "name": "Radio broadcasting",
+      "category": "Communication",
+      "perk": "One voice reaches every village and across the lines",
+      "risk": "One voice: whoever holds the microphone",
+      "prerequisites": [ "telegraph" ],
+      "minPractical": 0.4,
+      "affinity": { "industrial": 1, "federalist": 1, "militant": 0.5 },
+      "effects": { "contagion": 0.6, "coordination": 0.15, "influence": 0.6, "driftPerTick": 0.09 }
     }
   ]
 }

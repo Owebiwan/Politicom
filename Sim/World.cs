@@ -281,6 +281,9 @@ public sealed class World
         return sum;
     }
 
+    /// <summary>Whether a commune has the prerequisites and education to discover a technology itself.</summary>
+    public bool CanDiscover(Commune c, TechDefinition t) => ResearchSystem.CanDiscover(c, t);
+
     public EventDefinition EventDefinition(string id) => Scenario.Events.First(e => e.Id == id);
 
     public int ProjectsJoinedBy(int commune) => Projects.Count(p => p.Active && p.Participants.Contains(commune));
