@@ -31,10 +31,64 @@ public sealed class ScenarioDefinition
     /// A scenario by id: a file in Data/scenarios, or a generated map for
     /// "sandbox:SEED" / "sandbox:SEED:COMMUNES".
     /// </summary>
-    public static ScenarioDefinition Resolve(string dataDir, string id) =>
-        Sandbox.SandboxGenerator.TryParseId(id, out var seed, out var communes)
-            ? Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes)
-            : Load(DataPaths.Scenario(dataDir, id));
+    public static ScenarioDefinition Resolve(string dataDir, string id)
+    {
+        var (baseId, length) = SplitLength(id);
+        if (Sandbox.SandboxGenerator.TryParseId(baseId, out var seed, out var communes))
+            return Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes, length: length);
+        var scenario = Load(DataPaths.Scenario(dataDir, baseId));
+        return length is int turns ? scenario.WithLength(turns) : scenario;
+    }
+
+    public const int MaxTurns = 500;
+    internal static double RenewedBase = 0.6;
+    internal static double RenewedGrowth = 0.06;
+
+    /// <summary>"catalonia_1936@250" → ("catalonia_1936", 250); no suffix → (id, null).</summary>
+    public static (string BaseId, int? Length) SplitLength(string id)
+    {
+        int at = id.LastIndexOf('@');
+        if (at < 0) return (id, null);
+        if (!int.TryParse(id[(at + 1)..], out int turns)) throw new ArgumentException($"Bad game length in scenario id '{id}'.");
+        return (id[..at], turns);
+    }
+
+    /// <summary>
+    /// A copy that runs for <paramref name="turns"/> turns (at least the historical length, at
+    /// most <see cref="MaxTurns"/>). After the scripted history the war goes on: every enemy that
+    /// fought keeps launching renewed offensives, starting from its average offensive (not its
+    /// climactic last one) and growing slowly. Deterministic, so a given length always gives the
+    /// same game.
+    /// </summary>
+    public ScenarioDefinition WithLength(int turns)
+    {
+        var (baseId, _) = SplitLength(Id);
+        var copy = JsonSerializer.Deserialize<ScenarioDefinition>(JsonSerializer.Serialize(this, Json.Options), Json.Options)!;
+        int historical = EndTick;
+        turns = Math.Clamp(turns, historical, MaxTurns);
+        copy.Id = turns == historical ? baseId : $"{baseId}@{turns}";
+        copy.EndTick = turns;
+        if (turns == historical) return copy;
+
+        int interval = Math.Max(10, historical / 3);
+        foreach (var e in copy.Enemies)
+        {
+            e.GrowthUntil = historical; // past the history, the enemy rebuilds only through its offensives
+            var last = e.Offensives.OrderBy(o => o.Tick).LastOrDefault();
+            if (last is null) continue;
+            double typical = e.Offensives.Average(o => o.Strength);
+            int k = 1;
+            for (int tick = Math.Max(historical, last.Tick + last.Duration) + interval / 2; tick < turns; tick += interval, k++)
+                e.Offensives.Add(new Offensive
+                {
+                    Name = $"A renewed offensive by the {e.Name}",
+                    Tick = tick,
+                    Duration = Math.Max(3, Math.Min(last.Duration, interval / 2)),
+                    Strength = Math.Round(typical * (RenewedBase + RenewedGrowth * k), 1),
+                });
+        }
+        return copy;
+    }
 
     public static ScenarioDefinition Parse(string json) =>
         JsonSerializer.Deserialize<ScenarioDefinition>(json, Json.Options)

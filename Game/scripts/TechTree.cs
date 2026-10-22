@@ -213,6 +213,13 @@ public partial class TechTreePanel : HBoxContainer
     {
         AddThemeConstantOverride("separation", 18);
         _tree = new TechTreeView { World = _world };
+        // The tree is taller than a laptop screen: it scrolls, the details column stays put.
+        var scroll = new ScrollContainer
+        {
+            CustomMinimumSize = new Vector2(1060, 560),
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+        };
+        scroll.AddChild(_tree);
         _tree.TechChosen += Show;
         // Hovering describes a technology at once; moving off returns to the one selected.
         _tree.TechHovered += id =>
@@ -221,7 +228,7 @@ public partial class TechTreePanel : HBoxContainer
             else if (_tree.Selected is { } selected) Show(selected);
             else _details.Text = Intro;
         };
-        AddChild(_tree);
+        AddChild(scroll);
 
         var side = new VBoxContainer { CustomMinimumSize = new Vector2(300, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill };
         AddChild(side);

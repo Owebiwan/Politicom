@@ -23,7 +23,8 @@ internal static class WarSystem
         for (int k = 0; k < w.Enemies.Count; k++)
         {
             var e = w.Enemies[k];
-            e.Strength += e.Growth * (1 + 0.5 * e.Radicalization); // neighbours see a threat
+            if (e.GrowthUntil is not int until || w.Tick < until)
+                e.Strength += e.Growth * (1 + 0.5 * e.Radicalization); // neighbours see a threat
             e.Exhaustion = Math.Max(0, e.Exhaustion - b.ExhaustionDecay);
 
             var offensive = e.Offensives.FirstOrDefault(o => w.Tick >= o.Tick && w.Tick < o.Tick + o.Duration);

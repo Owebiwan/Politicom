@@ -4,8 +4,11 @@
   // education) apply to communes that hold the tech; everything else scales with the share
   // of the federation that holds it.
   //
-  // Five lines of development, each in chains of two to four steps. Communes discover what
-  // their education, needs and values lead them to; the movement can only circulate ideas.
+  // Five lines of development, each in chains of two to four steps. Every line has an
+  // efficient path that adds drift and a free path that brakes it at some cost, so growing
+  // a line is a choice: a commune on a line's free path is reluctant to take up that line's
+  // centralizing technologies (Balance.PathResistance). Communes discover what their education, needs and values lead them
+  // to; the movement can only circulate ideas.
   "technologies": [
 
     // ── Organizational ──────────────────────────────────────────────────────
@@ -111,6 +114,17 @@
       "effects": { "foodProduction": 0.1, "trustGrowth": 0.15, "freeRiding": 0.15, "driftPerTick": 0.01 }
     },
     {
+      "id": "land_councils",
+      "name": "Communal land councils",
+      "category": "Agricultural",
+      "perk": "Each village decides its own planting, in open assembly",
+      "risk": "Villages are slow to take up machines and methods they didn't choose",
+      "prerequisites": [ "seed_cooperatives" ],
+      "minPolitical": 0.25,
+      "affinity": { "agrarian": 2, "collectivist": 1.5, "federalist": -0.5 },
+      "effects": { "driftBrake": 0.08, "foodProduction": 0.05, "diffusion": -0.1 }
+    },
+    {
       "id": "irrigation_works",
       "name": "Irrigation works",
       "category": "Agricultural",
@@ -167,6 +181,18 @@
       "effects": { "goodsProduction": 0.15, "foodProduction": 0.05, "goodsUpkeep": 0.04, "driftPerTick": 0.04 }
     },
     {
+      "id": "workers_control",
+      "name": "Workers' control",
+      "category": "Industrial",
+      "perk": "Factory committees elected and rotated by the whole workforce",
+      "risk": "Less output than a managed plant: meetings, and no foremen",
+      "prerequisites": [ "collective_workshops" ],
+      "minPolitical": 0.28,
+      "minPractical": 0.2,
+      "affinity": { "industrial": 2, "collectivist": 2 },
+      "effects": { "driftBrake": 0.09, "goodsProduction": -0.05, "trustGrowth": 0.1 }
+    },
+    {
       "id": "war_industry",
       "name": "War industry conversion",
       "category": "Industrial",
@@ -213,6 +239,17 @@
       "effects": { "defense": 0.15, "contagion": 0.2, "coordination": -0.05 }
     },
     {
+      "id": "elected_officers",
+      "name": "Elected officers",
+      "category": "Military",
+      "perk": "Columns elect and recall their delegates, as the Durruti Column did",
+      "risk": "Slower to coordinate large campaigns",
+      "prerequisites": [ "militia_doctrine" ],
+      "minPolitical": 0.25,
+      "affinity": { "militant": 2, "collectivist": 1.5 },
+      "effects": { "driftBrake": 0.08, "defense": 0.05, "coordination": -0.08 }
+    },
+    {
       "id": "mobile_columns",
       "name": "Mobile columns",
       "category": "Military",
@@ -257,6 +294,17 @@
       "minPractical": 0.15,
       "affinity": { "collectivist": 1.5, "industrial": 0.5 },
       "effects": { "contagion": 0.3, "trustGrowth": 0.1, "driftBrake": 0.04, "driftPerTick": 0.01 }
+    },
+    {
+      "id": "wall_newspapers",
+      "name": "Wall newspapers",
+      "category": "Communication",
+      "perk": "Anyone can post news and argument on the commune's wall",
+      "risk": "Reaches only those who walk past: little influence beyond the commune",
+      "prerequisites": [ "libertarian_press" ],
+      "minPolitical": 0.18,
+      "affinity": { "collectivist": 1, "agrarian": 0.5 },
+      "effects": { "driftBrake": 0.06, "trustGrowth": 0.1, "contagion": -0.1, "influence": -0.2 }
     },
     {
       "id": "telegraph",

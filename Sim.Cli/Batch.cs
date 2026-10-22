@@ -36,7 +36,8 @@ internal static class Batch
             var (value, policyTemplate, s) = jobs[i];
             var balance = baseBalance.Clone();
             if (value is { } v) balance.Set(sweep!.Value.Name, v);
-            var scenario = fixedScenario ?? maps.GetOrAdd(s, key => new Lazy<ScenarioDefinition>(() => sandbox!.Generate(key))).Value;
+            var scenario = fixedScenario ?? maps.GetOrAdd(s, key => new Lazy<ScenarioDefinition>(() =>
+                sandbox!.Generate(key, length: o.Length))).Value;
             var world = World.Create(scenario, techs, balance, s);
             var policy = Policies.Get(policyTemplate.Name);
             while (world.Outcome == Outcome.Ongoing)

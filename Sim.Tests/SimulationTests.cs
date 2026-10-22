@@ -469,6 +469,54 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Every_line_of_development_has_a_free_path()
+    {
+        var techs = NewWorld().Techs;
+        Assert.All(techs.Categories, cat => Assert.Contains(techs.All,
+            t => t.Category == cat && t.Effects.DriftBrake > t.Effects.DriftPerTick));
+    }
+
+    [Fact]
+    public void Communes_on_a_free_path_resist_that_lines_centralizing_technologies()
+    {
+        var w = NewWorld();
+        var c = w.Communes[0];
+        var heavy = w.Techs["heavy_industry"];
+        var crop = w.Techs["crop_rotation"];
+        Assert.Equal(1, Systems.ResearchSystem.Openness(w, c, heavy));
+        c.Techs.Add("workers_control");
+        Assert.Equal(w.Balance.PathResistance, Systems.ResearchSystem.Openness(w, c, heavy));
+        Assert.Equal(1, Systems.ResearchSystem.Openness(w, c, crop)); // other lines unaffected
+    }
+
+    [Fact]
+    public void Games_can_run_past_their_history_up_to_500_turns()
+    {
+        var historical = World.Load(DataDir, "catalonia_1936");
+        var longer = World.Load(DataDir, "catalonia_1936@300");
+        Assert.Equal(135, historical.Scenario.EndTick);
+        Assert.Equal(300, longer.Scenario.EndTick);
+        Assert.Equal("catalonia_1936@300", longer.Scenario.Id);
+        Assert.Equal(500, World.Load(DataDir, "catalonia_1936@900").Scenario.EndTick); // capped
+        Assert.Equal("catalonia_1936", World.Load(DataDir, "catalonia_1936@20").Scenario.Id); // never shorter than history
+
+        var enemy = longer.Scenario.Enemies[0];
+        Assert.Contains(enemy.Offensives, o => o.Tick > 135 && o.Name.StartsWith("A renewed offensive"));
+        Assert.Equal(135, enemy.GrowthUntil);
+        Assert.Null(historical.Scenario.Enemies[0].GrowthUntil);
+
+        var policy = new Balanced();
+        while (longer.Outcome == Outcome.Ongoing)
+        {
+            policy.Act(longer);
+            longer.Step();
+        }
+        Assert.True(longer.Tick > 135 || longer.Outcome != Outcome.Survived);
+        var reloaded = World.LoadJson(World.Load(DataDir, "catalonia_1936@300").SaveJson(), longer.Techs);
+        Assert.Equal(300, reloaded.Scenario.EndTick); // the length travels with the save
+    }
+
+    [Fact]
     public void Balance_parameters_can_be_overridden_by_name()
     {
         var b = new Balance();

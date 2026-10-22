@@ -82,11 +82,11 @@ ranged from 0% to 100% across maps. With it, every map lands between about 30% a
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            1%       99%     0% │    51    53      8    82    49 │    34
-educator           1%       99%     0% │    52    54      9    85    50 │    29
-centralizer        0%        0%   100% │    53    53      6    50    40 │   100
-balanced          61%       39%     0% │    74    53     12    78    54 │    36
-trader            70%       30%     0% │    75    53     12    71    53 │    50
+passive            0%      100%     0% │    51    53      8    82    49 │    34
+educator           1%       99%     0% │    52    54      9    85    50 │    28
+centralizer        0%        0%   100% │    53    53      6    51    40 │   100
+balanced          62%       38%     0% │    74    53     12    78    54 │    35
+trader            68%       31%     1% │    76    54     12    71    53 │    50
 ```
 
 ## What the player sees
@@ -166,10 +166,25 @@ below):
 
 ## The tech tree
 
-24 technologies sit in five lines of development (Organizational, Agricultural, Industrial,
+28 technologies sit in five lines of development (Organizational, Agricultural, Industrial,
 Military, Communication), in chains of two to four steps. Some need two lines at once:
 - **Heavy industry:** war industry and electrification.
 - **General staff:** mobile columns and war industry.
+
+Every line has an **efficient path** that adds drift and a **free path** that brakes it at
+some cost:
+
+| Line | Free path |
+|---|---|
+| Organizational | Imperative mandate, rotating delegates |
+| Agricultural | Communal land councils |
+| Industrial | Workers' control |
+| Military | Elected officers |
+| Communication | Wall newspapers |
+
+A commune on a line's free path resists that line's centralizing technologies: it discovers
+and adopts them at about a third of the usual rate (`PathResistance`). So circulating a brake
+early decides which way a line develops.
 
 Almost every technology cuts both ways, adding drift or slowing decisions. The data is in
 `Data/technologies.json`.
@@ -191,6 +206,21 @@ schooling.
   **Circulate** button.
 
 **In the terminal,** `techs` lists the tree by category and depth.
+
+## Game length
+
+Each scenario runs to its historical end by default, but the start screen (or `--length N` in
+the terminal) lets you play up to 500 turns. After the scripted history the war goes on:
+- **Renewed offensives:** every enemy launches them, starting from its average offensive and
+  growing slowly. Its steady growth stops, so it rebuilds only through these offensives.
+- **Drift keeps building:** over a long game ideas spread everywhere, so the free paths matter.
+
+Long games are hard:
+- **Catalonia, 500 weeks:** the balanced player survives about 59% of games, the educator 76%.
+- **Free Territory:** under 10%.
+- **Paris:** no AI player has outlasted Bloody Week, which in the historical game ends on its
+  final day. A longer game asks whether you can.
+- **Sandbox:** maps are calibrated at the chosen length.
 
 ## Historical events
 
@@ -263,11 +293,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           38%       62%     0% │    69    50     20    65    51 │    65
-educator          96%        4%     0% │    68    51     26    76    55 │    52
+passive           33%       67%     0% │    70    50     19    67    51 │    59
+educator          93%        7%     0% │    67    51     24    79    55 │    38
 centralizer        0%        0%   100% │    36    50      5    52    36 │   100
-balanced          99%        0%     1% │    87    52     23    76    59 │    47
-trader           100%        0%     0% │    86    53     22    76    59 │    47
+balanced         100%        0%     0% │    87    52     22    78    60 │    39
+trader           100%        0%     0% │    86    53     22    77    59 │    41
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -279,11 +309,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    67    49     19    85    55 │    36
-educator           1%       99%     0% │    70    51     20    89    58 │    26
+passive            0%      100%     0% │    67    49     18    86    55 │    33
+educator           0%      100%     0% │    70    51     20    90    58 │    21
 centralizer        0%        0%   100% │    34    48      4    54    35 │   100
-balanced          72%       10%    18% │    86    50     21    73    57 │    64
-trader            28%        6%    66% │    80    50     18    63    53 │    83
+balanced          79%       13%     9% │    86    50     20    73    57 │    60
+trader            34%       11%    55% │    81    50     18    62    53 │    81
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -294,10 +324,10 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
 passive            0%      100%     0% │    83    67     11    91    63 │    26
-educator           0%      100%     0% │    83    67     12    96    64 │     9
+educator           0%      100%     0% │    83    67     12    96    64 │     8
 centralizer        0%        0%   100% │    84    64      8    51    52 │   100
-balanced          34%       66%     0% │    96    68     11    93    67 │    17
-trader            40%       60%     0% │    96    68     11    90    66 │    23
+balanced          36%       64%     0% │    96    68     11    93    67 │    17
+trader            36%       64%     0% │    96    68     11    90    66 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in

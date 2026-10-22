@@ -83,7 +83,8 @@ public sealed class SandboxGenerator
     }
 
     /// <param name="calibrate">Tune enemy strength so the map is winnable but hard (default).</param>
-    public ScenarioDefinition Generate(ulong seed, int communes = DefaultSize, bool calibrate = true)
+    /// <param name="length">Turns to play (null: the default two years). Calibration uses the full length.</param>
+    public ScenarioDefinition Generate(ulong seed, int communes = DefaultSize, bool calibrate = true, int? length = null)
     {
         if (communes is < 12 or > 60) throw new ArgumentOutOfRangeException(nameof(communes), "A sandbox region needs 12–60 communes.");
         var rng = new Rng(seed ^ 0x5A4DB0C5E1F2A3B7UL);
@@ -236,6 +237,7 @@ public sealed class SandboxGenerator
         };
         scenario.Events = PickEvents(rng, region, city, defs, enemies);
         scenario.Railways = Railways(rng, defs, points, spacing);
+        if (length is int turns) scenario = scenario.WithLength(turns);
         return calibrate ? Calibrate(scenario, seed) : scenario;
     }
 

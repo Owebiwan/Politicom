@@ -242,7 +242,7 @@ public partial class Main : Control
     private void SetWorld(World world)
     {
         _world = world;
-        _map.Geo = LoadGeo(world.Scenario.Id);
+        _map.Geo = LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
         _tipsShown.Clear();
         _communeList.World = world;
         _map.World = _driftMeter.World = _history.World = world;
@@ -281,7 +281,17 @@ public partial class Main : Control
             text.AddThemeFontSizeOverride("bold_font_size", 16);
             row.AddChild(text);
             var chosen = scenario;
-            var play = AddButton(row, "Play", "", () => StartScenario(chosen));
+            string turn = scenario.DaysPerTick switch { 7 => "week", 1 => "day", _ => "turn" };
+            var length = LengthPicker(scenario.EndTick, turn, scenario.Id == "paris_commune_1871"
+                ? LongerTooltip + " Paris has never outlasted Bloody Week: a longer game asks whether you can."
+                : LongerTooltip);
+            length.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            row.AddChild(length);
+            var play = AddButton(row, "Play", "", () =>
+            {
+                int turns = length.GetSelectedId();
+                StartScenario(turns == chosen.EndTick ? chosen : chosen.WithLength(turns));
+            });
             play.CustomMinimumSize = new Vector2(110, 40);
             play.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             list.AddChild(row);
@@ -305,10 +315,29 @@ public partial class Main : Control
 
     private const float PickerWidth = 1040;
 
-    private ScenarioDefinition? FindScenario(string id) =>
-        SandboxGenerator.TryParseId(id, out var seed, out var size) && _sandbox != null
-            ? _sandbox.Generate(seed, size)
-            : _scenarios.FirstOrDefault(s => s.Id == id);
+    /// <summary>A scenario by id, including generated maps and longer games ("…@300").</summary>
+    private ScenarioDefinition? FindScenario(string id)
+    {
+        var (baseId, length) = ScenarioDefinition.SplitLength(id);
+        if (SandboxGenerator.TryParseId(baseId, out var seed, out var size) && _sandbox != null)
+            return _sandbox.Generate(seed, size, length: length);
+        var found = _scenarios.FirstOrDefault(s => s.Id == baseId);
+        return found is null || length is not int turns ? found : found.WithLength(turns);
+    }
+
+    /// <summary>Historical length, or a longer war up to 500 turns.</summary>
+    private static OptionButton LengthPicker(int historical, string turn, string tooltip)
+    {
+        var picker = new OptionButton { TooltipText = tooltip };
+        picker.AddItem($"Historical · {historical} {turn}s", historical);
+        foreach (int n in new[] { 250, 500 })
+            if (n > historical) picker.AddItem($"{n} {turn}s", n);
+        return picker;
+    }
+
+    private const string LongerTooltip =
+        "After the historical events, the war goes on: the enemy launches renewed offensives, and drift keeps building. " +
+        "Every line of technology has a free path that brakes drift; in a long game you will need them.";
 
     /// <summary>The Sandbox row: seed, size and Play. Generation (with calibration) takes well under a second.</summary>
     private Control SandboxRow()
@@ -344,11 +373,14 @@ public partial class Main : Control
         foreach (var n in SandboxGenerator.Sizes) size.AddItem(n.ToString(), n);
         size.Select(Array.IndexOf(SandboxGenerator.Sizes, SandboxGenerator.DefaultSize));
         controls.AddChild(size);
+        var sandboxLength = LengthPicker(104, "week", LongerTooltip + " Longer maps take a few seconds to calibrate.");
+        controls.AddChild(sandboxLength);
         controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
         var play = AddButton(controls, "Play", "", () =>
         {
             ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
-            StartScenario(_sandbox!.Generate(value, size.GetSelectedId()));
+            int turns = sandboxLength.GetSelectedId();
+            StartScenario(_sandbox!.Generate(value, size.GetSelectedId(), length: turns == 104 ? null : turns));
         });
         play.CustomMinimumSize = new Vector2(110, 40);
         box.AddChild(controls);
@@ -386,7 +418,7 @@ public partial class Main : Control
 
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 
-            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)}){(SandboxGenerator.TryParseId(w.Scenario.Id, out var mapSeed, out var mapSize) ? $"\n\nSandbox map: seed {mapSeed}, {mapSize} communes." : "")}
+            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)}){(SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out var mapSize) ? $"\n\nSandbox map: seed {mapSeed}, {mapSize} communes." : "")}
             """, chart, ("Keep looking", CloseOverlay), ("Play again", NewGame), ("Choose scenario", ShowIntro));
     }
 
@@ -629,7 +661,7 @@ public partial class Main : Control
     {
         var w = _world;
         _header.Text = $"{w.Scenario.Name} · {w.Date:d MMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
-                       + (SandboxGenerator.TryParseId(w.Scenario.Id, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
+                       + (SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
         _stepButton.Text = $"+1 {w.Turn}";
         _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
 

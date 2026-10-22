@@ -57,6 +57,11 @@ public sealed class Balance
     public double DiscoveryRate { get; set; } = 0.012;
     public double DiffusionRate { get; set; } = 0.05;
     public double IdeaNudgeWeight { get; set; } = 4;
+    /// <summary>
+    /// How readily a commune that holds a line's free path (a brake) still takes up that line's
+    /// centralizing technologies, relative to one that doesn't. Below 1, the paths are a choice.
+    /// </summary>
+    public double PathResistance { get; set; } = 0.35;
     public int IdeaNudgeTicks { get; set; } = 20;
 
     // ── Voluntary projects ─────────────────────────────────────────────────

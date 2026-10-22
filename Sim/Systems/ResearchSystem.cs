@@ -24,7 +24,7 @@ internal static class ResearchSystem
             if (!w.Rng.Chance(b.DiscoveryRate * (0.25 + c.PracticalEducation))) continue;
             var candidates = w.Techs.All.Where(t => !c.Techs.Contains(t.Id) && CanDiscover(c, t)).ToList();
             if (candidates.Count == 0) continue;
-            var weights = candidates.Select(t => Weight(w, c, t)).ToList();
+            var weights = candidates.Select(t => Weight(w, c, t) * Openness(w, c, t)).ToList();
             var tech = w.Rng.PickWeighted(candidates, weights);
             bool first = !w.Communes.Any(o => o.Techs.Contains(tech.Id));
             c.Techs.Add(tech.Id);
@@ -52,7 +52,7 @@ internal static class ResearchSystem
                     var t = w.Techs[id];
                     if (!CanAdopt(dst, t)) continue;
                     double p = b.DiffusionRate * trust * (0.4 + dst.PracticalEducation) * boost * (w.IdeaNudges.ContainsKey(id) ? 2 : 1)
-                               * (w.Rail(src.Id, dst.Id) ? b.RailDiffusion : 1);
+                               * (w.Rail(src.Id, dst.Id) ? b.RailDiffusion : 1) * Openness(w, dst, t);
                     if (w.Rng.Chance(p)) adoptions.Add((dst, id));
                 }
             }
@@ -77,6 +77,21 @@ internal static class ResearchSystem
     /// </summary>
     internal static bool CanAdopt(Commune c, TechDefinition t) =>
         t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical * 0.5 && c.PoliticalEducation >= t.MinPolitical * 0.5;
+
+    /// <summary>
+    /// A commune that has taken a line's free path (holds a technology there that brakes drift
+    /// more than it adds) is reluctant to take up that line's centralizing technologies.
+    /// </summary>
+    internal static double Openness(World w, Commune c, TechDefinition t)
+    {
+        if (t.Effects.DriftPerTick <= t.Effects.DriftBrake) return 1;
+        foreach (var id in c.Techs)
+        {
+            var held = w.Techs[id];
+            if (held.Category == t.Category && held.Effects.DriftBrake > held.Effects.DriftPerTick) return w.Balance.PathResistance;
+        }
+        return 1;
+    }
 
     internal static bool CanDiscover(Commune c, TechDefinition t) =>
         t.Prerequisites.All(c.Techs.Contains) && c.PracticalEducation >= t.MinPractical && c.PoliticalEducation >= t.MinPolitical;

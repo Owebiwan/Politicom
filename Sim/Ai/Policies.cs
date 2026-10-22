@@ -43,6 +43,7 @@ public sealed class Educator : IPolicy
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(false));
         Helpers.AnswerEvents(w, e => e.Drift - e.Influence * 0.05);
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
+        if (w.Tick % 15 == 7 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
         if (w.Drift.Value > 20 && w.Influence >= w.Balance.CostRecall * DriftEffects.RecallCost(w.Drift.Stage) + 5) w.Apply(new RecallDelegates());
         if (w.Tick % 10 == 3 && Helpers.LeastPolitical(w) is { } t) w.Apply(new ProposeProject(ProjectKind.AteneoNetwork, t.Id));
         Helpers.ReliefForStarving(w);
@@ -113,7 +114,7 @@ public sealed class Balanced : IPolicy
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
         Helpers.ReliefForStarving(w);
         if (w.Tick % 20 == 5 && w.TechShare("militia_doctrine") < 0.5) w.Apply(new CirculateIdea("militia_doctrine"));
-        if (w.Tick % 20 == 15) w.Apply(new CirculateIdea("imperative_mandate"));
+        if (w.Tick % 20 == 15 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
         if (w.Tick % 16 == 8 && w.Influence > 40) w.Apply(new SponsorCongress());
 
         while (w.Influence > 25)
@@ -140,6 +141,17 @@ public sealed class Trader : IPolicy
 
 internal static class Helpers
 {
+    /// <summary>
+    /// The drift brake most worth circulating: one some commune could discover or adopt now,
+    /// least widespread first. Null if there is none.
+    /// </summary>
+    public static string? NextBrake(World w) =>
+        w.Techs.All
+            .Where(t => t.Effects.DriftBrake > 0 && w.TechShare(t.Id) < 0.6 && !w.IdeaNudges.ContainsKey(t.Id))
+            .Where(t => w.Federation.Any(c => !c.Techs.Contains(t.Id) && Systems.ResearchSystem.CanAdopt(c, t)))
+            .OrderBy(t => w.TechShare(t.Id)).ThenByDescending(t => t.Effects.DriftBrake)
+            .Select(t => t.Id).FirstOrDefault();
+
     /// <summary>Answers every pending event with the option whose effects score lowest.</summary>
     public static void AnswerEvents(World w, Func<EventEffects, double> cost)
     {

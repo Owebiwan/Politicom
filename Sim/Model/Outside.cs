@@ -18,6 +18,8 @@ public sealed class HostileState
     public string Color { get; set; } = "#eb4d40";
     public double Strength { get; set; }
     public double Growth { get; set; }
+    /// <summary>Turn after which steady growth stops (set when a game runs past its history); null = always.</summary>
+    public int? GrowthUntil { get; set; }
     /// <summary>How radicalized its workers are (the Spread score). Forces it to divert troops to repression.</summary>
     public double Radicalization { get; set; }
     /// <summary>Wear from occupying communes that have no head to cut off.</summary>

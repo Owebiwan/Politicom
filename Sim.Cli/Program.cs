@@ -36,6 +36,8 @@ static int Usage()
         politicom — Anarchist grand strategy simulation
 
         Usage:
+          Any command takes --length N to play N turns (up to 500) instead of the historical length.
+
           politicom play   [--seed N] [--scenario ID] [--load FILE]
               Play the scenario in the terminal (or resume a saved game).
 
