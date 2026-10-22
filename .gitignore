@@ -8,3 +8,5 @@ obj/
 Game/data/
 build/
 .DS_Store
+__pycache__/
+*.pyc
