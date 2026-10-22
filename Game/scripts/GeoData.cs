@@ -18,6 +18,10 @@ public sealed class GeoData
     public List<Vector2[]> Lakes { get; } = new();
     public List<Vector2[]> Borders { get; } = new();
     public List<(string Name, Vector2[] Points)> Rivers { get; } = new();
+    /// <summary>Provinces the federation's outer edge follows; drawn only when <see cref="DrawProvinces"/>.</summary>
+    /// <summary>Contested provinces are held only near the communes; the rest are held entire.</summary>
+    public List<(string Name, Vector2[] Ring, bool Contested)> Provinces { get; } = new();
+    public bool DrawProvinces { get; private set; }
     /// <summary>Real boundaries by commune name, when the scenario has them.</summary>
     public Dictionary<string, Vector2[]> Territories { get; } = new();
 
@@ -36,6 +40,11 @@ public sealed class GeoData
         foreach (var line in root.GetProperty("borders").EnumerateArray()) geo.Borders.Add(Points(line));
         foreach (var river in root.GetProperty("rivers").EnumerateArray())
             geo.Rivers.Add((river.GetProperty("name").GetString() ?? "", Points(river.GetProperty("points"))));
+        if (root.TryGetProperty("provinces", out var provinces))
+            foreach (var p in provinces.EnumerateArray())
+                geo.Provinces.Add((p.GetProperty("name").GetString() ?? "", Points(p.GetProperty("ring")),
+                    p.TryGetProperty("contested", out var c) && c.GetBoolean()));
+        geo.DrawProvinces = root.TryGetProperty("drawProvinces", out var draw) && draw.GetBoolean();
         if (root.TryGetProperty("territories", out var territories))
             foreach (var t in territories.EnumerateObject()) geo.Territories[t.Name] = Points(t.Value);
         return geo;

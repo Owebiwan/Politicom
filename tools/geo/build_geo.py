@@ -10,7 +10,8 @@ Usage:
 
 SOURCE_DIR must contain (download with tools/geo/README.md):
   ne_10m_land.geojson, ne_10m_lakes.geojson, ne_10m_rivers_lake_centerlines.geojson,
-  ne_10m_admin_0_boundary_lines_land.geojson, paris_arrondissements.geojson
+  ne_10m_admin_0_boundary_lines_land.geojson, ne_10m_admin_1_states_provinces.geojson,
+  paris_arrondissements.geojson
 """
 import json
 import os
@@ -21,9 +22,18 @@ import sys
 # whether to draw today's land borders (only where they match the period), and whether
 # commune territories come from real boundaries rather than being computed.
 REGIONS = {
-    "catalonia_1936": dict(bbox=(-1.6, 40.1, 3.7, 43.0), tol=0.006, borders=True),
+    # Spain's provinces date from 1833, so their boundaries are right for 1936 and can be drawn.
+    "catalonia_1936": dict(bbox=(-1.6, 40.1, 3.7, 43.0), tol=0.006, borders=True,
+                           provinces=("ESP", ["Barcelona", "Girona", "Lleida", "Tarragona", "Huesca", "Zaragoza", "Teruel"]),
+                           # Catalonia was held entire; in Aragon only the east, behind the front.
+                           contested=["Huesca", "Zaragoza", "Teruel"], draw_provinces=True),
     # 1918: today's borders didn't exist, and the Dnipro "lakes" are Soviet-era reservoirs.
-    "free_territory_1918": dict(bbox=(33.2, 45.3, 39.0, 49.4), tol=0.006, borders=False, lakes=False),
+    # Today's oblasts roughly cover the old Katerynoslav and Taurida governorates: good enough to
+    # shape the federation's edge, but not drawn, since the lines themselves are anachronistic.
+    "free_territory_1918": dict(bbox=(33.2, 45.3, 39.0, 49.4), tol=0.006, borders=False, lakes=False,
+                                provinces=("UKR", ["Dnipropetrovsk", "Zaporizhzhia", "Donetsk"]), draw_provinces=False,
+                                # The Free Territory never had fixed borders: it was wherever the insurgents held.
+                                contested=["Dnipropetrovsk", "Zaporizhzhia", "Donetsk"]),
     "paris_commune_1871": dict(bbox=(2.20, 48.79, 2.48, 48.93), tol=0.0002, borders=False, territories="paris"),
 }
 
@@ -166,6 +176,23 @@ def build(src, region_id, spec):
                     if len(piece) >= 2:
                         out["borders"].append(rounded(piece, digits))
 
+    if "provinces" in spec:
+        country, wanted = spec["provinces"]
+        out["provinces"] = []
+        out["drawProvinces"] = bool(spec.get("draw_provinces"))
+        for f in load(src, "ne_10m_admin_1_states_provinces.geojson"):
+            p = f["properties"]
+            if p.get("adm0_a3") != country or p.get("name_en") not in wanted:
+                continue
+            for ring in rings(f["geometry"]):
+                clipped = simplify(clip_polygon(ring, bbox), tol)
+                if len(clipped) >= 3 and area(clipped) >= min_area:
+                    out["provinces"].append({"name": p["name_en"], "ring": rounded(clipped, digits),
+                                             "contested": p["name_en"] in spec.get("contested", [])})
+        found = {p["name"] for p in out["provinces"]}
+        if found != set(wanted):
+            raise SystemExit(f"{region_id}: provinces not found: {sorted(set(wanted) - found)}")
+
     if spec.get("territories") == "paris":
         out["territories"] = paris_territories(src, region_id, tol, digits)
     return out
@@ -201,7 +228,8 @@ def main():
         with open(path, "w", encoding="utf-8") as f:
             json.dump(geo, f, ensure_ascii=False, separators=(",", ":"))
         print(f"{region_id}: {len(geo['land'])} land, {len(geo['lakes'])} lakes, {len(geo['rivers'])} river pieces, "
-              f"{len(geo['borders'])} borders, {len(geo.get('territories', {}))} territories, {os.path.getsize(path) // 1024} KB")
+              f"{len(geo['borders'])} borders, {len(geo.get('provinces', []))} province rings, "
+              f"{len(geo.get('territories', {}))} territories, {os.path.getsize(path) // 1024} KB")
 
 
 if __name__ == "__main__":

@@ -36,6 +36,7 @@ public partial class MapView : Control
     private static readonly Color NeutralLand = new("2e3134");
     private static readonly Color River = new("3b6890");
     private static readonly Color CountryBorder = new("6b7178");
+    private static readonly Color ProvinceBorder = new("ffffff30");
 
     private int? _hover;
     private Vector2 _mouse;
@@ -196,6 +197,17 @@ public partial class MapView : Control
 
         if (_geoLayout is { } g2)
         {
+            if (Geo!.DrawProvinces)
+                for (int r = 0; r < g2.Provinces.Count; r++)
+                {
+                    var ring = Screen(g2.Provinces[r]);
+                    var raw = Geo.Provinces[r].Ring;
+                    for (int k = 0; k < ring.Length; k++)
+                    {
+                        int n = (k + 1) % ring.Length;
+                        if (!Geo.OnBounds(raw[k], raw[n])) DrawDashedLine(ring[k], ring[n], ProvinceBorder, 1, 3);
+                    }
+                }
             float riverWidth = 1.4f * Mathf.Sqrt(_zoom);
             foreach (var (_, points) in g2.Rivers) DrawPolyline(Screen(points), River, riverWidth, true);
             foreach (var border in g2.Borders)
@@ -400,7 +412,9 @@ public partial class MapView : Control
 
     /// <summary>Real geography projected into layout space, cached with the layout.</summary>
     /// <param name="LandFill">Land as simple polygons that can be filled; <paramref name="Land"/> keeps the original coastline for outlines and clipping.</param>
-    private sealed record GeoLayout(List<Vector2[]> Land, List<Vector2[]> LandFill, List<Vector2[]> Lakes, List<Vector2[]> Borders, List<(string Name, Vector2[] Points)> Rivers);
+    /// <param name="Region">The provinces merged into one shape (empty if the scenario has none).</param>
+    private sealed record GeoLayout(List<Vector2[]> Land, List<Vector2[]> LandFill, List<Vector2[]> Lakes, List<Vector2[]> Borders,
+        List<(string Name, Vector2[] Points)> Rivers, List<Vector2[]> Provinces, List<Vector2[]> Region);
     private GeoLayout? _geoLayout;
 
     private Vector2 ToScreen(Commune c) => ToScreen(Layout()[c.Id]);
@@ -440,7 +454,9 @@ public partial class MapView : Control
                 land.SelectMany(Simple).ToList(),
                 geo.Lakes.Select(r => r.Select(_project).ToArray()).ToList(),
                 geo.Borders.Select(r => r.Select(_project).ToArray()).ToList(),
-                geo.Rivers.Select(r => (r.Name, r.Points.Select(_project).ToArray())).ToList());
+                geo.Rivers.Select(r => (r.Name, r.Points.Select(_project).ToArray())).ToList(),
+                geo.Provinces.Select(p => p.Ring.Select(_project).ToArray()).ToList(),
+                Region(geo, positions));
             return _layout = positions;
         }
 
@@ -482,6 +498,57 @@ public partial class MapView : Control
         return Geometry2D.IntersectPolygons(ring, box).Where(p => p.Length >= 3);
     }
 
+    /// <summary>
+    /// The land the federation can hold: core provinces entire, plus contested provinces only
+    /// within a rounded outline around the communes (the front).
+    /// </summary>
+    private List<Vector2[]> Region(GeoData geo, Vector2[] positions)
+    {
+        var core = geo.Provinces.Where(p => !p.Contested).Select(p => p.Ring.Select(_project).ToArray()).ToList();
+        var contested = geo.Provinces.Where(p => p.Contested).Select(p => p.Ring.Select(_project).ToArray()).ToList();
+        if (contested.Count == 0) return Union(core);
+        var front = FrontOutline(positions);
+        var held = Union(contested).SelectMany(p => Geometry2D.IntersectPolygons(p, front)).Where(p => !Geometry2D.IsPolygonClockwise(p));
+        return Union(core.Concat(held));
+    }
+
+    /// <summary>The communes' convex hull grown outward and rounded: a smooth line just beyond the outermost towns.</summary>
+    private static Vector2[] FrontOutline(Vector2[] positions)
+    {
+        var nearest = positions.Select((p, i) => positions.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
+        var hull = Geometry2D.ConvexHull(positions);
+        var grown = Geometry2D.OffsetPolygon(hull, nearest[nearest.Length / 2] * 0.9f, Geometry2D.PolyJoinType.Round);
+        return grown.Count > 0 ? grown.OrderByDescending(Area).First() : hull;
+    }
+
+    /// <summary>
+    /// Merges provinces into one region. Each was simplified on its own, so neighbours no longer
+    /// share exactly the same border; growing each by a pixel first closes those hairline gaps.
+    /// </summary>
+    private static List<Vector2[]> Union(IEnumerable<Vector2[]> polygons)
+    {
+        var merged = new List<Vector2[]>();
+        foreach (var poly in polygons.SelectMany(Simple))
+        {
+            var grown = Geometry2D.OffsetPolygon(poly, 1.5f).Where(p => !Geometry2D.IsPolygonClockwise(p)).ToList();
+            foreach (var piece in grown)
+            {
+                var current = piece;
+                for (int i = merged.Count - 1; i >= 0; i--)
+                {
+                    var union = Geometry2D.MergePolygons(merged[i], current).Where(p => !Geometry2D.IsPolygonClockwise(p)).ToList();
+                    if (union.Count == 1) // they touched: absorb the old shape
+                    {
+                        current = union[0];
+                        merged.RemoveAt(i);
+                    }
+                }
+                merged.Add(current);
+            }
+        }
+        return merged;
+    }
+
     /// <summary>Scale and origin that fit the points, plus a relative margin, into the drawable area.</summary>
     private (float Scale, Vector2 Origin) FitBox(Vector2[] points, float margin)
     {
@@ -518,8 +585,9 @@ public partial class MapView : Control
     /// Each commune's territory, as one or more polygons in layout space. Real boundaries are used
     /// where the scenario has them. Otherwise each starts as a disk around its commune and is
     /// clipped by the perpendicular bisector with every other commune, so neighbours share exact
-    /// borders; with geography it is then clipped to the land and to the federation's outline
-    /// (the communes' convex hull, rounded outward), so coasts are real and the edge is smooth.
+    /// borders. With geography it is then clipped to the land, to the provinces the federation
+    /// lies in (so its edge follows real borders), and to the communes' convex hull rounded
+    /// outward (so the side facing the enemy is a smooth front rather than a provincial line).
     /// </summary>
     private Vector2[][][] Cells()
     {
@@ -528,15 +596,11 @@ public partial class MapView : Control
         var w = World!;
         var nearest = pts.Select((p, i) => pts.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
         float median = nearest[nearest.Length / 2];
-        float reach = median * (Geo != null ? 2.2f : 1.3f);
-
-        Vector2[]? outline = null;
-        if (Geo != null)
-        {
-            var hull = Geometry2D.ConvexHull(pts);
-            var grown = Geometry2D.OffsetPolygon(hull, median * 0.9f, Geometry2D.PolyJoinType.Round);
-            outline = grown.Count > 0 ? grown.OrderByDescending(Area).First() : hull;
-        }
+        bool provinces = _geoLayout is { Region.Count: > 0 };
+        // With provinces, real borders bound the federation and a territory may reach a fair way
+        // to meet them; without, the hull outline does that job and the reach can be generous.
+        float reach = median * (Geo == null ? 1.3f : provinces ? 4f : 2.2f);
+        Vector2[]? outline = Geo != null && !provinces ? FrontOutline(pts) : null;
 
         var cells = new Vector2[pts.Length][][];
         for (int i = 0; i < pts.Length; i++)
@@ -550,9 +614,11 @@ public partial class MapView : Control
             for (int j = 0; j < pts.Length && poly.Count > 0; j++)
                 if (j != i) poly = ClipToward(poly, pts[i], pts[j]);
             var pieces = new List<Vector2[]> { poly.ToArray() };
-            if (outline != null && _geoLayout != null)
+            if (_geoLayout != null)
             {
-                pieces = pieces.SelectMany(p => Geometry2D.IntersectPolygons(p, outline)).ToList();
+                if (outline != null) pieces = pieces.SelectMany(p => Geometry2D.IntersectPolygons(p, outline)).ToList();
+                if (_geoLayout.Region.Count > 0)
+                    pieces = pieces.SelectMany(p => _geoLayout.Region.SelectMany(region => Geometry2D.IntersectPolygons(p, region))).ToList();
                 pieces = pieces.SelectMany(p => _geoLayout.Land.SelectMany(land => Geometry2D.IntersectPolygons(p, land))).ToList();
                 foreach (var lake in _geoLayout.Lakes)
                     pieces = pieces.SelectMany(p => Geometry2D.ClipPolygons(p, lake)).ToList();

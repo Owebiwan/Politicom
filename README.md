@@ -93,7 +93,9 @@ trader            64%       35%     1% │    76    54     12    71    53 │   
 
 - **The map:** each historical scenario is drawn on real geography: sea, coastlines, rivers
   and (for Catalonia) the French border. Communes sit at their true positions. Each commune's
-  territory is its share of the land, clipped to the coast and the federation's outline. Paris
+  territory is its share of the land, clipped to the coast and to the provinces the
+  federation holds. Catalonia fills its real provinces out to the Pyrenees, while the Aragon
+  front and the Free Territory's edges are drawn as a smooth front line. Paris
   uses the real arrondissement boundaries. The territories are coloured by the map mode over a
   tint for their land: farmland, mixed or industry. Generated sandbox maps have no geography
   and use rounded territories instead. Dense clusters such as Barcelona show their biggest
