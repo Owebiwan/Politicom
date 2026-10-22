@@ -18,7 +18,7 @@ internal static class EventSystem
             if (!def.RequiresFederated.All(name => w.Communes.Any(c => c.Name == name && c.InFederation))) continue;
             w.FiredEvents.Add(def.Id);
             w.PendingEvents.Add(new PendingEvent(def.Id, w.Tick + def.ExpiresAfter));
-            w.Emit(Severity.Decision, $"{def.Title}{(".?!".Contains(def.Title[^1]) ? "" : ".")} {def.Text}");
+            w.Emit(Severity.Decision, $"{def.Title}{(".?!".Contains(def.Title[^1]) ? "" : ".")} {def.Text}", title: def.Title);
         }
     }
 
@@ -55,6 +55,10 @@ internal static class EventSystem
         w.Influence = Math.Clamp(w.Influence + e.Influence, 0, b.InfluenceCap);
         foreach (var c in targets)
         {
+            if (e.Food != 0) c.Food = Math.Max(0, c.Food + e.Food * c.Population);
+            if (e.Population != 0) c.Population = Math.Max(1, c.Population * (1 + e.Population));
+            if (e.Culture != 0) c.Culture = Math.Clamp(c.Culture + e.Culture * (e.Culture > 0 ? 1 - c.Culture : 1), 0, 1);
+            if (e.Tech.Length > 0 && w.Techs.Contains(e.Tech) && w.Reached(w.Techs[e.Tech])) c.Techs.Add(e.Tech);
             c.Wellbeing = Math.Clamp(c.Wellbeing + e.Wellbeing, 0, 1);
             if (e.PoliticalEducation != 0) c.PoliticalEducation = Math.Clamp(c.PoliticalEducation + e.PoliticalEducation * (1 - c.PoliticalEducation), 0, 1);
         }

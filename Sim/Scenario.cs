@@ -37,6 +37,15 @@ public sealed class ScenarioDefinition
     public string? World { get; set; }
     /// <summary>The world state the region lies in.</summary>
     public string? HomeState { get; set; }
+    /// <summary>The regime the movement rises against (for events that suit it), e.g. "empire"; null if unknown.</summary>
+    public string? HomeIdeology { get; set; }
+    /// <summary>
+    /// Cities of the country not yet in the federation (a regional rising): each may rise and
+    /// join as the movement's example spreads.
+    /// </summary>
+    public List<CommuneDefinition> Reserve { get; set; } = new();
+    /// <summary>Random events that can happen in this game, filtered at play time by era, regime and communes.</summary>
+    public List<RandomEventTemplate> RandomEvents { get; set; } = new();
     /// <summary>Starting stance toward the federation for particular states, overriding their ideology's default.</summary>
     public Dictionary<string, double> Stances { get; set; } = new();
     /// <summary>The outside states, filled from the era's world map by <see cref="Global.WorldSetup.Attach"/>.</summary>
@@ -57,9 +66,10 @@ public sealed class ScenarioDefinition
         var (baseId, length) = SplitLength(id);
         if (Sandbox.SandboxGenerator.TryParseId(baseId, out var seed, out var communes))
             return Sandbox.SandboxGenerator.Load(dataDir).Generate(seed, communes, length: length);
-        if (Open.OpenStartGenerator.TryParseId(baseId, out var openEra, out var stateId, out var openSeed))
-            return Open.OpenStartGenerator.Generate(Global.Atlas.Load(dataDir, openEra), Sandbox.SandboxGenerator.Load(dataDir), stateId, openSeed, length: length);
+        if (Open.OpenStartGenerator.TryParseId(baseId, out var openEra, out var stateId, out var openSeed, out var scope))
+            return Open.OpenStartGenerator.Generate(Global.Atlas.Load(dataDir, openEra), Sandbox.SandboxGenerator.Load(dataDir), stateId, openSeed, length: length, scope: scope);
         var scenario = Load(DataPaths.Scenario(dataDir, baseId));
+        if (scenario.RandomEvents.Count == 0) scenario.RandomEvents = RandomEventTemplate.Load(DataPaths.RandomEvents(dataDir));
         if (scenario.World is { } era) Global.WorldSetup.Attach(scenario, Global.Atlas.Load(dataDir, era));
         return length is int turns ? scenario.WithLength(turns) : scenario;
     }
@@ -157,5 +167,7 @@ public static class DataPaths
     public static string Scenario(string dataDir, string id) => Path.Combine(dataDir, "scenarios", id + ".json");
     public static string Technologies(string dataDir) => Path.Combine(dataDir, "technologies.json");
     public static string World(string dataDir, string era) => Path.Combine(dataDir, "world", era + ".json");
+    public static string RandomEvents(string dataDir) => Path.Combine(dataDir, "events", "random_events.json");
+
     public static string SandboxTemplates(string dataDir) => Path.Combine(dataDir, "sandbox", "event_templates.json");
 }

@@ -131,7 +131,10 @@ public partial class Main : Control
             foreach (var s in _scenarios)
                 if (s.World is { } era && LoadAtlas(era) is { } atlas) Politicom.Sim.Global.WorldSetup.Attach(s, atlas);
             _scenario = _scenarios.FirstOrDefault(s => s.Id == "catalonia_1936") ?? _scenarios[0];
-            _sandbox = SandboxGenerator.Parse(ReadData("res://data/sandbox/event_templates.json"), _techs);
+            const string randomEvents = "res://data/events/random_events.json";
+            _sandbox = SandboxGenerator.Parse(ReadData("res://data/sandbox/event_templates.json"), _techs,
+                FileAccess.FileExists(randomEvents) ? ReadData(randomEvents) : null);
+            foreach (var s in _scenarios.Where(s => s.RandomEvents.Count == 0)) s.RandomEvents = _sandbox.RandomEvents.ToList();
             _world = World.Create(_scenario, _techs, seed: (ulong)DateTime.Now.Ticks);
         }
         catch (Exception e)
@@ -168,6 +171,7 @@ public partial class Main : Control
             ulong worldSeed = seedAt >= 0 && seedAt + 1 < args.Length ? ulong.Parse(args[seedAt + 1]) : 1;
             SetWorld(World.Create(chosen, _techs, seed: worldSeed));
         }
+        PopupsEnabled = Array.IndexOf(args, "--popups") >= 0;
         int weeksAt = Array.IndexOf(args, "--weeks");
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
         int selectAt = Array.IndexOf(args, "--select");
@@ -300,7 +304,10 @@ public partial class Main : Control
         var fresh = _world.Log.Skip(_seenEvents).ToList();
         if (fresh.Any(e => e.StopsTheClock)) SetSpeed(0);
         foreach (var e in fresh.Where(e => e.Severity == Severity.Danger || e.StopsTheClock))
-            _toasts.Show(Shorten(e.Text), e.Severity == Severity.Decision ? new Color(0.38f, 0.85f, 0.95f) : new Color(0.95f, 0.4f, 0.35f));
+        {
+            if (e.StopsTheClock && PopupsEnabled) QueuePopup(e);
+            else _toasts.Show(Shorten(e.Text), e.Severity == Severity.Decision ? new Color(0.38f, 0.85f, 0.95f) : new Color(0.95f, 0.4f, 0.35f));
+        }
         Refresh();
         ShowTips();
         OnOutcome();
@@ -499,9 +506,9 @@ public partial class Main : Control
         var (baseId, length) = ScenarioDefinition.SplitLength(id);
         if (SandboxGenerator.TryParseId(baseId, out var seed, out var size) && _sandbox != null)
             return _sandbox.Generate(seed, size, length: length);
-        if (OpenStartGenerator.TryParseId(baseId, out var era, out var stateId, out var openSeed) && _sandbox != null && LoadAtlas(era) is { } atlas)
+        if (OpenStartGenerator.TryParseId(baseId, out var era, out var stateId, out var openSeed, out var scope) && _sandbox != null && LoadAtlas(era) is { } atlas)
         {
-            try { return OpenStartGenerator.Generate(atlas, _sandbox, stateId, openSeed, length: length); }
+            try { return OpenStartGenerator.Generate(atlas, _sandbox, stateId, openSeed, length: length, scope: scope); }
             catch (ArgumentException e) { GD.PushWarning(e.Message); return null; }
         }
         var found = _scenarios.FirstOrDefault(s => s.Id == baseId);
@@ -612,23 +619,41 @@ public partial class Main : Control
         controls.AddChild(seed);
         var openLength = LengthPicker(104, "week", LongerTooltip + " Generation takes a few seconds.");
         controls.AddChild(openLength);
+        var scope = ScopePicker();
+        controls.AddChild(scope);
         AddButton(controls, "On the map…", "Choose the country on a world map of the era.", () =>
-            ShowCountryMap(eras, era.Selected, ulong.TryParse(seed.Text, out var mapSeed) ? mapSeed : NewSeed(), openLength.GetSelectedId()));
+            ShowCountryMap(eras, era.Selected, ulong.TryParse(seed.Text, out var mapSeed) ? mapSeed : NewSeed(), openLength.GetSelectedId(), (OpenScope)scope.Selected));
         controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
         var play = AddButton(controls, "Play", "", () =>
         {
             if (country.Selected < 0) return;
             ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
             int turns = openLength.GetSelectedId();
-            StartScenario(OpenStartGenerator.Generate(LoadAtlas(eras[era.Selected])!, _sandbox!, ids[country.Selected], value, length: turns == 104 ? null : turns));
+            StartScenario(OpenStartGenerator.Generate(LoadAtlas(eras[era.Selected])!, _sandbox!, ids[country.Selected], value, length: turns == 104 ? null : turns,
+                scope: (OpenScope)scope.Selected));
         });
         play.CustomMinimumSize = new Vector2(110, 40);
         box.AddChild(controls);
         return box;
     }
 
+    /// <summary>Whole country or a regional rising; item index = OpenScope.</summary>
+    private static OptionButton ScopePicker(OpenScope selected = OpenScope.Country)
+    {
+        var picker = new OptionButton
+        {
+            TooltipText = "Whole country: the movement holds its largest cities, and the government only the capital.\n" +
+                          "Regional rising: it holds a stronghold and the cities around it; the rest of the country is the government's, " +
+                          "but its towns may rise and join as the movement's example spreads.",
+        };
+        picker.AddItem("Whole country", (int)OpenScope.Country);
+        picker.AddItem("Regional rising", (int)OpenScope.Region);
+        picker.Select((int)selected);
+        return picker;
+    }
+
     /// <summary>The open start's world map: hover a country to see it, click to choose it, then Play.</summary>
-    private void ShowCountryMap(string[] eras, int eraIndex, ulong seed, int turns)
+    private void ShowCountryMap(string[] eras, int eraIndex, ulong seed, int turns, OpenScope startScope = OpenScope.Country)
     {
         var content = new VBoxContainer();
         content.AddThemeConstantOverride("separation", 10);
@@ -639,6 +664,8 @@ public partial class Main : Control
         foreach (var e in eras) era.AddItem(OpenStartGenerator.EraName(e));
         era.Select(eraIndex);
         top.AddChild(era);
+        var scope = ScopePicker(startScope);
+        top.AddChild(scope);
         var hint = new Label { Text = "Click a country in colour to start there. Grey ones have too few cities on the map. Scroll or pinch to zoom, drag to move.", Modulate = new Color(1, 1, 1, 0.6f) };
         top.AddChild(hint);
 
@@ -666,9 +693,10 @@ public partial class Main : Control
             var ideology = Politicom.Sim.Global.StateText.Name(Politicom.Sim.Global.WorldSetup.Parse(st.Ideology));
             return $"[b]{Esc(st.Name)}[/b]  [color=#9aa0a8]{ideology} · power {st.Power:0}" +
                    (st.Capital is { } c ? $" · capital {Esc(c.Name)}" : "") + "[/color]\n" +
-                   (playable
-                       ? $"The movement holds its largest cities, from {Esc(string.Join(", ", st.Cities.Where(x => st.Capital is null || x.Name != st.Capital.Name).Take(4).Select(x => x.Name)))}… The government holds the capital."
-                       : "[color=#9aa0a8]Too few cities on this map to play here.[/color]");
+                   (!playable ? "[color=#9aa0a8]Too few cities on this map to play here.[/color]"
+                    : scope.Selected == (int)OpenScope.Region
+                       ? "The movement rises in one region, around a stronghold far from the capital. The country's other towns may rise and join it."
+                       : $"The movement holds its largest cities, from {Esc(string.Join(", ", st.Cities.Where(x => st.Capital is null || x.Name != st.Capital.Name).Take(4).Select(x => x.Name)))}… The government holds the capital.");
         }
         void Refresh()
         {
@@ -679,12 +707,13 @@ public partial class Main : Control
             info.Text = Describe(picker.Hovered ?? picker.Selected);
         }
         picker.StateHovered += id => info.Text = Describe(id ?? picker.Selected);
+        scope.ItemSelected += _ => info.Text = Describe(picker.Hovered ?? picker.Selected);
         picker.StateChosen += _ => Refresh();
         era.ItemSelected += _ => Refresh();
         play.Pressed += () =>
         {
             if (picker.Selected is not { } id) return;
-            StartScenario(OpenStartGenerator.Generate(Current(), _sandbox!, id, seed, length: turns == 104 ? null : turns));
+            StartScenario(OpenStartGenerator.Generate(Current(), _sandbox!, id, seed, length: turns == 104 ? null : turns, scope: (OpenScope)scope.Selected));
         };
         Refresh();
 
@@ -1005,7 +1034,7 @@ public partial class Main : Control
         var w = _world;
         UpdateHeader();
         _stepButton.Text = $"+1 {w.Turn}";
-        _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
+        _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}" + (w.Communes.Count > w.InitialCommuneCount ? $" communes (began with {w.InitialCommuneCount})" : $"/{w.InitialCommuneCount}");
 
         _stage.Text = $"{DriftEffects.Name(w.Drift.Stage)} — {w.Drift.Value:0.0}" + (w.Drift.NextThreshold is { } t ? $"  (next stage at {t:0})" : "");
         _driftMeter.QueueRedraw();
@@ -1057,6 +1086,8 @@ public partial class Main : Control
 
     private void RefreshDecisions()
     {
+        // A pop-up whose decision was answered in the side panel, or ran out of time, goes away.
+        if (_popupDecision is { } open && _world.PendingEvents.All(p => p.Id != open)) ClosePopup();
         foreach (var child in _decisions.GetChildren()) child.QueueFree();
         var w = _world;
         if (w.Outcome != Outcome.Ongoing) return;
@@ -1082,6 +1113,135 @@ public partial class Main : Control
                 ("Select it", "Select it, then shift-click a neighbour and Mediate.", () => { _map.Selected = c.Id; Refresh(); }),
                 ("Hold by force", "Costs influence, its trust with every neighbour, and drift.", () => Do(new HoldCommune(c.Id))));
         }
+    }
+
+    // ── Pop-ups: decisions and big news, one at a time, in the middle of the screen ──
+    private readonly Queue<GameEvent> _popups = new();
+    private Control? _popup;
+    private string? _popupDecision;
+    /// <summary>Off for screenshot runs (unless --popups), which step many turns unattended.</summary>
+    private bool PopupsEnabled { get; set; } = true;
+
+    private void QueuePopup(GameEvent e)
+    {
+        _popups.Enqueue(e);
+        if (_popup == null) ShowNextPopup();
+    }
+
+    private void ClosePopup()
+    {
+        _popup?.QueueFree();
+        _popup = null;
+        _popupDecision = null;
+        Refresh();
+        ShowNextPopup();
+    }
+
+    private void ShowNextPopup()
+    {
+        if (_popup != null || _overlay != null || _world.Outcome != Outcome.Ongoing) return;
+        while (_popups.Count > 0)
+        {
+            var e = _popups.Dequeue();
+            // A scripted or random decision still waiting for an answer: its options, right here.
+            var pending = e.Severity == Severity.Decision && e.Title.Length > 0
+                ? _world.PendingEvents.Select(p => _world.EventDefinition(p.Id)).FirstOrDefault(d => d.Title == e.Title)
+                : null;
+            if (e.Severity == Severity.Decision && e.Title.Length > 0 && pending == null) continue; // answered meanwhile
+            string heading = e.Title.Length > 0 ? e.Title : e.Severity switch
+            {
+                Severity.Good => "Good news",
+                Severity.Danger => "Bad news",
+                Severity.Warning => "A warning",
+                Severity.Decision => "A decision",
+                _ => "News",
+            };
+            string body = pending != null ? pending.Text : e.Text;
+            var buttons = new List<(string Label, string Tooltip, Action OnPress)>();
+            if (pending != null)
+                buttons.AddRange(pending.Options.Select((o, i) => (o.Label,
+                    $"{o.Description}\n\n{o.Effects.Summary(_world.Turn)}" + (i == pending.DefaultOption ? "\n\n(happens if you don't answer)" : ""),
+                    (Action)(() =>
+                    {
+                        Do(new ChooseEventOption(pending.Id, i));
+                        ClosePopup();
+                    }))));
+            else
+            {
+                if (e.Commune is int id)
+                    buttons.Add(("Show me", "Select it on the map.", () =>
+                    {
+                        _map.Selected = id;
+                        _map.FocusOn(id, 2.5f);
+                        ClosePopup();
+                    }));
+                buttons.Add(("OK", "", ClosePopup));
+            }
+            _popupDecision = pending?.Id;
+            _popup = BuildPopup(heading, body, e, buttons);
+            AddChild(_popup);
+            return;
+        }
+    }
+
+    private Control BuildPopup(string heading, string body, GameEvent e, List<(string Label, string Tooltip, Action OnPress)> buttons)
+    {
+        var dim = new ColorRect { Color = new Color(0, 0, 0, 0.35f), MouseFilter = MouseFilterEnum.Stop };
+        dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        var center = new CenterContainer();
+        center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        dim.AddChild(center);
+        var accent = e.Severity switch
+        {
+            Severity.Good => new Color("6fbf7f"),
+            Severity.Danger => new Color("e0705f"),
+            Severity.Warning => new Color("f2c94c"),
+            Severity.Decision => new Color("5fc2d9"),
+            _ => new Color("9aa0a8"),
+        };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(620, 0) };
+        panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+        {
+            BgColor = new Color(0.11f, 0.12f, 0.14f), BorderColor = accent, BorderWidthTop = 4,
+            CornerRadiusTopLeft = 8, CornerRadiusTopRight = 8, CornerRadiusBottomLeft = 8, CornerRadiusBottomRight = 8,
+            ContentMarginLeft = 26, ContentMarginRight = 26, ContentMarginTop = 20, ContentMarginBottom = 20,
+            ShadowColor = new Color(0, 0, 0, 0.5f), ShadowSize = 18,
+        });
+        center.AddChild(panel);
+        var v = new VBoxContainer();
+        v.AddThemeConstantOverride("separation", 12);
+        panel.AddChild(v);
+        var date = new Label { Text = _world.Format(e.Date, "d MMMM yyyy").ToUpperInvariant(), Modulate = accent };
+        date.AddThemeFontSizeOverride("font_size", 12);
+        v.AddChild(date);
+        var title = new Label { Text = heading, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(568, 0) };
+        title.AddThemeFontSizeOverride("font_size", 24);
+        v.AddChild(title);
+        var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(568, 0), Text = Esc(body) };
+        text.AddThemeFontSizeOverride("normal_font_size", 15);
+        v.AddChild(text);
+        var options = new VBoxContainer();
+        options.AddThemeConstantOverride("separation", 8);
+        v.AddChild(options);
+        foreach (var (label, tooltip, onPress) in buttons)
+        {
+            var b = AddButton(options, label, tooltip, onPress);
+            b.CustomMinimumSize = new Vector2(0, 38);
+            if (tooltip.Length > 0 && tooltip != "Select it on the map.")
+            {
+                // The consequences right under the choice, not only in a tooltip.
+                var note = new Label { Text = tooltip.Split("\n\n").Skip(1).FirstOrDefault() ?? "", Modulate = new Color(1, 1, 1, 0.55f), AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(568, 0) };
+                note.AddThemeFontSizeOverride("font_size", 12);
+                if (note.Text.Length > 0) options.AddChild(note);
+            }
+        }
+        if (_popups.Count > 0)
+        {
+            var more = new Label { Text = $"{_popups.Count} more waiting", Modulate = new Color(1, 1, 1, 0.45f) };
+            more.AddThemeFontSizeOverride("font_size", 12);
+            v.AddChild(more);
+        }
+        return dim;
     }
 
     private void AddDecision(string text, params (string Label, string Tooltip, Action OnPress)[] options)

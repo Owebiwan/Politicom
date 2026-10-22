@@ -75,6 +75,10 @@ public sealed class World
     /// <summary>Science produced last turn, across the federation.</summary>
     public double LastScience { get; internal set; }
     public int Breakthroughs { get; internal set; }
+    /// <summary>Turn of the last random event.</summary>
+    public int LastRandomEvent { get; internal set; } = -999;
+    /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
+    public HashSet<string> Risen { get; } = new();
     /// <summary>Science the next breakthrough needs.</summary>
     public double BreakthroughCost => ResearchSystem.BreakthroughCost(this);
     /// <summary>The federation's technology level when the game started, for comparing with the world's.</summary>
@@ -314,6 +318,8 @@ public sealed class World
         LastScience = LastScience,
         Breakthroughs = Breakthroughs,
         TechLevelStart = TechLevelStart,
+        LastRandomEvent = LastRandomEvent,
+        Risen = Risen.ToList(),
         Scores = Scores,
         Outcome = Outcome,
         InitialCommuneCount = InitialCommuneCount,
@@ -360,6 +366,7 @@ public sealed class World
             LastScience = s.LastScience,
             Breakthroughs = s.Breakthroughs,
             TechLevelStart = s.TechLevelStart,
+            LastRandomEvent = s.LastRandomEvent,
             Scores = s.Scores,
             Outcome = s.Outcome,
         };
@@ -375,6 +382,7 @@ public sealed class World
         w.FiredEvents.UnionWith(s.FiredEvents);
         foreach (var (k, v) in s.IdeaNudges) w.IdeaNudges[k] = v;
         w.WidespreadTechs.UnionWith(s.WidespreadTechs);
+        w.Risen.UnionWith(s.Risen);
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();
@@ -390,6 +398,7 @@ public sealed class World
         if (Outcome != Outcome.Ongoing) return;
         RefreshTechShares();
         EventSystem.Run(this);
+        RandomEventSystem.Run(this);
         EconomySystem.Run(this);
         EducationSystem.Run(this);
         ResearchSystem.Run(this);
@@ -400,6 +409,7 @@ public sealed class World
         Global.InterstateSystem.Run(this);
         Global.RivalSystem.Run(this);
         Global.TechLevelSystem.Run(this);
+        RisingSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
@@ -450,8 +460,8 @@ public sealed class World
         return list.Count == 0 ? 0 : list.Average(f);
     }
 
-    internal void Emit(Severity severity, string text, int? commune = null, bool pause = false) =>
-        _log.Add(new GameEvent(Tick, Date, severity, text, commune, pause));
+    internal void Emit(Severity severity, string text, int? commune = null, bool pause = false, string title = "") =>
+        _log.Add(new GameEvent(Tick, Date, severity, text, commune, pause, title));
 
     /// <summary>One-off drift from an event; applied in this tick's drift update.</summary>
     internal void BumpDrift(double amount) => PendingDriftBump += amount;

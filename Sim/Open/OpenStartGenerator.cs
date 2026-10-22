@@ -10,10 +10,19 @@ namespace Politicom.Sim.Open;
 /// neighbours may back it. The result is an ordinary scenario, calibrated like a sandbox map so
 /// any start is winnable but hard.
 /// </summary>
+/// <summary>How much of the country the movement holds at the start.</summary>
+public enum OpenScope
+{
+    /// <summary>Its largest cities, nearly the whole country; only the capital holds out.</summary>
+    Country,
+    /// <summary>A stronghold and the cities around it; the rest of the country may rise and join.</summary>
+    Region,
+}
+
 public static class OpenStartGenerator
 {
     public const string IdPrefix = "open";
-    private const int MaxCommunes = 26, MinCommunes = 6, EndTick = 104;
+    private const int MaxCommunes = 26, MinCommunes = 6, EndTick = 104, RegionSize = 10, MaxReserve = 30;
 
     /// <summary>The world maps an open start can use, oldest first.</summary>
     public static readonly string[] Eras =
@@ -23,17 +32,27 @@ public static class OpenStartGenerator
     public static string EraName(string era) =>
         int.TryParse(era, out int y) ? y < 0 ? $"{-y} BC" : y < 1000 ? $"AD {y}" : $"{y}" : era;
 
-    public static string Id(string era, string stateId, ulong seed) => $"{IdPrefix}:{era}:{stateId}:{seed}";
+    public static string Id(string era, string stateId, ulong seed, OpenScope scope = OpenScope.Country) =>
+        $"{IdPrefix}:{era}:{stateId}:{seed}" + (scope == OpenScope.Region ? ":region" : "");
 
-    /// <summary>Parses "open:ERA:STATE" or "open:ERA:STATE:SEED".</summary>
-    public static bool TryParseId(string id, out string era, out string stateId, out ulong seed)
+    public static bool TryParseId(string id, out string era, out string stateId, out ulong seed) =>
+        TryParseId(id, out era, out stateId, out seed, out _);
+
+    /// <summary>Parses "open:ERA:STATE", "open:ERA:STATE:SEED" or "open:ERA:STATE:SEED:region".</summary>
+    public static bool TryParseId(string id, out string era, out string stateId, out ulong seed, out OpenScope scope)
     {
         era = stateId = "";
         seed = 1;
+        scope = OpenScope.Country;
         var parts = id.Split(':');
-        if (parts.Length is < 3 or > 4 || parts[0] != IdPrefix) return false;
+        if (parts.Length is < 3 or > 5 || parts[0] != IdPrefix) return false;
         era = parts[1];
         stateId = parts[2];
+        if (parts.Length == 5)
+        {
+            if (parts[4] != "region") return false;
+            scope = OpenScope.Region;
+        }
         return parts.Length == 3 || ulong.TryParse(parts[3], NumberStyles.None, CultureInfo.InvariantCulture, out seed);
     }
 
@@ -41,13 +60,27 @@ public static class OpenStartGenerator
     public static IEnumerable<AtlasState> Playable(Atlas atlas) =>
         atlas.States.Where(s => CommuneCities(s).Count >= MinCommunes).OrderBy(s => s.Name);
 
-    public static ScenarioDefinition Generate(Atlas atlas, SandboxGenerator sandbox, string stateId, ulong seed, bool calibrate = true, int? length = null)
+    public static ScenarioDefinition Generate(Atlas atlas, SandboxGenerator sandbox, string stateId, ulong seed, bool calibrate = true, int? length = null,
+                                             OpenScope scope = OpenScope.Country)
     {
         var state = atlas.State(stateId) ?? throw new ArgumentException($"No state '{stateId}' in the {atlas.Era} world.");
         var picked = CommuneCities(state);
         if (picked.Count < MinCommunes)
             throw new ArgumentException($"{state.Name} has too few cities on the map to play ({picked.Count}).");
         var rng = new Rng(seed ^ StableHash(atlas.Era + ":" + stateId) ^ 0x0BE2C0FFEEUL);
+        var capitalCity = state.Capital ?? state.Cities[0];
+        var reserveCities = new List<City>();
+        City? stronghold = null;
+        if (scope == OpenScope.Region)
+        {
+            // A stronghold among the larger cities, likelier far from the capital; the rising holds it and its surroundings.
+            var pool = HomeCities(state).Where(c => Km(c, capitalCity) > 20).ToList();
+            var candidates = pool.Take(8).ToList();
+            stronghold = rng.PickWeighted(candidates, candidates.Select(c => 1 + Km(c, capitalCity)).ToList());
+            var region = pool.OrderBy(c => Km(c, stronghold)).Take(RegionSize).ToHashSet();
+            picked = pool.Where(region.Contains).ToList();
+            reserveCities = pool.Where(c => !region.Contains(c)).Take(MaxReserve).ToList();
+        }
         int year = int.TryParse(atlas.Era, out var y) ? y : 1900;
         string country = StateText.Country(state.Name);
         var ideology = WorldSetup.Parse(state.Ideology);
@@ -55,14 +88,11 @@ public static class OpenStartGenerator
         // ── Communes: the largest cities, minus the capital the government holds ──
         var capital = state.Capital ?? state.Cities[0];
         double eraEducation = Math.Clamp((year - 1750) / 250.0, 0, 1);
-        var defs = new List<CommuneDefinition>();
-        for (int i = 0; i < picked.Count; i++)
+        CommuneDefinition Make(City c, double rank)
         {
-            var c = picked[i];
-            double rank = i / (double)picked.Count;
             var kind = rank < 0.2 ? CommuneKind.Industrial : rank < 0.5 ? CommuneKind.Mixed : CommuneKind.Agrarian;
             var (coll, mil, fed) = BaseValues(ideology);
-            defs.Add(new CommuneDefinition
+            return new CommuneDefinition
             {
                 Name = c.Name,
                 Kind = kind,
@@ -75,8 +105,13 @@ public static class OpenStartGenerator
                 Practical = Math.Round(Math.Clamp(0.05 + 0.15 * eraEducation + (kind == CommuneKind.Industrial ? 0.05 : 0) + rng.Jitter(0.04), 0.03, 0.6), 2),
                 Political = Math.Round(Math.Clamp(0.1 + 0.12 * eraEducation + rng.Jitter(0.05), 0.03, 0.5), 2),
                 Techs = kind == CommuneKind.Industrial ? new[] { year >= 1830 ? "collective_workshops" : year >= 1000 ? "craft_workshops" : "household_crafts" } : Array.Empty<string>(),
-            });
+            };
         }
+        // Kinds by size within the country: the largest cities are its industry wherever the rising starts.
+        var byPop = picked.Concat(reserveCities).OrderByDescending(c => c.Pop).ToList();
+        double Rank(City c) => byPop.IndexOf(c) / (double)byPop.Count;
+        var defs = picked.Select(c => Make(c, Rank(c))).ToList();
+        var reserve = reserveCities.Select(c => Make(c, Rank(c))).ToList();
 
         // ── The enemy: the government, from the capital; the communes nearest it are the front ──
         string enemyName = EnemyName(year, ideology, state.Name, country);
@@ -102,10 +137,10 @@ public static class OpenStartGenerator
 
         var scenario = new ScenarioDefinition
         {
-            Id = Id(atlas.Era, stateId, seed),
-            Name = $"The {country} Commune",
-            Description = $"{Ages.Format(start, yearOffset, "MMMM yyyy")}. {Rising(year, ideology, state.Name, country, defs[0].Name, capital.Name)} " +
-                          $"Hold the federation together for two years. (Open start: {state.Name}, {EraName(atlas.Era)}.)",
+            Id = Id(atlas.Era, stateId, seed, scope),
+            Name = stronghold is null ? $"The {country} Commune" : $"The {stronghold.Name} Commune",
+            Description = $"{Ages.Format(start, yearOffset, "MMMM yyyy")}. {Rising(year, ideology, state.Name, country, (stronghold?.Name ?? defs[0].Name), capital.Name, regional: stronghold != null)} " +
+                          $"Hold the federation together for two years. (Open start: {state.Name}, {EraName(atlas.Era)}{(stronghold != null ? ", regional rising" : "")}.)",
             StartDate = start,
             YearOffset = yearOffset,
             EndTick = EndTick,
@@ -116,8 +151,10 @@ public static class OpenStartGenerator
             Enemies = new List<HostileState> { enemy },
             Ally = new AllyState { Name = "", OfferInterval = 0 },
             Communes = defs,
+            Reserve = reserve,
+            RandomEvents = sandbox.RandomEvents.ToList(),
         };
-        scenario.Geography = Geography(state, defs);
+        scenario.Geography = Geography(state, defs.Concat(reserve).ToList()); // the whole country for a regional rising: its towns may join
         string? hero = year < 1789 ? $"the {(year < 500 ? "war leader" : "captain")} of {defs[Math.Min(defs.Count - 1, 1 + rng.Next(Math.Max(1, defs.Count - 1)))].Name}" : null;
         scenario.Events = sandbox.PickEvents(rng, year, country, defs[0].Name, defs, scenario.Enemies, hero);
         WorldSetup.Attach(scenario, atlas);
@@ -202,7 +239,7 @@ public static class OpenStartGenerator
     }
 
     /// <summary>How the rising is described, by age.</summary>
-    internal static string Rising(int year, Ideology ideology, string stateName, string country, string city, string capital)
+    internal static string Rising(int year, Ideology ideology, string stateName, string country, string city, string capital, bool regional = false)
     {
         string of = Proper(stateName);
         string rulers = ideology switch
@@ -221,6 +258,9 @@ public static class OpenStartGenerator
             < 1789 => $"The commons of {of} have risen against the crown: they hold {city} and the towns around it",
             _ => $"Strikes and risings have spread across {country}: workers and peasants hold {city} and the towns around it",
         };
+        if (regional)
+            return $"{who.Replace("and the towns around it", "and the country around it")}. The rest of {Proper(stateName)} is still in the government's hands — " +
+                   $"but its towns are watching, and {rulers}.";
         return $"{who}, and {rulers}.";
     }
 

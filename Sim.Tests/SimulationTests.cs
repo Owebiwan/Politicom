@@ -118,6 +118,58 @@ public class SimulationTests
         Assert.True(w.States.Count(s => s.Does(Sim.Global.StateActions.Embargo)) > lines.Count);
     }
 
+    [Fact]
+    public void A_regional_rising_holds_a_region_and_the_country_can_rise_to_join_it()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1936");
+        var scenario = Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "ARG", 3, calibrate: false, scope: Sim.Open.OpenScope.Region);
+        Assert.InRange(scenario.Communes.Count, 6, 10);
+        Assert.NotEmpty(scenario.Reserve);
+        Assert.Empty(scenario.Reserve.Select(r => r.Name).Intersect(scenario.Communes.Select(c => c.Name)));
+        Assert.EndsWith(":region", scenario.Id);
+        Assert.True(Sim.Open.OpenStartGenerator.TryParseId(scenario.Id, out _, out _, out _, out var scope));
+        Assert.Equal(Sim.Open.OpenScope.Region, scope);
+        var w = World.Create(scenario, NewWorld().Techs, seed: 2);
+        var policy = new Sim.Ai.Balanced();
+        for (int i = 0; i < 80 && w.Outcome == Outcome.Ongoing; i++)
+        {
+            policy.Act(w);
+            w.Step();
+        }
+        Assert.NotEmpty(w.Risen);
+        Assert.Contains(w.Log, e => e.Title.EndsWith(" rises"));
+        Assert.Equal(w.InitialCommuneCount + w.Risen.Count, w.Communes.Count);
+        var resumed = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(w.Risen.OrderBy(x => x), resumed.Risen.OrderBy(x => x));
+    }
+
+    [Fact]
+    public void Random_events_fit_their_age_and_regime_and_arrive_as_decisions()
+    {
+        var templates = RandomEventTemplate.Load(DataPaths.RandomEvents(DataDir));
+        Assert.True(templates.Count >= 30);
+        Assert.Equal(templates.Count, templates.Select(t => t.Id).Distinct().Count());
+        Assert.All(templates, t => Assert.True(t.Event.Options.Count >= 2, t.Id));
+        // Over many ancient games, only events that suit antiquity happen.
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1");
+        var seen = new HashSet<string>();
+        for (ulong seed = 1; seed <= 6; seed++)
+        {
+            var w = World.Create(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "ROMAN", seed, calibrate: false), NewWorld().Techs, seed: seed);
+            w.Run(104);
+            foreach (var id in w.FiredEvents.Where(id => id.StartsWith("random_")))
+                seen.Add(id.Split('_', 2)[1][..id.Split('_', 2)[1].LastIndexOf('_')]);
+        }
+        Assert.NotEmpty(seen);
+        foreach (var id in seen)
+        {
+            var t = templates.Single(x => x.Id == id);
+            Assert.InRange(1, t.Eras[0], t.Eras[1]);
+            Assert.True(t.Regimes.Length == 0 || t.Regimes.Contains("empire"), id);
+        }
+        Assert.DoesNotContain("rumour", seen); // the internet is far off
+    }
+
     [Theory]
     [MemberData(nameof(Eras))]
     public void Open_starts_are_valid_for_every_playable_state(string era)

@@ -840,7 +840,16 @@ public partial class MapView : Control
         // With provinces, real borders bound the federation and a territory may reach a fair way
         // to meet them; without, the hull outline does that job and the reach can be generous.
         float reach = median * (Geo == null ? 1.3f : provinces ? 4f : 2.2f);
-        Vector2[]? outline = Geo != null && !provinces ? FrontOutline(home) : null;
+        // The outline is the region's, grown to take in towns of a regional rising that rose later.
+        var held = pts.Where((_, i) => i < w.InitialCommuneCount || w.Scenario.Reserve.Any(d => d.Name == w.Communes[i].Name)).ToArray();
+        Vector2[]? outline = Geo != null && !provinces ? FrontOutline(held) : null;
+
+        // A regional rising: the country's towns that haven't risen hold their own ground, so a
+        // town that rises later gets a territory of its own size instead of half the country.
+        var reserve = w.Scenario.Reserve;
+        var waiting = Geo == null ? Array.Empty<Vector2>() : reserve.Where(d => !w.Risen.Contains(d.Name))
+            .Select(d => _project(new Vector2((float)d.Lon, (float)d.Lat))).ToArray();
+        bool Risen(int i) => i >= w.InitialCommuneCount && reserve.Any(d => d.Name == w.Communes[i].Name);
 
         var cells = new Vector2[pts.Length][][];
         for (int i = 0; i < pts.Length; i++)
@@ -852,7 +861,7 @@ public partial class MapView : Control
             }
             // Federated cities are far apart: each reaches toward the others, so they share their country.
             float r = reach;
-            if (i >= w.InitialCommuneCount)
+            if (i >= w.InitialCommuneCount && !Risen(i))
             {
                 var others = pts.Skip(w.InitialCommuneCount).Where((_, k) => k + w.InitialCommuneCount != i).ToList();
                 r = others.Count == 0 ? median * 12 : Mathf.Max(median * 3, others.Min(q => q.DistanceTo(pts[i])) * 1.6f);
@@ -860,8 +869,10 @@ public partial class MapView : Control
             var poly = Enumerable.Range(0, 48).Select(k => pts[i] + Vector2.Right.Rotated(k * Mathf.Tau / 48) * r).ToList();
             for (int j = 0; j < pts.Length && poly.Count > 0; j++)
                 if (j != i) poly = ClipToward(poly, pts[i], pts[j]);
+            foreach (var town in waiting)
+                if (poly.Count > 0) poly = ClipToward(poly, pts[i], town);
             var pieces = new List<Vector2[]> { poly.ToArray() };
-            if (i >= w.InitialCommuneCount)
+            if (i >= w.InitialCommuneCount && !Risen(i))
             {
                 // A federated city: its territory is its share of the country it came from.
                 if (Globe_Layout() is { } gl && gl.StateRings.Where(r => r.Box.HasPoint(pts[i]) && Geometry2D.IsPointInPolygon(pts[i], r.Ring)).Select(r => r.Ring).FirstOrDefault() is { } country)

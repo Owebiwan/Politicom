@@ -26,6 +26,14 @@ public sealed class EventOption
 
 public sealed class EventEffects
 {
+    /// <summary>Food per thousand people in the affected communes (a harvest, a flood).</summary>
+    public double Food { get; set; }
+    /// <summary>Fractional change in the affected communes' population (refugees, plague).</summary>
+    public double Population { get; set; }
+    /// <summary>Culture added in the affected communes.</summary>
+    public double Culture { get; set; }
+    /// <summary>A technique the affected communes learn (if the world has reached it).</summary>
+    public string Tech { get; set; } = "";
     /// <summary>Communes affected by wellbeing, trust and education effects. Empty = the whole federation.</summary>
     public string[] Communes { get; set; } = Array.Empty<string>();
     public double Drift { get; set; }
@@ -63,6 +71,10 @@ public sealed class EventEffects
         }
         string scope = Communes.Length == 0 ? "" : Communes.Length <= 2 ? $" ({string.Join(", ", Communes)})" : $" ({Communes.Length} communes)";
         Add(Drift, "drift");
+        Add(Food, "food per thousand people" + scope);
+        Add(Population * 100, "% population" + scope);
+        Add(Culture * 100, "% culture" + scope);
+        if (Tech.Length > 0) parts.Add($"learn {Tech.Replace('_', ' ')}{scope}");
         Add(Influence, "influence");
         Add(Wellbeing * 100, "% wellbeing" + scope);
         Add(Trust * 100, "% trust" + scope);

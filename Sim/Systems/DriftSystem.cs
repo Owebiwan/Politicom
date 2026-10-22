@@ -34,14 +34,14 @@ internal static class DriftSystem
             {
                 w.DriftWarnedAt = t;
                 w.Emit(Severity.Warning, $"Hierarchy drift is nearing {t:0} ({w.Drift.Value:0.0}). " +
-                    (t >= 100 ? "At 100 a state crystallizes and the revolution is over." : $"{DriftEffects.Name((DriftStage)(Array.IndexOf(DriftTracker.Thresholds, t) + 1))} will form unless it is pushed back."), pause: true);
+                    (t >= 100 ? "At 100 a state crystallizes and the revolution is over." : $"{DriftEffects.Name((DriftStage)(Array.IndexOf(DriftTracker.Thresholds, t) + 1))} will form unless it is pushed back."), pause: true, title: "Hierarchy is gathering");
             }
         if (changed is { } stage && stage != DriftStage.State)
         {
             bool rising = stage > before;
             w.Emit(rising ? Severity.Danger : Severity.Good,
                 (rising ? $"Hierarchy hardens: {DriftEffects.Name(stage)}. " : $"Self-management restored: back to {DriftEffects.Name(stage)}. ")
-                + DriftEffects.Describe(stage), pause: rising);
+                + DriftEffects.Describe(stage), pause: rising, title: rising ? $"Hierarchy hardens: {DriftEffects.Name(stage)}" : "");
         }
     }
 

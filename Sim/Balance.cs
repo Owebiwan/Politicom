@@ -199,6 +199,16 @@ public sealed class Balance
     /// <summary>Destroyed when fewer than this share of communes remain free and federated.</summary>
     public double CollapseFraction { get; set; } = 0.3;
 
+    // ── Random events and risings ──────────────────────────────────────────
+    /// <summary>Chance per week of a random event, once the gap since the last has passed.</summary>
+    public double RandomEventRate { get; set; } = 0.12;
+    /// <summary>Weeks between random events at least.</summary>
+    public double RandomEventGap { get; set; } = 6;
+    /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
+    public double RisingRate { get; set; } = 0.02;
+    /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>
+    public double RisingReachKm { get; set; } = 250;
+
     // ── Science, culture and technology levels ─────────────────────────────
     /// <summary>Science for the first breakthrough; each later one costs BreakthroughGrowth more.</summary>
     public double BreakthroughCost { get; set; } = 100;

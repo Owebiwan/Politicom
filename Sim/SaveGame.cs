@@ -51,6 +51,8 @@ public sealed class SaveGame
     public double LastScience { get; set; }
     public int Breakthroughs { get; set; }
     public double TechLevelStart { get; set; }
+    public int LastRandomEvent { get; set; } = -999;
+    public List<string> Risen { get; set; } = new();
     public Scores Scores { get; set; } = new();
     public Outcome Outcome { get; set; }
     public int InitialCommuneCount { get; set; }

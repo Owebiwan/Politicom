@@ -142,6 +142,19 @@ choose.
 - **Difficulty:** calibrated like a sandbox map.
 - **Which countries:** any with at least 6 cities on the map besides the capital. There are
   dozens per era.
+- **Whole country or a regional rising:** both are offered.
+  - **Whole country** (the default): the movement holds the country's largest cities, and the
+    government holds only the capital.
+  - **Regional rising:** the movement holds a stronghold, usually far from the capital, and
+    the 9 cities nearest it; the government holds the rest of the country.
+  - **Joining a regional rising:** the country's other towns (up to 30) watch, and may rise
+    and join the federation, one at a time. That's likelier near the federation
+    (`RisingReachKm`), when the enemy's own workers are radicalized, and where the movement's
+    culture runs deep, and less likely as drift grows. A risen town gets its own territory
+    on the map.
+  - **Terminal:** add `:region` to the id, e.g. `open:1500:FRANCE:2:region`.
+- **Revolutions abroad** are separate. Other countries' workers can rise too; a libertarian
+  victory makes a sister federation that may offer to federate, and its cities then join yours.
 - **Godot:** use the Open world row in the scenario picker. Choose an era, a country, a seed and a
   length, or press **On the map…** to choose the country on a world map of the era:
   - **Hover** a country to see its regime, capital and the cities the movement would hold.
@@ -183,6 +196,36 @@ Real maps (the historical scenarios, open starts and the world view) are shaded 
 - **Turning it off:** use the **Relief** switch next to Trust links, or press **R**.
 - **Building it:** `tools/geo/build_relief.py` builds the tiles (about 9 MB); see
   `tools/geo/README.md`.
+
+## Random events and pop-ups
+
+Besides each scenario's scripted dilemmas, **random events** happen: about one every couple of
+months of game time, each kind at most once a game. There are 37 of them, in
+`Data/events/random_events.json`, written for different societies. Each fits by era, by the
+regime the movement rises against, and by the communes it needs:
+
+- **Any age:** a bumper harvest, a drought, a fire, refugees, a quarrel over water, a
+  festival, a spy, a defecting officer, hoarders, a flood.
+- **Travellers bringing a technique of their age:** a millwright, a printer, an engineer,
+  hackers.
+- **Antiquity and stateless peoples:** a comet, gladiators, raiders, kinship with the clans, a
+  great gift-feast, the high priest's offer.
+- **Feudal and theocratic regimes:** the tithe, a relic, excommunication, burning the manor
+  rolls, witch trials, privateers.
+- **Empires:** the imperial levy, a governor who wants to switch sides.
+- **Modern regimes:** elections called to split the movement, a king's constitution,
+  blackshirt squads, the party's commissars, a general strike, broken machines.
+- **The contemporary world:** sanctions, a foreign journalist, a rumour online.
+
+How they play:
+- **If nobody answers,** the default is what happens when nobody acts, so a passive movement
+  gains little from them.
+- **Blows to the enemy** are scaled to its strength, so no single event decides a war.
+- **Pop-ups:** every decision, scripted or random, and every big piece of news (a revolution
+  abroad, a town rising, hierarchy hardening) opens in the middle of the screen with its
+  choices. Each choice shows its effects under it. News items that concern a commune have a
+  **Show me** button. Several queue up, and a pop-up closes by itself if its decision was
+  answered in the side panel or ran out of time.
 
 ## What the player sees
 

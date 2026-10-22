@@ -28,7 +28,7 @@ public static class RevolutionSystem
                 s.Uprising = b.UprisingTicks;
                 s.UprisingSupport = 0;
                 w.Emit(Severity.Decision, $"Revolution in {s.Name}! Its {(w.Year < 1789 ? "commons" : "workers")} have risen. The outcome will be decided in {w.Turns(b.UprisingTicks)}; " +
-                                          "you can send support from the World tab.", pause: true);
+                                          "you can send support from the World tab.", pause: true, title: $"Revolution in {s.Name}");
             }
         }
     }
@@ -69,14 +69,14 @@ public static class RevolutionSystem
             s.Stance = 0.2;
             w.SetBaseline(s.Id, 0.2);
             w.Emit(Severity.Warning, $"The revolution wins in {country} — and {who}: the {s.Name}. " +
-                                     $"A new rival for the loyalty of the world's {(w.Year < 1789 ? "commons" : "workers")}.", pause: true);
+                                     $"A new rival for the loyalty of the world's {(w.Year < 1789 ? "commons" : "workers")}.", pause: true, title: $"A party takes power in {country}");
             return;
         }
         s.Ideology = Ideology.Libertarian;
         s.Name = $"Free Communes of {country}";
         s.Stance = 0.9;
         w.SetBaseline(s.Id, 0.9);
-        w.Emit(Severity.Good, $"The revolution wins in {country}: the {s.Name} — a sister federation. Its workers will send arms and volunteers.", pause: true);
+        w.Emit(Severity.Good, $"The revolution wins in {country}: the {s.Name} — a sister federation. Its workers will send arms and volunteers.", pause: true, title: $"The revolution wins in {country}");
         if (w.Scenario.States.FirstOrDefault(d => d.Id == s.Id) is { Cities.Count: > 0 }) OfferFederation(w, s);
     }
 
@@ -132,6 +132,6 @@ public static class RevolutionSystem
             Practical = 0.3, Political = 0.35,
             Techs = new[] { "open_assemblies", "libertarian_press" }.Where(w.Techs.Contains).ToArray(),
         }).ToList());
-        w.Emit(Severity.Good, $"{string.Join(", ", cities.Select(c => c.Name))} join the federation.", pause: true);
+        w.Emit(Severity.Good, $"{string.Join(", ", cities.Select(c => c.Name))} join the federation.", pause: true, title: "New communes join");
     }
 }

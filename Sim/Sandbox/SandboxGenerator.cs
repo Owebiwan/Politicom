@@ -56,6 +56,9 @@ public sealed class SandboxGenerator
     }
     private readonly TechCatalog _techs;
 
+    /// <summary>Random events for every game generated here (and played from data files).</summary>
+    public IReadOnlyList<RandomEventTemplate> RandomEvents { get; private init; } = Array.Empty<RandomEventTemplate>();
+
     private SandboxGenerator(List<Template> templates, TechCatalog techs)
     {
         _templates = templates;
@@ -63,7 +66,7 @@ public sealed class SandboxGenerator
     }
 
     /// <summary>The tech catalog is needed to play the calibration games.</summary>
-    public static SandboxGenerator Parse(string templatesJson, TechCatalog techs)
+    public static SandboxGenerator Parse(string templatesJson, TechCatalog techs, string? randomEventsJson = null)
     {
         using var doc = JsonDocument.Parse(templatesJson, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
         var templates = doc.RootElement.GetProperty("templates").EnumerateArray()
@@ -80,11 +83,15 @@ public sealed class SandboxGenerator
             .ToList();
         if (templates.Count < EventsPerMap)
             throw new InvalidDataException($"Sandbox needs at least {EventsPerMap} event templates, found {templates.Count}.");
-        return new SandboxGenerator(templates, techs);
+        return new SandboxGenerator(templates, techs)
+        {
+            RandomEvents = randomEventsJson is null ? Array.Empty<RandomEventTemplate>() : RandomEventTemplate.Parse(randomEventsJson),
+        };
     }
 
     public static SandboxGenerator Load(string dataDir) =>
-        Parse(File.ReadAllText(DataPaths.SandboxTemplates(dataDir)), TechCatalog.Load(DataPaths.Technologies(dataDir)));
+        Parse(File.ReadAllText(DataPaths.SandboxTemplates(dataDir)), TechCatalog.Load(DataPaths.Technologies(dataDir)),
+              File.Exists(DataPaths.RandomEvents(dataDir)) ? File.ReadAllText(DataPaths.RandomEvents(dataDir)) : null);
 
     public static string Id(ulong seed, int communes = DefaultSize) => $"{IdPrefix}:{seed}:{communes}";
 
@@ -253,6 +260,7 @@ public sealed class SandboxGenerator
             Communes = defs,
         };
         scenario.Events = PickEvents(rng, start.Year, region, city, defs, enemies);
+        scenario.RandomEvents = RandomEvents.ToList();
         scenario.Railways = Railways(rng, defs, points, spacing);
         var angles = enemyCount == 2 ? new[] { angle1, angle2 } : new[] { angle1 };
         scenario.Geography = GeographyGenerator.Generate(seed, points, defs, spacing, angles,

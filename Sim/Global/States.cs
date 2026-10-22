@@ -172,7 +172,9 @@ public static class WorldSetup
     /// </summary>
     public static void Attach(ScenarioDefinition scenario, Atlas atlas)
     {
-        if (scenario.States.Count > 0 || scenario.HomeState is null) return;
+        if (scenario.HomeState is null) return;
+        scenario.HomeIdeology ??= atlas.State(scenario.HomeState)?.Ideology;
+        if (scenario.States.Count > 0) return;
         double lon = scenario.Communes.Average(c => c.Lon), lat = scenario.Communes.Average(c => c.Lat);
         var home = atlas.State(scenario.HomeState);
         var homeNeighbours = new HashSet<string>(home?.Neighbours ?? Array.Empty<string>());
