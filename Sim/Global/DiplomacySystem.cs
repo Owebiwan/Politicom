@@ -85,7 +85,9 @@ internal static class DiplomacySystem
             $"{s.Name} starts selling arms to the federation.", $"{s.Name} stops selling arms.");
         Toggle(w, s, StateActions.Volunteers, s.Stance > 0.5, s.Stance < 0.4,
             $"Volunteers from {s.Name} arrive to fight alongside the militias.", $"Volunteers from {s.Name} stop coming.");
-        Toggle(w, s, StateActions.Intervention, right && s.Weight >= 0.8 && s.Stance < -0.6, s.Stance > -0.5,
+        // Troops cross oceans only for an enemy they already back; otherwise only states near enough intervene.
+        bool reach = s.Proximity >= 0.25 || w.Enemies.Any(e => e.Sponsors.Contains(s.Id));
+        Toggle(w, s, StateActions.Intervention, right && reach && s.Weight >= 0.8 && s.Stance < -0.6, s.Stance > -0.5 || !reach,
             $"{s.Name} intervenes: its troops and aircraft join the {Sponsored(w, s)}.", $"{s.Name} withdraws its forces.");
     }
 
