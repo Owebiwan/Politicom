@@ -78,7 +78,7 @@ internal static class ScoreSystem
         var active = w.Active.ToList();
         var b = w.Balance;
         s.Samples++;
-        s.SurvivalSum += w.Federation.Count() / (double)w.InitialCommuneCount;
+        s.SurvivalSum += Math.Min(1, w.Federation.Count() / (double)w.InitialCommuneCount);
         s.Survival = 100 * s.SurvivalSum / Math.Max(1, w.Scenario.EndTick);
 
         double foodSecurity = active.Count == 0 ? 0 : active.Average(c => c.Starving ? 0 : Math.Clamp(c.Food / (c.Population * b.FoodNeed * 2), 0, 1));
@@ -87,7 +87,13 @@ internal static class ScoreSystem
         s.QualitySum += quality;
         s.QualityOfLife = s.QualitySum / s.Samples;
 
-        s.Spread = 100 * w.Radicalization;
+        // Spread: the enemy's workers, the world's workers (weighted by power), and revolutions won.
+        if (w.States.Count == 0) s.Spread = 100 * w.Radicalization;
+        else
+        {
+            double world = w.States.Sum(x => x.Power * (x.Sister ? 1 : x.Radicalization)) / w.States.Sum(x => x.Power);
+            s.Spread = Math.Min(100, 100 * (0.4 * w.Radicalization + 0.6 * world) + 10 * w.States.Count(x => x.Sister));
+        }
 
         s.FreedomSum += 100 - w.Drift.Value;
         s.Freedom = s.FreedomSum / s.Samples;

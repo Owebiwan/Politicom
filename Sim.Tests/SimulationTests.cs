@@ -631,6 +631,61 @@ public class SimulationTests
         return inside;
     }
 
+    [Theory]
+    [InlineData("French Republic", "France")]
+    [InlineData("German Reich", "Germany")]
+    [InlineData("Kingdom of Italy", "Italy")]
+    [InlineData("Soviet Union", "Russia")]
+    [InlineData("Mongolian People's Republic", "Mongolia")]
+    [InlineData("British Empire", "Britain")]
+    [InlineData("United States", "United States")]
+    [InlineData("French Republic (Versailles)", "France")]
+    public void Country_names_drop_the_regime(string state, string country) =>
+        Assert.Equal(country, Global.StateText.Country(state));
+
+    [Fact]
+    public void Radicalized_workers_rise_and_the_rising_is_decided()
+    {
+        var w = NewWorld(seed: 5);
+        var portugal = w.States.Single(s => s.Id == "PRT");
+        portugal.Radicalization = 0.95;
+        for (int i = 0; i < 40 && portugal.Uprising == 0; i++) w.Step();
+        Assert.True(portugal.Uprising > 0, "no rising in 40 turns at 95% radicalization");
+        Assert.Contains(w.Log, e => e.Text.StartsWith("Revolution in Portugal"));
+        w.Run(w.Balance.UprisingTicks);
+        Assert.Equal(0, portugal.Uprising);
+        bool won = portugal.RevolutionCount > 0;
+        if (won) Assert.True(portugal.Ideology is Global.Ideology.Libertarian or Global.Ideology.Communist);
+        else Assert.True(portugal.Radicalization < 0.5 && portugal.Repression > 0.3);
+    }
+
+    [Fact]
+    public void A_sister_federation_can_federate_and_its_cities_play_on()
+    {
+        var w = NewWorld(seed: 3);
+        var france = w.States.Single(s => s.Id == "FRA");
+        france.Ideology = Global.Ideology.Libertarian;
+        int before = w.Communes.Count;
+        Systems.EventSystem.Apply(w, new EventEffects { Federate = "FRA" });
+        Assert.True(france.Federated);
+        Assert.InRange(w.Communes.Count - before, 1, w.Balance.FederateCities);
+        var paris = w.Communes.Single(c => c.Name == "Paris");
+        Assert.True(paris.InFederation);
+        Assert.NotEmpty(w.Trust.Neighbors(paris.Id));
+        // The closest pair of cities joins the new communes to the original federation.
+        Assert.Contains(Enumerable.Range(before, w.Communes.Count - before), i => w.Trust.Neighbors(i).Any(n => n < before));
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(w.Communes.Count, restored.Communes.Count);
+        var policy = new Balanced();
+        for (int i = 0; i < 20 && restored.Outcome == Outcome.Ongoing; i++)
+        {
+            policy.Act(restored);
+            restored.Step();
+        }
+        Assert.Equal(w.Communes.Count, restored.Communes.Count);
+    }
+
     [Fact]
     public void Balance_parameters_can_be_overridden_by_name()
     {

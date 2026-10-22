@@ -31,7 +31,7 @@ public partial class Main : Control
     private const int CommuneTab = 2;
     private const int WorldTab = 3;
     private RichTextLabel _worldSummary = null!, _stateDetail = null!;
-    private Button _appealButton = null!, _delegatesButton = null!, _agitateButton = null!;
+    private Button _appealButton = null!, _delegatesButton = null!, _agitateButton = null!, _supportButton = null!;
     private VBoxContainer _stateList = null!;
     private string? _selectedState;
 
@@ -61,23 +61,27 @@ public partial class Main : Control
         _appealButton.Text = $"International appeal ({w.Balance.CostAppeal:0})";
 
         var selected = _selectedState is { } sid ? w.States.FirstOrDefault(s => s.Id == sid) : null;
-        _delegatesButton.Disabled = _agitateButton.Disabled = selected is null;
+        _delegatesButton.Disabled = _agitateButton.Disabled = selected is null || selected.Sister;
+        _supportButton.Visible = selected is { Uprising: > 0 };
+        _supportButton.Text = $"Support the rising ({w.Balance.CostSupportUprising:0})";
         _delegatesButton.Text = $"Send delegates ({w.Balance.CostDelegates:0})";
         _agitateButton.Text = $"Agitate workers ({w.Balance.CostAgitate:0})";
         _stateDetail.Text = selected is null
             ? "[color=#808590]Click a country on the map, or one below.[/color]"
             : $"[b]{Esc(selected.Name)}[/b] — {Politicom.Sim.Global.StateText.Name(selected.Ideology)}, weight {selected.Weight:0.0} (power {selected.Power:0}, {(selected.Proximity >= 1 ? "a neighbour" : $"{selected.Proximity:P0} interest at this distance")})\n" +
               $"{Politicom.Sim.Global.StateText.Stance(selected.Stance)} toward you ([b]{selected.Stance:+0.00;-0.00}[/b]) — {Politicom.Sim.Global.StateText.Actions(selected.Actions)}\n" +
-              $"Workers radicalized: {selected.Radicalization:P0}\n" +
+              $"Workers radicalized: {selected.Radicalization:P0}" + (selected.Repression > 0.05 ? $" · repression {selected.Repression:P0}" : "") + "\n" +
+              (selected.Uprising > 0 ? $"[color=#f2c94c][b]Revolution under way[/b]: decided in {w.Turns(selected.Uprising)}, success chance {Politicom.Sim.Global.RevolutionSystem.SuccessChance(w, selected):P0}, of which a party seizes power {Politicom.Sim.Global.RevolutionSystem.AuthoritarianChance(w, selected):P0}.[/color]\n" : "") +
+              (selected.Sister ? (selected.Federated ? "[color=#e07a6a]A sister federation, now part of yours.[/color]\n" : "[color=#e07a6a]A sister federation.[/color]\n") : "") +
               "[color=#808590]Thresholds: embargo below −0.30, arms above +0.35, volunteers above +0.50, intervention below −0.60. Order in the federation reassures governments and disappoints sympathizers.[/color]";
 
         foreach (var child in _stateList.GetChildren()) child.QueueFree();
-        foreach (var s in w.States.OrderByDescending(s => s.Weight).Take(12))
+        foreach (var s in w.States.OrderByDescending(s => s.Uprising > 0).ThenByDescending(s => s.Sister).ThenByDescending(s => s.Weight).Take(12))
         {
             var id = s.Id;
             var row = new Button
             {
-                Text = $"{s.Name} — {Politicom.Sim.Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}) · {Politicom.Sim.Global.StateText.Actions(s.Actions)}",
+                Text = $"{s.Name} — " + (s.Uprising > 0 ? $"REVOLUTION ({w.Turns(s.Uprising)})" : s.Sister ? "sister federation" : $"{Politicom.Sim.Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}) · {Politicom.Sim.Global.StateText.Actions(s.Actions)}"),
                 Flat = true,
                 Alignment = HorizontalAlignment.Left,
                 ToggleMode = true,
@@ -139,7 +143,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME] [--clock SECONDS] [--world] [--mode NAME]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME] [--clock SECONDS] [--world] [--mode NAME] [--seed N]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -154,7 +158,9 @@ public partial class Main : Control
         if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && FindScenario(args[scenarioAt + 1]) is { } chosen)
         {
             _scenario = chosen;
-            SetWorld(World.Create(chosen, _techs, seed: 1));
+            int seedAt = Array.IndexOf(args, "--seed");
+            ulong worldSeed = seedAt >= 0 && seedAt + 1 < args.Length ? ulong.Parse(args[seedAt + 1]) : 1;
+            SetWorld(World.Create(chosen, _techs, seed: worldSeed));
         }
         int weeksAt = Array.IndexOf(args, "--weeks");
         int weeks = weeksAt >= 0 && weeksAt + 1 < args.Length ? int.Parse(args[weeksAt + 1]) : 0;
@@ -798,6 +804,10 @@ public partial class Main : Control
         _agitateButton = AddButton(stateActions, "Agitate workers", "Radicalize the state's workers. Its government notices and cools toward you.", () =>
         {
             if (_selectedState is { } id) Do(new AgitateWorkers(id));
+        });
+        _supportButton = AddButton(stateActions, "Support the rising", "Arms and organizers for a revolution under way: a better chance it wins — and a little drift at home.", () =>
+        {
+            if (_selectedState is { } id) Do(new SupportUprising(id));
         });
         Section(worldTab, "The powers that matter most to you");
         _stateList = new VBoxContainer();

@@ -640,7 +640,7 @@ public partial class MapView : Control
 
     private Vector2[] Layout()
     {
-        if (_layout != null && _layoutSize == Size) return _layout;
+        if (_layout != null && _layoutSize == Size && _layout.Length == World!.Communes.Count) return _layout;
         var w = World!;
         _layoutSize = Size;
         _cells = null;
@@ -664,7 +664,7 @@ public partial class MapView : Control
                 geo.Borders.Select(r => r.Select(_project).ToArray()).ToList(),
                 geo.Rivers.Select(r => (r.Name, r.Points.Select(_project).ToArray())).ToList(),
                 geo.Provinces.Select(p => p.Ring.Select(_project).ToArray()).ToList(),
-                Region(geo, positions));
+                Region(geo, positions.Take(w.InitialCommuneCount).ToArray()));
             return _layout = positions;
         }
 
@@ -800,15 +800,18 @@ public partial class MapView : Control
     private Vector2[][][] Cells()
     {
         var pts = Layout();
-        if (_cells != null) return _cells;
+        if (_cells != null && _cells.Length == pts.Length) return _cells;
         var w = World!;
-        var nearest = pts.Select((p, i) => pts.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
+        // Spacing and the federation's outline come from the original region; cities that joined
+        // later (a federated sister) are elsewhere on the map.
+        var home = pts.Take(w.InitialCommuneCount).ToArray();
+        var nearest = home.Select((p, i) => home.Where((_, j) => j != i).Min(q => p.DistanceTo(q))).OrderBy(d => d).ToArray();
         float median = nearest[nearest.Length / 2];
         bool provinces = _geoLayout is { Region.Count: > 0 };
         // With provinces, real borders bound the federation and a territory may reach a fair way
         // to meet them; without, the hull outline does that job and the reach can be generous.
         float reach = median * (Geo == null ? 1.3f : provinces ? 4f : 2.2f);
-        Vector2[]? outline = Geo != null && !provinces ? FrontOutline(pts) : null;
+        Vector2[]? outline = Geo != null && !provinces ? FrontOutline(home) : null;
 
         var cells = new Vector2[pts.Length][][];
         for (int i = 0; i < pts.Length; i++)
@@ -818,10 +821,25 @@ public partial class MapView : Control
                 cells[i] = new[] { real.Select(_project).ToArray() };
                 continue;
             }
-            var poly = Enumerable.Range(0, 48).Select(k => pts[i] + Vector2.Right.Rotated(k * Mathf.Tau / 48) * reach).ToList();
+            // Federated cities are far apart: each reaches toward the others, so they share their country.
+            float r = reach;
+            if (i >= w.InitialCommuneCount)
+            {
+                var others = pts.Skip(w.InitialCommuneCount).Where((_, k) => k + w.InitialCommuneCount != i).ToList();
+                r = others.Count == 0 ? median * 12 : Mathf.Max(median * 3, others.Min(q => q.DistanceTo(pts[i])) * 1.6f);
+            }
+            var poly = Enumerable.Range(0, 48).Select(k => pts[i] + Vector2.Right.Rotated(k * Mathf.Tau / 48) * r).ToList();
             for (int j = 0; j < pts.Length && poly.Count > 0; j++)
                 if (j != i) poly = ClipToward(poly, pts[i], pts[j]);
             var pieces = new List<Vector2[]> { poly.ToArray() };
+            if (i >= w.InitialCommuneCount)
+            {
+                // A federated city: its territory is its share of the country it came from.
+                if (Globe_Layout() is { } gl && gl.StateRings.Where(r => r.Box.HasPoint(pts[i]) && Geometry2D.IsPointInPolygon(pts[i], r.Ring)).Select(r => r.Ring).FirstOrDefault() is { } country)
+                    pieces = pieces.SelectMany(p => Geometry2D.IntersectPolygons(p, country)).Where(p => !Geometry2D.IsPolygonClockwise(p)).ToList();
+                cells[i] = pieces.Where(p => p.Length >= 3).ToArray();
+                continue;
+            }
             if (_geoLayout != null)
             {
                 if (outline != null) pieces = pieces.SelectMany(p => Geometry2D.IntersectPolygons(p, outline)).ToList();

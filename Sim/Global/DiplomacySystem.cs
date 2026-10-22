@@ -40,8 +40,9 @@ internal static class DiplomacySystem
 
             // Contagion reaches abroad too, weaker with distance.
             double voice = w.Mean(c => c.PoliticalEducation);
+            int sisters = w.States.Count(o => o.Sister && s.Neighbours.Contains(o.Id));
             s.Radicalization = Math.Clamp(s.Radicalization
-                + b.ContagionRate * voice * (1 + w.SocietyEffect(t => t.Contagion)) * s.Proximity * 0.5
+                + b.ContagionRate * (voice * (1 + w.SocietyEffect(t => t.Contagion)) * s.Proximity * 0.5 + b.SisterContagion * sisters) * (1 - s.Repression)
                 - b.RepressionRate * s.Radicalization, 0, 1);
         }
 

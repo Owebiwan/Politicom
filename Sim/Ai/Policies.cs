@@ -41,6 +41,7 @@ public sealed class Educator : IPolicy
     public void Act(World w)
     {
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(false));
+        Helpers.AcceptFederation(w);
         Helpers.AnswerEvents(w, e => e.Drift - e.Influence * 0.05);
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
         if (w.Tick % 15 == 7 && Helpers.NextBrake(w) is { } brake) w.Apply(new CirculateIdea(brake));
@@ -107,6 +108,7 @@ public sealed class Balanced : IPolicy
         else if (!w.ForeignTrade && wantTrade && margin > 10 && w.Embargo < 0.5) w.Apply(new SetForeignTrade(true));
 
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(crisis && w.Drift.Value < 15));
+        Helpers.AcceptFederation(w);
         Helpers.AnswerEvents(w, e => e.Drift + e.EnemyStrength * (crisis ? 6 : 3) - e.Influence * 0.05 - e.Wellbeing * 10 - e.Trust * 20);
 
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
@@ -161,6 +163,25 @@ internal static class Helpers
         }
         if (crisis && w.States.Any(s => s.Does(Global.StateActions.Volunteers)) && w.Influence > reserve + w.Balance.CostAppeal)
             w.Apply(new InternationalAppeal());
+
+        // Revolutions abroad: back a rising under way, and fan the ones close to breaking out.
+        foreach (var s in w.States.Where(s => s.Uprising > 0 && s.UprisingSupport == 0))
+            if (w.Influence > reserve + w.Balance.CostSupportUprising) w.Apply(new SupportUprising(s.Id));
+        if (w.Tick % 10 == 4 && w.Influence > reserve + w.Balance.CostAgitate
+            && w.States.Where(s => !s.Sister && s.Uprising == 0 && s.Radicalization > 0.3 && s.Repression < 0.3)
+                       .OrderByDescending(s => s.Radicalization).FirstOrDefault() is { } ripe)
+            w.Apply(new AgitateWorkers(ripe.Id));
+    }
+
+    /// <summary>Accept a sister federation's offer to federate.</summary>
+    public static void AcceptFederation(World w)
+    {
+        foreach (var pending in w.PendingEvents.ToList())
+        {
+            var options = w.EventDefinition(pending.Id).Options;
+            int join = options.FindIndex(o => o.Effects.Federate.Length > 0);
+            if (join >= 0) w.Apply(new ChooseEventOption(pending.Id, join));
+        }
     }
 
     /// <summary>

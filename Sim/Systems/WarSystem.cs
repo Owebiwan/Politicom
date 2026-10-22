@@ -76,7 +76,7 @@ internal static class WarSystem
 
         foreach (var c in w.Communes)
             if (c.OccupiedBy is int k && c.Techs.Contains("militia_doctrine"))
-                w.Enemies[k].Exhaustion += b.GuerrillaExhaustion;
+                w.Enemies[k].Exhaustion = Math.Min(1, w.Enemies[k].Exhaustion + b.GuerrillaExhaustion);
     }
 
     internal static double Defense(World w, Commune c)
@@ -113,7 +113,7 @@ internal static class WarSystem
         c.Control = 0;
         w.PendingSecessions.RemoveAll(s => s.Commune == c.Id);
         foreach (var p in w.ActiveProjects) p.Participants.Remove(c.Id);
-        e.Exhaustion += w.Balance.OccupationExhaustion;
+        e.Exhaustion = Math.Min(1, e.Exhaustion + w.Balance.OccupationExhaustion);
         foreach (var n in w.Trust.Neighbors(c.Id))
             if (!w.Communes[n].Occupied) w.Communes[n].Fronts.Add(enemy);
         w.Emit(Severity.Danger, $"{c.Name} falls to the {e.Name}. With no capital to take, every commune has to be taken one by one.", c.Id);

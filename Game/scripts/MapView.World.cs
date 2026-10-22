@@ -208,7 +208,8 @@ public partial class MapView
 
     private void ColorGlobeMesh()
     {
-        var key = (Mode, Mode is MapMode.Diplomacy or MapMode.Revolution ? World?.Tick ?? 0 : 0, SelectedState);
+        // Revolutions recolour states in any mode, so every mode refreshes per turn.
+        var key = (Mode, World?.Tick ?? 0, SelectedState);
         if (_globeMesh != null && key == _meshKey) return;
         var fills = Globe!.States.Select(StateFill).ToArray();
         var colors = new Color[_meshVerts!.Length];
@@ -236,9 +237,12 @@ public partial class MapView
     private Color StateFill(AtlasState s)
     {
         var sim = World?.States.FirstOrDefault(x => x.Id == s.Id);
+        string ideology = sim?.Ideology.ToString().ToLowerInvariant() ?? s.Ideology;
         Color c;
-        if (Mode == MapMode.Ideology)
-            c = IdeologyColors.TryGetValue(s.Ideology, out var ic) ? ic : new Color("777777");
+        if (sim is { Sister: true } && Mode is not (MapMode.Diplomacy or MapMode.Revolution))
+            c = new Color("8a3a32"); // a sister federation
+        else if (Mode == MapMode.Ideology)
+            c = IdeologyColors.TryGetValue(ideology, out var ic) ? ic : new Color("777777");
         else if (Mode == MapMode.Diplomacy)
             c = sim is null ? new Color("4a4d52")
                 : sim.Stance < 0 ? new Color("6d6f73").Lerp(new Color("b0392f"), (float)-sim.Stance)
@@ -326,7 +330,7 @@ public partial class MapView
             float screenSide = Mathf.Sqrt(area) * s;
             if (screenSide < 28) continue;
             int size = (int)Mathf.Clamp(screenSide / 9, 10, 20);
-            var text = state.Name.ToUpperInvariant();
+            var text = (World?.States.FirstOrDefault(x => x.Id == state.Id)?.Name ?? state.Name).ToUpperInvariant();
             var extent = font.GetStringSize(text, HorizontalAlignment.Left, -1, size);
             if (extent.X > screenSide * 1.6f) continue;
             var p = ToScreen(at) - extent / 2 + new Vector2(0, size * 0.35f);
@@ -353,13 +357,14 @@ public partial class MapView
         var sim = World?.States.FirstOrDefault(x => x.Id == s.Id);
         var lines = new List<string>
         {
-            s.Name,
+            sim?.Name ?? s.Name,
             $"{char.ToUpperInvariant(s.Ideology[0])}{s.Ideology[1..]} · capital {s.Capital?.Name ?? "—"}",
         };
         if (sim != null)
         {
             lines.Add($"{char.ToUpperInvariant(StateText.Stance(sim.Stance)[0])}{StateText.Stance(sim.Stance)[1..]} toward you ({sim.Stance:+0.00;-0.00}) · {StateText.Actions(sim.Actions)}");
-            lines.Add($"Workers radicalized {sim.Radicalization:P0} · weight {sim.Weight:0.0}");
+            lines.Add($"Workers radicalized {sim.Radicalization:P0} · weight {sim.Weight:0.0}"
+                      + (sim.Uprising > 0 ? $" · REVOLUTION under way ({World!.Turns(sim.Uprising)})" : ""));
         }
         else if (World?.Scenario.HomeState == s.Id) lines.Add("Your federation's own country");
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;

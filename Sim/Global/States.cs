@@ -16,6 +16,8 @@ public sealed class StateDefinition
     public double Proximity { get; set; }
     public double InitialStance { get; set; }
     public string[] Neighbours { get; set; } = Array.Empty<string>();
+    /// <summary>Its largest cities (home country first): where communes appear if it federates.</summary>
+    public List<City> Cities { get; set; } = new();
 }
 
 /// <summary>What a state is currently doing about the federation.</summary>
@@ -36,7 +38,7 @@ public enum StateActions
 public sealed class WorldState
 {
     public string Id { get; init; } = "";
-    public string Name { get; init; } = "";
+    public string Name { get; set; } = "";
     public Ideology Ideology { get; set; }
     public double Power { get; init; }
     public double Proximity { get; init; }
@@ -47,6 +49,18 @@ public sealed class WorldState
     /// <summary>0..1: how radicalized its workers are.</summary>
     public double Radicalization { get; set; }
     [JsonInclude] public StateActions Actions { get; internal set; }
+    /// <summary>0..1: how hard the state cracks down; raised by a crushed revolution, fading slowly.</summary>
+    public double Repression { get; set; }
+    /// <summary>Turns left in a revolution under way (0 = none).</summary>
+    public int Uprising { get; set; }
+    /// <summary>Extra chance of success from the movement's support for an uprising under way.</summary>
+    public double UprisingSupport { get; set; }
+    /// <summary>Revolutions that have won here.</summary>
+    public int RevolutionCount { get; set; }
+    /// <summary>Its cities have joined the federation.</summary>
+    public bool Federated { get; set; }
+    /// <summary>A libertarian revolution won here: a sister federation.</summary>
+    [JsonIgnore] public bool Sister => Ideology == Ideology.Libertarian;
 
     /// <summary>Power that counts toward the federation, given distance.</summary>
     [JsonIgnore] public double Weight => Power * Proximity;
@@ -74,6 +88,27 @@ public static class StateText
         <= 0.5 => "sympathetic",
         _ => "friendly",
     };
+
+    private static readonly Dictionary<string, string> Countries = new()
+    {
+        ["French"] = "France", ["British"] = "Britain", ["German"] = "Germany", ["Spanish"] = "Spain",
+        ["Portuguese"] = "Portugal", ["Russian"] = "Russia", ["Soviet"] = "Russia", ["Ottoman"] = "Turkey",
+        ["Mongolian"] = "Mongolia", ["Ukrainian"] = "Ukraine", ["Hungarian"] = "Hungary", ["Qing"] = "China",
+        ["Austria-Hungary"] = "Austria-Hungary", ["German-Austria"] = "Austria",
+    };
+
+    /// <summary>The country's name without its regime ("French Republic" → "France"), for naming what replaces it.</summary>
+    public static string Country(string name)
+    {
+        foreach (var prefix in new[] { "Kingdom of ", "Empire of ", "Federal State of ", "Republic of ", "Union of ", "Principality of ",
+                                       "National State of ", "People's Republic of ", "Confederation of ", "Free Communes of ", "Workers' Republic of ",
+                                       "Khedivate of ", "Democratic Republic of ", "United States of ", "Kingdom of Serbs, Croats and Slovenes" })
+            if (name.StartsWith(prefix)) return prefix.StartsWith("Kingdom of Serbs") ? "Yugoslavia" : name[prefix.Length..];
+        name = name.Replace(" (Versailles)", "");
+        foreach (var suffix in new[] { " People's Republic", " Democratic Republic", " Republic", " Empire", " Reich", " State", " Union" })
+            if (name.EndsWith(suffix)) name = name[..^suffix.Length];
+        return Countries.TryGetValue(name, out var country) ? country : name.StartsWith("The ") ? name[4..] : name;
+    }
 
     public static string Actions(StateActions a)
     {
@@ -127,6 +162,7 @@ public static class WorldSetup
                 Proximity = homeNeighbours.Contains(s.Id) ? 1 : Math.Round(1 / (1 + km / 1500), 3),
                 InitialStance = scenario.Stances.TryGetValue(s.Id, out var stance) ? stance : BaseStance(ideology),
                 Neighbours = s.Neighbours.ToArray(),
+                Cities = s.Cities.Take(6).ToList(),
             });
         }
     }

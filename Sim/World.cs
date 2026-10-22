@@ -88,6 +88,40 @@ public sealed class World
     private readonly Dictionary<string, double> _baselines = new();
     /// <summary>Where a state's stance settles absent anything else: its starting attitude.</summary>
     public double Baseline(string stateId) => _baselines.GetValueOrDefault(stateId);
+    internal void SetBaseline(string stateId, double value) => _baselines[stateId] = value;
+
+    /// <summary>
+    /// New communes join mid-game (a sister federation's cities). They link to each other and,
+    /// weakly, to the nearest commune already in the federation.
+    /// </summary>
+    internal void AddCommunes(List<CommuneDefinition> defs)
+    {
+        int first = _communes.Count;
+        foreach (var d in defs)
+        {
+            var c = new Commune(_communes.Count, d.Name, d.Kind)
+            {
+                Description = d.Description, Longitude = d.Lon, Latitude = d.Lat, Population = d.Population,
+                Values = new CommuneValues(d.Collectivism, d.Militancy, d.Federalism),
+                PracticalEducation = d.Practical, PoliticalEducation = d.Political,
+                PracticalSchooling = Balance.BaselineSchooling, PoliticalSchooling = Balance.BaselineSchooling,
+                Wellbeing = 0.65,
+            };
+            c.Food = c.Population * Balance.FoodNeed * Balance.ReserveTicks * 1.5;
+            c.Goods = c.Population * Balance.GoodsNeed * Balance.ReserveTicks * 1.5;
+            c.Techs.UnionWith(d.Techs);
+            _communes.Add(c);
+        }
+        Trust.Grow(defs.Count);
+        var added = _communes.Skip(first).ToList();
+        foreach (var c in added)
+            foreach (var n in added.Where(o => o != c).OrderBy(o => TrustNetwork.DistanceKm(c, o)).Take(3))
+                Trust.Link(c.Id, n.Id, 0.6);
+        var anchor = added.SelectMany(c => _communes.Take(first).Where(o => o.InFederation).Select(o => (c, o)))
+                          .OrderBy(p => TrustNetwork.DistanceKm(p.c, p.o)).FirstOrDefault();
+        if (anchor.c != null) Trust.Link(anchor.c.Id, anchor.o.Id, 0.4);
+        RefreshTechShares();
+    }
     /// <summary>Last turn's arms bought from friendly states.</summary>
     public double LastArms { get; internal set; }
     /// <summary>This turn's defense bonus from foreign volunteers.</summary>
@@ -237,8 +271,8 @@ public sealed class World
     /// <summary>Rebuilds a world from a save. The result continues exactly as the saved game would have.</summary>
     public static World Restore(SaveGame s, TechCatalog techs)
     {
-        if (s.Communes.Count != s.InitialCommuneCount)
-            throw new InvalidDataException("Save file is inconsistent: commune count changed.");
+        if (s.Communes.Count < s.InitialCommuneCount)
+            throw new InvalidDataException("Save file is inconsistent: communes are missing.");
         for (int i = 0; i < s.Communes.Count; i++)
         {
             if (s.Communes[i].Id != i) throw new InvalidDataException("Save file is inconsistent: commune ids out of order.");
@@ -298,6 +332,7 @@ public sealed class World
         ResearchSystem.Run(this);
         ProjectSystem.Run(this);
         Global.DiplomacySystem.Run(this);
+        Global.RevolutionSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

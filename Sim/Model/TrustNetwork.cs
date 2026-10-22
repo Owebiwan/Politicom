@@ -6,8 +6,8 @@ namespace Politicom.Sim;
 /// </summary>
 public sealed class TrustNetwork
 {
-    private readonly double[,] _trust;
-    private readonly List<int>[] _adjacent;
+    private double[,] _trust;
+    private List<int>[] _adjacent;
 
     public TrustNetwork(int count)
     {
@@ -16,7 +16,20 @@ public sealed class TrustNetwork
         _adjacent = Enumerable.Range(0, count).Select(_ => new List<int>()).ToArray();
     }
 
-    public int Count { get; }
+    public int Count { get; private set; }
+
+    /// <summary>Adds communes (with no links yet), for a federation that grows mid-game.</summary>
+    internal void Grow(int extra)
+    {
+        int n = Count + extra;
+        var trust = new double[n, n];
+        for (int a = 0; a < Count; a++)
+            for (int b = 0; b < Count; b++)
+                trust[a, b] = _trust[a, b];
+        _trust = trust;
+        _adjacent = _adjacent.Concat(Enumerable.Range(0, extra).Select(_ => new List<int>())).ToArray();
+        Count = n;
+    }
 
     public double this[int a, int b] => _trust[a, b];
 

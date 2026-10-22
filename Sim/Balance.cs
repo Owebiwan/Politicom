@@ -105,6 +105,19 @@ public sealed class Balance
     public int AppealTicks { get; set; } = 12;
     public int AppealCooldown { get; set; } = 20;
 
+    // ── Revolutions abroad ─────────────────────────────────────────────────
+    /// <summary>Radicalization above which a state's workers may rise.</summary>
+    public double RevolutionThreshold { get; set; } = 0.55;
+    /// <summary>Chance per turn of a rising, per point of radicalization over the threshold.</summary>
+    public double UprisingChance { get; set; } = 0.6;
+    public int UprisingTicks { get; set; } = 8;
+    /// <summary>Extra contagion per neighbouring sister federation.</summary>
+    public double SisterContagion { get; set; } = 0.5;
+    public double CostSupportUprising { get; set; } = 15;
+    public double SupportUprisingEffect { get; set; } = 0.15;
+    public int FederateDelay { get; set; } = 6;
+    public int FederateCities { get; set; } = 5;
+
     // ── Foreign trade ──────────────────────────────────────────────────────
     /// <summary>Share of each commune's food surplus sold abroad per turn while trading.</summary>
     public double TradeShare { get; set; } = 0.3;

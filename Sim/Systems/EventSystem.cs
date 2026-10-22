@@ -76,6 +76,7 @@ internal static class EventSystem
             w.Ally.OfferInterval = 0;
             w.Ally.OfferPending = false;
         }
+        if (e.Federate.Length > 0) Global.RevolutionSystem.Federate(w, e.Federate);
         foreach (var (id, delta) in e.Stances)
             if (w.States.FirstOrDefault(s => s.Id == id) is { } state)
                 state.Stance = Math.Clamp(state.Stance + delta, -1, 1);

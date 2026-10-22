@@ -25,6 +25,8 @@ public sealed record HoldCommune(int Commune) : PlayerAction;
 public sealed record SendDelegates(string StateId) : PlayerAction;
 /// <summary>Agitate a foreign state's workers: they radicalize, and the state resents it.</summary>
 public sealed record AgitateWorkers(string StateId) : PlayerAction;
+/// <summary>Send arms and organizers to a revolution under way abroad.</summary>
+public sealed record SupportUprising(string StateId) : PlayerAction;
 /// <summary>An appeal to the workers of the world: double the volunteers for a while.</summary>
 public sealed record InternationalAppeal : PlayerAction;
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
@@ -58,6 +60,7 @@ internal static class ActionSystem
             SendDelegates a => Delegates(w, a),
             AgitateWorkers a => Agitate(w, a),
             InternationalAppeal => Appeal(w),
+            SupportUprising a => Support(w, a),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
     }
@@ -268,6 +271,19 @@ internal static class ActionSystem
         s.Radicalization = Math.Min(1, s.Radicalization + b.AgitateEffect * (1 - s.Radicalization));
         s.Stance = Math.Clamp(s.Stance - 0.04, -1, 1);
         return ActionResult.Done($"Agitators reach the workers of {s.Name}: {s.Radicalization:P0} radicalized. Its government notices.");
+    }
+
+    private static ActionResult Support(World w, SupportUprising a)
+    {
+        if (w.States.FirstOrDefault(s => s.Id == a.StateId) is not { } s) return ActionResult.Fail($"No state '{a.StateId}'.");
+        if (s.Uprising == 0) return ActionResult.Fail($"There is no revolution under way in {s.Name}.");
+        var b = w.Balance;
+        if (s.UprisingSupport >= 2 * b.SupportUprisingEffect) return ActionResult.Fail("You are already sending all the support you can.");
+        if (!Spend(w, b.CostSupportUprising)) return Broke(w, b.CostSupportUprising);
+        s.UprisingSupport += b.SupportUprisingEffect;
+        w.BumpDrift(1); // organizing abroad needs organizers
+        w.Emit(Severity.Info, $"Arms and organizers cross into {s.Name} to support the rising (success now {Global.RevolutionSystem.SuccessChance(w, s):P0}).");
+        return ActionResult.Done($"Support sent to the revolution in {s.Name}.");
     }
 
     private static ActionResult Appeal(World w)
