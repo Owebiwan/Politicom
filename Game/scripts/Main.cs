@@ -461,7 +461,7 @@ public partial class Main : Control
 
             [b]The dilemma.[/b] Almost everything that helps you win the war (a war committee, government arms, conscription, appointed commanders) pushes [color=#f2c94c]hierarchy drift[/color] up. At 25, 50 and 75 drift, permanent councils, then commissars, then a police force take over, each with real bonuses. At 100 a state has crystallized and the revolution is over, however strong the society is. Political education, recall and rotation are the brakes.
 
-            [b]Winning.[/b] Hold out as a free federation until the scenario ends; you're scored on survival, quality of life, spread and freedom. [b]Controls:[/b] click a commune, shift-click a second; Space pauses, 1–3 set speed; scroll to zoom, drag to pan.
+            [b]Winning.[/b] Hold out as a free federation until the scenario ends; you're scored on survival, quality of life, spread and freedom. [b]Controls:[/b] click a commune, shift-click a second; Space pauses, 1–3 set speed; scroll or pinch to zoom, drag to move the map.
             """, scroll, PickerWidth);
     }
 

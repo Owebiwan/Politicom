@@ -50,7 +50,7 @@ dotnet run --project Sim.Cli -c Release -- batch --runs 300
 Controls:
 - Click a commune to select it; shift-click a second commune for mediation or railways.
 - Space pauses, 1–3 set the speed, and `.` advances one week.
-- Scroll or pinch to zoom, drag or two-finger scroll to pan, and double-click empty space to reset the view.
+- Scroll (mouse wheel, Magic Mouse or trackpad) or pinch to zoom at the pointer. Drag with any button to move the map; a click without moving selects. Double-click empty space to reset the view.
 - The game pauses itself when a decision comes up.
 
 If your Godot version differs from 4.7.2, Godot will offer to update the `Godot.NET.Sdk`

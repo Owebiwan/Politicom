@@ -48,6 +48,8 @@ public partial class MapView : Control
     private Vector2 _pan;
     private bool _dragging;
     private Vector2 _dragFrom;
+    private Vector2 _pressAt;
+    private bool _dragMoved;
 
     private World? _world;
 
@@ -227,49 +229,57 @@ public partial class MapView : Control
     {
         switch (e)
         {
-            // Wheel or pinch zooms; drag or two-finger scroll pans; double-click empty space resets.
+            // Scrolling (wheel, Magic Mouse, trackpad) and pinching zoom at the pointer; any button
+            // drags the map; a press that doesn't move is a click; double-click empty space resets.
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelUp } up:
-                ZoomAt(up.Position, 1.15f);
+                ZoomAt(up.Position, Mathf.Pow(1.15f, Mathf.Max(1, up.Factor)));
                 break;
             case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelDown } down:
-                ZoomAt(down.Position, 1 / 1.15f);
+                ZoomAt(down.Position, 1 / Mathf.Pow(1.15f, Mathf.Max(1, down.Factor)));
                 break;
             case InputEventMagnifyGesture pinch:
                 ZoomAt(pinch.Position, pinch.Factor);
                 break;
             case InputEventPanGesture scroll:
-                _pan -= scroll.Delta * 12;
-                QueueRedraw();
+                // macOS sends Magic Mouse and trackpad scrolling as pan gestures: zoom with them.
+                ZoomAt(scroll.Position, Mathf.Exp(-scroll.Delta.Y * 0.08f));
                 break;
             case InputEventMouseButton { ButtonIndex: MouseButton.Left or MouseButton.Right or MouseButton.Middle } button:
-                if (!button.Pressed)
-                    _dragging = false;
-                else if (button.ButtonIndex == MouseButton.Left && !AtWorldZoom && Hit(button.Position) is int id)
-                    CommuneClicked?.Invoke(id, button.ShiftPressed);
-                else if (button.ButtonIndex == MouseButton.Left && !button.DoubleClick && HitState(button.Position) is { } st)
+                if (button.Pressed)
                 {
-                    StateClicked?.Invoke(st.Id);
-                    _dragging = true; // a click on a country can still start a drag
-                    _dragFrom = button.Position;
-                }
-                else if (button.DoubleClick)
-                {
-                    _zoom = 1;
-                    _pan = Vector2.Zero;
-                    QueueRedraw();
+                    if (button.DoubleClick && button.ButtonIndex == MouseButton.Left && (AtWorldZoom || Hit(button.Position) is null) && HitState(button.Position) is null)
+                    {
+                        _zoom = 1;
+                        _pan = Vector2.Zero;
+                        QueueRedraw();
+                        break;
+                    }
+                    _dragging = true;
+                    _dragMoved = false;
+                    _dragFrom = _pressAt = button.Position;
                 }
                 else
                 {
-                    _dragging = true;
-                    _dragFrom = button.Position;
+                    bool wasClick = _dragging && !_dragMoved && button.ButtonIndex == MouseButton.Left;
+                    _dragging = false;
+                    if (wasClick)
+                    {
+                        if (!AtWorldZoom && Hit(button.Position) is int id) CommuneClicked?.Invoke(id, button.ShiftPressed);
+                        else if (HitState(button.Position) is { } st) StateClicked?.Invoke(st.Id);
+                    }
                 }
                 break;
             case InputEventMouseMotion motion:
                 if (_dragging)
                 {
-                    _pan += motion.Position - _dragFrom;
+                    // A few pixels of wobble during a click aren't a drag.
+                    if (!_dragMoved && motion.Position.DistanceTo(_pressAt) > 4) _dragMoved = true;
+                    if (_dragMoved)
+                    {
+                        _pan += motion.Position - _dragFrom;
+                        QueueRedraw();
+                    }
                     _dragFrom = motion.Position;
-                    QueueRedraw();
                 }
                 _mouse = motion.Position;
                 var hit = AtWorldZoom ? null : Hit(motion.Position);
@@ -593,7 +603,7 @@ public partial class MapView : Control
         DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
         DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         DrawString(font, new Vector2(14, Size.Y - 14),
-"Boxes: enemy armies (pressure). Black-red flags: militia (defense). Moving dots: militia columns. Rails: railways. Dashed yellow: seceded. T: trust links.",
+"Drag to move · scroll or pinch to zoom · click to select. Boxes: enemy armies. Black-red flags: militia. Rails: railways. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
