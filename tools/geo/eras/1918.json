@@ -52,6 +52,15 @@
     {"id": "PRU", "name": "Peru", "ideology": "conservative", "capital": "Lima", "members": ["PER"]},
     {"id": "COL", "name": "Colombia", "ideology": "conservative", "capital": "Bogotá", "members": ["COL", "PAN"]},
     {"id": "VEN", "name": "Venezuela", "ideology": "conservative", "capital": "Caracas", "members": ["VEN"]},
-    {"id": "CUB", "name": "Cuba", "ideology": "conservative", "capital": "Havana", "members": ["CUB"]}
+    {"id": "CUB", "name": "Cuba", "ideology": "conservative", "capital": "Havana", "members": ["CUB"]},
+    {"id": "BOL", "name": "Bolivia", "ideology": "conservative", "capital": "La Paz", "members": ["BOL"]},
+    {"id": "PRY", "name": "Paraguay", "ideology": "conservative", "capital": "Asunción", "members": ["PRY"]},
+    {"id": "URY", "name": "Uruguay", "ideology": "liberal", "capital": "Montevideo", "members": ["URY"]},
+    {"id": "ECU", "name": "Ecuador", "ideology": "liberal", "capital": "Quito", "members": ["ECU"]},
+    {"id": "GTM", "name": "Guatemala", "ideology": "conservative", "capital": "Guatemala", "members": ["GTM", "HND", "SLV", "NIC"]},
+    {"id": "CRI", "name": "Costa Rica", "ideology": "liberal", "capital": "San José", "members": ["CRI"]},
+    {"id": "HTI", "name": "Haiti", "ideology": "conservative", "capital": "Port-au-Prince", "members": ["HTI", "DOM"]},
+    {"id": "SAU", "name": "Najd and Hejaz", "ideology": "monarchy", "capital": "Riyadh", "members": ["SAU", "YEM"]},
+    {"id": "NPL", "name": "Nepal", "ideology": "monarchy", "capital": "Kathmandu", "members": ["NPL", "BTN"]}
   ]
 }

@@ -33,8 +33,16 @@
     {"id": "BRA", "name": "Empire of Brazil", "ideology": "monarchy", "capital": "Rio de Janeiro", "members": ["BRA"], "power": 2},
     {"id": "ARG", "name": "Argentina", "ideology": "liberal", "capital": "Buenos Aires", "members": ["ARG"]},
     {"id": "CHL", "name": "Chile", "ideology": "conservative", "capital": "Santiago", "members": ["CHL"]},
-    {"id": "PRU", "name": "Peru", "ideology": "conservative", "capital": "Lima", "members": ["PER", "BOL"]},
+    {"id": "PRU", "name": "Peru", "ideology": "conservative", "capital": "Lima", "members": ["PER"]},
     {"id": "COL", "name": "United States of Colombia", "ideology": "liberal", "capital": "Bogotá", "members": ["COL", "PAN"]},
-    {"id": "VEN", "name": "Venezuela", "ideology": "conservative", "capital": "Caracas", "members": ["VEN"]}
+    {"id": "VEN", "name": "Venezuela", "ideology": "conservative", "capital": "Caracas", "members": ["VEN"]},
+    {"id": "PRY", "name": "Paraguay", "ideology": "conservative", "capital": "Asunción", "members": ["PRY"]},
+    {"id": "URY", "name": "Uruguay", "ideology": "liberal", "capital": "Montevideo", "members": ["URY"]},
+    {"id": "ECU", "name": "Ecuador", "ideology": "conservative", "capital": "Quito", "members": ["ECU"]},
+    {"id": "BOL", "name": "Bolivia", "ideology": "conservative", "capital": "La Paz", "members": ["BOL"]},
+    {"id": "GTM", "name": "Guatemala", "ideology": "conservative", "capital": "Guatemala", "members": ["GTM", "HND", "SLV", "NIC", "CRI"]},
+    {"id": "HTI", "name": "Haiti", "ideology": "conservative", "capital": "Port-au-Prince", "members": ["HTI", "DOM"]},
+    {"id": "NPL", "name": "Nepal", "ideology": "monarchy", "capital": "Kathmandu", "members": ["NPL", "BTN"]},
+    {"id": "LBR", "name": "Liberia", "ideology": "conservative", "capital": "Monrovia", "members": ["LBR"]}
   ]
 }
