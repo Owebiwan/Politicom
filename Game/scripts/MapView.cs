@@ -170,7 +170,7 @@ public partial class MapView : Control
             var tip = at + (towards - at) * 0.8f;
             var dir = (towards - at).Normalized();
             DrawLine(at, tip, new Color(color, alpha * (0.5f + 0.5f * pulse)), 2.5f * scale, true);
-            DrawColoredPolygon(new[] { tip + dir * 7 * scale, tip + dir.Orthogonal() * 4 * scale, tip - dir.Orthogonal() * 4 * scale },
+            FillPolygon(new[] { tip + dir * 7 * scale, tip + dir.Orthogonal() * 4 * scale, tip - dir.Orthogonal() * 4 * scale },
                 new Color(color, alpha * (0.5f + 0.5f * pulse)));
         }
         DrawRect(box, new Color(color.Darkened(0.6f), alpha * 0.9f));
@@ -186,8 +186,8 @@ public partial class MapView : Control
         float scale = Mathf.Clamp(1.05f + Mathf.Sqrt(defense) * 0.35f, 1.05f, 2.1f) * Mathf.Sqrt(_zoom);
         var size = new Vector2(16, 11) * scale;
         var box = new Rect2(at - size / 2, size);
-        DrawColoredPolygon(new[] { box.Position, new Vector2(box.End.X, box.Position.Y), new Vector2(box.Position.X, box.End.Y) }, new Color(Anarchist, alpha));
-        DrawColoredPolygon(new[] { new Vector2(box.End.X, box.Position.Y), box.End, new Vector2(box.Position.X, box.End.Y) }, new Color(0.05f, 0.05f, 0.05f, alpha));
+        FillPolygon(new[] { box.Position, new Vector2(box.End.X, box.Position.Y), new Vector2(box.Position.X, box.End.Y) }, new Color(Anarchist, alpha));
+        FillPolygon(new[] { new Vector2(box.End.X, box.Position.Y), box.End, new Vector2(box.Position.X, box.End.Y) }, new Color(0.05f, 0.05f, 0.05f, alpha));
         DrawRect(box, new Color(1, 1, 1, alpha * 0.5f), false, 1);
     }
 
@@ -299,7 +299,7 @@ public partial class MapView : Control
         var font = ThemeDB.FallbackFont;
         // A generated map's land goes under its neighbouring countries; real maps' land comes from the world layer.
         if (Generated && _geoLayout is { } g0)
-            foreach (var land in g0.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
+            foreach (var land in g0.LandFill) FillPolygon(Screen(land), NeutralLand);
         bool globe = DrawGlobe(font);
         bool detail = !AtWorldZoom;
         var cells = Cells();
@@ -307,7 +307,7 @@ public partial class MapView : Control
 
         if (_geoLayout is { } g)
         {
-            if (!globe) foreach (var land in g.LandFill) DrawColoredPolygon(Screen(land), NeutralLand);
+            if (!globe) foreach (var land in g.LandFill) FillPolygon(Screen(land), NeutralLand);
             for (int r = 0; r < g.Land.Count; r++)
             {
                 var ring = Screen(g.Land[r]);
@@ -318,7 +318,7 @@ public partial class MapView : Control
                     if (!Geo.OnBounds(raw[k], raw[n])) DrawLine(ring[k], ring[n], Coast, 1.3f, true);
                 }
             }
-            foreach (var lake in g.Lakes) DrawColoredPolygon(Screen(lake), Sea);
+            foreach (var lake in g.Lakes) FillPolygon(Screen(lake), Sea);
         }
 
         // Territories
@@ -326,7 +326,7 @@ public partial class MapView : Control
         {
             var fill = Fill(w, c);
             if (c.Id == _hover) fill = fill.Lightened(0.12f);
-            foreach (var piece in screen[c.Id]) DrawColoredPolygon(piece, fill);
+            foreach (var piece in screen[c.Id]) FillPolygon(piece, fill);
         }
 
         // Railways: a dark bed with light cross-ties.
@@ -502,6 +502,16 @@ public partial class MapView : Control
     }
 
     private Vector2[] Screen(Vector2[] layout) => layout.Select(ToScreen).ToArray();
+
+    /// <summary>
+    /// Fills a polygon, skipping ones that can't be triangulated: zoomed far out, territories
+    /// shrink to slivers whose points coincide, and the renderer would log an error every frame.
+    /// </summary>
+    private void FillPolygon(Vector2[] poly, Color color)
+    {
+        if (poly.Length < 3 || Area(poly) < 0.5f || Geometry2D.TriangulatePolygon(poly).Length == 0) return;
+        DrawColoredPolygon(poly, color);
+    }
 
     /// <summary>Territory colour: the map mode over a tint for the kind of land; occupied land takes the occupier's colour.</summary>
     private Color Fill(World w, Commune c)

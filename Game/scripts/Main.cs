@@ -352,7 +352,11 @@ public partial class Main : Control
 
     private void ToggleWorldView()
     {
-        if (_map.Globe is null) return;
+        if (_map.Globe is null)
+        {
+            Say("This game has no world map — it was saved before the world map was added. Start a new game to play on the world map.");
+            return;
+        }
         if (_map.AtWorldZoom) _map.ShowRegion();
         else _map.ShowWorld();
         _worldButton.Text = _map.AtWorldZoom ? "Region" : "World";
@@ -377,9 +381,17 @@ public partial class Main : Control
         _world = world;
         _selectedState = null;
         _dayInTurn = 0;
-        _map.Globe = LoadAtlas(world.Scenario.World)
+        // Saves from before the world map carry no era: use their scenario's.
+        string? era = world.Scenario.World
+                      ?? _scenarios.FirstOrDefault(s => s.Id == ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId)?.World;
+        _map.Globe = LoadAtlas(era)
                      ?? (world.Scenario.Geography is { Neighbours.Count: > 0 } g ? Politicom.Sim.Global.Atlas.FromGenerated(g) : null);
         _map.SelectedState = null;
+        _worldButton.Disabled = _map.Globe is null;
+        _worldButton.Text = "World";
+        _worldButton.TooltipText = _map.Globe is null
+            ? "This game has no world map (it was saved before the world map was added). Start a new game to play on the world map."
+            : "Zoom out to the whole world, or back to the region (W).";
         _map.Geo = world.Scenario.Geography is { } generated
             ? GeoData.From(generated)
             : LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
