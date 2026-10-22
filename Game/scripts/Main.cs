@@ -77,7 +77,7 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME]</c>
+    /// Dev hook: <c>godot --path Game -- --screenshot out.png [--scenario ID] [--weeks N] [--select ID] [--focus ID] [--zoom Z] [--intro] [--communes] [--tab N] [--techs [ID]] [--policy NAME] [--clock SECONDS]</c>
     /// simulates N weeks, saves a screenshot and quits. Used to check the UI without clicking.
     /// </summary>
     private async void HandleScreenshotArgs()
@@ -106,6 +106,14 @@ public partial class Main : Control
             StepTurn();
         }
         for (int i = 0; i < 40; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); // let armies slide into place
+        int clockAt = Array.IndexOf(args, "--clock");
+        if (clockAt >= 0 && clockAt + 1 < args.Length)
+        {
+            CloseOverlay();
+            SetSpeed(1);
+            await ToSignal(GetTree().CreateTimer(double.Parse(args[clockAt + 1], System.Globalization.CultureInfo.InvariantCulture)), SceneTreeTimer.SignalName.Timeout);
+            SetSpeed(0);
+        }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
@@ -126,13 +134,32 @@ public partial class Main : Control
         GetTree().Quit();
     }
 
+    /// <summary>
+    /// Days shown into the current turn. Turns stay a week long, but while the clock runs the
+    /// date ticks forward a day at a time, at the same overall pace, and the turn resolves on
+    /// its last day.
+    /// </summary>
+    private int _dayInTurn;
+
     public override void _Process(double delta)
     {
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
         _accumulator += delta;
-        if (_accumulator < SecondsPerTurn[_speed]) return;
-        _accumulator = 0;
-        StepTurn();
+        double secondsPerDay = SecondsPerTurn[_speed] / _world.Scenario.DaysPerTick;
+        while (_accumulator >= secondsPerDay && _speed != 0 && _world.Outcome == Outcome.Ongoing)
+        {
+            _accumulator -= secondsPerDay;
+            if (++_dayInTurn >= _world.Scenario.DaysPerTick) StepTurn();
+            else UpdateHeader();
+        }
+    }
+
+    private void UpdateHeader()
+    {
+        var w = _world;
+        var date = w.Date.AddDays(_dayInTurn);
+        _header.Text = $"{w.Scenario.Name} · {date:d MMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
+                       + (SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
     }
 
     public override void _UnhandledInput(InputEvent e)
@@ -168,6 +195,7 @@ public partial class Main : Control
 
     private void StepTurn()
     {
+        _dayInTurn = 0;
         if (_world.Outcome != Outcome.Ongoing) return;
         _world.Step();
         // Like a Paradox popup: pause when the movement has a decision to make.
@@ -242,7 +270,10 @@ public partial class Main : Control
     private void SetWorld(World world)
     {
         _world = world;
-        _map.Geo = LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
+        _dayInTurn = 0;
+        _map.Geo = world.Scenario.Geography is { } generated
+            ? GeoData.From(generated)
+            : LoadGeo(ScenarioDefinition.SplitLength(world.Scenario.Id).BaseId);
         _tipsShown.Clear();
         _communeList.World = world;
         _map.World = _driftMeter.World = _history.World = world;
@@ -660,8 +691,7 @@ public partial class Main : Control
     private void Refresh()
     {
         var w = _world;
-        _header.Text = $"{w.Scenario.Name} · {w.Date:d MMM yyyy} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
-                       + (SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
+        UpdateHeader();
         _stepButton.Text = $"+1 {w.Turn}";
         _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}/{w.InitialCommuneCount}";
 

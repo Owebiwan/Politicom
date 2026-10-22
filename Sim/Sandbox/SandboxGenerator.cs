@@ -237,6 +237,9 @@ public sealed class SandboxGenerator
         };
         scenario.Events = PickEvents(rng, region, city, defs, enemies);
         scenario.Railways = Railways(rng, defs, points, spacing);
+        var angles = enemyCount == 2 ? new[] { angle1, angle2 } : new[] { angle1 };
+        scenario.Geography = GeographyGenerator.Generate(seed, points, defs, spacing, angles,
+            cities.OrderByDescending(c => defs[c].Population).First());
         if (length is int turns) scenario = scenario.WithLength(turns);
         return calibrate ? Calibrate(scenario, seed) : scenario;
     }

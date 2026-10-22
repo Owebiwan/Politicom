@@ -24,6 +24,8 @@ public sealed class ScenarioDefinition
     public List<EventDefinition> Events { get; set; } = new();
     /// <summary>Railway lines at the start, as pairs of commune names. A line also makes the two neighbours.</summary>
     public List<string[]> Railways { get; set; } = new();
+    /// <summary>Generated geography (sandbox maps). Historical scenarios load theirs from Data/geo.</summary>
+    public Sandbox.GeographyDefinition? Geography { get; set; }
 
     public static ScenarioDefinition Load(string path) => Parse(File.ReadAllText(path));
 

@@ -97,8 +97,9 @@ trader            68%       31%     1% │    76    54     12    71    53 │   
   federation holds. Catalonia fills its real provinces out to the Pyrenees, while the Aragon
   front and the Free Territory's edges are drawn as a smooth front line. Paris
   uses the real arrondissement boundaries. The territories are coloured by the map mode over a
-  tint for their land: farmland, mixed or industry. Generated sandbox maps have no geography
-  and use rounded territories instead. Dense clusters such as Barcelona show their biggest
+  tint for their land: farmland, mixed or industry. Generated sandbox maps get invented geography of the
+  same kind: a wandering coastline away from the enemy (or none, for a landlocked region),
+  rivers (one through the largest city), lakes and provinces. Dense clusters such as Barcelona show their biggest
   labels first; zoom in for the rest.
   - Occupied land takes the occupier's colour, and front borders are drawn in the enemy's colour.
   - A small bar under each front commune's name shows how much of it is still held.
@@ -117,6 +118,8 @@ trader            68%       31%     1% │    76    54     12    71    53 │   
     advances. During an offensive they pulse and point at their target.
   - The federation's militia appear as black-and-red flags sized by their defense, and
     defensive campaigns send columns marching from the communes taking part to the front.
+- **A daily clock:** turns are a week long, but while the clock runs the date ticks forward a
+  day at a time at the same overall pace, and the turn resolves on its last day.
 - **The sidebar:** the clock, influence, the drift meter and any decision waiting on you are
   always visible. Everything else is in four tabs: Overview, Movement, Commune and Log.
   Clicking a commune opens its tab.

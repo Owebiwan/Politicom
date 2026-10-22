@@ -25,6 +25,23 @@ public sealed class GeoData
     /// <summary>Real boundaries by commune name, when the scenario has them.</summary>
     public Dictionary<string, Vector2[]> Territories { get; } = new();
 
+    /// <summary>Geography generated with a sandbox map.</summary>
+    public static GeoData From(Politicom.Sim.Sandbox.GeographyDefinition g)
+    {
+        static Vector2[] Points(double[][] pts) => pts.Select(p => new Vector2((float)p[0], (float)p[1])).ToArray();
+        var geo = new GeoData
+        {
+            Bounds = new Rect2((float)g.Bbox[0], (float)g.Bbox[1], (float)(g.Bbox[2] - g.Bbox[0]), (float)(g.Bbox[3] - g.Bbox[1])),
+            DrawProvinces = g.DrawProvinces,
+        };
+        geo.Land.AddRange(g.Land.Select(Points));
+        geo.Lakes.AddRange(g.Lakes.Select(Points));
+        geo.Borders.AddRange(g.Borders.Select(Points));
+        geo.Rivers.AddRange(g.Rivers.Select(r => (r.Name, Points(r.Points))));
+        geo.Provinces.AddRange(g.Provinces.Select(p => (p.Name, Points(p.Ring), p.Contested)));
+        return geo;
+    }
+
     public static GeoData Parse(string json)
     {
         using var doc = JsonDocument.Parse(json);
@@ -48,6 +65,26 @@ public sealed class GeoData
         if (root.TryGetProperty("territories", out var territories))
             foreach (var t in territories.EnumerateObject()) geo.Territories[t.Name] = Points(t.Value);
         return geo;
+    }
+
+    /// <summary>
+    /// Land for filling, with every vertex on the clipping box pushed far outward, so where land
+    /// runs off the edge of the data it carries on past the edge of the screen instead of
+    /// stopping in a straight line against the sea.
+    /// </summary>
+    public Vector2[] Extended(Vector2[] ring)
+    {
+        const float eps = 1e-4f;
+        float far = Mathf.Max(Bounds.Size.X, Bounds.Size.Y) * 4;
+        return ring.Select(p =>
+        {
+            var q = p;
+            if (Mathf.Abs(p.X - Bounds.Position.X) < eps) q.X -= far;
+            if (Mathf.Abs(p.X - Bounds.End.X) < eps) q.X += far;
+            if (Mathf.Abs(p.Y - Bounds.Position.Y) < eps) q.Y -= far;
+            if (Mathf.Abs(p.Y - Bounds.End.Y) < eps) q.Y += far;
+            return q;
+        }).ToArray();
     }
 
     /// <summary>

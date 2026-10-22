@@ -613,7 +613,7 @@ public partial class MapView : Control
             var land = geo.Land.Select(r => r.Select(_project).ToArray()).ToList();
             _geoLayout = new GeoLayout(
                 land,
-                land.SelectMany(Simple).ToList(),
+                geo.Land.Select(r => geo.Extended(r).Select(_project).ToArray()).SelectMany(Simple).ToList(),
                 geo.Lakes.Select(r => r.Select(_project).ToArray()).ToList(),
                 geo.Borders.Select(r => r.Select(_project).ToArray()).ToList(),
                 geo.Rivers.Select(r => (r.Name, r.Points.Select(_project).ToArray())).ToList(),

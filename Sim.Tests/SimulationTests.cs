@@ -93,6 +93,36 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Sandbox_maps_have_geography_with_every_town_on_land()
+    {
+        static bool Inside(double[][] ring, double x, double y)
+        {
+            bool inside = false;
+            for (int i = 0, j = ring.Length - 1; i < ring.Length; j = i++)
+                if ((ring[i][1] > y) != (ring[j][1] > y) &&
+                    x < (ring[j][0] - ring[i][0]) * (y - ring[i][1]) / (ring[j][1] - ring[i][1]) + ring[i][0])
+                    inside = !inside;
+            return inside;
+        }
+        int coastal = 0;
+        for (ulong seed = 1; seed <= 40; seed++)
+        {
+            var s = Sandbox.Value.Generate(seed, calibrate: false);
+            var g = Assert.IsType<Sim.Sandbox.GeographyDefinition>(s.Geography);
+            var land = Assert.Single(g.Land);
+            Assert.NotEmpty(g.Rivers);
+            Assert.NotEmpty(g.Provinces);
+            Assert.All(s.Communes, c => Assert.True(Inside(land, c.Lon, c.Lat), $"seed {seed}: {c.Name} is at sea"));
+            Assert.All(s.Communes, c => Assert.DoesNotContain(g.Lakes, lake => Inside(lake, c.Lon, c.Lat)));
+            Assert.All(s.Communes, c => Assert.Contains(g.Provinces, p => Inside(p.Ring, c.Lon, c.Lat)));
+            if (land.Length > 4) coastal++;
+        }
+        Assert.InRange(coastal, 20, 39); // most maps have a coast, some are landlocked
+        var json = System.Text.Json.JsonSerializer.Serialize(Sandbox.Value.Generate(5, calibrate: false).Geography);
+        Assert.Equal(json, System.Text.Json.JsonSerializer.Serialize(Sandbox.Value.Generate(5, calibrate: false).Geography));
+    }
+
+    [Fact]
     public void Sandbox_ids_parse()
     {
         Assert.True(SandboxGenerator.TryParseId("sandbox:42", out var seed, out var size));
