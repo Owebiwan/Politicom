@@ -439,8 +439,7 @@ public partial class MapView
         var at = _mouse + new Vector2(16, 16);
         if (at.X + width > Size.X) at.X = _mouse.X - width - 8;
         if (at.Y + height > Size.Y) at.Y = _mouse.Y - height - 8;
-        DrawRect(new Rect2(at, new Vector2(width, height)), new Color(0.03f, 0.03f, 0.04f, 0.92f));
-        DrawRect(new Rect2(at, new Vector2(width, height)), new Color(1, 1, 1, 0.15f), false, 1);
+        DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4)); // the same gold-rimmed frame as the interface's tooltips
         for (int i = 0; i < lines.Count; i++)
             DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
     }
