@@ -21,8 +21,8 @@
 # Interface credits
 
 - Pixel art (`Game/pixel/`): drawn for this project as text grids in `tools/ui/build_pixel_art.py`.
-- Fonts (`Game/fonts/`): **Cinzel** by Natanael Gama and **Alegreya Sans** by Juan Pablo del
-  Peral (Huerta Tipográfica), both under the **SIL Open Font License 1.1** (licence texts
-  alongside the fonts).
-- The gilt frames and the clock emblems (`Game/ui/`) were drawn for this project.
+- Font (`Game/fonts/`): **Crimson Pro** by Jacques Le Bailly, under the **SIL Open Font
+  License 1.1** (licence text alongside the font).
+- The ornaments (`Game/ui/`: frames, plates, buttons, tabs, medallions, dividers) are drawn in
+  code by `tools/ui/build_ornaments.py`; the clock emblems and switches were drawn for this project.
 

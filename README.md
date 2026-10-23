@@ -229,11 +229,21 @@ How they play:
 
 ## What the player sees
 
-**The look.** The interface is styled like a strategy game:
-- **Panels:** dark lacquered panels with gilt borders. Pop-ups, the scenario picker and
-  tooltips sit in gilt frames; pop-ups and the scenario picker have diamond corner bosses.
-- **Type:** **Cinzel** capitals for titles, tabs and section headings; **Alegreya Sans** for
-  reading, the map and the tech tree.
+**The look.** The interface is modelled on Victoria 3:
+- **Windows:** pop-ups, the scenario picker, the tech tree and the dashboard are dark grained
+  lacquer in engraved gold frames with flourished corners: a bracket with curling ends and a
+  palmette.
+- **Titles:** window titles sit on a metal-rimmed plate with scroll terminals.
+- **Section headings:** each sits on a shaded bar with fine gold rules.
+- **Controls:** buttons are embossed bronze plates (lit on hover, red lacquer when on).
+  Tabs are plates with the open one lit, and switches are gilt.
+- **Medallions:** pop-up and decision emblems sit in beaded gold medallions. Dividers are
+  tapered gold rules.
+- **Text:** a book serif, **Crimson Pro**, throughout. Titles and headings are semibold, in
+  title case and gold; body text is regular, cream, at about 16 px; figures are bold.
+- **Replacing the art:** every ornament is a PNG drawn by `tools/ui/build_ornaments.py`
+  (Pillow and numpy). Painted art of the same size and margins can replace any of them
+  without code changes; the margins are in `Game/scripts/UiTheme.cs`.
 - **Pixel art:** 55 sprites drawn for the game, each a 16 × 16 grid of characters in
   `tools/ui/build_pixel_art.py`, rendered at 8× with hard edges.
   - **Settlements:** each commune is drawn by kind and age. Before 1750 that's thatched

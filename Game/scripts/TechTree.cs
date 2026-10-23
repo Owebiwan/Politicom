@@ -134,8 +134,8 @@ public partial class TechTreeView : Control
             bool reached = from <= w.Year;
             bool current = Ages.Index(w.Year) == index;
             if (current) DrawRect(new Rect2(x - ColGap / 2, 0, width + ColGap, Size.Y), new Color(1, 1, 1, 0.025f));
-            string label = Ages.All[index].Name.ToUpperInvariant() + (current ? " · NOW" : reached ? "" : $" · FROM {Ages.Year(from)}");
-            DrawString(font, new Vector2(x, 20), label, HorizontalAlignment.Left, width, 12, reached ? UiTheme.Heading : Muted);
+            string label = Ages.All[index].Name + (current ? " · now" : reached ? "" : $" · from {Ages.Year(from)}");
+            DrawString(UiTheme.Display, new Vector2(x, 21), label, HorizontalAlignment.Left, width, 15, reached ? UiTheme.GoldBright : Muted);
             if (i > 0) DrawLine(new Vector2(x - ColGap / 2, 4), new Vector2(x - ColGap / 2, Size.Y), new Color(1, 1, 1, 0.08f), 1);
         }
 
@@ -144,7 +144,7 @@ public partial class TechTreeView : Control
             DrawRect(new Rect2(0, y - 4, Size.X, h + 8), new Color(1, 1, 1, 0.025f));
             if (UiTheme.Icon(name.ToLowerInvariant()) is { } emblem)
                 DrawTextureRect(emblem, new Rect2(LabelW / 2 - 16, y + h / 2 - 42, 32, 32), false);
-            DrawString(UiTheme.Display, new Vector2(4, y + h / 2 + 8), name.ToUpperInvariant(), HorizontalAlignment.Center, LabelW - 8, 11, UiTheme.Heading);
+            DrawString(UiTheme.Display, new Vector2(4, y + h / 2 + 10), name, HorizontalAlignment.Center, LabelW - 8, 14, UiTheme.GoldBright);
         }
 
         // The chain behind whatever is hovered or selected lights up.

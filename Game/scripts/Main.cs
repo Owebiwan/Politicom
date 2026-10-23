@@ -779,7 +779,7 @@ public partial class Main : Control
         v.AddThemeConstantOverride("separation", 14);
         panel.AddChild(v);
 
-        v.AddChild(UiTheme.Title(title, 28));
+        v.AddChild(UiTheme.TitlePlate(title, 26));
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(width - 56, 0), Text = body.Trim() };
         text.AddThemeFontSizeOverride("normal_font_size", 15);
         text.AddThemeFontSizeOverride("bold_font_size", 15);
@@ -850,6 +850,7 @@ public partial class Main : Control
         _map.AddChild(_communeList);
 
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(360, 0) };
+        panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(14)); // clear of the corner ornaments
         root.AddChild(panel);
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         foreach (var edge in new[] { "left", "right", "top", "bottom" }) margin.AddThemeConstantOverride($"margin_{edge}", 12);
@@ -1294,7 +1295,7 @@ public partial class Main : Control
             Severity.Decision => "decision",
             _ => "log",
         };
-        titleRow.AddChild(UiTheme.IconRect(emblem, 48));
+        titleRow.AddChild(UiTheme.Medallion(emblem, 64));
         var title = UiTheme.Title(heading, 24);
         title.CustomMinimumSize = new Vector2(520, 0);
         title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -1331,14 +1332,12 @@ public partial class Main : Control
     private void AddDecision(string text, params (string Label, string Tooltip, Action OnPress)[] options)
     {
         var box = new PanelContainer();
-        var style = UiTheme.Box(new Color("1e1c18"), border: UiTheme.Gold, radius: 3, margin: 10, vmargin: 8);
-        style.BorderWidthLeft = 4;
-        box.AddThemeStyleboxOverride("panel", style);
+        box.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(12));
         var v = new VBoxContainer();
         box.AddChild(v);
         var head = new HBoxContainer();
         head.AddThemeConstantOverride("separation", 10);
-        head.AddChild(UiTheme.IconRect("decision", 32));
+        head.AddChild(UiTheme.Medallion("decision", 44));
         head.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(260, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill });
         v.AddChild(head);
         var row = new HFlowContainer();
