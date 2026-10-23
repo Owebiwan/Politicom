@@ -142,6 +142,13 @@ internal static class UiTheme
         }
         t.SetFont("font", "CheckButton", BodyMedium);
         t.SetConstant("icon_max_width", "CheckButton", 0); // switches keep their own size (Button's emblem limit would shrink them)
+        // Gilt switches: red with a gold knob when on, dark with a grey knob when off — both legible on dark panels.
+        var on = GD.Load<Texture2D>("res://ui/switch_on.svg");
+        var off = GD.Load<Texture2D>("res://ui/switch_off.svg");
+        t.SetIcon("checked", "CheckButton", on);
+        t.SetIcon("unchecked", "CheckButton", off);
+        t.SetIcon("checked_disabled", "CheckButton", on);
+        t.SetIcon("unchecked_disabled", "CheckButton", off);
         t.SetStylebox("normal", "CheckButton", Box(new Color(0, 0, 0, 0), margin: 4, vmargin: 4));
         t.SetStylebox("hover", "CheckButton", Box(new Color("ffffff0d"), margin: 4, vmargin: 4));
         t.SetStylebox("pressed", "CheckButton", Box(new Color(0, 0, 0, 0), margin: 4, vmargin: 4));
@@ -159,16 +166,16 @@ internal static class UiTheme
 
         // Tabs: Cinzel captions, a gilt rule under the open tab.
         t.SetFont("font", "TabContainer", Display);
-        t.SetFontSize("font_size", "TabContainer", 13);
+        t.SetFontSize("font_size", "TabContainer", 12);
         t.SetStylebox("panel", "TabContainer", Box(Panel, border: GoldDim, radius: 0, margin: 12));
-        t.SetStylebox("tab_selected", "TabContainer", Box(Panel, radius: 0, margin: 12, vmargin: 7, underline: GoldBright));
-        t.SetStylebox("tab_unselected", "TabContainer", Box(Background, radius: 0, margin: 12, vmargin: 7));
-        t.SetStylebox("tab_hovered", "TabContainer", Box(new Color("1d1e23"), radius: 0, margin: 12, vmargin: 7, underline: GoldDim));
+        t.SetStylebox("tab_selected", "TabContainer", Box(Panel, radius: 0, margin: 7, vmargin: 6, underline: GoldBright));
+        t.SetStylebox("tab_unselected", "TabContainer", Box(Background, radius: 0, margin: 7, vmargin: 6));
+        t.SetStylebox("tab_hovered", "TabContainer", Box(new Color("1d1e23"), radius: 0, margin: 7, vmargin: 6, underline: GoldDim));
         t.SetColor("font_selected_color", "TabContainer", GoldBright);
         t.SetColor("font_unselected_color", "TabContainer", Muted);
         t.SetColor("font_hovered_color", "TabContainer", Text);
-        t.SetConstant("icon_max_width", "TabContainer", 18);
-        t.SetConstant("icon_separation", "TabContainer", 6);
+        t.SetConstant("icon_max_width", "TabContainer", 16);
+        t.SetConstant("icon_separation", "TabContainer", 4);
 
         // Bars, separators, scrolling
         t.SetStylebox("background", "ProgressBar", Box(new Color("0f1013"), border: GoldDim, radius: 2));

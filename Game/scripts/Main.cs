@@ -849,7 +849,7 @@ public partial class Main : Control
         };
         _map.AddChild(_communeList);
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(480, 0) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(360, 0) };
         root.AddChild(panel);
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         foreach (var edge in new[] { "left", "right", "top", "bottom" }) margin.AddThemeConstantOverride($"margin_{edge}", 12);
@@ -858,7 +858,7 @@ public partial class Main : Control
         margin.AddChild(side);
 
         // ── Always visible: where and when, the clock, influence, drift and anything waiting on you ──
-        _header = AddLabel(side, 18);
+        _header = AddLabel(side, 15);
         _header.AddThemeFontOverride("font", UiTheme.Display);
         _header.AddThemeColorOverride("font_color", UiTheme.GoldBright);
 
@@ -882,12 +882,12 @@ public partial class Main : Control
         AddButton(clock, "Save", "Save to a single quick-save slot.", SaveGame);
         AddButton(clock, "Load", "Load the quick-save.", LoadGame);
 
-        var view = new HBoxContainer();
+        var view = new HFlowContainer(); // wraps rather than widening the dashboard
         side.AddChild(view);
         _worldButton = AddButton(view, "World", "Zoom out to the whole world, or back to the region (W).", ToggleWorldView);
         AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
         AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
-        _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show." };
+        _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show.", CustomMinimumSize = new Vector2(150, 0) };
         foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {mode}", (int)mode);
         _mapMode.ItemSelected += index =>
         {
@@ -941,7 +941,7 @@ public partial class Main : Control
 
         var movement = Tab("Movement");
         movement.AddChild(UiTheme.SectionTitle("Emergency measures"));
-        var measures = new HBoxContainer();
+        var measures = new HFlowContainer(); // wraps in the narrow dashboard instead of squeezing the switches
         movement.AddChild(measures);
         _warCommittee = new CheckButton { Text = "War committee", TooltipText = "Defense +35% and cheaper coordination — drift every turn it sits." };
         _warCommittee.Toggled += on => { if (on != _world.WarCommittee) Do(new SetWarCommittee(on)); };
@@ -1047,8 +1047,8 @@ public partial class Main : Control
 
         var log = Tab("Log");
         _log = AddRich(log);
-        var tabIcons = new[] { "overview", "movement", "commune", "world", "log" };
-        for (int i = 0; i < _tabs.GetTabCount() && i < tabIcons.Length; i++) _tabs.SetTabIcon(i, UiTheme.Icon(tabIcons[i]));
+        // The tabs are captions only: with emblems they wouldn't all fit the narrow dashboard.
+        _tabs.ClipTabs = false;
 
         SetSpeed(0);
     }
@@ -1339,7 +1339,7 @@ public partial class Main : Control
         var head = new HBoxContainer();
         head.AddThemeConstantOverride("separation", 10);
         head.AddChild(UiTheme.IconRect("decision", 28));
-        head.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(380, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        head.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(260, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill });
         v.AddChild(head);
         var row = new HFlowContainer();
         v.AddChild(row);
@@ -1391,7 +1391,7 @@ public partial class Main : Control
                 Text = $"#{p.Id} {p.Definition.Name}{target}: {p.Participants.Count}/{p.Invited.Count} joined, {p.LastOverhead:P0} lost to coordination, due {w.Turn} {p.Deadline}"
                        + (p.ProjectedFinish(w.Tick) is int t ? (t > p.Deadline ? $" — on pace for {w.Turn} {t}: LATE" : $" — on pace for {w.Turn} {t}") : " — stalled"),
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                CustomMinimumSize = new Vector2(420, 0),
+                CustomMinimumSize = new Vector2(300, 0),
             });
             var bar = new HBoxContainer();
             bar.AddChild(new ProgressBar { MinValue = 0, MaxValue = p.Work, Value = p.Progress, SizeFlagsHorizontal = SizeFlags.ExpandFill, ShowPercentage = false, CustomMinimumSize = new Vector2(0, 12) });
@@ -1486,7 +1486,7 @@ public partial class Main : Control
 
     private static Label AddLabel(Container parent, int size = 14)
     {
-        var l = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(420, 0) };
+        var l = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(300, 0) };
         l.AddThemeFontSizeOverride("font_size", size);
         parent.AddChild(l);
         return l;
@@ -1494,7 +1494,7 @@ public partial class Main : Control
 
     private static RichTextLabel AddRich(Container parent)
     {
-        var r = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(420, 0) };
+        var r = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(300, 0) };
         parent.AddChild(r);
         return r;
     }
