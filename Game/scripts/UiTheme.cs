@@ -76,9 +76,9 @@ internal static class UiTheme
         ["communication"] = "t_press", ["rail"] = "t_train", ["scores"] = "good", ["time"] = "chart",
     };
 
-    private static string SpritePath(string key) => $"res://pixel/{SpriteFor.GetValueOrDefault(key, key)}.png";
+    public static string SpritePath(string key) => $"res://emblems/{SpriteFor.GetValueOrDefault(key, key)}.svg";
 
-    /// <summary>A pixel-art sprite (see tools/ui/build_pixel_art.py), or null if there's none for the key.</summary>
+    /// <summary>An engraved emblem (see tools/ui/build_emblems.py), or null if there's none for the key.</summary>
     public static Texture2D? Icon(string key)
     {
         if (IconCache.TryGetValue(key, out var cached)) return cached;
@@ -86,8 +86,8 @@ internal static class UiTheme
         return IconCache[key] = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
     }
 
-    /// <summary>A sprite inline in rich text. Sizes that are multiples of 16 keep its pixels square.</summary>
-    public static string Img(string key, int size = 16) =>
+    /// <summary>An emblem inline in rich text.</summary>
+    public static string Img(string key, int size = 18) =>
         ResourceLoader.Exists(SpritePath(key)) ? $"[img={size}x{size}]{SpritePath(key)}[/img]" : "";
 
     /// <summary>An emblem as a control, sized for a line of text.</summary>

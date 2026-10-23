@@ -212,7 +212,7 @@ public partial class TechTreeView : Control
         }
     }
 
-    /// <summary>The pixel sprite for a technology, by what it is (its id), else by its line.</summary>
+    /// <summary>The emblem for a technology, by what it is (its id), else by its line.</summary>
     public static string Sprite(TechDefinition t)
     {
         string id = t.Id;
@@ -398,7 +398,7 @@ public partial class TechTreePanel : HBoxContainer
         string unlocks = string.Join(", ", _world.Techs.Unlocks(id).Where(u => !_world.CommonKnowledge(u)).Select(u => u.Name));
         string era = $"{Ages.Name(t.Era)} age" + (t.Era > -10000 ? $", from {Ages.Year(t.Era)}" : "") + (t.Until is int until ? $"; common knowledge by {Ages.Year(until)}" : "");
         _details.Text =
-            $"[img=48x48]res://pixel/{TechTreeView.Sprite(t)}.png[/img] [b]{Esc(t.Name)}[/b]\n[color=#8b919b]{Esc(t.Category)} · {era}[/color]\n\n" +
+            $"[img=48x48]{UiTheme.SpritePath(TechTreeView.Sprite(t))}[/img] [b]{Esc(t.Name)}[/b]\n[color=#8b919b]{Esc(t.Category)} · {era}[/color]\n\n" +
             (_world.Reached(t) ? "" : $"[color=#f2c94c]Not yet: the world reaches it in {Ages.Year(t.Era)}.[/color]\n\n") +
             $"[color=#6fbf7f]+[/color] {Esc(t.Perk)}\n[color=#e0705f]−[/color] {Esc(t.Risk)}\n\n" +
             $"{effects}\n[color=#8b919b](Holders' effects apply where it's used; the rest scale with how widely it has spread.)[/color]\n\n" +

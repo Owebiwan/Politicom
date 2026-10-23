@@ -20,7 +20,10 @@
 
 # Interface credits
 
-- Pixel art (`Game/pixel/`): drawn for this project as text grids in `tools/ui/build_pixel_art.py`.
+- Emblems (`Game/emblems/`): silhouettes from **game-icons.net**, licensed under **CC BY 3.0**
+  (creativecommons.org/licenses/by/3.0), by Lorc, Delapouite, Carl Olsen, Caro Asercion,
+  Cathelineau, Sbed and Skoll; given an engraved metal finish by `tools/ui/build_emblems.py`.
+  The militia flag was drawn for this project.
 - Font (`Game/fonts/`): **Crimson Pro** by Jacques Le Bailly, under the **SIL Open Font
   License 1.1** (licence text alongside the font).
 - The ornaments (`Game/ui/`: frames, plates, buttons, tabs, medallions, dividers) are drawn in

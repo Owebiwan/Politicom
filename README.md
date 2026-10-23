@@ -244,20 +244,17 @@ How they play:
 - **Replacing the art:** every ornament is a PNG drawn by `tools/ui/build_ornaments.py`
   (Pillow and numpy). Painted art of the same size and margins can replace any of them
   without code changes; the margins are in `Game/scripts/UiTheme.cs`.
-- **Pixel art:** 55 sprites drawn for the game, each a 16 × 16 grid of characters in
-  `tools/ui/build_pixel_art.py`, rendered at 8× with hard edges.
-  - **Settlements:** each commune is drawn by kind and age. Before 1750 that's thatched
-    villages, workshops and walled towns; after, farms, smoking factories and brick towns.
-    Occupied communes are ruins.
-  - **Armies:** enemy armies are soldiers of their age (spearmen early, riflemen later),
-    tinted in the enemy's colour. The militia is a militiaman under the black-and-red flag.
-  - **Technologies:** every one has a sprite, chosen by what it is: council, raised hands,
-    book, ledger, plough, sprout, water, mill, gear, lightning, train, press, radio mast,
-    computer, sword, tower, rifle, tank, plane, tractor.
-  - **Interface:** resources, section headings and pop-ups use sprites too: wheat, anvil,
-    coins, flame, flask, mask, heart, crossed swords, fist, scroll and others.
+- **Emblems:** engraved emblems replace the earlier pixel art: game-icons.net silhouettes
+  (CC BY 3.0) struck in gold, steel or enamel, with a dark keyline and shadow
+  (`tools/ui/build_emblems.py`). They're vector graphics, so they're crisp at any size.
+  - **Settlements:** each commune is a round map pin with a gold rim and an ivory emblem of
+    its kind and age: huts, a smithy or a castle before 1750; a barn, a factory or a church
+    after. Occupied communes are ruins on a red-rimmed pin.
+  - **Armies:** enemy armies are a Roman-style helmet before 1700 and a steel helmet after,
+    tinted in the enemy's colour. The militia is a black-and-red flag.
+  - **Technologies, resources, section headings and pop-ups** each have their own emblem.
 - **Section headings** end in a thin gilt rule.
-- **Rebuilding:** `tools/ui/build_pixel_art.py` rebuilds the sprites. Font credits are in
+- **Rebuilding:** `tools/ui/build_emblems.py` rebuilds the emblems. Credits are in
   `Data/geo/ATTRIBUTION.md`.
 
 **Militia, gold and enthusiasm.** Three resources that each come with a dilemma:

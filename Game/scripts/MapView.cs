@@ -478,7 +478,7 @@ public partial class MapView : Control
             float side = SpriteSize(c);
             if (UiTheme.Icon(town) is { } sprite)
             {
-                var rect = new Rect2(p - new Vector2(side / 2, side * 0.62f), new Vector2(side, side));
+                var rect = new Rect2(p - new Vector2(side / 2, side / 2), new Vector2(side, side)); // a round pin, centred on the town
                 if (c.Id == Selected || c.Id == _hover) DrawCircle(p, side * 0.55f, new Color(1, 1, 1, 0.18f));
                 DrawTextureRect(sprite, rect, false, c.Occupied ? new Color(1, 1, 1, 0.8f) : (c.Federated ? Colors.White : new Color(0.75f, 0.75f, 0.75f)));
             }
@@ -966,7 +966,7 @@ public partial class MapView : Control
 
     /// <summary>A settlement sprite's size: 24 px for a village, up to 40 for a city, grown a little with zoom.</summary>
     private float SpriteSize(Commune c) =>
-        Mathf.Clamp(20 + Mathf.Sqrt((float)c.Population) * 2.2f, 24, 40) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f);
+        Mathf.Clamp(18 + Mathf.Sqrt((float)c.Population) * 2f, 22, 36) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f);
 
     /// <summary>The commune whose territory contains the point.</summary>
     private int? Hit(Vector2 at)
