@@ -104,6 +104,7 @@ public partial class Main : Control
     private SandboxGenerator? _sandbox;
     private CheckButton _reliefToggle = null!;
     private TechCatalog _techs = null!;
+    private RichTextLabel _resources = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
     private CheckButton _warCommittee = null!, _trade = null!;
@@ -841,7 +842,7 @@ public partial class Main : Control
         {
             Visible = false,
             AnchorTop = 1, AnchorBottom = 1,
-            OffsetLeft = 16, OffsetRight = 776, OffsetTop = -420, OffsetBottom = -56,
+            OffsetLeft = 16, OffsetRight = 946, OffsetTop = -420, OffsetBottom = -56,
         };
         _communeList.CommuneChosen += id =>
         {
@@ -924,6 +925,8 @@ public partial class Main : Control
 
         var overview = Tab("Overview");
         _driftDetail = AddRich(overview);
+        Section(overview, "Resources");
+        _resources = AddRich(overview);
         Section(overview, "Outside pressure");
         _enemy = AddRich(overview);
         _scores = AddLabel(overview);
@@ -1063,6 +1066,7 @@ public partial class Main : Control
                    + (Politicom.Sim.Global.TechLevelSystem.EnemyEdge(w, e) is var edge and > 1.005 ? $" · [color=#f07060]+{edge - 1:P0} from better weapons[/color]" : "")
                    + $"\nFront: {(fronts.Any() ? string.Join(", ", fronts) : "none")}";
         });
+        _resources.Text = ResourcesText(w);
         _enemy.Text = string.Join("\n", lines)
                       + $"\nTrade: {(w.ForeignTrade ? $"selling {w.LastExports:0} food for {w.LastImports:0} goods per {w.Turn}" : "closed")} · embargo {w.Embargo:P0}"
                       + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Turns(w.Ally.MilitarizationTicks)} more." : "");
@@ -1113,6 +1117,37 @@ public partial class Main : Control
                 ("Select it", "Select it, then shift-click a neighbour and Mediate.", () => { _map.Selected = c.Id; Refresh(); }),
                 ("Hold by force", "Costs influence, its trust with every neighbour, and drift.", () => Do(new HoldCommune(c.Id))));
         }
+    }
+
+    /// <summary>The federation's food and goods: what it holds, makes and needs, and where it falls short.</summary>
+    private static string ResourcesText(World w)
+    {
+        var members = w.Federation.ToList();
+        if (members.Count == 0) return "";
+        string Rate(double made, double need) =>
+            $"[color={(made >= need ? "#70d080" : "#f07060")}]{(made >= need ? "+" : "")}{made - need:0.0}[/color]";
+        string Names(IEnumerable<Commune> cs)
+        {
+            var list = cs.Select(c => Esc(c.Name)).ToList();
+            return list.Count <= 4 ? string.Join(", ", list) : string.Join(", ", list.Take(4)) + $" and {list.Count - 4} more";
+        }
+        double food = members.Sum(c => Math.Max(0, c.Food)), foodMade = members.Sum(c => c.FoodProduced) + w.Scenario.FoodImports, foodNeed = members.Sum(w.FoodDemand);
+        double goods = members.Sum(c => Math.Max(0, c.Goods)), goodsMade = members.Sum(c => c.GoodsProduced), goodsNeed = members.Sum(w.GoodsDemand);
+        var starving = members.Where(c => c.Starving).ToList();
+        var shortOfArms = members.Where(c => c.Front && c.GoodsCoverage < 0.9).ToList();
+        string turn = w.Turn;
+        var text = $"[b]Food[/b] {food:0} in store, {foodMade:0} {(w.Scenario.FoodImports > 0 ? "grown and imported" : "grown")} against {foodNeed:0} eaten a {turn} ({Rate(foodMade, foodNeed)}) · " +
+                   $"{(foodNeed > 0 ? food / foodNeed : 0):0} {turn}s in reserve\n" +
+                   $"[b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
+        var from = new List<string>();
+        if (w.LastArms > 0.05) from.Add($"arms {w.LastArms:0.0}");
+        if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");
+        if (w.Scenario.FoodImports > 0) from.Add($"food {w.Scenario.FoodImports:0.0} (counted above)");
+        if (from.Count > 0) text += $"\n[b]From abroad[/b] {string.Join(" · ", from)} a {turn}";
+        text += $"\n[b]Science[/b] {w.LastScience:0.0} a {turn} · [b]Culture[/b] {w.Mean(c => c.Culture):P0} on average";
+        if (starving.Count > 0) text += $"\n[color=#f07060]Starving: {Names(starving)}[/color]";
+        if (shortOfArms.Count > 0) text += $"\n[color=#f0a040]Short of arms at the front: {Names(shortOfArms)}[/color]";
+        return text;
     }
 
     // ── Pop-ups: decisions and big news, one at a time, in the middle of the screen ──

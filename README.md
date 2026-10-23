@@ -229,6 +229,18 @@ How they play:
 
 ## What the player sees
 
+**Resources.** The Overview's Resources section shows the federation's food and goods:
+- **Food and goods:** what's in store, what's made a turn against what's eaten or used
+  (green when there's a surplus, red when there's a deficit), and how many turns of food
+  are in reserve.
+- **From abroad:** arms bought from friendly states, trade, and food imports.
+- **Science and culture:** science a turn, and culture on average.
+- **Shortages:** which communes are starving, and which front communes are short of arms.
+
+The commune list (C) has **Food** and **Goods** columns: each commune's stores in turns of its
+own needs, sortable, with the detail on hover. Industrial towns live on the farms' food and
+the farms on the towns' goods, so the columns show where the federation depends on sharing.
+
 - **The map:** each historical scenario is drawn on real geography: sea, coastlines, rivers
   and (for Catalonia) the French border. Communes sit at their true positions. Each commune's
   territory is its share of the land, clipped to the coast and to the provinces the

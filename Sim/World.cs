@@ -79,6 +79,11 @@ public sealed class World
     public int LastRandomEvent { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
+    /// <summary>Food a commune eats in a turn.</summary>
+    public double FoodDemand(Commune c) => c.Population * Balance.FoodNeed;
+    /// <summary>Goods a commune uses in a turn: upkeep, plus arms at the front.</summary>
+    public double GoodsDemand(Commune c) => EconomySystem.GoodsDemand(this, c);
+
     /// <summary>Science the next breakthrough needs.</summary>
     public double BreakthroughCost => ResearchSystem.BreakthroughCost(this);
     /// <summary>The federation's technology level when the game started, for comparing with the world's.</summary>
