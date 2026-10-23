@@ -52,6 +52,8 @@ internal static class EventSystem
         var ids = targets.Select(c => c.Id).ToHashSet();
 
         if (e.Drift != 0) w.BumpDrift(e.Drift);
+        w.Gold = Math.Max(0, w.Gold + e.Gold);
+        w.Enthusiasm = Math.Clamp(w.Enthusiasm + e.Enthusiasm, 0, 1);
         w.Influence = Math.Clamp(w.Influence + e.Influence, 0, b.InfluenceCap);
         foreach (var c in targets)
         {

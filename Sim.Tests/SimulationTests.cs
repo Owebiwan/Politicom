@@ -119,6 +119,64 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Volunteers_strengthen_a_front_at_the_cost_of_work_and_conscription_adds_drift()
+    {
+        var calm = NewWorld();
+        var called = NewWorld();
+        called.Influence = 100;
+        var front = called.Federation.First(c => c.Front);
+        Assert.True(called.Apply(new CallVolunteers(front.Id)).Ok);
+        Assert.True(front.Mobilization > called.BaselineMobilization(front));
+        calm.Step();
+        called.Step();
+        var same = calm.Communes[front.Id];
+        Assert.True(front.Defense > same.Defense);
+        Assert.True(front.FoodProduced + front.GoodsProduced < same.FoodProduced + same.GoodsProduced);
+
+        var drafted = NewWorld();
+        Assert.True(drafted.Apply(new SetConscription(true)).Ok);
+        drafted.Run(10);
+        Assert.All(drafted.Federation, c => Assert.True(c.Mobilization > 0.15));
+        Assert.True(drafted.LastDrift.Conscription > 0);
+        Assert.True(drafted.Enthusiasm < NewWorld().Enthusiasm);
+    }
+
+    [Fact]
+    public void Gold_is_seized_once_buys_abroad_and_its_guards_add_drift()
+    {
+        var w = NewWorld();
+        Assert.False(w.Apply(new BuyAbroad(Purchase.Arms)).Ok); // no gold yet
+        Assert.True(w.Apply(new SeizeTreasuries()).Ok);
+        Assert.False(w.Apply(new SeizeTreasuries()).Ok);
+        double gold = w.Gold;
+        Assert.True(gold >= w.Balance.GoldPerPurchase);
+        w.Step();
+        Assert.True(w.LastDrift.Treasury > 0);
+        double frontGoods = w.Federation.Where(c => c.Front).Sum(c => c.Goods);
+        var bought = w.Apply(new BuyAbroad(Purchase.Arms));
+        Assert.True(bought.Ok, bought.Message);
+        Assert.True(w.Federation.Where(c => c.Front).Sum(c => c.Goods) > frontGoods);
+        Assert.Equal(gold - w.Balance.GoldPerPurchase, w.Gold, 6);
+        Assert.Equal(w.Gold, World.LoadJson(w.SaveJson(), w.Techs).Gold, 6);
+    }
+
+    [Fact]
+    public void Enthusiasm_wanes_with_hunger_and_lifts_production()
+    {
+        var keen = NewWorld();
+        var weary = NewWorld();
+        weary.Enthusiasm = 0.3;
+        keen.Step();
+        weary.Step();
+        Assert.True(keen.Federation.Sum(c => c.FoodProduced) > weary.Federation.Sum(c => c.FoodProduced));
+        var hungry = NewWorld();
+        foreach (var c in hungry.Communes) c.Food = 0;
+        double before = hungry.Enthusiasm;
+        hungry.Run(4);
+        Assert.True(hungry.Enthusiasm < before);
+    }
+
+    [Fact]
     public void A_regional_rising_holds_a_region_and_the_country_can_rise_to_join_it()
     {
         var atlas = Sim.Global.Atlas.Load(DataDir, "1936");

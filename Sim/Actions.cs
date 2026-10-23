@@ -60,6 +60,18 @@ public static class CulturalWorks
 /// <summary>Found a cultural work in a commune: it builds cultural influence there and around it.</summary>
 public sealed record FoundCulturalWork(int Commune, CulturalWorkKind Kind) : PlayerAction;
 
+/// <summary>Call for volunteers in a commune: more of its people (and its neighbours') take up arms.</summary>
+public sealed record CallVolunteers(int Commune) : PlayerAction;
+/// <summary>Conscription across the federation: a levy in every commune, at a price in drift and enthusiasm.</summary>
+public sealed record SetConscription(bool Active) : PlayerAction;
+/// <summary>Seize the banks' and churches' treasuries: gold to buy abroad, once a game.</summary>
+public sealed record SeizeTreasuries : PlayerAction;
+
+public enum Purchase { Arms, Grain, Machines }
+
+/// <summary>Spend gold abroad, with a state willing to sell.</summary>
+public sealed record BuyAbroad(Purchase What) : PlayerAction;
+
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
 public sealed record ChooseEventOption(string EventId, int Option) : PlayerAction;
 
@@ -94,6 +106,10 @@ internal static class ActionSystem
             SupportUprising a => Support(w, a),
             ExposeCells a => Expose(w, a),
             SetResearchFocus a => Focus(w, a),
+            CallVolunteers a => Volunteers(w, a),
+            SetConscription a => Conscript(w, a),
+            SeizeTreasuries => Seize(w),
+            BuyAbroad a => Buy(w, a),
             FoundCulturalWork a => CulturalWork(w, a),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
@@ -268,6 +284,93 @@ internal static class ActionSystem
                 break;
         }
         w.Emit(Severity.Good, text, c.Id);
+        return ActionResult.Done(text);
+    }
+
+    private static ActionResult Volunteers(World w, CallVolunteers a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        var b = w.Balance;
+        if (c.Mobilization >= b.MaxMobilization) return ActionResult.Fail($"{c.Name} has all the fighters it can spare.");
+        if (!Spend(w, b.CostVolunteers)) return Broke(w, b.CostVolunteers);
+        // The call carries as far as the revolution's spirit does.
+        double call = b.VolunteerCall * (0.5 + 0.625 * w.Enthusiasm);
+        c.Mobilization = Math.Min(b.MaxMobilization, c.Mobilization + call);
+        foreach (var n in w.Trust.Neighbors(c.Id))
+        {
+            var d = w.Communes[n];
+            if (d.InFederation) d.Mobilization = Math.Min(b.MaxMobilization, d.Mobilization + call * 0.5 * w.Trust[c.Id, n]);
+        }
+        string text = $"Volunteers come forward in {c.Name} and the communes around it. Fewer hands in the fields while they serve.";
+        w.Emit(Severity.Info, text, c.Id);
+        return ActionResult.Done(text);
+    }
+
+    private static ActionResult Conscript(World w, SetConscription a)
+    {
+        if (w.Conscription == a.Active) return ActionResult.Fail(a.Active ? "Conscription is already in force." : "There is no conscription.");
+        w.Conscription = a.Active;
+        w.Emit(a.Active ? Severity.Warning : Severity.Good, a.Active
+            ? $"Conscription: every commune must send {w.Balance.ConscriptionFloor:P0} of its people to the militias. Lists, officers and penalties — drift every {w.Turn}, and enthusiasm wanes."
+            : "Conscription ends. Those who want to go home may.");
+        return ActionResult.Done(a.Active ? "Conscription in force." : "Conscription ended.");
+    }
+
+    private static ActionResult Seize(World w)
+    {
+        if (w.TreasuriesSeized) return ActionResult.Fail("The treasuries have already been seized.");
+        var b = w.Balance;
+        double gold = Math.Round(b.TreasuryGold * w.Federation.Sum(c => c.Population), 1);
+        w.TreasuriesSeized = true;
+        w.Gold += gold;
+        w.BumpDrift(b.SeizeDrift);
+        // Crowned heads and churches take the seizure of their kind's wealth personally.
+        foreach (var s in w.States.Where(s => s.Ideology is Global.Ideology.Monarchy or Global.Ideology.Theocracy or Global.Ideology.Empire))
+            s.Stance = Math.Clamp(s.Stance - 0.05, -1, 1);
+        string vaults = w.Year < 1600 ? "the treasuries of the lords and the churches" : "the vaults of the banks and the churches";
+        string text = $"The militias open {vaults}: {gold:0} in gold and silver. A committee is formed to guard it — and committees that guard gold grow powerful.";
+        w.Emit(Severity.Warning, text);
+        return ActionResult.Done(text);
+    }
+
+    /// <summary>States that will sell to the federation, best first. Without a world, smugglers.</summary>
+    public static IEnumerable<Global.WorldState> Sellers(World w) =>
+        w.States.Where(s => !s.Sister && s.Stance > -0.2 && !s.Does(Global.StateActions.Embargo)).OrderByDescending(s => s.Weight * (1 + s.Stance));
+
+    private static ActionResult Buy(World w, BuyAbroad a)
+    {
+        var b = w.Balance;
+        if (w.Gold < b.GoldPerPurchase) return ActionResult.Fail($"Buying abroad takes {b.GoldPerPurchase:0} gold; the federation has {w.Gold:0}.");
+        var seller = Sellers(w).FirstOrDefault();
+        if (w.States.Count > 0 && seller is null) return ActionResult.Fail("No state will sell to the federation.");
+        // Middlemen take more the more of the world refuses to trade; smugglers take a third.
+        double value = seller is null ? 0.66 : 1 - 0.5 * w.Embargo;
+        var members = w.Federation.ToList();
+        string what;
+        switch (a.What)
+        {
+            case Purchase.Arms:
+                var fronts = members.Where(c => c.Front).ToList();
+                var to = fronts.Count > 0 ? fronts : members;
+                foreach (var c in to) c.Goods += b.GoldArms * value / to.Count;
+                what = $"arms for the front ({b.GoldArms * value:0} goods)";
+                break;
+            case Purchase.Grain:
+                var hungry = members.OrderBy(c => c.Food / Math.Max(0.1, w.FoodDemand(c))).Take(Math.Max(1, members.Count / 3)).ToList();
+                foreach (var c in hungry) c.Food += b.GoldFood * value / hungry.Count;
+                what = $"grain for the hungriest communes ({b.GoldFood * value:0} food)";
+                break;
+            default:
+                var works = members.Where(c => c.Kind != CommuneKind.Agrarian).ToList();
+                foreach (var c in works.Count > 0 ? works : members) c.ProductivityBonus += b.GoldMachines * value;
+                what = $"machines for the workshops (+{b.GoldMachines * value:P0} output there)";
+                break;
+        }
+        w.Gold -= b.GoldPerPurchase;
+        w.BumpDrift(b.PurchaseDrift);
+        if (seller != null) seller.Stance = Math.Clamp(seller.Stance + 0.03, -1, 1);
+        string text = $"{(seller is null ? "Smugglers" : $"Merchants of {seller.Name}")} sell {what} for {b.GoldPerPurchase:0} gold. The treasury committee signs the contracts.";
+        w.Emit(Severity.Info, text);
         return ActionResult.Done(text);
     }
 

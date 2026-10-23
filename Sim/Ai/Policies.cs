@@ -74,6 +74,9 @@ public sealed class Centralizer : IPolicy
         foreach (var s in w.PendingSecessions.ToList()) w.Apply(new HoldCommune(s.Commune));
         if (!w.IdeaNudges.ContainsKey("federal_statistics")) w.Apply(new CirculateIdea("federal_statistics"));
         if (w.ResearchFocus != "Military") w.Apply(new SetResearchFocus("Military"));
+        if (!w.Conscription) w.Apply(new SetConscription(true));
+        if (!w.TreasuriesSeized) w.Apply(new SeizeTreasuries());
+        if (w.Gold >= w.Balance.GoldPerPurchase) w.Apply(new BuyAbroad(Purchase.Arms));
         if (w.Tick % 15 == 2) w.Apply(new ProposeProject(ProjectKind.Collectivization));
         if (w.OffensiveUnderway || w.Tick % 12 == 0) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
         w.Apply(new SponsorCongress());
@@ -128,6 +131,16 @@ public sealed class Balanced : IPolicy
         string focus = crisis ? "Military" : margin < 10 ? "Organizational" : w.Federation.Any(c => c.Starving) ? "Agricultural" : "Industrial";
         if (focus != w.ResearchFocus) w.Apply(new SetResearchFocus(focus));
         if (w.Tick % 6 == 1 && w.Influence > 35) Helpers.CulturalWork(w, crisis ? CulturalWorkKind.Newspaper : CulturalWorkKind.ArtMovement);
+
+        // Fighters: volunteers where the front is weakest. No conscription: that's the centralizer's way.
+        if (crisis && w.Tick % 3 == 0 && w.Influence > 20
+            && w.Federation.Where(c => c.Front).OrderBy(c => c.Control).FirstOrDefault() is { } weakest)
+            w.Apply(new CallVolunteers(weakest.Id));
+        // Gold: seized in a crisis, spent at once (a hoard feeds its guards).
+        if (crisis && !w.TreasuriesSeized && w.Drift.Value < 10 && w.LastDrift.Net < 0.15)
+            w.Apply(new SeizeTreasuries()); // only with drift to spare, and not climbing fast: the gold's guards will add to it
+        if (w.Gold >= w.Balance.GoldPerPurchase && margin > 5 && (crisis || w.Federation.Any(c => c.Starving)))
+            w.Apply(new BuyAbroad(w.Federation.Any(c => c.Starving) ? Purchase.Grain : Purchase.Arms));
 
         while (w.Influence > 25)
         {

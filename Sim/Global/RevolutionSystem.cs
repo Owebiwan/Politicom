@@ -73,6 +73,7 @@ public static class RevolutionSystem
             return;
         }
         s.Ideology = Ideology.Libertarian;
+        w.Enthusiasm = Math.Min(1, w.Enthusiasm + 0.05);
         s.Name = $"Free Communes of {country}";
         s.Stance = 0.9;
         w.SetBaseline(s.Id, 0.9);

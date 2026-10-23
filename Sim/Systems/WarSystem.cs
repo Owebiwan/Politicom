@@ -83,13 +83,13 @@ internal static class WarSystem
     internal static double Defense(World w, Commune c)
     {
         var b = w.Balance;
-        double own = Militia(b, c);
+        double own = Militia(w, c);
         double support = 0;
         foreach (var n in w.Trust.Neighbors(c.Id))
         {
             var d = w.Communes[n];
             if (d.Occupied || d.Front) continue;
-            support += w.Trust[c.Id, n] * Militia(b, d) * b.NeighborSupport * (d.Federated ? 1 : 0.3) * (w.Rail(c.Id, n) ? b.RailSupport : 1);
+            support += w.Trust[c.Id, n] * Militia(w, d) * b.NeighborSupport * (d.Federated ? 1 : 0.3) * (w.Rail(c.Id, n) ? b.RailSupport : 1);
         }
         double mult = (1 + w.LocalEffect(c, e => e.Defense))
                       * (1 + DriftEffects.Defense(w.Drift.Stage))
@@ -102,8 +102,10 @@ internal static class WarSystem
         return (own + support) * mult;
     }
 
-    private static double Militia(Balance b, Commune c) =>
-        c.Population * b.MilitiaPerPop * (0.6 + 0.4 * CommuneValues.To01(c.Values.Militancy));
+    /// <summary>A commune's militia: its people under arms (relative to what it would field anyway), their militancy and spirit.</summary>
+    private static double Militia(World w, Commune c) =>
+        c.Population * w.Balance.MilitiaPerPop * (c.Mobilization / w.BaselineMobilization(c))
+        * (0.6 + 0.4 * CommuneValues.To01(c.Values.Militancy)) * w.EnthusiasmFactor;
 
     private static void Occupy(World w, Commune c, int enemy)
     {
@@ -118,13 +120,14 @@ internal static class WarSystem
         foreach (var n in w.Trust.Neighbors(c.Id))
             if (!w.Communes[n].Occupied) w.Communes[n].Fronts.Add(enemy);
         w.Emit(Severity.Danger, $"{c.Name} falls to the {e.Name}. With no capital to take, every commune has to be taken one by one.", c.Id);
+        w.Enthusiasm = Math.Max(0, w.Enthusiasm - w.Balance.EnthusiasmLoss);
     }
 
     /// <summary>Contagion: political education and the press radicalize workers across each border.</summary>
     private static void Contagion(World w)
     {
         var b = w.Balance;
-        double press = (1 + w.SocietyEffect(t => t.Contagion)) * (1 + b.CultureContagion * CultureSystem.Mean(w)) * w.CommunicationSpeed;
+        double press = w.EnthusiasmFactor * (1 + w.SocietyEffect(t => t.Contagion)) * (1 + b.CultureContagion * CultureSystem.Mean(w)) * w.CommunicationSpeed;
         double meanPolitical = w.Mean(c => c.PoliticalEducation);
         for (int k = 0; k < w.Enemies.Count; k++)
         {

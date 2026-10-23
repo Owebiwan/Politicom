@@ -75,6 +75,21 @@ public sealed class World
     /// <summary>Science produced last turn, across the federation.</summary>
     public double LastScience { get; internal set; }
     public int Breakthroughs { get; internal set; }
+    /// <summary>0..1: the revolution's enthusiasm. It wears down over a long war and is renewed by what goes well.</summary>
+    public double Enthusiasm { get; set; }
+    /// <summary>Gold and silver held: it buys abroad, and its guards gather power while it sits.</summary>
+    public double Gold { get; internal set; }
+    public bool Conscription { get; internal set; }
+    /// <summary>The state that would sell to the federation now, or null (smugglers, or nobody if there's a world and no willing seller).</summary>
+    public string? Seller => ActionSystem.Sellers(this).FirstOrDefault()?.Name;
+    public bool TreasuriesSeized { get; internal set; }
+    /// <summary>People under arms across the federation (thousands).</summary>
+    public double Fighters => Federation.Sum(c => c.Population * c.Mobilization);
+    /// <summary>Militia share a commune settles at as things stand.</summary>
+    public double BaselineMobilization(Commune c) => Balance.BaseMobilization + (c.Front ? Balance.FrontMobilization : 0);
+    /// <summary>Production, militia and contagion multiplier from enthusiasm (1 at the start).</summary>
+    public double EnthusiasmFactor => 1 + Balance.EnthusiasmEffect * (Enthusiasm - Balance.StartEnthusiasm);
+
     /// <summary>Turn of the last random event.</summary>
     public int LastRandomEvent { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
@@ -167,6 +182,7 @@ public sealed class World
             c.Food = c.Population * Balance.FoodNeed * Balance.ReserveTicks * 1.5;
             c.Goods = c.Population * Balance.GoodsNeed * Balance.ReserveTicks * 1.5;
             c.Techs.UnionWith(d.Techs);
+            c.Mobilization = Balance.BaseMobilization;
             _communes.Add(c);
         }
         Trust.Grow(defs.Count);
@@ -273,7 +289,13 @@ public sealed class World
             world.AddRailway(Id(line[0]), Id(line[1]));
         }
         world.RefreshTechShares();
-        foreach (var c in world._communes) c.Culture = balance.StartCulture * c.PoliticalEducation;
+        foreach (var c in world._communes)
+        {
+            c.Culture = balance.StartCulture * c.PoliticalEducation;
+            c.Mobilization = world.BaselineMobilization(c);
+        }
+        world.Enthusiasm = balance.StartEnthusiasm;
+        world.Gold = scenario.Gold;
         world.TechLevelStart = world.TechLevel;
         foreach (var e in world.Enemies) e.TechStart = e.TechLevel;
         world.Emit(Severity.Info, scenario.Description);
@@ -324,6 +346,10 @@ public sealed class World
         Breakthroughs = Breakthroughs,
         TechLevelStart = TechLevelStart,
         LastRandomEvent = LastRandomEvent,
+        Enthusiasm = Enthusiasm,
+        Gold = Gold,
+        Conscription = Conscription,
+        TreasuriesSeized = TreasuriesSeized,
         Risen = Risen.ToList(),
         Scores = Scores,
         Outcome = Outcome,
@@ -372,6 +398,10 @@ public sealed class World
             Breakthroughs = s.Breakthroughs,
             TechLevelStart = s.TechLevelStart,
             LastRandomEvent = s.LastRandomEvent,
+            Enthusiasm = s.Enthusiasm,
+            Gold = s.Gold,
+            Conscription = s.Conscription,
+            TreasuriesSeized = s.TreasuriesSeized,
             Scores = s.Scores,
             Outcome = s.Outcome,
         };
@@ -415,6 +445,7 @@ public sealed class World
         Global.RivalSystem.Run(this);
         Global.TechLevelSystem.Run(this);
         RisingSystem.Run(this);
+        MilitiaSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

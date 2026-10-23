@@ -52,6 +52,10 @@ public sealed class SaveGame
     public int Breakthroughs { get; set; }
     public double TechLevelStart { get; set; }
     public int LastRandomEvent { get; set; } = -999;
+    public double Enthusiasm { get; set; } = 0.8;
+    public double Gold { get; set; }
+    public bool Conscription { get; set; }
+    public bool TreasuriesSeized { get; set; }
     public List<string> Risen { get; set; } = new();
     public Scores Scores { get; set; } = new();
     public Outcome Outcome { get; set; }

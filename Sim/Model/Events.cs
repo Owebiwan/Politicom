@@ -32,6 +32,10 @@ public sealed class EventEffects
     public double Population { get; set; }
     /// <summary>Culture added in the affected communes.</summary>
     public double Culture { get; set; }
+    /// <summary>Gold gained (or spent).</summary>
+    public double Gold { get; set; }
+    /// <summary>Change in the revolution's enthusiasm.</summary>
+    public double Enthusiasm { get; set; }
     /// <summary>A technique the affected communes learn (if the world has reached it).</summary>
     public string Tech { get; set; } = "";
     /// <summary>Communes affected by wellbeing, trust and education effects. Empty = the whole federation.</summary>
@@ -72,6 +76,8 @@ public sealed class EventEffects
         string scope = Communes.Length == 0 ? "" : Communes.Length <= 2 ? $" ({string.Join(", ", Communes)})" : $" ({Communes.Length} communes)";
         Add(Drift, "drift");
         Add(Food, "food per thousand people" + scope);
+        Add(Gold, "gold");
+        Add(Enthusiasm * 100, "% enthusiasm");
         Add(Population * 100, "% population" + scope);
         Add(Culture * 100, "% culture" + scope);
         if (Tech.Length > 0) parts.Add($"learn {Tech.Replace('_', ' ')}{scope}");

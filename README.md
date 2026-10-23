@@ -229,6 +229,31 @@ How they play:
 
 ## What the player sees
 
+**Militia, gold and enthusiasm.** Three resources that each come with a dilemma:
+- **Militia:** each commune has a share of its people under arms, about a tenth.
+  - **Defence** scales with that share. Fighters beyond the usual share don't work, so the
+    commune produces less.
+  - **Volunteering:** a commune drifts toward what it volunteers. That's more where people
+    are militant, and fewer as enthusiasm fades.
+  - **Call for volunteers** (Commune tab) raises the share here and in the neighbouring
+    communes. **Conscription** (Movement tab) puts at least a fifth of every commune's people
+    under arms, but adds drift every turn and wears enthusiasm down.
+  - **Losses:** losing front communes lose people.
+  - The balanced AI only calls for volunteers; conscription is the centralizer's tool.
+- **Gold:** **Seize the treasuries** once a game for gold and silver from the banks and
+  churches, or win it in events.
+  - **What it buys:** arms for the front, grain for the hungriest communes, or machines for
+    the workshops, from a state willing to sell. Prices are worse under embargo; with no
+    world, smugglers sell at a third off.
+  - **The catch:** seizing adds drift and angers monarchies, empires and churches. While the
+    gold sits, the treasury committee that guards it adds drift every turn, so it's
+    better spent.
+- **Enthusiasm:** the revolution's spirit, starting at 80%.
+  - **What lowers it:** a long war, hunger, every commune lost, hierarchy and conscription.
+  - **What raises it:** culture, towns rising, and revolutions won abroad.
+  - **What it changes:** production, militias and contagion (×0.94 at 40%, ×1.03 at full),
+    and how many come forward when volunteers are called.
+
 **Resources.** The Overview's Resources section shows the federation's food and goods:
 - **Food and goods:** what's in store, what's made a turn against what's eaten or used
   (green when there's a surplus, red when there's a deficit), and how many turns of food

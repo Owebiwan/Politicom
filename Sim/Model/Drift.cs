@@ -49,13 +49,15 @@ public sealed class DriftBreakdown
     public double ForeignTrade { get; set; }
     public double PartyCells { get; set; }
     public double Militarization { get; set; }
+    public double Conscription { get; set; }
+    public double Treasury { get; set; }
     public double LargeProjects { get; set; }
     public double Events { get; set; }
     public double PoliticalEducationBrake { get; set; }
     public double TechnologyBrake { get; set; }
     public double CultureBrake { get; set; }
 
-    [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects;
+    [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects + Conscription + Treasury;
     [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake + CultureBrake;
     [JsonIgnore] public double Net => Pressure - Brakes + Events;
 
@@ -69,6 +71,8 @@ public sealed class DriftBreakdown
         yield return ("Foreign trade (currency, accounts)", ForeignTrade);
         yield return ("Party cells", PartyCells);
         yield return ("Government militarization", Militarization);
+        yield return ("Conscription", Conscription);
+        yield return ("The treasury committee", Treasury);
         yield return ("Large federal projects", LargeProjects);
         yield return ("One-off events", Events);
         yield return ("Political education", -PoliticalEducationBrake);

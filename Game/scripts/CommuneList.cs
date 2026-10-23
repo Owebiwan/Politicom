@@ -12,7 +12,7 @@ namespace Politicom.Game;
 /// </summary>
 public partial class CommuneList : PanelContainer
 {
-    private static readonly string[] Titles = { "Commune", "Pop", "Trust", "Well-being", "Pract.", "Polit.", "Discont.", "Status", "Food", "Goods" };
+    private static readonly string[] Titles = { "Commune", "Pop", "Trust", "Well-being", "Pract.", "Polit.", "Discont.", "Status", "Food", "Goods", "Militia" };
 
     private Tree _tree = null!;
     private int _sortColumn = 6; // discontent: the communes most likely to leave first
@@ -26,7 +26,7 @@ public partial class CommuneList : PanelContainer
 
     public override void _Ready()
     {
-        CustomMinimumSize = new Vector2(930, 360);
+        CustomMinimumSize = new Vector2(1000, 360);
         AddThemeStyleboxOverride("panel", new StyleBoxFlat
         {
             BgColor = new Color(0.07f, 0.08f, 0.1f, 0.94f),
@@ -51,7 +51,7 @@ public partial class CommuneList : PanelContainer
         {
             _tree.SetColumnTitle(i, Titles[i]);
             _tree.SetColumnExpand(i, i is 0 or 7);
-            _tree.SetColumnCustomMinimumWidth(i, i switch { 0 => 130, 3 => 80, 7 => 150, 8 or 9 => 70, _ => 58 });
+            _tree.SetColumnCustomMinimumWidth(i, i switch { 0 => 130, 3 => 80, 7 => 150, 8 or 9 or 10 => 70, _ => 58 });
         }
         _tree.ColumnTitleClicked += (column, _) =>
         {
@@ -95,6 +95,8 @@ public partial class CommuneList : PanelContainer
             item.SetText(8, $"{FoodTurns(w, c):0} {w.Turn[0]}");
             item.SetText(9, $"{GoodsTurns(w, c):0} {w.Turn[0]}");
             item.SetTooltipText(8, $"Food {Math.Max(0, c.Food):0} in store, +{c.FoodProduced:0.0} a {w.Turn}, eats {w.FoodDemand(c):0.0}");
+            item.SetText(10, $"{c.Mobilization:P0}");
+            item.SetTooltipText(10, $"{c.Population * c.Mobilization:0.0} thousand under arms");
             item.SetTooltipText(9, $"Goods {Math.Max(0, c.Goods):0} in store, +{c.GoodsProduced:0.0} a {w.Turn}, uses {w.GoodsDemand(c):0.0}");
             if (c.Occupied)
                 for (int i = 0; i < Titles.Length; i++) item.SetCustomColor(i, new Color(1, 1, 1, 0.35f));
@@ -125,6 +127,7 @@ public partial class CommuneList : PanelContainer
         6 => c.Discontent,
         8 => FoodTurns(w, c),
         9 => GoodsTurns(w, c),
+        10 => c.Mobilization,
         _ => Status(w, c),
     };
 

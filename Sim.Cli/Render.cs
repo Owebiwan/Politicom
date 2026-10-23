@@ -41,7 +41,10 @@ internal static class Render
                       $"Occupied {w.Communes.Count(c => c.Occupied)}   Seceded {w.Communes.Count(c => !c.Occupied && !c.Federated)}" +
                       (w.WarCommittee ? Paint("   WAR COMMITTEE SITTING", "33") : "") +
                       (w.ForeignTrade ? Paint($"   TRADING: {w.LastExports:0} food → {w.LastImports:0} goods", "33") : "") +
-                      (w.Ally.MilitarizationTicks > 0 ? Paint($"   militarized {w.Turns(w.Ally.MilitarizationTicks)}", "33") : ""));
+                      (w.Ally.MilitarizationTicks > 0 ? Paint($"   militarized {w.Turns(w.Ally.MilitarizationTicks)}", "33") : "") +
+                      (w.Conscription ? Paint("   CONSCRIPTION", "33") : ""));
+        sb.AppendLine($"Militia {w.Fighters:0.0}k under arms   Enthusiasm {w.Enthusiasm:P0}   Gold {w.Gold:0}" +
+                      (w.Gold > 0 ? Dim($" (guards add {w.Balance.GoldHoldingDrift * w.Gold * w.Weeks:0.00} drift/{w.Turn})") : ""));
 
         string driftColor = w.Drift.Stage switch { DriftStage.Free => "32", DriftStage.PermanentCouncils => "33", _ => "31" };
         sb.AppendLine($"Drift     {Bar(w.Drift.Value, 100, 40, driftColor)} {w.Drift.Value,5:0.0}  {Bold(DriftEffects.Name(w.Drift.Stage))}" +

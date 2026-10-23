@@ -95,6 +95,7 @@ internal static class RisingSystem
             w.AddCommunes(new List<CommuneDefinition> { d });
             var c = w.Communes[^1];
             c.Culture = b.StartCulture * c.PoliticalEducation;
+            w.Enthusiasm = Math.Min(1, w.Enthusiasm + 0.05);
             w.Emit(Severity.Good, $"{d.Name} rises! Its people take the town, drive out the officials and vote to join the federation.",
                 c.Id, pause: true, title: $"{d.Name} rises");
             return; // one a turn

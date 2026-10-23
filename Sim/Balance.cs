@@ -199,6 +199,42 @@ public sealed class Balance
     /// <summary>Destroyed when fewer than this share of communes remain free and federated.</summary>
     public double CollapseFraction { get; set; } = 0.3;
 
+    // ── Militia, gold and enthusiasm ───────────────────────────────────────
+    /// <summary>Share of a commune's people in its militia, as things stand (more at the front).</summary>
+    public double BaseMobilization { get; set; } = 0.1;
+    public double FrontMobilization { get; set; } = 0;
+    /// <summary>Share of the gap to what a commune volunteers that closes each week.</summary>
+    public double MobilizationPull { get; set; } = 0.08;
+    public double MaxMobilization { get; set; } = 0.35;
+    /// <summary>Militia share added by a call for volunteers (half that in the neighbours).</summary>
+    public double VolunteerCall { get; set; } = 0.05;
+    public double CostVolunteers { get; set; } = 8;
+    /// <summary>Under conscription no commune has fewer under arms than this.</summary>
+    public double ConscriptionFloor { get; set; } = 0.2;
+    public double ConscriptionDrift { get; set; } = 0.15;
+    public double ConscriptionEnthusiasm { get; set; } = 0.004;
+    /// <summary>People lost per week, as a share of a losing front commune's militia.</summary>
+    public double CombatLoss { get; set; } = 0.01;
+    public double StartEnthusiasm { get; set; } = 0.8;
+    public double EnthusiasmDecay { get; set; } = 0.001;
+    public double EnthusiasmCulture { get; set; } = 0.012;
+    public double EnthusiasmHunger { get; set; } = 0.02;
+    public double EnthusiasmHierarchy { get; set; } = 0.001;
+    /// <summary>Production, militia and contagion change by this much per point of enthusiasm away from the start.</summary>
+    public double EnthusiasmEffect { get; set; } = 0.15;
+    /// <summary>Enthusiasm lost when a commune falls.</summary>
+    public double EnthusiasmLoss { get; set; } = 0.015;
+    /// <summary>Gold from seizing the treasuries, per thousand people in the federation.</summary>
+    public double TreasuryGold { get; set; } = 0.12;
+    public double SeizeDrift { get; set; } = 3;
+    /// <summary>Drift per week per unit of gold held: the committee that guards it.</summary>
+    public double GoldHoldingDrift { get; set; } = 0.0015;
+    public double GoldPerPurchase { get; set; } = 10;
+    public double GoldArms { get; set; } = 25;
+    public double GoldFood { get; set; } = 40;
+    public double GoldMachines { get; set; } = 0.03;
+    public double PurchaseDrift { get; set; } = 1;
+
     // ── Random events and risings ──────────────────────────────────────────
     /// <summary>Chance per week of a random event, once the gap since the last has passed.</summary>
     public double RandomEventRate { get; set; } = 0.12;

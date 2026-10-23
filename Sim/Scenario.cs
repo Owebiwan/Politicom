@@ -37,6 +37,8 @@ public sealed class ScenarioDefinition
     public string? World { get; set; }
     /// <summary>The world state the region lies in.</summary>
     public string? HomeState { get; set; }
+    /// <summary>Gold the movement holds at the start (seized from a bank, say).</summary>
+    public double Gold { get; set; }
     /// <summary>The regime the movement rises against (for events that suit it), e.g. "empire"; null if unknown.</summary>
     public string? HomeIdeology { get; set; }
     /// <summary>

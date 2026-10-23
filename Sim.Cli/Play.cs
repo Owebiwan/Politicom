@@ -36,6 +36,10 @@ internal static class Play
           appeal                                  appeal to the workers of the world: twice the volunteers for a while
           support <state>                         back a revolution under way abroad
           expose <commune>                        break up a rival party's cells here and next door
+          volunteers <commune>                    call for volunteers: more fighters here and next door, less work done
+          conscription on|off                     a levy in every commune (drift, and enthusiasm wanes)
+          seize                                   seize the treasuries: gold to buy abroad (drift; its guards add more)
+          buy arms|grain|machines                 spend gold abroad, with a state willing to sell
           focus <line|balanced>                   put the communes' science into one line of technology
           paper|schools|art <commune>             found a newspaper, a school movement or an art movement (culture)
 
@@ -168,6 +172,10 @@ internal static class Play
         "appeal" => new InternationalAppeal(),
         "support" => new SupportUprising(State(w, p, 1)),
         "expose" => new ExposeCells(Commune(w, p, 1)),
+        "volunteers" => new CallVolunteers(Commune(w, p, 1)),
+        "conscription" => new SetConscription(Arg(p, 1) == "on"),
+        "seize" => new SeizeTreasuries(),
+        "buy" => new BuyAbroad(Arg(p, 1) switch { "grain" or "food" => Purchase.Grain, "machines" => Purchase.Machines, _ => Purchase.Arms }),
         "focus" => new SetResearchFocus(p.Length < 2 || p[1] == "balanced" ? null : w.Techs.Categories.FirstOrDefault(c => c.StartsWith(p[1], StringComparison.OrdinalIgnoreCase)) ?? p[1]),
         "paper" => new FoundCulturalWork(Commune(w, p, 1), CulturalWorkKind.Newspaper),
         "schools" => new FoundCulturalWork(Commune(w, p, 1), CulturalWorkKind.SchoolMovement),

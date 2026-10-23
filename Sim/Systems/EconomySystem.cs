@@ -27,12 +27,14 @@ internal static class EconomySystem
         Imports(w);
         foreach (var c in w.Active)
         {
-            double labor = Math.Max(0, 1 - c.PracticalSchooling - c.PoliticalSchooling - b.ProjectLabor * w.ProjectsJoinedBy(c.Id));
+            // Fighters beyond what the commune would field anyway aren't in the fields and workshops.
+            double labor = Math.Max(0, 1 - c.PracticalSchooling - c.PoliticalSchooling - b.ProjectLabor * w.ProjectsJoinedBy(c.Id)
+                                       - Math.Max(0, c.Mobilization - w.BaselineMobilization(c)));
             double trust = 1 + b.TrustProductivity * (w.Trust.AverageTrust(c.Id) - 0.5) * 2;
             double skill = 1 + b.PracticalProductivity * c.PracticalEducation;
             double morale = 0.7 + 0.3 * c.Wellbeing;
             double recall = w.RecallPenaltyTicks > 0 ? 0.95 : 1;
-            double m = labor * trust * skill * morale * c.Control * recall * DriftEffects.Productivity(stage) * (1 + c.ProductivityBonus);
+            double m = labor * trust * skill * morale * c.Control * recall * DriftEffects.Productivity(stage) * (1 + c.ProductivityBonus) * w.EnthusiasmFactor;
 
             var (foodYield, goodsYield) = c.Kind switch
             {

@@ -107,7 +107,9 @@ public partial class Main : Control
     private RichTextLabel _resources = null!;
     private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
-    private CheckButton _warCommittee = null!, _trade = null!;
+    private CheckButton _warCommittee = null!, _trade = null!, _conscription = null!;
+    private Button _seize = null!;
+    private readonly List<Button> _buyButtons = new();
     private OptionButton _projectKind = null!, _idea = null!, _mapMode = null!;
     private readonly List<Button> _speedButtons = new();
 
@@ -842,7 +844,7 @@ public partial class Main : Control
         {
             Visible = false,
             AnchorTop = 1, AnchorBottom = 1,
-            OffsetLeft = 16, OffsetRight = 946, OffsetTop = -420, OffsetBottom = -56,
+            OffsetLeft = 16, OffsetRight = 1016, OffsetTop = -420, OffsetBottom = -56,
         };
         _communeList.CommuneChosen += id =>
         {
@@ -946,11 +948,27 @@ public partial class Main : Control
         _trade = new CheckButton { Text = "Foreign trade", TooltipText = "Sell surplus grain abroad for arms. Buyers want currency, which brings markets and accounts back in (drift every turn). Embargoes grow as the idea spreads." };
         _trade.Toggled += on => { if (on != _world.ForeignTrade) Do(new SetForeignTrade(on)); };
         measures.AddChild(_trade);
+        _conscription = new CheckButton { Text = "Conscription", TooltipText = "Every commune sends at least a fifth of its people to the militias. Far stronger fronts, fewer hands at work — drift every turn, and enthusiasm wanes." };
+        _conscription.Toggled += on => { if (on != _world.Conscription) Do(new SetConscription(on)); };
+        measures.AddChild(_conscription);
+
         var federation = new HBoxContainer();
         movement.AddChild(federation);
         AddButton(federation, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
         AddButton(federation, "Sponsor congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
 
+        Section(movement, "Gold");
+        var gold = new HFlowContainer();
+        movement.AddChild(gold);
+        _seize = AddButton(gold, "Seize the treasuries", "Gold and silver from the banks and churches, once: it buys abroad. +drift now, and the committee that guards it gathers power (drift every turn) until it's spent. Monarchies and churches resent it.",
+            () => Do(new SeizeTreasuries()));
+        foreach (var (what, label, tip) in new[]
+        {
+            (Purchase.Arms, "Buy arms", "Goods for the front communes."),
+            (Purchase.Grain, "Buy grain", "Food for the hungriest communes."),
+            (Purchase.Machines, "Buy machines", "Lasting output in the towns' workshops."),
+        })
+            _buyButtons.Add(AddButton(gold, label, tip + " Costs gold, a little drift, and needs a state willing to sell (prices worse under embargo).", () => Do(new BuyAbroad(what))));
         Section(movement, "Propose a project");
         var propose = new HBoxContainer();
         movement.AddChild(propose);
@@ -993,6 +1011,8 @@ public partial class Main : Control
         foreach (var kind in Enum.GetValues<CulturalWorkKind>())
             AddButton(actions, CulturalWorks.Name(kind, _world.Year), CulturalWorks.Describe(kind) + $" Costs {_world.Balance.CostCulturalWork:0} influence; a commune takes {_world.Balance.CulturalWorkCooldown} weeks to take one up.",
                 () => WithSelected(id => new FoundCulturalWork(id, kind)));
+        AddButton(actions, "Call for volunteers", "More of its people, and some of its neighbours', join the militia: stronger here, less work done. The call carries further when enthusiasm is high.",
+            () => WithSelected(id => new CallVolunteers(id)));
         AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {
             if (_map.Selected is int a && _map.Secondary is int b) Do(new Mediate(a, b));
@@ -1075,6 +1095,15 @@ public partial class Main : Control
 
         RefreshWorld();
         _warCommittee.SetPressedNoSignal(w.WarCommittee);
+        _conscription.SetPressedNoSignal(w.Conscription);
+        _seize.Disabled = w.TreasuriesSeized;
+        _seize.Text = w.TreasuriesSeized ? "Treasuries seized" : "Seize the treasuries";
+        foreach (var b in _buyButtons)
+        {
+            b.Disabled = w.Gold < w.Balance.GoldPerPurchase || (w.States.Count > 0 && w.Seller is null);
+            b.TooltipText = b.TooltipText.Split("\n\nNow:")[0] + $"\n\nNow: {w.Gold:0} gold, {w.Balance.GoldPerPurchase:0} a purchase; " +
+                            (w.States.Count == 0 ? "smugglers sell, at a third off." : w.Seller is { } seller ? $"{seller} would sell." : "no state will sell.");
+        }
         _trade.SetPressedNoSignal(w.ForeignTrade);
         RefreshDecisions();
         RefreshCommune();
@@ -1144,6 +1173,12 @@ public partial class Main : Control
         if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");
         if (w.Scenario.FoodImports > 0) from.Add($"food {w.Scenario.FoodImports:0.0} (counted above)");
         if (from.Count > 0) text += $"\n[b]From abroad[/b] {string.Join(" · ", from)} a {turn}";
+        text += $"\n[b]Militia[/b] {w.Fighters:0.0} thousand under arms ({w.Fighters / Math.Max(0.1, members.Sum(c => c.Population)):P0} of the people)" +
+                (w.Conscription ? " · [color=#f0a040]conscription[/color]" : "");
+        var mood = w.Enthusiasm switch { >= 0.75 => "#70d080", >= 0.5 => "#e0c050", _ => "#f07060" };
+        text += $"\n[b]Enthusiasm[/b] [color={mood}]{w.Enthusiasm:P0}[/color] (production and militias ×{w.EnthusiasmFactor:0.00})";
+        if (w.Gold > 0 || w.TreasuriesSeized)
+            text += $"\n[b]Gold[/b] {w.Gold:0}" + (w.Gold > 0 ? $" · its guards add {w.Balance.GoldHoldingDrift * w.Gold * w.Weeks:0.00} drift a {turn}" : " (spent)");
         text += $"\n[b]Science[/b] {w.LastScience:0.0} a {turn} · [b]Culture[/b] {w.Mean(c => c.Culture):P0} on average";
         if (starving.Count > 0) text += $"\n[color=#f07060]Starving: {Names(starving)}[/color]";
         if (shortOfArms.Count > 0) text += $"\n[color=#f0a040]Short of arms at the front: {Names(shortOfArms)}[/color]";
@@ -1312,7 +1347,7 @@ public partial class Main : Control
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
             $"Food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
             $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · discontent {c.Discontent:0.00}\n" +
-            $"Culture {c.Culture:P0} · science {c.Science:0.00} a {w.Turn}" + (w.Tick - c.LastCulturalWork < CulturalWorks.Cooldown(w) ? " · taking up a cultural work" : "") + "\n" +
+            $"Militia {c.Mobilization:P0} of its people ({c.Population * c.Mobilization:0.0} thousand) · culture {c.Culture:P0} · science {c.Science:0.00} a {w.Turn}" + (w.Tick - c.LastCulturalWork < CulturalWorks.Cooldown(w) ? " · taking up a cultural work" : "") + "\n" +
             (c.PartyInfluence > 0.01 ? $"[color=#e07a6a]Party cells: {c.PartyInfluence:P0}[/color] — a rival party's hold here, adding drift\n" : "") +
             $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Where(t => !w.CommonKnowledge(w.Techs[t])).Select(t => w.Techs[t].Name)))}\n" +
             $"Neighbours (trust): {neighbours}";
