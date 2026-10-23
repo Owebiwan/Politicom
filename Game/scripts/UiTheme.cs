@@ -98,7 +98,7 @@ internal static class UiTheme
         return sb;
     }
 
-    /// <summary>Gilt frame for panels and tooltips.</summary>
+    /// <summary>Gilt frame for panels, tooltips and menus: a plain double border, no corner bosses.</summary>
     public static StyleBoxTexture FramePanel(int content = 16) => Frame("frame.svg", 20, content);
     /// <summary>A heavier frame for pop-ups and the scenario picker.</summary>
     public static StyleBoxTexture FrameStrong(int content = 26) => Frame("frame_strong.svg", 22, content);

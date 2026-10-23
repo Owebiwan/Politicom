@@ -2,5 +2,4 @@
 <rect x="3" y="3" width="90" height="90" rx="3" fill="#17181c" fill-opacity="0.97"/>
 <rect x="3.5" y="3.5" width="89" height="89" rx="3" fill="none" stroke="#6b5530" stroke-width="2"/>
 <rect x="8.5" y="8.5" width="79" height="79" fill="none" stroke="#b8944f" stroke-width="1" stroke-opacity="0.8"/>
-<path d="M10 3 L17 10 L10 17 L3 10 Z" fill="#c9a25b" stroke="#6b5530" stroke-width="1.2"/><circle cx="10" cy="10" r="2" fill="#17181c"/><path d="M86 3 L93 10 L86 17 L79 10 Z" fill="#c9a25b" stroke="#6b5530" stroke-width="1.2"/><circle cx="86" cy="10" r="2" fill="#17181c"/><path d="M10 79 L17 86 L10 93 L3 86 Z" fill="#c9a25b" stroke="#6b5530" stroke-width="1.2"/><circle cx="10" cy="86" r="2" fill="#17181c"/><path d="M86 79 L93 86 L86 93 L79 86 Z" fill="#c9a25b" stroke="#6b5530" stroke-width="1.2"/><circle cx="86" cy="86" r="2" fill="#17181c"/>
 </svg>

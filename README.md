@@ -231,7 +231,7 @@ How they play:
 
 **The look.** The interface is styled like a strategy game:
 - **Panels:** dark lacquered panels with gilt borders. Pop-ups, the scenario picker and
-  tooltips sit in frames with diamond corner bosses.
+  tooltips sit in gilt frames; pop-ups and the scenario picker have diamond corner bosses.
 - **Type:** **Cinzel** capitals for titles, tabs and section headings; **Alegreya Sans** for
   reading, the map and the tech tree.
 - **Emblems:** coloured emblems from game-icons.net (CC BY 3.0) mark each resource (wheat,
