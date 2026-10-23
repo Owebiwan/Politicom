@@ -50,7 +50,9 @@ public partial class MapView
                 _reliefWorld = LoadShade(ReliefDir + "world.shade");
                 _reliefWorldTried = true;
             }
-            if (_reliefWorld != null) DrawTextureRect(_reliefWorld, world, false, ReliefTint);
+            // The source's polar rows (above 84° N) are streaky over open sea: leave them out.
+            if (_reliefWorld != null)
+                DrawTextureRectRegion(_reliefWorld, LonLatRect(-180, -90, 180, 84), new Rect2(0, OverviewWidth / 360f * 6, OverviewWidth, OverviewWidth / 360f * 174), ReliefTint);
             return;
         }
         for (int row = 0; row < 180 / TileDeg; row++)
@@ -62,7 +64,11 @@ public partial class MapView
                 if (!ReliefTiles.TryGetValue((col, row), out var tile))
                     ReliefTiles[(col, row)] = tile = LoadShade($"{ReliefDir}t_{col}_{row}.shade"); // missing = open sea
                 // Each tile carries a one-pixel border from its neighbours: draw only the inside, so edges blend.
-                if (tile != null) DrawTextureRectRegion(tile, rect, new Rect2(1, 1, TileWidth, TileWidth), ReliefTint);
+                if (tile == null) continue;
+                if (row == 0) // clip the polar strip, as for the overview
+                    DrawTextureRectRegion(tile, LonLatRect(west, north - TileDeg, west + TileDeg, 84), new Rect2(1, 1 + TileWidth / 5f, TileWidth, TileWidth * 4 / 5f), ReliefTint);
+                else
+                    DrawTextureRectRegion(tile, rect, new Rect2(1, 1, TileWidth, TileWidth), ReliefTint);
             }
     }
 }

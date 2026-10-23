@@ -306,9 +306,11 @@ public partial class MapView : Control
 
     public override void _Draw()
     {
-        // A city map (real boundaries, no coast) sits on land; a region sits on the sea.
-        DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : Globe != null || Geo.Territories.Count == 0 ? Sea : NeutralLand);
+        // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
+        if (!SeaShown) DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : NeutralLand);
         if (World is not { } w) return;
+        Layout(); // the projection the sea follows
+        UpdateSea();
         var font = ThemeDB.FallbackFont;
         // A generated map's land goes under its neighbouring countries; real maps' land comes from the world layer.
         if (Generated && _geoLayout is { } g0)
@@ -341,6 +343,7 @@ public partial class MapView : Control
             if (c.Id == _hover) fill = fill.Lightened(0.12f);
             foreach (var piece in screen[c.Id]) FillPolygon(piece, fill);
         }
+        DrawTerrain();
         DrawRelief();
 
         // Railways: a dark bed with light cross-ties.

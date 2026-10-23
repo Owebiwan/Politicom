@@ -185,6 +185,21 @@ Balanced AI over 100 games each. The centralizer becomes a state in (almost) eve
 
 The sandbox (fresh maps) averages 70%.
 
+## Water, terrain and the paper chart
+
+The map is modelled on Victoria 3's:
+- **The sea:** an animated shader (`Game/shaders/sea.gdshader`) draws ripples that drift and
+  catch the light, shallow teal near the coast deepening to navy offshore, and broken foam
+  where it meets the land. The water is anchored to longitude and latitude, so it stays put
+  as you pan and zoom.
+- **Land cover:** Natural Earth's land cover (forest, grassland, desert, tundra, ice) tints the
+  political and map-mode colours lightly. It switches off with Relief.
+- **The paper chart:** zoomed out toward the whole world, the sea turns to parchment with
+  engraved lines following the coasts, and the countries become watercolour on paper.
+- **Inland maps:** Paris sits on land, not sea.
+- **Data:** `tools/geo/build_sea.py` builds the coast-distance field and the land-cover texture
+  in `Game/map/` from Natural Earth (public domain).
+
 ## Relief
 
 Real maps (the historical scenarios, open starts and the world view) are shaded with
@@ -221,6 +236,18 @@ How they play:
 - **If nobody answers,** the default is what happens when nobody acts, so a passive movement
   gains little from them.
 - **Blows to the enemy** are scaled to its strength, so no single event decides a war.
+- **Pictures:** event pop-ups open with a picture in a gilt frame. These are
+  public-domain period art from Wikimedia Commons: medieval chronicles, Bruegel, engravings
+  from illustrated papers, and photographs of 1871, 1917, 1919 and 1946.
+  - **One style:** each picture is toned to the same sepia engraving
+    (`tools/ui/process_event_art.py`), so paintings, woodcuts and photographs read as one
+    series. A credit line sits under each frame.
+  - **Matching:** an event's words set its theme (war, uprising, assembly, hunger, harvest,
+    work, faith, plague, fire, flood, refugees, festival, trade or press), and the game's
+    year picks the age. The nearest age with a picture is used.
+  - **Adding a picture:** add an entry with its Commons file title to
+    `tools/ui/event_art.json` and rerun the script. `tools/ui/find_event_art.py` lists
+    public-domain candidates for a slot.
 - **Pop-ups:** every decision, scripted or random, and every big piece of news (a revolution
   abroad, a town rising, hierarchy hardening) opens in the middle of the screen with its
   choices. Each choice shows its effects under it. News items that concern a commune have a

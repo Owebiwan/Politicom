@@ -11,6 +11,8 @@
   licence. Distributing a build that contains them means distributing it under GPL-3.0 terms,
   or replacing these files.
 - Land, lakes, rivers, land borders and provinces: **Natural Earth** (naturalearthdata.com), public domain.
+- Land cover and coastlines for the sea (`Game/map/`): **Natural Earth I** land cover and
+  1:50m land, public domain, processed by `tools/geo/build_sea.py`.
 - Shaded relief (`Data/relief/`): **Natural Earth "Shaded Relief, High Resolution"** (SR_HR),
   public domain, converted to transparent shade tiles.
 - Paris arrondissement boundaries (`paris_commune_1871.json`, `territories`): **Ville de Paris,
@@ -28,4 +30,7 @@
   License 1.1** (licence text alongside the font).
 - The ornaments (`Game/ui/`: frames, plates, buttons, tabs, medallions, dividers) are drawn in
   code by `tools/ui/build_ornaments.py`; the clock emblems and switches were drawn for this project.
-
+- Event pictures (`Game/art/events/`): public-domain works and photographs from **Wikimedia
+  Commons**, each checked as public domain or CC0. They are cropped and toned by
+  `tools/ui/process_event_art.py`. Each picture's author, date, licence and source page are
+  in `Data/events/art_credits.json` and shown under it in the game.
