@@ -209,7 +209,7 @@ internal static class UiTheme
         t.SetStylebox("hover", "PopupMenu", Box(AccentSoft, radius: 2));
         t.SetFont("font", "PopupMenu", Body);
 
-        // Tabs: Cinzel captions, a gilt rule under the open tab.
+        // Tabs: plates with semibold captions; the open one lit.
         t.SetFont("font", "TabContainer", Display);
         t.SetFontSize("font_size", "TabContainer", 15);
         t.SetStylebox("panel", "TabContainer", FramePanel(12));
