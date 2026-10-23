@@ -617,7 +617,7 @@ public partial class MapView : Control
         DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
         DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         DrawString(font, new Vector2(14, Size.Y - 14),
-"Drag to move · scroll or pinch to zoom · click to select. Boxes: enemy armies. Black-red flags: militia. Rails: railways. T: trust links.",
+"Drag to move · scroll or pinch to zoom · click to select. Soldiers: enemy armies. Flag-bearers: your militia. Ruins: occupied. Rails: railways. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
