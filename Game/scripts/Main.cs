@@ -22,7 +22,8 @@ public partial class Main : Control
     private double _accumulator;
     private int _seenEvents;
 
-    private Label _header = null!, _influence = null!, _stage = null!, _scores = null!, _feedback = null!;
+    private Label _header = null!, _stage = null!, _scores = null!, _feedback = null!;
+    private RichTextLabel _influence = null!;
     private DriftMeter _driftMeter = null!;
     private Button _stepButton = null!;
     private HistoryChart _history = null!;
@@ -457,7 +458,7 @@ public partial class Main : Control
             {
                 BbcodeEnabled = true, FitContent = true, ScrollActive = false,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(820, 0),
-                Text = $"[b]{Esc(scenario.Name)}[/b]  [color=#9aa0a8]{(end.Year == scenario.StartDate.Year ? $"{end.Year}" : $"{scenario.StartDate.Year}–{end.Year}")} · {scenario.Communes.Count} communes · "
+                Text = $"{UiTheme.DisplayText(Esc(scenario.Name))}  [color=#9aa0a8]{(end.Year == scenario.StartDate.Year ? $"{end.Year}" : $"{scenario.StartDate.Year}–{end.Year}")} · {scenario.Communes.Count} communes · "
                        + $"against {Esc(string.Join(" and ", scenario.Enemies.Select(e => e.Name)))}[/color]\n{Esc(scenario.Description)}",
             };
             text.AddThemeFontSizeOverride("normal_font_size", 14);
@@ -539,7 +540,7 @@ public partial class Main : Control
         var text = new RichTextLabel
         {
             BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(820, 0),
-            Text = "[b]Sandbox[/b]  [color=#9aa0a8]a generated region · two years · one or two enemies[/color]\n"
+            Text = UiTheme.DisplayText("Sandbox") + "  [color=#9aa0a8]a generated region · two years · one or two enemies[/color]\n"
                    + "An alternate-history map with its own communes, fronts and dilemmas, tuned to be winnable but hard. Same seed, same map.",
         };
         text.AddThemeFontSizeOverride("normal_font_size", 14);
@@ -589,7 +590,7 @@ public partial class Main : Control
         var text = new RichTextLabel
         {
             BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(820, 0),
-            Text = "[b]Open world[/b]  [color=#9aa0a8]any country · its own cities as communes · its government as the enemy[/color]\n"
+            Text = UiTheme.DisplayText("Open world") + "  [color=#9aa0a8]any country · its own cities as communes · its government as the enemy[/color]\n"
                    + "The movement rises wherever you choose. Hostile neighbours may back the government; the rest of the world goes on around you.",
         };
         text.AddThemeFontSizeOverride("normal_font_size", 14);
@@ -772,20 +773,13 @@ public partial class Main : Control
         dim.AddChild(center);
 
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(width, 0) };
-        panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.11f, 0.12f, 0.14f),
-            CornerRadiusTopLeft = 10, CornerRadiusTopRight = 10, CornerRadiusBottomLeft = 10, CornerRadiusBottomRight = 10,
-            ContentMarginLeft = 28, ContentMarginRight = 28, ContentMarginTop = 24, ContentMarginBottom = 24,
-        });
+        panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(30));
         center.AddChild(panel);
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 14);
         panel.AddChild(v);
 
-        var heading = new Label { Text = title };
-        heading.AddThemeFontSizeOverride("font_size", 26);
-        v.AddChild(heading);
+        v.AddChild(UiTheme.Title(title, 28));
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(width - 56, 0), Text = body.Trim() };
         text.AddThemeFontSizeOverride("normal_font_size", 15);
         text.AddThemeFontSizeOverride("bold_font_size", 15);
@@ -864,13 +858,19 @@ public partial class Main : Control
         margin.AddChild(side);
 
         // ── Always visible: where and when, the clock, influence, drift and anything waiting on you ──
-        _header = AddLabel(side, 16);
+        _header = AddLabel(side, 18);
+        _header.AddThemeFontOverride("font", UiTheme.Display);
+        _header.AddThemeColorOverride("font_color", UiTheme.GoldBright);
 
         var clock = new HBoxContainer();
         side.AddChild(clock);
-        foreach (var (label, speed) in new[] { ("❚❚", 0), ("▶", 1), ("▶▶", 2), ("▶▶▶", 3) })
+        foreach (var (label, speed) in new[] { ("pause", 0), ("play", 1), ("fast", 2), ("fastest", 3) })
         {
-            var b = new Button { Text = label, ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed", CustomMinimumSize = new Vector2(40, 0) };
+            var b = new Button
+            {
+                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed",
+                CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
+            };
             b.Pressed += () => SetSpeed(speed);
             clock.AddChild(b);
             _speedButtons.Add(b);
@@ -910,10 +910,11 @@ public partial class Main : Control
         };
         view.AddChild(_reliefToggle);
 
-        _influence = AddLabel(side);
+        _influence = AddRich(side);
         _influence.MouseFilter = MouseFilterEnum.Stop;
         _influence.TooltipText = "Influence is the movement's only resource. It regenerates every turn from political education, wellbeing and the press, up to 100.\nIt pays for schools, pamphlets, mediation, projects, congresses, recall.";
         _stage = AddLabel(side, 14);
+        _stage.AddThemeFontOverride("font", UiTheme.Display);
         _driftMeter = new DriftMeter();
         side.AddChild(_driftMeter);
 
@@ -1046,6 +1047,8 @@ public partial class Main : Control
 
         var log = Tab("Log");
         _log = AddRich(log);
+        var tabIcons = new[] { "overview", "movement", "commune", "world", "log" };
+        for (int i = 0; i < _tabs.GetTabCount() && i < tabIcons.Length; i++) _tabs.SetTabIcon(i, UiTheme.Icon(tabIcons[i]));
 
         SetSpeed(0);
     }
@@ -1057,7 +1060,10 @@ public partial class Main : Control
         var w = _world;
         UpdateHeader();
         _stepButton.Text = $"+1 {w.Turn}";
-        _influence.Text = $"Influence {w.Influence:0}  (+{w.InfluenceRegen:0.0}/{w.Turn})    Federation {w.Federation.Count()}" + (w.Communes.Count > w.InitialCommuneCount ? $" communes (began with {w.InitialCommuneCount})" : $"/{w.InitialCommuneCount}");
+        _influence.Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#9a9283](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]   " +
+                          $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" + (w.Communes.Count > w.InitialCommuneCount ? $" [color=#9a9283](began {w.InitialCommuneCount})[/color]" : $"/{w.InitialCommuneCount}") + "   " +
+                          $"{UiTheme.Img("enthusiasm")} {w.Enthusiasm:P0}   {UiTheme.Img("militia")} {w.Fighters:0.0}k" +
+                          (w.Gold > 0 ? $"   {UiTheme.Img("gold")} {w.Gold:0}" : "");
 
         _stage.Text = $"{DriftEffects.Name(w.Drift.Stage)} — {w.Drift.Value:0.0}" + (w.Drift.NextThreshold is { } t ? $"  (next stage at {t:0})" : "");
         _driftMeter.QueueRedraw();
@@ -1080,7 +1086,7 @@ public partial class Main : Control
             int k = w.Enemies.ToList().IndexOf(e);
             var fronts = w.Active.Where(c => c.Fronts.Contains(k))
                 .Select(c => $"{Esc(c.Name)} [color={(c.Defense >= c.Pressure ? "#70d080" : "#f07060")}]{c.Control:P0}[/color]");
-            return $"[b][color={e.Color}]■[/color] {Esc(e.Name)}[/b]: strength {e.EffectiveStrength:0.0}"
+            return $"{UiTheme.Img("enemy")} [b][color={e.Color}]{Esc(e.Name)}[/color][/b]: strength {e.EffectiveStrength:0.0}"
                    + (e.CurrentOffensive is { } o ? $"  [color=#f07060][b]{Esc(o.Name)}[/b][/color]" : "")
                    + $" · exhaustion {e.Exhaustion:P0} · its workers radicalized {e.Radicalization:P0}"
                    + (Politicom.Sim.Global.TechLevelSystem.EnemyEdge(w, e) is var edge and > 1.005 ? $" · [color=#f07060]+{edge - 1:P0} from better weapons[/color]" : "")
@@ -1091,7 +1097,7 @@ public partial class Main : Control
                       + $"\nTrade: {(w.ForeignTrade ? $"selling {w.LastExports:0} food for {w.LastImports:0} goods per {w.Turn}" : "closed")} · embargo {w.Embargo:P0}"
                       + (w.Ally.MilitarizationTicks > 0 ? $"\nMilitarized for {w.Turns(w.Ally.MilitarizationTicks)} more." : "");
         var s = w.Scores;
-        _scores.Text = $"Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
+        _scores.Text = $"★ Survival {s.Survival:0} · Quality of life {s.QualityOfLife:0} · Spread {s.Spread:0} · Freedom {s.Freedom:0}";
 
         RefreshWorld();
         _warCommittee.SetPressedNoSignal(w.WarCommittee);
@@ -1165,23 +1171,23 @@ public partial class Main : Control
         var starving = members.Where(c => c.Starving).ToList();
         var shortOfArms = members.Where(c => c.Front && c.GoodsCoverage < 0.9).ToList();
         string turn = w.Turn;
-        var text = $"[b]Food[/b] {food:0} in store, {foodMade:0} {(w.Scenario.FoodImports > 0 ? "grown and imported" : "grown")} against {foodNeed:0} eaten a {turn} ({Rate(foodMade, foodNeed)}) · " +
+        var text = $"{UiTheme.Img("food")} [b]Food[/b] {food:0} in store, {foodMade:0} {(w.Scenario.FoodImports > 0 ? "grown and imported" : "grown")} against {foodNeed:0} eaten a {turn} ({Rate(foodMade, foodNeed)}) · " +
                    $"{(foodNeed > 0 ? food / foodNeed : 0):0} {turn}s in reserve\n" +
-                   $"[b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
+                   $"{UiTheme.Img("goods")} [b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
         var from = new List<string>();
         if (w.LastArms > 0.05) from.Add($"arms {w.LastArms:0.0}");
         if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");
         if (w.Scenario.FoodImports > 0) from.Add($"food {w.Scenario.FoodImports:0.0} (counted above)");
-        if (from.Count > 0) text += $"\n[b]From abroad[/b] {string.Join(" · ", from)} a {turn}";
-        text += $"\n[b]Militia[/b] {w.Fighters:0.0} thousand under arms ({w.Fighters / Math.Max(0.1, members.Sum(c => c.Population)):P0} of the people)" +
+        if (from.Count > 0) text += $"\n{UiTheme.Img("world")} [b]From abroad[/b] {string.Join(" · ", from)} a {turn}";
+        text += $"\n{UiTheme.Img("militia")} [b]Militia[/b] {w.Fighters:0.0} thousand under arms ({w.Fighters / Math.Max(0.1, members.Sum(c => c.Population)):P0} of the people)" +
                 (w.Conscription ? " · [color=#f0a040]conscription[/color]" : "");
         var mood = w.Enthusiasm switch { >= 0.75 => "#70d080", >= 0.5 => "#e0c050", _ => "#f07060" };
-        text += $"\n[b]Enthusiasm[/b] [color={mood}]{w.Enthusiasm:P0}[/color] (production and militias ×{w.EnthusiasmFactor:0.00})";
+        text += $"\n{UiTheme.Img("enthusiasm")} [b]Enthusiasm[/b] [color={mood}]{w.Enthusiasm:P0}[/color] (production and militias ×{w.EnthusiasmFactor:0.00})";
         if (w.Gold > 0 || w.TreasuriesSeized)
-            text += $"\n[b]Gold[/b] {w.Gold:0}" + (w.Gold > 0 ? $" · its guards add {w.Balance.GoldHoldingDrift * w.Gold * w.Weeks:0.00} drift a {turn}" : " (spent)");
-        text += $"\n[b]Science[/b] {w.LastScience:0.0} a {turn} · [b]Culture[/b] {w.Mean(c => c.Culture):P0} on average";
-        if (starving.Count > 0) text += $"\n[color=#f07060]Starving: {Names(starving)}[/color]";
-        if (shortOfArms.Count > 0) text += $"\n[color=#f0a040]Short of arms at the front: {Names(shortOfArms)}[/color]";
+            text += $"\n{UiTheme.Img("gold")} [b]Gold[/b] {w.Gold:0}" + (w.Gold > 0 ? $" · its guards add {w.Balance.GoldHoldingDrift * w.Gold * w.Weeks:0.00} drift a {turn}" : " (spent)");
+        text += $"\n{UiTheme.Img("science")} [b]Science[/b] {w.LastScience:0.0} a {turn} · {UiTheme.Img("culture")} [b]Culture[/b] {w.Mean(c => c.Culture):P0} on average";
+        if (starving.Count > 0) text += $"\n{UiTheme.Img("danger")} [color=#f07060]Starving: {Names(starving)}[/color]";
+        if (shortOfArms.Count > 0) text += $"\n{UiTheme.Img("pressure")} [color=#f0a040]Short of arms at the front: {Names(shortOfArms)}[/color]";
         return text;
     }
 
@@ -1269,14 +1275,8 @@ public partial class Main : Control
             Severity.Decision => new Color("5fc2d9"),
             _ => new Color("9aa0a8"),
         };
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(620, 0) };
-        panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.11f, 0.12f, 0.14f), BorderColor = accent, BorderWidthTop = 4,
-            CornerRadiusTopLeft = 8, CornerRadiusTopRight = 8, CornerRadiusBottomLeft = 8, CornerRadiusBottomRight = 8,
-            ContentMarginLeft = 26, ContentMarginRight = 26, ContentMarginTop = 20, ContentMarginBottom = 20,
-            ShadowColor = new Color(0, 0, 0, 0.5f), ShadowSize = 18,
-        });
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(640, 0) };
+        panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(30));
         center.AddChild(panel);
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 12);
@@ -1284,9 +1284,23 @@ public partial class Main : Control
         var date = new Label { Text = _world.Format(e.Date, "d MMMM yyyy").ToUpperInvariant(), Modulate = accent };
         date.AddThemeFontSizeOverride("font_size", 12);
         v.AddChild(date);
-        var title = new Label { Text = heading, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(568, 0) };
-        title.AddThemeFontSizeOverride("font_size", 24);
-        v.AddChild(title);
+        var titleRow = new HBoxContainer();
+        titleRow.AddThemeConstantOverride("separation", 14);
+        string emblem = e.Severity switch
+        {
+            Severity.Good => e.Title.EndsWith(" rises") ? "revolution" : "good",
+            Severity.Danger => "danger",
+            Severity.Warning => e.Title.StartsWith("Hierarchy") ? "drift" : "warning",
+            Severity.Decision => "decision",
+            _ => "log",
+        };
+        titleRow.AddChild(UiTheme.IconRect(emblem, 44));
+        var title = UiTheme.Title(heading, 24);
+        title.CustomMinimumSize = new Vector2(520, 0);
+        title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        titleRow.AddChild(title);
+        v.AddChild(titleRow);
+        v.AddChild(new Ornament { CustomMinimumSize = new Vector2(0, 10) });
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(568, 0), Text = Esc(body) };
         text.AddThemeFontSizeOverride("normal_font_size", 15);
         v.AddChild(text);
@@ -1317,11 +1331,16 @@ public partial class Main : Control
     private void AddDecision(string text, params (string Label, string Tooltip, Action OnPress)[] options)
     {
         var box = new PanelContainer();
-        var style = new StyleBoxFlat { BgColor = new Color(0.1f, 0.25f, 0.3f), ContentMarginLeft = 8, ContentMarginRight = 8, ContentMarginTop = 6, ContentMarginBottom = 6 };
+        var style = UiTheme.Box(new Color("1e1c18"), border: UiTheme.Gold, radius: 3, margin: 10, vmargin: 8);
+        style.BorderWidthLeft = 4;
         box.AddThemeStyleboxOverride("panel", style);
         var v = new VBoxContainer();
         box.AddChild(v);
-        v.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(400, 0) });
+        var head = new HBoxContainer();
+        head.AddThemeConstantOverride("separation", 10);
+        head.AddChild(UiTheme.IconRect("decision", 28));
+        head.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(380, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        v.AddChild(head);
         var row = new HFlowContainer();
         v.AddChild(row);
         foreach (var (label, tooltip, onPress) in options) AddButton(row, label, tooltip, onPress);

@@ -142,7 +142,9 @@ public partial class TechTreeView : Control
         foreach (var (y, h, name) in _bands)
         {
             DrawRect(new Rect2(0, y - 4, Size.X, h + 8), new Color(1, 1, 1, 0.025f));
-            DrawString(font, new Vector2(6, y + h / 2 + 4), name.ToUpperInvariant(), HorizontalAlignment.Left, LabelW - 10, 11, UiTheme.Heading);
+            if (UiTheme.Icon(name.ToLowerInvariant()) is { } emblem)
+                DrawTextureRect(emblem, new Rect2(LabelW / 2 - 18, y + h / 2 - 44, 36, 36), false);
+            DrawString(UiTheme.Display, new Vector2(4, y + h / 2 + 8), name.ToUpperInvariant(), HorizontalAlignment.Center, LabelW - 8, 11, UiTheme.Heading);
         }
 
         // The chain behind whatever is hovered or selected lights up.

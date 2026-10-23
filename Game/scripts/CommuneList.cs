@@ -167,8 +167,9 @@ public partial class ToastStack : VBoxContainer
         var panel = new PanelContainer { MouseFilter = MouseFilterEnum.Ignore };
         panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
         {
-            BgColor = new Color(0.06f, 0.07f, 0.09f, 0.92f),
-            BorderColor = accent, BorderWidthLeft = 4,
+            BgColor = new Color(0.07f, 0.07f, 0.08f, 0.94f),
+            BorderColor = accent, BorderWidthLeft = 4, BorderWidthTop = 1, BorderWidthRight = 1, BorderWidthBottom = 1,
+            ShadowColor = new Color(0, 0, 0, 0.45f), ShadowSize = 6,
             CornerRadiusTopRight = 6, CornerRadiusBottomRight = 6,
             ContentMarginLeft = 12, ContentMarginRight = 12, ContentMarginTop = 6, ContentMarginBottom = 6,
         });

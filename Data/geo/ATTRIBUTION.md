@@ -17,3 +17,15 @@
   "Arrondissements"**, opendata.paris.fr, licensed under the Open Database License (ODbL)
   1.0. This file is a simplified derivative of that database and is shared under the same
   licence.
+
+# Interface credits
+
+- Icons (`Game/icons/`): from **game-icons.net**, licensed under **CC BY 3.0**
+  (creativecommons.org/licenses/by/3.0). By Lorc (lorcblog.blogspot.com), Delapouite
+  (delapouite.com) and Carl Olsen. Recoloured, with the background removed and an outline
+  added (`tools/ui/build_icons.py`).
+- Fonts (`Game/fonts/`): **Cinzel** by Natanael Gama and **Alegreya Sans** by Juan Pablo del
+  Peral (Huerta Tipográfica), both under the **SIL Open Font License 1.1** (licence texts
+  alongside the fonts).
+- The gilt frames and the clock emblems (`Game/ui/`) were drawn for this project.
+

@@ -229,6 +229,18 @@ How they play:
 
 ## What the player sees
 
+**The look.** The interface is styled like a strategy game:
+- **Panels:** dark lacquered panels with gilt borders. Pop-ups, the scenario picker and
+  tooltips sit in frames with diamond corner bosses.
+- **Type:** **Cinzel** capitals for titles, tabs and section headings; **Alegreya Sans** for
+  reading, the map and the tech tree.
+- **Emblems:** coloured emblems from game-icons.net (CC BY 3.0) mark each resource (wheat,
+  anvil, pikeman, coins, flame, flask, masks), each tab, each section heading, each kind of
+  pop-up (scroll, laurels, hazard, bell, fist) and each line of the tech tree.
+- **Section headings** end in a gilt rule with a diamond.
+- **Rebuilding:** `tools/ui/build_icons.py` rebuilds the emblems. Credits are in
+  `Data/geo/ATTRIBUTION.md`.
+
 **Militia, gold and enthusiasm.** Three resources that each come with a dilemma:
 - **Militia:** each commune has a share of its people under arms, about a tenth.
   - **Defence** scales with that share. Fighters beyond the usual share don't work, so the
