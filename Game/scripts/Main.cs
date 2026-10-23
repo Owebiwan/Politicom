@@ -1276,12 +1276,13 @@ public partial class Main : Control
             Severity.Decision => new Color("5fc2d9"),
             _ => new Color("9aa0a8"),
         };
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(640, 0) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(700, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(30));
         center.AddChild(panel);
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 12);
         panel.AddChild(v);
+        if (EventArt.Slot(_world, heading, body) is { } art) v.AddChild(EventArt.Frame(art, 640));
         var date = new Label { Text = _world.Format(e.Date, "d MMMM yyyy").ToUpperInvariant(), Modulate = accent };
         date.AddThemeFontSizeOverride("font_size", 12);
         v.AddChild(date);

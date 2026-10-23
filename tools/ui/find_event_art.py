@@ -81,7 +81,7 @@ def api(params):
 def search(query, limit=12):
     data = api({
         "action": "query", "generator": "search", "gsrnamespace": 6, "gsrsearch": query, "gsrlimit": limit,
-        "prop": "imageinfo", "iiprop": "url|size|extmetadata|mime", "iiurlwidth": 640,
+        "prop": "imageinfo", "iiprop": "url|size|extmetadata|mime", "iiurlwidth": 500,  # a standard thumbnail size (Commons asks for these)
     })
     pages = sorted(data.get("query", {}).get("pages", {}).values(), key=lambda p: p.get("index", 99))
     out = []
@@ -117,7 +117,8 @@ def main():
     out = sys.argv[1]
     slots = sys.argv[2:] or list(SLOTS)
     os.makedirs(out, exist_ok=True)
-    found = {}
+    index = os.path.join(out, "candidates.json")
+    found = json.load(open(index)) if os.path.exists(index) else {}
     for slot in slots:
         cands = []
         for q in SLOTS[slot]:
@@ -125,7 +126,7 @@ def main():
                 cands += [c for c in search(q) if c["title"] not in {x["title"] for x in cands}]
             except Exception as e:  # network hiccup: carry on with what there is
                 print(slot, q, "failed:", e)
-            time.sleep(0.5)
+            time.sleep(4)  # Commons rate-limits quick searches
             if len(cands) >= 4:
                 break
         cands = cands[:4]
@@ -138,11 +139,11 @@ def main():
                 c["preview"] = path
             except Exception as e:
                 print(slot, "download failed:", e)
-            time.sleep(0.3)
+            time.sleep(2)
         found[slot] = cands
         print(slot, len(cands))
-    with open(os.path.join(out, "candidates.json"), "w") as f:
-        json.dump(found, f, indent=1)
+        with open(index, "w") as f:  # after every slot, so an interrupted run keeps what it found
+            json.dump(found, f, indent=1)
 
 
 if __name__ == "__main__":

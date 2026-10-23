@@ -1,0 +1,274 @@
+{
+ "war_medieval": {
+  "file": "File:Battle of crecy froissart (cropped).jpg",
+  "caption": "The battle of Crécy, from Froissart's Chronicles",
+  "focus": [
+   0.5,
+   0.45
+  ]
+ },
+ "war_earlymodern": {
+  "file": "File:The citizens of Kronach heroically defend their city against Swedish and Weimar troops, 1634. After the painting by Schwoiser.jpg",
+  "caption": "The citizens of Kronach defend their town, 1634",
+  "focus": [
+   0.5,
+   0.45
+  ]
+ },
+ "war_industrial": {
+  "file": "File:Gardekorps.jpg",
+  "caption": "Guards at Gravelotte, 1870",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "war_modern": {
+  "file": "File:American soldiers from the 31st Infantry marching near Vladivostok Russia April 27 1919.jpg",
+  "caption": "Intervention troops near Vladivostok, 1919",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "uprising_medieval": {
+  "file": "File:Death of Wat Tyler - Froissart, Chroniques de France et d'Angleterre, Book II (c.1475-1483), f.175 - BL Royal MS 18 E I (cropped).jpg",
+  "caption": "The Peasants' Revolt, 1381",
+  "focus": [
+   0.5,
+   0.4
+  ]
+ },
+ "uprising_earlymodern": {
+  "file": "File:Print, satirical print, broadside (BM E,2.369).jpg",
+  "caption": "Woodcut from a broadside of 1525",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "uprising_industrial": {
+  "file": "File:Barricade Voltaire Lenoir Commune Paris 1871.jpg",
+  "caption": "A barricade of the Paris Commune, 1871",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "uprising_modern": {
+  "file": "File:First Red Guards in Petrograd, fall 1917 cropped.jpg",
+  "caption": "Armed workers in Petrograd, 1917",
+  "focus": [
+   0.5,
+   0.45
+  ]
+ },
+ "assembly_ancient": {
+  "file": "File:Cicero Denounces Catiline in the Roman Senate by Cesare Maccari.png",
+  "caption": "The Roman Senate, by Cesare Maccari",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "assembly_industrial": {
+  "file": "File:Hague Congress in L'Illustration.jpg",
+  "caption": "The close of the Hague Congress of the International, 1872",
+  "focus": [
+   0.5,
+   0.6
+  ]
+ },
+ "assembly_modern": {
+  "file": "File:Poznan 1918 meeting.jpg",
+  "caption": "A public meeting, Poznań, November 1918",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "hunger_medieval": {
+  "file": "File:Weltchronik Fulda Aa88 069v detail.jpg",
+  "caption": "Seven years of plenty and of famine, from a medieval chronicle",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "hunger_industrial": {
+  "file": "File:Emigrants leaving Queenstown Ireland for New York 1874.jpg",
+  "caption": "Emigrants leaving Ireland, 1874",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "hunger_modern": {
+  "file": "File:Berlin -- travelling soup kitchen LOC 22415718790.jpg",
+  "caption": "A travelling soup kitchen, Berlin, c. 1915",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "refugees": {
+  "file": "File:Refugees asking reservist regiment for bread, 1914.jpg",
+  "caption": "Refugees asking soldiers for bread, 1914",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "festival_earlymodern": {
+  "file": "File:Pieter Bruegel The Peasant Dance.jpg",
+  "caption": "The Peasant Dance, by Pieter Bruegel the Elder",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "festival_industrial": {
+  "file": "File:Federation.jpg",
+  "caption": "The Festival of the Federation, 1790",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "trade_earlymodern": {
+  "file": "File:Quinten Massijs (I) - The Moneylender and his Wife (detail) - WGA14282.jpg",
+  "caption": "The Moneylender and his Wife, by Quentin Matsys",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "trade_industrial": {
+  "file": "File:1857 panic.jpeg",
+  "caption": "A run on a savings bank, 1857",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "war_contemporary": {
+  "file": "File:Operation Crossroads Baker Edit.jpg",
+  "caption": "Atomic test, Bikini Atoll, 1946",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "press_contemporary": {
+  "file": "File:Glen Beck and Betty Snyder program the ENIAC in building 328 at the Ballistic Research Laboratory.jpg",
+  "caption": "Programming ENIAC, 1940s",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "assembly_medieval": {
+  "file": "File:Landsgemeinde Ende 18. Jhr.jpg",
+  "caption": "A Landsgemeinde, the open-air assembly of Appenzell",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "assembly_earlymodern": {
+  "file": "File:Jacques-Louis David - Serment du Jeu de paume, le 20 juin 1789 - P67 - musée Carnavalet - 0.jpg",
+  "caption": "The Tennis Court Oath, 1789, by Jacques-Louis David",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "harvest_medieval": {
+  "file": "File:Reeve and Serfs.jpg",
+  "caption": "Reapers and the reeve, from the Queen Mary Psalter",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "harvest_earlymodern": {
+  "file": "File:Pieter Bruegel the Elder- The Harvesters - Google Art Project.jpg",
+  "caption": "The Harvesters, by Pieter Bruegel the Elder",
+  "focus": [
+   0.5,
+   0.6
+  ]
+ },
+ "harvest_industrial": {
+  "file": "File:Jean-François Millet - Gleaners - Google Art Project 2.jpg",
+  "caption": "The Gleaners, by Jean-François Millet",
+  "focus": [
+   0.5,
+   0.6
+  ]
+ },
+ "work_industrial": {
+  "file": "File:Adolph-Menzel-German-Eisenwalzwerk-Moderne-Cyklopen-The-Iron-Rolling-Mill-Modern-Cyclopes-.jpg",
+  "caption": "The Iron Rolling Mill, by Adolph Menzel",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "work_modern": {
+  "file": "File:StateLibQld 1 205388 Workers inside the churn room of the butter factory, Kingaroy, 1938.jpg",
+  "caption": "Workers in a factory churn room, 1938",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "faith_medieval": {
+  "file": "File:Pilgrims in Constantinople BnF Fr2810 fol144.jpg",
+  "caption": "Pilgrims, from the Livre des merveilles",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "faith_earlymodern": {
+  "file": "File:Savonarola-preaching-against-prodigality-ludwig-von-langenmantel-1879.jpg",
+  "caption": "Savonarola preaching in Florence",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "fire": {
+  "file": "File:Great Fire London.jpg",
+  "caption": "The Great Fire of London, 1666",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "flood": {
+  "file": "File:The Saint Elizabeth’s Day Flood by Master of the St Elizabeth Panels c1490-1495.jpg",
+  "caption": "The St Elizabeth's Day Flood, c. 1490",
+  "focus": [
+   0.13,
+   0.55
+  ]
+ },
+ "town_medieval": {
+  "file": "File:Hartmann Schedel - Nuremberg Chronicle, Page 100 - View of the city of Nuremberg - WGA20964.jpg",
+  "caption": "Nuremberg, from the Nuremberg Chronicle, 1493",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "town_industrial": {
+  "file": "File:City Hotel, Broadway, New York City.jpg",
+  "caption": "A city street, 19th century",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ }
+}
