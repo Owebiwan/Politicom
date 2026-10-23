@@ -6,8 +6,8 @@ namespace Politicom.Game;
 /// <summary>
 /// One theme for the whole interface, in the manner of a strategy game: dark lacquered panels
 /// with gilt borders and corner bosses, Cinzel capitals for titles, tabs and headings,
-/// Alegreya Sans for reading, and coloured emblems (game-icons.net) beside resources and
-/// headings. Semantic colours (good/bad, enemies, drift stages) stay where they are used.
+/// Alegreya Sans for reading, and pixel-art sprites beside resources and headings.
+/// Semantic colours (good/bad, enemies, drift stages) stay where they are used.
 /// </summary>
 internal static class UiTheme
 {
@@ -55,17 +55,27 @@ internal static class UiTheme
     // ── Icons ──
     private static readonly Dictionary<string, Texture2D?> IconCache = new();
 
-    /// <summary>A coloured emblem from res://icons (see tools/ui/build_icons.py), or null if missing.</summary>
+    /// <summary>Interface keys drawn by another key's sprite.</summary>
+    private static readonly Dictionary<string, string> SpriteFor = new()
+    {
+        ["commune"] = "town", ["movement"] = "t_flag", ["log"] = "t_book", ["overview"] = "world", ["tech"] = "t_gear",
+        ["organizational"] = "t_council", ["agricultural"] = "t_plough", ["industrial"] = "t_gear", ["military"] = "t_sword",
+        ["communication"] = "t_press", ["rail"] = "t_train", ["scores"] = "good", ["time"] = "chart",
+    };
+
+    private static string SpritePath(string key) => $"res://pixel/{SpriteFor.GetValueOrDefault(key, key)}.png";
+
+    /// <summary>A pixel-art sprite (see tools/ui/build_pixel_art.py), or null if there's none for the key.</summary>
     public static Texture2D? Icon(string key)
     {
         if (IconCache.TryGetValue(key, out var cached)) return cached;
-        string path = $"res://icons/{key}.svg";
+        string path = SpritePath(key);
         return IconCache[key] = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
     }
 
-    /// <summary>An emblem inline in rich text.</summary>
-    public static string Img(string key, int size = 18) =>
-        ResourceLoader.Exists($"res://icons/{key}.svg") ? $"[img={size}x{size}]res://icons/{key}.svg[/img]" : "";
+    /// <summary>A sprite inline in rich text. Sizes that are multiples of 16 keep its pixels square.</summary>
+    public static string Img(string key, int size = 16) =>
+        ResourceLoader.Exists(SpritePath(key)) ? $"[img={size}x{size}]{SpritePath(key)}[/img]" : "";
 
     /// <summary>An emblem as a control, sized for a line of text.</summary>
     public static TextureRect IconRect(string key, int size = 20) => new()
@@ -217,7 +227,7 @@ internal static class UiTheme
         var row = new HBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
         row.AddThemeConstantOverride("separation", 8);
         icon ??= SectionIcons.GetValueOrDefault(text.ToLowerInvariant());
-        if (icon != null && Icon(icon) != null) row.AddChild(IconRect(icon, 20));
+        if (icon != null && Icon(icon) != null) row.AddChild(IconRect(icon, 16));
         var l = new Label { Text = text.ToUpperInvariant() };
         l.AddThemeFontOverride("font", Display);
         l.AddThemeColorOverride("font_color", Heading);

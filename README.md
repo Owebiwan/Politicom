@@ -234,11 +234,20 @@ How they play:
   tooltips sit in gilt frames; pop-ups and the scenario picker have diamond corner bosses.
 - **Type:** **Cinzel** capitals for titles, tabs and section headings; **Alegreya Sans** for
   reading, the map and the tech tree.
-- **Emblems:** coloured emblems from game-icons.net (CC BY 3.0) mark each resource (wheat,
-  anvil, pikeman, coins, flame, flask, masks), each tab, each section heading, each kind of
-  pop-up (scroll, laurels, hazard, bell, fist) and each line of the tech tree.
+- **Pixel art:** 55 sprites drawn for the game, each a 16 × 16 grid of characters in
+  `tools/ui/build_pixel_art.py`, rendered at 8× with hard edges.
+  - **Settlements:** each commune is drawn by kind and age. Before 1750 that's thatched
+    villages, workshops and walled towns; after, farms, smoking factories and brick towns.
+    Occupied communes are ruins.
+  - **Armies:** enemy armies are soldiers of their age (spearmen early, riflemen later),
+    tinted in the enemy's colour. The militia is a militiaman under the black-and-red flag.
+  - **Technologies:** every one has a sprite, chosen by what it is: council, raised hands,
+    book, ledger, plough, sprout, water, mill, gear, lightning, train, press, radio mast,
+    computer, sword, tower, rifle, tank, plane, tractor.
+  - **Interface:** resources, section headings and pop-ups use sprites too: wheat, anvil,
+    coins, flame, flask, mask, heart, crossed swords, fist, scroll and others.
 - **Section headings** end in a thin gilt rule.
-- **Rebuilding:** `tools/ui/build_icons.py` rebuilds the emblems. Credits are in
+- **Rebuilding:** `tools/ui/build_pixel_art.py` rebuilds the sprites. Font credits are in
   `Data/geo/ATTRIBUTION.md`.
 
 **Militia, gold and enthusiasm.** Three resources that each come with a dilemma:

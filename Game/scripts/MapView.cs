@@ -175,22 +175,22 @@ public partial class MapView : Control
             FillPolygon(new[] { tip + dir * 7 * scale, tip + dir.Orthogonal() * 4 * scale, tip - dir.Orthogonal() * 4 * scale },
                 new Color(color, alpha * (0.5f + 0.5f * pulse)));
         }
-        DrawRect(box, new Color(color.Darkened(0.6f), alpha * 0.9f));
-        DrawRect(box, new Color(color, alpha), false, 1.5f);
-        DrawLine(box.Position, box.End, new Color(color, alpha), 1.2f, true);
-        DrawLine(new Vector2(box.Position.X, box.End.Y), new Vector2(box.End.X, box.Position.Y), new Color(color, alpha), 1.2f, true);
-        DrawString(font, new Vector2(at.X - 20, box.End.Y + 11), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
+        // A soldier of the age, in the enemy's colour (the sprite is pale, so the colour tints it).
+        var soldier = UiTheme.Icon(World is { Year: < 1700 } ? "spearman" : "rifleman");
+        float side = 32 * scale;
+        var sprite = new Rect2(at - new Vector2(side / 2, side * 0.6f), new Vector2(side, side));
+        if (soldier != null) DrawTextureRect(soldier, sprite, false, new Color(color.Lightened(0.25f), alpha));
+        DrawString(font, new Vector2(at.X - 20, sprite.End.Y + 9), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
     }
 
     /// <summary>The federation's militia at a front commune: a black-and-red flag sized by its defense.</summary>
     private void DrawMilitia(Vector2 at, float defense, float alpha)
     {
-        float scale = Mathf.Clamp(1.05f + Mathf.Sqrt(defense) * 0.35f, 1.05f, 2.1f) * Mathf.Sqrt(_zoom);
-        var size = new Vector2(16, 11) * scale;
-        var box = new Rect2(at - size / 2, size);
-        FillPolygon(new[] { box.Position, new Vector2(box.End.X, box.Position.Y), new Vector2(box.Position.X, box.End.Y) }, new Color(Anarchist, alpha));
-        FillPolygon(new[] { new Vector2(box.End.X, box.Position.Y), box.End, new Vector2(box.Position.X, box.End.Y) }, new Color(0.05f, 0.05f, 0.05f, alpha));
-        DrawRect(box, new Color(1, 1, 1, alpha * 0.5f), false, 1);
+        // A militiaman under the black-and-red flag, larger as the commune's defense grows.
+        float scale = Mathf.Clamp(0.8f + Mathf.Sqrt(defense) * 0.25f, 0.8f, 1.6f) * Mathf.Sqrt(_zoom);
+        float side = 32 * scale;
+        if (UiTheme.Icon("militia") is { } militia)
+            DrawTextureRect(militia, new Rect2(at - new Vector2(side / 2, side * 0.6f), new Vector2(side, side)), false, new Color(1, 1, 1, alpha));
     }
 
     public MapMode Mode { get; set; } = MapMode.Trust;
@@ -462,18 +462,24 @@ public partial class MapView : Control
         {
             var p = ToScreen(c);
             float r = Marker(c);
-            if (c.Occupied)
+            // A settlement of its kind and age; ruins once occupied.
+            string town = c.Occupied ? "ruins" : (w.Year < 1750, c.Kind) switch
             {
-                var occupier = c.OccupiedBy is int by ? EnemyColor(w, by) : Danger;
-                DrawLine(p + new Vector2(-r, -r), p + new Vector2(r, r), occupier, 2, true);
-                DrawLine(p + new Vector2(-r, r), p + new Vector2(r, -r), occupier, 2, true);
-            }
-            else
+                (true, CommuneKind.Agrarian) => "village",
+                (true, CommuneKind.Industrial) => "workshop",
+                (true, _) => "oldtown",
+                (false, CommuneKind.Agrarian) => "farm",
+                (false, CommuneKind.Industrial) => "factory",
+                _ => "town",
+            };
+            float side = SpriteSize(c);
+            if (UiTheme.Icon(town) is { } sprite)
             {
-                DrawCircle(p, r + 1.5f, Border);
-                DrawCircle(p, r, c.Kind == CommuneKind.Industrial ? new Color("e9e4d8") : new Color("cfd6c4"));
-                if (c.Starving) DrawCircle(p + new Vector2(r + 2, -r - 2), 3.5f, Warn);
+                var rect = new Rect2(p - new Vector2(side / 2, side * 0.62f), new Vector2(side, side));
+                if (c.Id == Selected || c.Id == _hover) DrawCircle(p, side * 0.55f, new Color(1, 1, 1, 0.18f));
+                DrawTextureRect(sprite, rect, false, c.Occupied ? new Color(1, 1, 1, 0.8f) : (c.Federated ? Colors.White : new Color(0.75f, 0.75f, 0.75f)));
             }
+            if (c.Starving && !c.Occupied) DrawCircle(p + new Vector2(side / 2, -side / 2), 4, Warn);
         }
         var taken = new List<Rect2>();
         var order = w.Communes.OrderByDescending(c => c.Id == Selected || c.Id == _hover).ThenByDescending(c => c.Population);
@@ -481,7 +487,7 @@ public partial class MapView : Control
         {
             var p = ToScreen(c);
             float r = Marker(c);
-            var labelAt = p + new Vector2(r + 5, 4);
+            var labelAt = p + new Vector2(SpriteSize(c) / 2 + 3, 4);
             var size = font.GetStringSize(c.Name, HorizontalAlignment.Left, -1, 12);
             var rect = new Rect2(labelAt - new Vector2(0, size.Y - 3), size + new Vector2(0, c.Front && !c.Occupied ? 9 : 0));
             bool always = c.Id == Selected || c.Id == _hover;
@@ -955,6 +961,10 @@ public partial class MapView : Control
 
     /// <summary>Town marker size: small, growing gently with population.</summary>
     private static float Marker(Commune c) => 2.5f + Mathf.Sqrt((float)c.Population) * 0.45f;
+
+    /// <summary>A settlement sprite's size: 24 px for a village, up to 40 for a city, grown a little with zoom.</summary>
+    private float SpriteSize(Commune c) =>
+        Mathf.Clamp(20 + Mathf.Sqrt((float)c.Population) * 2.2f, 24, 40) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f);
 
     /// <summary>The commune whose territory contains the point.</summary>
     private int? Hit(Vector2 at)

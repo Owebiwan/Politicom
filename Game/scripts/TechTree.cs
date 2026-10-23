@@ -143,7 +143,7 @@ public partial class TechTreeView : Control
         {
             DrawRect(new Rect2(0, y - 4, Size.X, h + 8), new Color(1, 1, 1, 0.025f));
             if (UiTheme.Icon(name.ToLowerInvariant()) is { } emblem)
-                DrawTextureRect(emblem, new Rect2(LabelW / 2 - 18, y + h / 2 - 44, 36, 36), false);
+                DrawTextureRect(emblem, new Rect2(LabelW / 2 - 16, y + h / 2 - 42, 32, 32), false);
             DrawString(UiTheme.Display, new Vector2(4, y + h / 2 + 8), name.ToUpperInvariant(), HorizontalAlignment.Center, LabelW - 8, 11, UiTheme.Heading);
         }
 
@@ -182,9 +182,13 @@ public partial class TechTreeView : Control
             var border = t.Id == Selected ? EdgeLit : w.IdeaNudges.ContainsKey(t.Id) ? UiTheme.Accent : new Color(1, 1, 1, holders > 0 ? 0.18f : 0.08f);
             DrawRect(r, border, false, t.Id == Selected || w.IdeaNudges.ContainsKey(t.Id) ? 2 : 1);
 
+            // Its sprite, faded while out of reach.
+            if (UiTheme.Icon(Sprite(t)) is { } icon)
+                DrawTextureRect(icon, new Rect2(r.Position + new Vector2(6, 4), new Vector2(24, 24)), false,
+                    new Color(1, 1, 1, holders > 0 ? 1 : reachable ? 0.8f : 0.35f));
             var text = holders > 0 ? UiTheme.Text : reachable ? new Color(UiTheme.Text, 0.75f) : Muted;
             if (future) text = new Color(Muted, 0.7f);
-            DrawString(font, r.Position + new Vector2(8, 17), t.Name, HorizontalAlignment.Left, NodeW - 16, 13, text);
+            DrawString(font, r.Position + new Vector2(36, 17), t.Name, HorizontalAlignment.Left, NodeW - 42, 13, text);
 
             // Spread across the federation
             var bar = new Rect2(r.Position + new Vector2(8, 26), new Vector2(NodeW - 66, 5));
@@ -206,6 +210,41 @@ public partial class TechTreeView : Control
             if (needs.Length > 0)
                 DrawString(font, new Vector2(r.Position.X + NodeW * 0.4f, r.Position.Y + 45), needs, HorizontalAlignment.Right, NodeW * 0.6f - 8, 11, Muted);
         }
+    }
+
+    /// <summary>The pixel sprite for a technology, by what it is (its id), else by its line.</summary>
+    public static string Sprite(TechDefinition t)
+    {
+        string id = t.Id;
+        bool Has(params string[] words) => words.Any(id.Contains);
+        if (Has("statistic", "accounting", "planning", "cybernetic", "budget")) return "t_ledger";
+        if (Has("assembl", "moot", "sortition", "consensus", "civil_resistance", "elected", "workers_control", "rotating", "mandate")) return "t_hands";
+        if (Has("council", "elders", "magistr", "federation", "charter", "confeder", "guild", "brotherhood", "kinship", "syndicalist")) return "t_council";
+        if (Has("school", "univers", "librar", "ateneo", "monastic", "scribe", "writing", "scientific")) return "t_book";
+        if (Has("tractor", "mechanized")) return "t_tractor";
+        if (Has("irrigation", "water")) return "t_water";
+        if (Has("mill")) return "t_mill";
+        if (Has("seed", "agroecology", "green_rev", "new_world", "fertiliz", "agronomy")) return "t_sprout";
+        if (Has("plough", "crop", "field", "commons", "herds", "granar", "terrac", "land_councils")) return "t_plough";
+        if (Has("electri", "microgrid")) return "t_bolt";
+        if (Has("steam", "rail", "locomotive")) return "t_train";
+        if (Has("computer", "software", "internet", "encrypted", "fabrication", "community_workshops")) return "t_computer";
+        if (Has("radio", "telegraph", "telephone", "television", "cinema")) return "t_radio";
+        if (Has("press", "pamphlet", "newspaper", "correspondent", "printing", "preacher", "oral", "postal", "couriers")) return "t_press";
+        if (Has("armour", "tank")) return "t_tank";
+        if (Has("air", "drone")) return "t_plane";
+        if (Has("gun", "rifle", "powder")) return "t_rifle";
+        if (Has("staff")) return "t_star";
+        if (Has("fort", "walls", "hill", "town_militias", "defence")) return "t_tower";
+        if (Has("militia", "war_bands", "phalanx", "chariot", "legion", "pike", "columns", "guerrilla", "leagues")) return "t_sword";
+        return t.Category switch
+        {
+            "Organizational" => "t_council",
+            "Agricultural" => "t_plough",
+            "Industrial" => "t_gear",
+            "Military" => "t_sword",
+            _ => "t_press",
+        };
     }
 
     /// <summary>The technology and everything leading to it.</summary>
@@ -359,7 +398,7 @@ public partial class TechTreePanel : HBoxContainer
         string unlocks = string.Join(", ", _world.Techs.Unlocks(id).Where(u => !_world.CommonKnowledge(u)).Select(u => u.Name));
         string era = $"{Ages.Name(t.Era)} age" + (t.Era > -10000 ? $", from {Ages.Year(t.Era)}" : "") + (t.Until is int until ? $"; common knowledge by {Ages.Year(until)}" : "");
         _details.Text =
-            $"[b]{Esc(t.Name)}[/b]\n[color=#8b919b]{Esc(t.Category)} · {era}[/color]\n\n" +
+            $"[img=48x48]res://pixel/{TechTreeView.Sprite(t)}.png[/img] [b]{Esc(t.Name)}[/b]\n[color=#8b919b]{Esc(t.Category)} · {era}[/color]\n\n" +
             (_world.Reached(t) ? "" : $"[color=#f2c94c]Not yet: the world reaches it in {Ages.Year(t.Era)}.[/color]\n\n") +
             $"[color=#6fbf7f]+[/color] {Esc(t.Perk)}\n[color=#e0705f]−[/color] {Esc(t.Risk)}\n\n" +
             $"{effects}\n[color=#8b919b](Holders' effects apply where it's used; the rest scale with how widely it has spread.)[/color]\n\n" +

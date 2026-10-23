@@ -1294,7 +1294,7 @@ public partial class Main : Control
             Severity.Decision => "decision",
             _ => "log",
         };
-        titleRow.AddChild(UiTheme.IconRect(emblem, 44));
+        titleRow.AddChild(UiTheme.IconRect(emblem, 48));
         var title = UiTheme.Title(heading, 24);
         title.CustomMinimumSize = new Vector2(520, 0);
         title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -1338,7 +1338,7 @@ public partial class Main : Control
         box.AddChild(v);
         var head = new HBoxContainer();
         head.AddThemeConstantOverride("separation", 10);
-        head.AddChild(UiTheme.IconRect("decision", 28));
+        head.AddChild(UiTheme.IconRect("decision", 32));
         head.AddChild(new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(260, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill });
         v.AddChild(head);
         var row = new HFlowContainer();
