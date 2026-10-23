@@ -366,8 +366,11 @@ public partial class MapView : Control
                         if (!Geo.OnBounds(raw[k], raw[n])) DrawDashedLine(ring[k], ring[n], ProvinceBorder, 1, 3);
                     }
                 }
+            // Rivers come from regional-scale data: a handful of points per city. On a city map (real
+            // districts, e.g. Paris) they'd be straight strokes across the streets, so they're left out.
             float riverWidth = 1.4f * Mathf.Sqrt(_zoom);
-            foreach (var (_, points) in g2.Rivers) DrawPolyline(Screen(points), River, riverWidth, true);
+            if (Geo!.Territories.Count == 0)
+                foreach (var (_, points) in g2.Rivers) DrawPolyline(Screen(points), River, riverWidth, true);
             foreach (var border in g2.Borders)
             {
                 var b = Screen(border);
