@@ -210,8 +210,7 @@ internal static class UiTheme
     }
 
     /// <summary>
-    /// A section heading: an emblem, the title in gilt capitals, and a rule that ends in a
-    /// diamond, as in the margins of an old map.
+    /// A section heading: an emblem, the title in gilt capitals, and a thin gilt rule.
     /// </summary>
     public static Control SectionTitle(string text, string? icon = null)
     {
@@ -276,15 +275,12 @@ internal static class UiTheme
     private static StyleBoxLine Line(Color color) => new() { Color = color, Thickness = 1 };
 }
 
-/// <summary>A thin gilt rule ending in a small diamond: the flourish after a section title.</summary>
+/// <summary>A thin gilt rule: the flourish after a section title.</summary>
 public partial class Ornament : Control
 {
     public override void _Draw()
     {
         float y = Size.Y / 2 + 1;
-        var gold = new Color(UiTheme.Gold, 0.55f);
-        DrawLine(new Vector2(2, y), new Vector2(Size.X - 10, y), gold, 1);
-        var c = new Vector2(Size.X - 5, y);
-        DrawColoredPolygon(new[] { c + new Vector2(0, -4), c + new Vector2(4, 0), c + new Vector2(0, 4), c + new Vector2(-4, 0) }, new Color(UiTheme.Gold, 0.8f));
+        DrawLine(new Vector2(2, y), new Vector2(Size.X - 2, y), new Color(UiTheme.Gold, 0.55f), 1);
     }
 }

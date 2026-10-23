@@ -237,7 +237,7 @@ How they play:
 - **Emblems:** coloured emblems from game-icons.net (CC BY 3.0) mark each resource (wheat,
   anvil, pikeman, coins, flame, flask, masks), each tab, each section heading, each kind of
   pop-up (scroll, laurels, hazard, bell, fist) and each line of the tech tree.
-- **Section headings** end in a gilt rule with a diamond.
+- **Section headings** end in a thin gilt rule.
 - **Rebuilding:** `tools/ui/build_icons.py` rebuilds the emblems. Credits are in
   `Data/geo/ATTRIBUTION.md`.
 
