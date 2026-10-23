@@ -1234,6 +1234,10 @@ public partial class Main : Control
                 _ => "News",
             };
             string body = pending != null ? pending.Text : e.Text;
+            // News often opens with its own headline ("Orléans rises! Its people…"): don't say it twice.
+            if (heading.Length > 0 && body.StartsWith(heading))
+                body = body[heading.Length..].TrimStart('!', '.', ':', ' ', '—');
+            if (body.Length > 0) body = char.ToUpperInvariant(body[0]) + body[1..];
             var buttons = new List<(string Label, string Tooltip, Action OnPress)>();
             if (pending != null)
                 buttons.AddRange(pending.Options.Select((o, i) => (o.Label,

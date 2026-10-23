@@ -373,7 +373,7 @@ public partial class MapView : Control
             // districts, e.g. Paris) they'd be straight strokes across the streets, so they're left out.
             float riverWidth = 1.4f * Mathf.Sqrt(_zoom);
             if (Geo!.Territories.Count == 0)
-                foreach (var (_, points) in g2.Rivers) DrawPolyline(Screen(points), River, riverWidth, true);
+                foreach (var (_, points) in g2.Rivers) DrawRiver(Screen(MouthLast(points, g2)), riverWidth);
             foreach (var border in g2.Borders)
             {
                 var b = Screen(border);
@@ -965,6 +965,32 @@ public partial class MapView : Control
     private static float Radius(Commune c) => 5 + Mathf.Sqrt((float)c.Population) * 1.2f;
 
     /// <summary>Town marker size: small, growing gently with population.</summary>
+    // Rivers as water: a dark bank, a core in the sea's shallow teal, a faint highlight, widening toward the mouth.
+    private static readonly Color RiverBank = new("1d2e36");
+    private static readonly Color RiverWater = new("2f5d68");
+    private static readonly Color RiverLight = new("7fb3bd");
+
+    private void DrawRiver(Vector2[] pts, float width)
+    {
+        if (pts.Length < 2) return;
+        for (int pass = 0; pass < 3; pass++)
+            for (int i = 0; i + 1 < pts.Length; i++)
+            {
+                float t = (i + 0.5f) / (pts.Length - 1);
+                float w = width * (0.55f + 1.1f * t); // narrow at the source, broad at the mouth
+                var (color, scale) = pass switch { 0 => (RiverBank, 1.9f), 1 => (RiverWater, 1.2f), _ => (new Color(RiverLight, 0.35f), 0.35f) };
+                DrawLine(pts[i], pts[i + 1], color, w * scale, true);
+            }
+    }
+
+    /// <summary>The river's points ordered source to mouth: the mouth is the end nearer the coast.</summary>
+    private static Vector2[] MouthLast(Vector2[] pts, GeoLayout g)
+    {
+        if (pts.Length < 2 || g.Land.Count == 0) return pts;
+        float Near(Vector2 p) => g.Land.Min(r => r.Min(q => q.DistanceSquaredTo(p)));
+        return Near(pts[0]) < Near(pts[^1]) ? pts.Reverse().ToArray() : pts;
+    }
+
     private static float Marker(Commune c) => 2.5f + Mathf.Sqrt((float)c.Population) * 0.45f;
 
     /// <summary>A settlement sprite's size: 24 px for a village, up to 40 for a city, grown a little with zoom.</summary>
