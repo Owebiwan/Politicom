@@ -22,6 +22,7 @@ public partial class StatePicker : Control
     private HashSet<string> _playable = new();
     private readonly List<(AtlasState State, ArrayMesh Mesh, Rect2 Box, Vector2[][] Rings)> _states = new();
     private ImageTexture? _relief;
+    private ShaderMaterial? _seaMaterial;
     private ArrayMesh? _land;
     private float _zoom = 1;
     private Vector2 _pan;
@@ -42,6 +43,12 @@ public partial class StatePicker : Control
         ClipContents = true;
         TextureFilter = TextureFilterEnum.LinearWithMipmaps;
         _relief = MapView.LoadShade(MapView.ReliefDir + "world.shade");
+        // The same animated sea as the main map, behind everything.
+        _seaMaterial = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/sea.gdshader") };
+        if (ResourceLoader.Exists("res://map/coast.png")) _seaMaterial.SetShaderParameter("coast", GD.Load<Texture2D>("res://map/coast.png"));
+        var sea = new ColorRect { Material = _seaMaterial, ShowBehindParent = true, MouseFilter = MouseFilterEnum.Ignore };
+        sea.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        AddChild(sea);
     }
 
     /// <summary>Shows an era's map; keeps the selection if that state exists in it.</summary>
@@ -214,7 +221,15 @@ public partial class StatePicker : Control
 
     public override void _Draw()
     {
-        DrawRect(new Rect2(Vector2.Zero, Size), Sea);
+        if (_seaMaterial != null)
+        {
+            var degPerPx = new Vector2(1 / Scale, -1 / Scale);
+            _seaMaterial.SetShaderParameter("deg_per_px", degPerPx);
+            _seaMaterial.SetShaderParameter("origin", -Origin * degPerPx);
+            _seaMaterial.SetShaderParameter("size", Size);
+            _seaMaterial.SetShaderParameter("paper", 0f);
+        }
+        else DrawRect(new Rect2(Vector2.Zero, Size), Sea);
         if (_atlas is null) return;
         var font = ThemeDB.FallbackFont;
         var xf = new Transform2D(new Vector2(Scale, 0), new Vector2(0, -Scale), Origin);

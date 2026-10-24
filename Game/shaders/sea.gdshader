@@ -61,7 +61,7 @@ void fragment() {
     col += spec * 0.28 * vec3(1.0, 0.95, 0.82);
 
     // Foam: a broken band a few screen pixels wide along the coast.
-    float band = max(km_px * 6.0, 1.5);
+    float band = clamp(km_px * 6.0, 1.5, 60.0); // a few pixels close in, never a halo zoomed out
     float foam = (1.0 - smoothstep(band * 0.25, band, dkm)) * (0.45 + 0.55 * noise(p * 3.0 + vec2(t * 3.0, -t * 2.0)));
     col = mix(col, foam_col, has_coast ? clamp(foam, 0.0, 1.0) * 0.6 : 0.0);
 
