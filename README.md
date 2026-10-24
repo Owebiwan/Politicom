@@ -214,7 +214,7 @@ The map is modelled on Victoria 3's:
   cream over the sea and brown ink on the paper chart.
 - **Data:** `tools/geo/build_sea.py` builds the coast-distance field and the land-cover texture
   in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
-  ground (`Game/data/land/`) from NASA's Blue Marble and its elevation (public domain).
+  ground (`Data/land/`, mirrored into the game) from NASA's Blue Marble and its elevation (public domain).
 
 ## Relief
 

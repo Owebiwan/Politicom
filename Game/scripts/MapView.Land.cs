@@ -6,7 +6,7 @@ namespace Politicom.Game;
 
 /// <summary>
 /// The land layer: the world's countries and the region's communes drawn over the real ground
-/// (Game/data/land, from tools/geo/build_land.py) by shaders/land.gdshader, each colour a tint
+/// (Data/land, from tools/geo/build_land.py) by shaders/land.gdshader, each colour a tint
 /// that keeps the terrain's light and shade, as on Victoria 3's map. The layer sits behind the
 /// map (over the sea) and holds its shapes in layout space; panning and zooming only move and
 /// scale it, so its drawing is recorded again only when colours change.

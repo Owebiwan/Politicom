@@ -17,7 +17,7 @@
   <!-- ../Data is the single source of truth. Mirror it into res://data so exports pack it. -->
   <Target Name="MirrorGameData" BeforeTargets="BeforeBuild">
     <ItemGroup>
-      <GameData Include="../Data/**/*.json;../Data/**/*.shade" />
+      <GameData Include="../Data/**/*.json;../Data/**/*.shade;../Data/**/*.land" />
     </ItemGroup>
     <Copy SourceFiles="@(GameData)" DestinationFiles="@(GameData->'data/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>

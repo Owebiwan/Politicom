@@ -11,7 +11,7 @@
   licence. Distributing a build that contains them means distributing it under GPL-3.0 terms,
   or replacing these files.
 - Land, lakes, rivers, land borders and provinces: **Natural Earth** (naturalearthdata.com), public domain.
-- The ground under the map (`Game/data/land/`): **NASA Earth Observatory**, Blue Marble: Next
+- The ground under the map (`Data/land/`, mirrored into the game): **NASA Earth Observatory**, Blue Marble: Next
   Generation (July 2004, with topography and bathymetry) and the GEBCO-derived elevation
   published with it, public domain. Graded and hill-shaded by `tools/geo/build_land.py`.
 - Land cover and coastlines for the sea (`Game/map/`): **Natural Earth I** land cover and

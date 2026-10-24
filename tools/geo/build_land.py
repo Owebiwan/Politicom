@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Builds Game/data/land/: the ground under the map, from NASA's Blue Marble Next Generation
+Builds Data/land/ (mirrored into Game/data/land/ by the build): the ground under the map, from NASA's Blue Marble Next Generation
 (July 2004, with topography and bathymetry, 21600 x 10800, about 1.85 km a pixel) and the
 GEBCO-derived elevation that comes with it (gebco_08_rev_elev_21600x10800.png). Both are
 NASA Earth Observatory images, public domain.
