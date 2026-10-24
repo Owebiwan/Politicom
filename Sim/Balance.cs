@@ -206,6 +206,8 @@ public sealed class Balance
     /// <summary>Share of the gap to what a commune volunteers that closes each week.</summary>
     public double MobilizationPull { get; set; } = 0.08;
     public double MaxMobilization { get; set; } = 0.35;
+    /// <summary>How much more a fully militant commune volunteers than a pacific one (0 = no difference).</summary>
+    public double VolunteerMilitancy { get; set; } = 0.3;
     /// <summary>Militia share added by a call for volunteers (half that in the neighbours).</summary>
     public double VolunteerCall { get; set; } = 0.05;
     public double CostVolunteers { get; set; } = 8;

@@ -14,7 +14,7 @@ internal static class MilitiaSystem
         var b = w.Balance;
         foreach (var c in w.Federation)
         {
-            double volunteers = w.BaselineMobilization(c) * (0.7 + 0.6 * CommuneValues.To01(c.Values.Militancy)) * (0.5 + 0.625 * w.Enthusiasm);
+            double volunteers = w.BaselineMobilization(c) * (1 - b.VolunteerMilitancy / 2 + b.VolunteerMilitancy * CommuneValues.To01(c.Values.Militancy)) * (0.5 + 0.625 * w.Enthusiasm);
             double target = Math.Min(b.MaxMobilization, w.Conscription ? Math.Max(volunteers, b.ConscriptionFloor) : volunteers);
             c.Mobilization += (target - c.Mobilization) * Math.Min(1, b.MobilizationPull * w.Weeks);
             if (c.Front && c.Pressure > c.Defense && c.Defense > 0)

@@ -641,11 +641,11 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           30%       70%     0% │    61    49     10    66    47 │    60
-educator          93%        7%     0% │    63    51     16    77    52 │    37
-centralizer        0%        0%   100% │    34    50      3    52    35 │   100
-balanced         100%        0%     0% │    83    52     14    81    57 │    29
-trader            96%        0%     4% │    85    52     13    72    56 │    48
+passive            6%       94%     0% │    58    49      8    66    45 │    64
+educator          85%       15%     0% │    64    51     15    78    52 │    38
+centralizer        0%        0%   100% │    26    50      2    50    32 │   100
+balanced          94%        0%     6% │    87    51     13    71    56 │    50
+trader            87%        0%    13% │    85    52     13    65    54 │    64
 ```
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
@@ -657,11 +657,11 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    67    49     11    86    53 │    33
-educator           0%      100%     0% │    65    51     11    90    54 │    20
-centralizer        0%        0%   100% │    32    48      2    55    34 │   100
-balanced          70%        0%    30% │    86    49     12    67    54 │    73
-trader            43%        1%    56% │    81    49     11    64    51 │    77
+passive            0%      100%     0% │    65    49     11    83    52 │    38
+educator           2%       98%     0% │    70    51     12    90    56 │    20
+centralizer        0%        0%   100% │    28    48      2    50    32 │   100
+balanced          80%        1%    19% │    87    50     12    68    54 │    72
+trader            31%        1%    68% │    80    49     11    60    50 │    87
 ```
 
 There, refusing to centralize at all means being crushed by the final Red offensive, but
@@ -671,11 +671,11 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    82    67      7    91    62 │    26
-educator           0%      100%     0% │    79    67      7    96    62 │     6
-centralizer        0%        0%   100% │    84    64      5    51    51 │   100
-balanced          30%       70%     0% │    96    68      7    93    66 │    16
-trader            44%       56%     0% │    96    68      7    90    65 │    22
+passive            0%      100%     0% │    82    67      7    91    62 │    27
+educator           0%      100%     0% │    80    67      7    96    62 │     7
+centralizer        0%        0%   100% │    78    63      4    48    49 │   100
+balanced          31%       69%     0% │    96    68      7    92    65 │    18
+trader            48%       52%     0% │    96    68      7    90    65 │    23
 ```
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in
