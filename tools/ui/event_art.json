@@ -326,5 +326,21 @@
    0.5,
    0.6
   ]
+ },
+ "press_earlymodern": {
+  "file": "File:De uitvinding van de boekdrukkunst, objectno PK.OPB.0186.005.jpg",
+  "caption": "A printing shop, after Stradanus (c. 1590)",
+  "focus": [
+   0.5,
+   0.45
+  ]
+ },
+ "uprising_contemporary": {
+  "file": "File:A Young Woman Holds a Banner at the Civil Rights March on Washington, D.C., on August 28, 1963.jpg",
+  "caption": "The March on Washington for Jobs and Freedom, 1963",
+  "focus": [
+   0.5,
+   0.45
+  ]
  }
 }
