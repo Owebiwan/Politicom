@@ -216,6 +216,23 @@ The map is modelled on Victoria 3's:
   in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
   ground (`Data/land/`, mirrored into the game) from NASA's Blue Marble and its elevation (public domain).
 
+## The 3D map
+
+The map is three-dimensional, as Victoria 3's is (`Game/scripts/Map3D.cs`,
+`Game/shaders/terrain3d.gdshader`):
+- **Ground:** the flat map (`MapView`) is drawn off-screen and laid over a grid raised by the
+  real elevation (NASA's GEBCO-derived elevation, `Data/land/height.land`), mountains
+  exaggerated about sevenfold and lit from the north-west.
+- **Camera:** a perspective camera looks straight down over the world and tilts toward the
+  horizon (up to 38°) as you zoom in, the distance fading into haze. Settings → "Tilt the map
+  as you zoom in" turns the tilt off.
+- **How it fits together:** the flat map keeps its size and behaviour; it sits at the foot of
+  a larger canvas (the area the tilted camera can see) and draws beyond its own edges into
+  it. Pointer input is cast onto the ground and handed to the flat map in its coordinates, so
+  clicking, dragging, scrolling and pinching work as before. The legend, banner and tooltips
+  are drawn flat on an overlay, and the colour grade, vignette and falling snow lie over the
+  screen.
+
 ## Towns, armies and seasons on the map
 
 - **Settlements:** zoomed in, each commune is a small town of buildings in oblique view, lit

@@ -41,7 +41,7 @@ public partial class MapView
     private void DrawRelief()
     {
         if (!ShowRelief || Geo is null || Generated) return;
-        var view = new Rect2(Vector2.Zero, Size);
+        var view = ViewRect;
         var world = LonLatRect(-180, -90, 180, 90);
         // The overview while each of its pixels covers no more than about one and a half on screen; tiles closer in.
         if (world.Size.X / OverviewWidth <= 1.5f)

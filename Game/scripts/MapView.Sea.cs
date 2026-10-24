@@ -52,9 +52,10 @@ public partial class MapView
         float perLon = ToScreen(_project(new Vector2(1, 0))).X - p0.X;
         float perLat = ToScreen(_project(new Vector2(0, 1))).Y - p0.Y;
         var degPerPx = new Vector2(1 / perLon, 1 / perLat);
+        Cover(_sea);
         _seaMaterial!.SetShaderParameter("deg_per_px", degPerPx);
-        _seaMaterial.SetShaderParameter("origin", -p0 * degPerPx);
-        _seaMaterial.SetShaderParameter("size", Size);
+        _seaMaterial.SetShaderParameter("origin", -(p0 - ViewRect.Position) * degPerPx);
+        _seaMaterial.SetShaderParameter("size", ViewRect.Size);
         _seaMaterial.SetShaderParameter("has_coast", !Generated);
         _seaMaterial.SetShaderParameter("paper", PaperBlend());
     }
@@ -79,9 +80,12 @@ public partial class MapView
         float perLon = ToScreen(_project(new Vector2(1, 0))).X - p0.X;
         float perLat = ToScreen(_project(new Vector2(0, 1))).Y - p0.Y;
         var degPerPx = new Vector2(1 / perLon, 1 / perLat);
+        Cover(_grade);
         _gradeMaterial!.SetShaderParameter("deg_per_px", degPerPx);
-        _gradeMaterial.SetShaderParameter("origin", -p0 * degPerPx);
-        _gradeMaterial.SetShaderParameter("size", Size);
+        _gradeMaterial.SetShaderParameter("origin", -(p0 - ViewRect.Position) * degPerPx);
+        _gradeMaterial.SetShaderParameter("size", ViewRect.Size);
+        // With the 3D map the grade, vignette and snowfall belong to the screen, not the ground.
+        _gradeMaterial.SetShaderParameter("grade", ExternalUi ? 0f : 1f);
         // Clouds gather as the view widens, and clear for the paper chart.
         float km = KmPerPixel();
         float clouds = Mathf.SmoothStep(4f, 9f, km) * (1 - PaperBlend());
@@ -91,7 +95,21 @@ public partial class MapView
         float winter = lat >= 0 ? Winter(north: true) : Winter(north: false);
         float line = 66 - 12 * winter; // as the land shader's snow line
         float snowfall = ShowRelief ? winter * Mathf.SmoothStep(line - 6, line + 2, Mathf.Abs(lat)) * (1 - Mathf.SmoothStep(1.5f, 3f, km)) : 0f;
-        _gradeMaterial.SetShaderParameter("snowfall", snowfall);
+        Snowfall = snowfall;
+        _gradeMaterial.SetShaderParameter("snowfall", ExternalUi ? 0f : snowfall);
+    }
+
+    /// <summary>How hard snow is falling on the view (for the 3D map's screen overlay).</summary>
+    public float Snowfall { get; private set; }
+
+    /// <summary>Stretches a full-rect child over the area the map draws into.</summary>
+    private void Cover(Control c)
+    {
+        var r = ViewRect;
+        c.OffsetLeft = r.Position.X;
+        c.OffsetTop = r.Position.Y;
+        c.OffsetRight = r.End.X - Size.X;
+        c.OffsetBottom = r.End.Y - Size.Y;
     }
 
     private static void LoadTerrain()

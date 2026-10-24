@@ -288,7 +288,7 @@ public partial class MapView : Control
     public override void _Ready()
     {
         MouseFilter = MouseFilterEnum.Stop;
-        ClipContents = true;
+        ClipContents = !ExternalUi;
         TextureFilter = TextureFilterEnum.LinearWithMipmaps; // the relief is stretched far beyond its pixels
     }
 
@@ -302,6 +302,25 @@ public partial class MapView : Control
         bool moving = _armies.Values.Any(a => a.Position.DistanceSquaredTo(a.Target) > 0.25f || (a.Alpha > 0 && a.Alpha < 1));
         bool marching = w.ActiveProjects.Any(p => p.Kind == ProjectKind.DefensiveCampaign) || w.OffensiveUnderway;
         if (moving || marching || w.PendingSecessions.Count > 0 || w.Ally.OfferPending) QueueRedraw();
+    }
+
+    private bool _feeding;
+
+    /// <summary>Input from the 3D map, already turned into this map's coordinates.</summary>
+    public void Feed(InputEvent e)
+    {
+        _feeding = true;
+        try { _GuiInput(e); }
+        finally { _feeding = false; }
+    }
+
+    /// <summary>The pointer has left the map: no hover tooltips.</summary>
+    public void ClearHover()
+    {
+        _hover = null;
+        _hoverCity = null;
+        _hoverState = null;
+        QueueRedraw();
     }
 
     public override void _GuiInput(InputEvent e)
@@ -386,7 +405,7 @@ public partial class MapView : Control
             default:
                 return;
         }
-        AcceptEvent();
+        if (!_feeding) AcceptEvent();
     }
 
     public override void _Draw()
@@ -394,7 +413,7 @@ public partial class MapView : Control
         // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
         if (World is not { } w) return;
         // A city map has no sea: it sits on land (under the land layer, which draws the ground itself).
-        if (!SeaShown && !LandActive) DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : NeutralLand);
+        if (!SeaShown && !LandActive) DrawRect(ViewRect, Geo == null ? Background : NeutralLand);
         Layout(); // the projection the sea follows
         Cells();  // generated and city maps settle their fit here: the land layer must follow it
         UpdateSea();
@@ -502,9 +521,7 @@ public partial class MapView : Control
             DrawWars();
             DrawRegionMarker();
             DrawGlobeLabels(font, new List<Rect2>());
-            DrawLegend(font);
-            if (_hoverState is { } hs) DrawStateTooltip(font, hs);
-            DrawBanner(font);
+            if (!ExternalUi) DrawHud(font);
             return;
         }
         if (globe && _zoom < 0.6f) DrawGlobeLabels(font, new List<Rect2>());
@@ -603,9 +620,35 @@ public partial class MapView : Control
         }
 
         DrawForeignCities(font, taken);
+        if (!ExternalUi) DrawHud(font);
+    }
+
+    // ── The HUD: legend, banner and tooltips ─────────────────────────────────
+    // Drawn on the map itself, or (with the 3D map) flat on an overlay above it, so they never tilt.
+
+    private CanvasItem? _ui;
+    private Vector2 _uiMouse;
+    private CanvasItem Ui => _ui ?? this;
+    private Vector2 UiMouse => _ui != null ? _uiMouse : _mouse;
+
+    /// <summary>When set, the legend, banner and tooltips are left to <see cref="DrawUi"/> (the 3D map's flat overlay).</summary>
+    public bool ExternalUi { get; set; }
+
+    /// <summary>Draws the legend, banner and tooltips on another canvas, with the pointer at `mouse` there.</summary>
+    public void DrawUi(CanvasItem target, Vector2 mouse)
+    {
+        _ui = target;
+        _uiMouse = mouse;
+        try { DrawHud(ThemeDB.FallbackFont); }
+        finally { _ui = null; }
+    }
+
+    private void DrawHud(Font font)
+    {
+        if (World is not { } w) return;
         DrawLegend(font);
-        if (_hover is int h) DrawTooltip(font, w, w.Communes[h]);
-        else if (_hoverCity is { } hc) DrawCityTooltip(font, hc.State, hc.City);
+        if (!AtWorldZoom && _hover is int h) DrawTooltip(font, w, w.Communes[h]);
+        else if (!AtWorldZoom && _hoverCity is { } hc) DrawCityTooltip(font, hc.State, hc.City);
         else if (_hoverState is { } hs) DrawStateTooltip(font, hs);
         DrawBanner(font);
     }
@@ -617,10 +660,10 @@ public partial class MapView : Control
         var face = UiTheme.Display;
         var size = face.GetStringSize(banner, HorizontalAlignment.Left, -1, 26);
         var plate = new Rect2(new Vector2((Size.X - size.X) / 2 - 56, Size.Y - LegendHeight - 78), new Vector2(size.X + 112, 52));
-        DrawStyleBox(UiTheme.TitlePlateStyle(), plate);
+        Ui.DrawStyleBox(UiTheme.TitlePlateStyle(), plate);
         var at = new Vector2(plate.Position.X + 56, plate.Position.Y + 35);
-        DrawString(face, at + new Vector2(0, 2), banner, HorizontalAlignment.Left, -1, 26, new Color(0, 0, 0, 0.6f));
-        DrawString(face, at, banner, HorizontalAlignment.Left, -1, 26, UiTheme.GoldBright);
+        Ui.DrawString(face, at + new Vector2(0, 2), banner, HorizontalAlignment.Left, -1, 26, new Color(0, 0, 0, 0.6f));
+        Ui.DrawString(face, at, banner, HorizontalAlignment.Left, -1, 26, UiTheme.GoldBright);
     }
 
     private Vector2[] Screen(Vector2[] layout) => layout.Select(ToScreen).ToArray();
@@ -775,9 +818,9 @@ public partial class MapView : Control
             MapMode.Revolution => "Revolution — how radicalized each state's workers are: dark none, bright red near revolt.",
             _ => "Wellbeing — rust low, sand middling, green high.",
         };
-        DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
-        DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
-        DrawString(font, new Vector2(14, Size.Y - 14),
+        Ui.DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
+        Ui.DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
+        Ui.DrawString(font, new Vector2(14, Size.Y - 14),
 "Drag to move · scroll or pinch to zoom · click to select. Soldiers: enemy armies. Flag-bearers: your militia. Ruins: occupied. Rails: railways. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
@@ -796,12 +839,12 @@ public partial class MapView : Control
         };
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;
         float height = lines.Length * 17 + 12;
-        var at = _mouse + new Vector2(16, 16);
-        if (at.X + width > Size.X) at.X = _mouse.X - width - 8;
-        if (at.Y + height > Size.Y) at.Y = _mouse.Y - height - 8;
-        DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4)); // the same gold-rimmed frame as the interface's tooltips
+        var at = UiMouse + new Vector2(16, 16);
+        if (at.X + width > Size.X) at.X = UiMouse.X - width - 8;
+        if (at.Y + height > Size.Y) at.Y = UiMouse.Y - height - 8;
+        Ui.DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4)); // the same gold-rimmed frame as the interface's tooltips
         for (int i = 0; i < lines.Length; i++)
-            DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
+            Ui.DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
     }
 
     // ── Projection ──────────────────────────────────────────────────────────
@@ -1149,6 +1192,29 @@ public partial class MapView : Control
     private static float Marker(Commune c) => 2.5f + Mathf.Sqrt((float)c.Population) * 0.45f;
 
     /// <summary>A settlement sprite's size: 24 px for a village, up to 40 for a city, grown a little with zoom.</summary>
+    /// <summary>
+    /// The area the map draws into, in its own coordinates. Normally its own rectangle; the 3D map
+    /// widens it, since a tilted camera sees land beyond the map's edges.
+    /// </summary>
+    public Rect2? ExtentOverride { get; set; }
+    private Rect2 ViewRect => ExtentOverride ?? new Rect2(Vector2.Zero, Size);
+
+    public float Zoom => _zoom;
+    /// <summary>Real geography with a world map (not generated, not a city map): the 3D map raises its relief.</summary>
+    public bool RealGeography => SeaShown && !Generated && Globe != null;
+    public float KilometresPerPixel => KmPerPixel();
+    /// <summary>Longitude and latitude at the extent's top-left, and degrees per pixel.</summary>
+    public (Vector2 Origin, Vector2 DegPerPx) LonLatFrame
+    {
+        get
+        {
+            var p0 = ToScreen(_project(Vector2.Zero));
+            float perLon = ToScreen(_project(new Vector2(1, 0))).X - p0.X, perLat = ToScreen(_project(new Vector2(0, 1))).Y - p0.Y;
+            var deg = new Vector2(1 / perLon, 1 / perLat);
+            return (-(p0 - ViewRect.Position) * deg, deg);
+        }
+    }
+
     /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
     private bool Settlements => _zoom >= 0.6f;
 

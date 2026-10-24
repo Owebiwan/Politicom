@@ -41,7 +41,7 @@ public partial class MapView
     {
         _citiesShown.Clear();
         if (Globe_Layout() is not { } g || World is not { } w) return;
-        var view = new Rect2(Vector2.Zero, Size).Grow(-4);
+        var view = ViewRect.Grow(-4);
         var communes = w.Communes.Select(c => ToScreen(c)).ToList();
         var recent = w.Missions.Where(m => m.Tick >= w.Tick - 26).ToList();
         string sprite = w.Year < 1750 ? "oldtown" : "town";
@@ -114,11 +114,11 @@ public partial class MapView
         else lines.Add("The seat of your country's government");
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;
         float height = lines.Count * 17 + 12;
-        var at = _mouse + new Vector2(16, 16);
-        if (at.X + width > Size.X) at.X = _mouse.X - width - 8;
-        if (at.Y + height > Size.Y) at.Y = _mouse.Y - height - 8;
-        DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4));
+        var at = UiMouse + new Vector2(16, 16);
+        if (at.X + width > Size.X) at.X = UiMouse.X - width - 8;
+        if (at.Y + height > Size.Y) at.Y = UiMouse.Y - height - 8;
+        Ui.DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4));
         for (int i = 0; i < lines.Count; i++)
-            DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : i == lines.Count - 1 && sim != null ? new Color("d9b45a") : Label);
+            Ui.DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : i == lines.Count - 1 && sim != null ? new Color("d9b45a") : Label);
     }
 }

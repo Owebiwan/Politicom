@@ -326,7 +326,7 @@ public partial class MapView
             DrawSetTransform(Vector2.Zero, 0, Vector2.One);
         }
 
-        var view = new Rect2(-o / s, Size / s); // the visible area, in layout space
+        var view = new Rect2((ViewRect.Position - o) / s, ViewRect.Size / s); // the visible area, in layout space
         bool InRegion(Vector2 a, Vector2 b) => _zoom >= DetailZoom && g.Region.HasPoint((a + b) / 2);
         if (Generated)
         {
@@ -437,7 +437,7 @@ public partial class MapView
         if (Globe_Layout() is not { } g || Globe is null) return;
         var face = UiTheme.Display;
         float s = _fitScale * _zoom;
-        var view = new Rect2(Vector2.Zero, Size);
+        var view = ViewRect;
         foreach (var state in Globe.States.OrderByDescending(st => g.Labels[st.Id].Area))
         {
             var (at, angle, length) = g.NameLines[state.Id];
@@ -513,11 +513,11 @@ public partial class MapView
         else if (World?.Scenario.HomeState == s.Id) lines.Add("Your federation's own country");
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;
         float height = lines.Count * 17 + 12;
-        var at = _mouse + new Vector2(16, 16);
-        if (at.X + width > Size.X) at.X = _mouse.X - width - 8;
-        if (at.Y + height > Size.Y) at.Y = _mouse.Y - height - 8;
-        DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4)); // the same gold-rimmed frame as the interface's tooltips
+        var at = UiMouse + new Vector2(16, 16);
+        if (at.X + width > Size.X) at.X = UiMouse.X - width - 8;
+        if (at.Y + height > Size.Y) at.Y = UiMouse.Y - height - 8;
+        Ui.DrawStyleBox(UiTheme.FramePanel(0), new Rect2(at, new Vector2(width, height)).Grow(4)); // the same gold-rimmed frame as the interface's tooltips
         for (int i = 0; i < lines.Count; i++)
-            DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
+            Ui.DrawString(font, at + new Vector2(10, 20 + i * 17), lines[i], HorizontalAlignment.Left, -1, i == 0 ? 15 : 13, i == 0 ? Colors.White : Label);
     }
 }

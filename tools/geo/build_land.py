@@ -13,6 +13,7 @@ coastlines decide where land ends (the land is drawn inside the map's polygons),
 blue fringe; lakes inside the land keep their water.
 
 - world.land: the whole world, 4096 x 2048, for zoomed-out views.
+- height.land: elevation, 4096 x 2048 grey (0 at sea level, white at Everest), for the 3D map.
 - t_<col>_<row>.land: 30 x 30 degree tiles at full resolution (1800 x 1800), assembled in the
   game into one texture around the scenario's region. Column 0 starts at 180 W, row 0 at 90 N.
   Tiles with no land are left out.
@@ -98,6 +99,9 @@ def main():
     PX_PER_DEG, full = 4096 / 360, PX_PER_DEG
     Image.fromarray(finish(small, small_elev)).save(os.path.join(out, "world.land"), "WEBP", quality=84, method=6)
     PX_PER_DEG = full
+
+    # Elevation for the 3D map's relief: 0 at sea level, 1 at Everest.
+    Image.fromarray(elev).resize((4096, 2048), Image.BOX).save(os.path.join(out, "height.land"), "WEBP", lossless=True)
 
     tile, margin, n = TILE_DEG * PX_PER_DEG, 96, 0
     for row in range(180 // TILE_DEG):

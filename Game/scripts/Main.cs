@@ -28,6 +28,21 @@ public partial class Main : Control
     private Button _stepButton = null!;
     private HistoryChart _history = null!;
     private Control? _overlay;
+    private Map3D _map3d = null!;
+
+    private static bool LoadTiltSetting()
+    {
+        var config = new ConfigFile();
+        return config.Load("user://settings.cfg") != Error.Ok || config.GetValue("map", "tilt", true).AsBool();
+    }
+
+    private static void SaveTiltSetting(bool tilt)
+    {
+        var config = new ConfigFile();
+        config.Load("user://settings.cfg");
+        config.SetValue("map", "tilt", tilt);
+        config.Save("user://settings.cfg");
+    }
     /// <summary>The start menu, while it's open; and whether a game has been started or loaded since launch.</summary>
     private Control? _menu;
     private bool _inGame;
@@ -516,6 +531,12 @@ public partial class Main : Control
         var music = Slider("Music", audio.MusicVolume);
         var sound = Slider("Sounds", audio.SoundVolume);
         var mute = new CheckBox { Text = "Mute everything", ButtonPressed = audio.Muted };
+        var tilt = new CheckBox { Text = "Tilt the map as you zoom in (3D)", ButtonPressed = _map3d.Tilt };
+        tilt.Toggled += on =>
+        {
+            _map3d.Tilt = on;
+            SaveTiltSetting(on);
+        };
         void Apply() => audio.SetVolumes((float)music.Value / 100, (float)sound.Value / 100, mute.ButtonPressed);
         music.ValueChanged += _ => Apply();
         sound.ValueChanged += _ => { Apply(); audio.Play("click"); };
@@ -524,6 +545,7 @@ public partial class Main : Control
         box.AddThemeConstantOverride("separation", 12);
         box.AddChild(grid);
         box.AddChild(mute);
+        box.AddChild(tilt);
         box.AddChild(new Label
         {
             Text = "Music from Wikimedia Commons (public domain and Creative Commons recordings, credited as each piece starts); interface sounds by Kenney (CC0).",
@@ -604,7 +626,7 @@ public partial class Main : Control
             });
         if (saves.Count > 0) Item("Load game", "Any saved game.", () => ShowLoadDialog(ShowStartMenu));
         Item("Leaderboard", "Your finished games, ranked by score.", () => ShowLeaderboard(ShowStartMenu));
-        Item("Settings", "Music and sound volumes.", ShowSettings);
+        Item("Settings", "Music, sound and the map.", ShowSettings);
         Item("Quit", "", () => GetTree().Quit());
 
         var credit = new Label
@@ -1098,7 +1120,8 @@ public partial class Main : Control
         _map.CommuneClicked += OnCommuneClicked;
         _map.StateClicked += SelectState;
         _map.CityClicked += ShowMission;
-        root.AddChild(_map);
+        _map3d = new Map3D(_map) { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsStretchRatio = 3, Tilt = LoadTiltSetting() };
+        root.AddChild(_map3d);
 
         // Top-right of the map, clear of the commune list (bottom-left). They fade after a few seconds.
         _toasts = new ToastStack
@@ -1106,7 +1129,7 @@ public partial class Main : Control
             AnchorLeft = 1, AnchorRight = 1,
             OffsetLeft = -460, OffsetRight = -16, OffsetTop = 16, OffsetBottom = 300,
         };
-        _map.AddChild(_toasts);
+        _map3d.AddChild(_toasts);
         _communeList = new CommuneList
         {
             Visible = false,
@@ -1120,7 +1143,7 @@ public partial class Main : Control
             _map.CenterOn(id);
             Refresh();
         };
-        _map.AddChild(_communeList);
+        _map3d.AddChild(_communeList);
 
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(360, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(14)); // clear of the corner ornaments
