@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Politicom.Sim;
 
@@ -23,6 +24,13 @@ public partial class MapView
     private sealed record Building(Vector2 Offset, float Width, float Depth, float Height, int Kind, int Tone);
 
     private readonly Dictionary<(int Id, int Count, Age Age, CommuneKind Kind), List<Building>> _plans = new();
+
+    /// <summary>A town's buildings for the 3D map: offsets (in town sizes), footprint, height, kind and tone.</summary>
+    public IReadOnlyList<(Vector2 Offset, float Width, float Depth, float Height, int Kind, int Tone)> TownPlan(Commune c)
+    {
+        var plan = Plan(c, AgeOf(World?.Year ?? 1900));
+        return plan.Select(b => (b.Offset, b.Width, b.Depth, b.Height, b.Kind, b.Tone)).ToList();
+    }
 
     /// <summary>Building kinds: 0 house, 1 landmark (temple, church, cathedral, town hall), 2 chimney, 3 block.</summary>
     private List<Building> Plan(Commune c, Age age)
@@ -63,7 +71,7 @@ public partial class MapView
     };
 
     /// <summary>Draws a town as a settlement at p, about `size` pixels across.</summary>
-    private void DrawSettlement(Commune c, Vector2 p, float size, bool highlight)
+    private void DrawSettlement(Commune c, Vector2 p, float size, bool highlight, bool buildings = true)
     {
         int year = World?.Year ?? 1900;
         var age = AgeOf(year);
@@ -77,6 +85,7 @@ public partial class MapView
         if (highlight) DrawEllipse(p, s * 0.55f, s * 0.33f, new Color(1, 0.95f, 0.75f, 0.22f));
         if (age == Age.Medieval && plan.Count >= 10 && !ruined)
             DrawArc(p, s * 0.47f, 0, Mathf.Tau, 40, new Color(0.55f, 0.5f, 0.42f, 0.9f), Mathf.Max(1.5f, s * 0.035f), true); // town walls
+        if (!buildings) return; // the 3D map stands its models here
         var dim = c.Federated || ruined ? Colors.White : new Color(0.72f, 0.72f, 0.72f);
         foreach (var b in plan)
         {

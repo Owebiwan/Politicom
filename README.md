@@ -233,6 +233,21 @@ The map is three-dimensional, as Victoria 3's is (`Game/scripts/Map3D.cs`,
   are drawn flat on an overlay, and the colour grade, vignette and falling snow lie over the
   screen.
 
+### Models on the 3D map
+
+Close in, towns, armies and militia are 3D models standing on the raised ground
+(`Game/scripts/Map3D.Objects.cs`, models in `Game/models/` from Kenney's Fantasy Town, Castle,
+City (industrial, commercial) and Mini Characters kits, CC0):
+- **Towns** are built from the flat map's plan for each commune, painted for their age: houses
+  with tiled gable roofs (whitewashed under Roman tiles in antiquity, sandstone and terracotta
+  or slate later), a temple, a church tower or a domed tower; factories with brick chimneys
+  trailing smoke once industry comes; blocks of flats in the twentieth century; broken walls
+  where a town is occupied.
+- **Armies** are companies of figures in the enemy's colour, more of them the stronger the
+  army, with rifles (spears before 1700) under a standard rippling in the wind; the **militia**
+  stand in their own clothes under the black-and-red flag.
+- Zoomed out, the flat map's emblems take over again.
+
 ## Towns, armies and seasons on the map
 
 - **Settlements:** zoomed in, each commune is a small town of buildings in oblique view, lit

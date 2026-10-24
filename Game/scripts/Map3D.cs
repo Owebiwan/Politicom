@@ -49,6 +49,7 @@ public partial class Map3D : Control
     {
         Map = map;
         map.ExternalUi = true;
+        map.Objects3D = true;
         ClipContents = true;
         MouseFilter = MouseFilterEnum.Stop;
     }
@@ -74,9 +75,11 @@ public partial class Map3D : Control
             {
                 BackgroundMode = Godot.Environment.BGMode.Color, BackgroundColor = haze,
                 TonemapMode = Godot.Environment.ToneMapper.Linear,
+                AmbientLightSource = Godot.Environment.AmbientSource.Color, AmbientLightColor = new Color(0.78f, 0.8f, 0.86f), AmbientLightEnergy = 0.75f,
             },
         });
         _groundMaterial.SetShaderParameter("haze", haze);
+        SetUpObjects();
 
         // The screen's colour grade, vignette and snowfall, then the flat legend and tooltips.
         AddChild(new BackBufferCopy { CopyMode = BackBufferCopy.CopyModeEnum.Viewport });
@@ -163,7 +166,9 @@ public partial class Map3D : Control
         _groundMaterial.SetShaderParameter("origin", origin);
         _groundMaterial.SetShaderParameter("deg_per_px", deg);
         float lift = relief ? Exaggeration / Mathf.Max(0.05f, Map.KilometresPerPixel * 1000) : 0;
-        _groundMaterial.SetShaderParameter("lift", Mathf.Min(lift, 0.02f));
+        lift = Mathf.Min(lift, 0.02f);
+        _groundMaterial.SetShaderParameter("lift", lift);
+        SyncObjects(lift);
         _groundMaterial.SetShaderParameter("haze_near", Distance * 1.05f);
         _groundMaterial.SetShaderParameter("haze_far", Distance * 2.4f);
         _groundMaterial.SetShaderParameter("haze_amount", Mathf.Clamp(_tilt / Mathf.DegToRad(MaxTilt), 0, 1) * 0.85f);

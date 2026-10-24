@@ -160,7 +160,7 @@ public partial class MapView : Control
     }
 
     /// <summary>NATO-style infantry symbol: a box with a cross, in the enemy's colour.</summary>
-    private void DrawArmy(Vector2 at, float strength, Color color, float alpha, bool attacking, Vector2 towards, Font font)
+    private void DrawArmy(Vector2 at, float strength, Color color, float alpha, bool attacking, Vector2 towards, Font font, bool figures = true)
     {
         float scale = Mathf.Clamp(0.75f + Mathf.Sqrt(strength) * 0.35f, 0.75f, 2f) * Mathf.Sqrt(_zoom);
         var size = new Vector2(22, 14) * scale;
@@ -178,17 +178,18 @@ public partial class MapView : Control
         // A company of soldiers of the age in the enemy's colour: more figures the stronger the
         // army, in two ranks under its standard.
         bool early = World is { Year: < 1700 };
-        int figures = (int)Mathf.Clamp(Mathf.Round(1.5f + Mathf.Sqrt(strength) * 1.3f), 2, 7);
+        int count = figures ? (int)Mathf.Clamp(Mathf.Round(1.5f + Mathf.Sqrt(strength) * 1.3f), 2, 7) : 0;
         float side = 24 * scale;
         var bottom = Vector2.Zero;
-        for (int i = figures - 1; i >= 0; i--) // back rank first
+        if (!figures) bottom = at + new Vector2(0, side * 0.3f);
+        for (int i = count - 1; i >= 0; i--) // back rank first
         {
             int rank = i % 2, file = i / 2;
-            var pos = at + new Vector2((file - (figures - 1) / 4f) * side * 0.36f + rank * side * 0.18f, side * 0.3f - rank * side * 0.2f);
+            var pos = at + new Vector2((file - (count - 1) / 4f) * side * 0.36f + rank * side * 0.18f, side * 0.3f - rank * side * 0.2f);
             DrawFigure(pos, side * 0.75f, rank == 1 ? color.Darkened(0.2f) : color, color.Darkened(0.5f), alpha, early);
             bottom = new Vector2(Mathf.Max(bottom.X, pos.X), Mathf.Max(bottom.Y, pos.Y));
         }
-        DrawStandard(at + new Vector2(-side * 0.55f - (figures - 1) * side * 0.1f, -side * 0.15f), side, color, alpha);
+        if (figures) DrawStandard(at + new Vector2(-side * 0.55f - (count - 1) * side * 0.1f, -side * 0.15f), side, color, alpha);
         DrawString(font, new Vector2(at.X - 20, bottom.Y + 12), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
     }
 
@@ -411,6 +412,9 @@ public partial class MapView : Control
     public override void _Draw()
     {
         // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
+        TownSpots.Clear();
+        ArmySpots.Clear();
+        MilitiaSpots.Clear();
         if (World is not { } w) return;
         // A city map has no sea: it sits on land (under the land layer, which draws the ground itself).
         if (!SeaShown && !LandActive) DrawRect(ViewRect, Geo == null ? Background : NeutralLand);
@@ -553,7 +557,8 @@ public partial class MapView : Control
         {
             var c = w.Communes[commune];
             bool attacking = w.Enemies[enemy].CurrentOffensive != null && !c.Occupied;
-            DrawArmy(ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking, ToScreen(c), font);
+            if (ObjectsShown) ArmySpots.Add((enemy, commune, ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking));
+            DrawArmy(ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking, ToScreen(c), font, figures: !ObjectsShown);
         }
         var pts = Layout();
         var members = w.Federation.ToList();
@@ -564,7 +569,9 @@ public partial class MapView : Control
             {
                 var p = pts[c.Id];
                 var toward = (centroid - p).LengthSquared() < 1 ? Vector2.Left : (centroid - p).Normalized();
-                DrawMilitia(ToScreen(p + toward * MedianSpacing(pts) * 0.32f), (float)c.Defense, 0.95f);
+                var at = ToScreen(p + toward * MedianSpacing(pts) * 0.32f);
+                if (ObjectsShown) MilitiaSpots.Add((c.Id, at, (float)c.Defense));
+                else DrawMilitia(at, (float)c.Defense, 0.95f);
             }
         }
 
@@ -585,7 +592,8 @@ public partial class MapView : Control
                 _ => "town",
             };
             float side = SpriteSize(c);
-            if (Settlements) DrawSettlement(c, p, side, c.Id == Selected || c.Id == _hover);
+            if (ObjectsShown) TownSpots.Add((c.Id, p, side));
+            if (Settlements) DrawSettlement(c, p, side, c.Id == Selected || c.Id == _hover, buildings: !ObjectsShown);
             else if (UiTheme.Icon(town) is { } sprite)
             {
                 var rect = new Rect2(p - new Vector2(side / 2, side / 2), new Vector2(side, side)); // a round pin, centred on the town
@@ -1214,6 +1222,14 @@ public partial class MapView : Control
             return (-(p0 - ViewRect.Position) * deg, deg);
         }
     }
+
+    /// <summary>With the 3D map, towns, armies and militia close in are models: the flat map lists where they stand instead of drawing them.</summary>
+    public bool Objects3D { get; set; }
+    public bool ObjectsShown => Objects3D && Settlements && !AtWorldZoom;
+    /// <summary>Filled as the map draws (map coordinates): towns with their size, armies, and militia at the fronts.</summary>
+    public readonly List<(int Id, Vector2 At, float Size)> TownSpots = new();
+    public readonly List<(int Enemy, int Commune, Vector2 At, float Strength, Color Color, float Alpha, bool Attacking)> ArmySpots = new();
+    public readonly List<(int Commune, Vector2 At, float Defense)> MilitiaSpots = new();
 
     /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
     private bool Settlements => _zoom >= 0.6f;

@@ -50,3 +50,8 @@
   licences; each piece's performer, licence and source page are in `Data/audio/music.json`
   and shown in the game as it plays. CC BY-SA pieces stay under CC BY-SA.
 - Interface sounds: **Kenney** (kenney.nl), RPG Audio, UI Audio and Interface Sounds, CC0.
+
+## 3D models
+
+- Town, castle, city and character models in `Game/models/`: **Kenney** (kenney.nl), Fantasy
+  Town Kit, Castle Kit, City Kit (Industrial, Commercial, Suburban) and Mini Characters, CC0.
