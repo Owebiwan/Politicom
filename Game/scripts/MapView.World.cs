@@ -61,6 +61,8 @@ public partial class MapView
         public List<(Vector2[] Line, Rect2 Box)> Coasts { get; } = new();
         public List<(Vector2[] Line, Rect2 Box)> Borders { get; } = new();
         public Dictionary<string, (Vector2 At, float Area)> Labels { get; } = new();
+        /// <summary>Each state's name line: its home piece's centre, main axis (radians) and length along it.</summary>
+        public Dictionary<string, (Vector2 At, float Angle, float Length)> NameLines { get; } = new();
         public Rect2 Extent;
         public Rect2 Region;
     }
@@ -115,6 +117,7 @@ public partial class MapView
                 : default;
             var piece = home.Ring != null ? home : pieces.OrderByDescending(r => r.Box.Area).First();
             g.Labels[s.Id] = (piece.Box.GetCenter(), piece.Box.Area);
+            g.NameLines[s.Id] = NameLine(piece.Ring, piece.Box);
         }
         var all = g.Coasts.Select(c => c.Box).Concat(g.StateRings.Select(r => r.Box)).ToList();
         g.Extent = all.Aggregate(all[0], (a, b) => a.Merge(b));
@@ -383,25 +386,83 @@ public partial class MapView
     }
 
     /// <summary>Country names at world zoom: biggest first, skipped where they'd overlap or not fit.</summary>
+    /// <summary>
+    /// Where a country's name runs, as on Victoria 3's map: along the shape's longest axis (from
+    /// the outline's spread, tilted no more than 35°) through its middle, as long as the shape is.
+    /// </summary>
+    private static (Vector2 At, float Angle, float Length) NameLine(Vector2[] ring, Rect2 box)
+    {
+        var c = ring.Aggregate(Vector2.Zero, (a, b) => a + b) / ring.Length;
+        if (!Geometry2D.IsPointInPolygon(c, ring)) c = box.GetCenter();
+        float sxx = 0, syy = 0, sxy = 0;
+        foreach (var p in ring)
+        {
+            var d = p - c;
+            sxx += d.X * d.X; syy += d.Y * d.Y; sxy += d.X * d.Y;
+        }
+        float angle = 0.5f * Mathf.Atan2(2 * sxy, sxx - syy);
+        angle = Mathf.Clamp(Mathf.Wrap(angle, -Mathf.Pi / 2, Mathf.Pi / 2), -0.61f, 0.61f);
+        var dir = Vector2.Right.Rotated(angle);
+        float lo = float.MaxValue, hi = float.MinValue;
+        foreach (var p in ring)
+        {
+            float t = (p - c).Dot(dir);
+            lo = Mathf.Min(lo, t); hi = Mathf.Max(hi, t);
+        }
+        return (c + dir * (lo + hi) / 2, angle, hi - lo);
+    }
+
+    /// <summary>
+    /// Country names across their territory: spaced capitals in the title face, sized to the
+    /// country, along its main axis with a gentle bow, faint enough to read through.
+    /// </summary>
     private void DrawGlobeLabels(Font font, List<Rect2> taken)
     {
         if (Globe_Layout() is not { } g || Globe is null) return;
+        var face = UiTheme.Display;
         float s = _fitScale * _zoom;
+        var view = new Rect2(Vector2.Zero, Size);
         foreach (var state in Globe.States.OrderByDescending(st => g.Labels[st.Id].Area))
         {
-            var (at, area) = g.Labels[state.Id];
-            float screenSide = Mathf.Sqrt(area) * s;
-            if (screenSide < 28) continue;
-            int size = (int)Mathf.Clamp(screenSide / 9, 10, 20);
-            var text = (World?.States.FirstOrDefault(x => x.Id == state.Id)?.Name ?? state.Name).ToUpperInvariant();
-            var extent = font.GetStringSize(text, HorizontalAlignment.Left, -1, size);
-            if (extent.X > screenSide * 1.6f) continue;
-            var p = ToScreen(at) - extent / 2 + new Vector2(0, size * 0.35f);
-            var rect = new Rect2(p - new Vector2(0, size), extent);
-            if (!new Rect2(Vector2.Zero, Size).Encloses(rect) || taken.Any(t => t.Intersects(rect))) continue;
-            taken.Add(rect);
-            DrawStringOutline(font, p, text, HorizontalAlignment.Left, -1, size, 3, new Color(0, 0, 0, 0.6f));
-            DrawString(font, p, text, HorizontalAlignment.Left, -1, size, new Color(1, 1, 1, 0.78f));
+            var (at, angle, length) = g.NameLines[state.Id];
+            float span = length * s * 0.72f; // leave the ends of the country clear
+            if (span < 60) continue;
+            var text = StateText.Country(World?.States.FirstOrDefault(x => x.Id == state.Id)?.Name ?? state.Name).ToUpperInvariant();
+            if (text.Length == 0) continue;
+            // Size from the room: wide countries get big, airy names.
+            float probe = face.GetStringSize(text, HorizontalAlignment.Left, -1, 20).X;
+            int size = (int)Mathf.Clamp(span / (probe / 20 + 0.6f * (text.Length - 1) / 1) * 1.0f, 11, 34);
+            float plain = face.GetStringSize(text, HorizontalAlignment.Left, -1, size).X;
+            float tracking = Mathf.Clamp((span - plain) / Mathf.Max(1, text.Length - 1), size * 0.08f, size * 0.9f);
+            float total = plain + tracking * (text.Length - 1);
+            if (total > span * 1.15f && size == 11) continue; // no room even small
+            var centre = ToScreen(at);
+            var dir = Vector2.Right.Rotated(angle);
+            var normal = dir.Orthogonal();
+            var bounds = new Rect2(centre, Vector2.Zero).Grow(size).Expand(centre + dir * total / 2).Expand(centre - dir * total / 2);
+            if (!view.Intersects(bounds) || taken.Any(t => t.Intersects(bounds))) continue;
+            taken.Add(bounds);
+            // Cream over the dark sea and lands; brown ink on the paper chart.
+            float paper = PaperBlend();
+            var ink = new Color(1, 0.97f, 0.88f, 0.62f).Lerp(new Color(0.24f, 0.17f, 0.10f, 0.72f), paper);
+            var shade = new Color(0, 0, 0, 0.45f).Lerp(new Color(1, 0.96f, 0.85f, 0.35f), paper);
+            float x = -total / 2;
+            float bow = total * 0.06f; // a slight arch, highest in the middle
+            foreach (char ch in text)
+            {
+                string glyph = ch.ToString();
+                float w = face.GetStringSize(glyph, HorizontalAlignment.Left, -1, size).X;
+                float mid = x + w / 2;
+                float u = mid / (total / 2); // -1..1 along the name
+                var pos = centre + dir * mid - normal * bow * (1 - u * u);
+                float tilt = angle + Mathf.Atan(2 * bow * u / Mathf.Max(1, total / 2)) * 0.9f;
+                DrawSetTransform(pos, tilt, Vector2.One);
+                var origin = new Vector2(-w / 2, size * 0.35f);
+                DrawString(face, origin + new Vector2(0, 1.5f), glyph, HorizontalAlignment.Left, -1, size, shade);
+                DrawString(face, origin, glyph, HorizontalAlignment.Left, -1, size, ink);
+                x += w + tracking;
+            }
+            DrawSetTransform(Vector2.Zero, 0, Vector2.One);
         }
     }
 

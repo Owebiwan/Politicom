@@ -197,6 +197,9 @@ The map is modelled on Victoria 3's:
 - **The paper chart:** zoomed out toward the whole world, the sea turns to parchment with
   engraved lines following the coasts, and the countries become watercolour on paper.
 - **Inland maps:** Paris sits on land, not sea.
+- **Country names:** names run across their territory in spaced capitals, along the
+  country's main axis with a slight bow and sized to fit it, as on Victoria 3's map. They're
+  cream over the sea and brown ink on the paper chart.
 - **Data:** `tools/geo/build_sea.py` builds the coast-distance field and the land-cover texture
   in `Game/map/` from Natural Earth (public domain).
 
