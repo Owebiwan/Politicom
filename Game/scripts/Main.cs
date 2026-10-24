@@ -214,6 +214,16 @@ public partial class Main : Control
         int pickerAt = Array.IndexOf(args, "--picker");
         if (pickerAt >= 0 && pickerAt + 1 < args.Length)
             ShowCountryMap(OpenEras.Where(HasAtlas).ToArray(), Math.Max(0, Array.IndexOf(OpenEras.Where(HasAtlas).ToArray(), args[pickerAt + 1])), 1, 104);
+        // --scroll X,Y (fractions of the window): a trackpad swipe there, for testing what it scrolls.
+        for (int i = 0; i + 1 < args.Length; i++)
+        {
+            if (args[i] != "--scroll") continue;
+            var xy = args[i + 1].Split(',').Select(v => float.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            var scrollAt = GetViewport().GetFinalTransform() * (GetViewport().GetVisibleRect().Size * new Vector2(xy[0], xy[1]));
+            for (int f = 0; f < 3; f++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            GetViewport().PushInput(new InputEventMouseMotion { Position = scrollAt, GlobalPosition = scrollAt });
+            for (int k = 0; k < 6; k++) GetViewport().PushInput(new InputEventPanGesture { Position = scrollAt, Delta = new Vector2(0, 3) });
+        }
         // --click X,Y (fractions of the window): a real mouse press and release, for testing input paths.
         for (int i = 0; i + 1 < args.Length; i++)
         {

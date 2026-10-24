@@ -66,6 +66,26 @@ public partial class CommuneList : PanelContainer
         v.AddChild(_tree);
     }
 
+    /// <summary>
+    /// Scrolling over the list scrolls the list, never the map beneath it. A trackpad or Magic
+    /// Mouse swipe arrives as a pan gesture, which the table doesn't take itself.
+    /// </summary>
+    public override void _GuiInput(InputEvent e)
+    {
+        switch (e)
+        {
+            case InputEventPanGesture pan:
+                var bar = _tree.GetChildren(true).OfType<VScrollBar>().FirstOrDefault();
+                if (bar != null) bar.Value += pan.Delta.Y * 24;
+                AcceptEvent();
+                break;
+            case InputEventMouseButton { ButtonIndex: MouseButton.WheelUp or MouseButton.WheelDown or MouseButton.WheelLeft or MouseButton.WheelRight }:
+            case InputEventMagnifyGesture:
+                AcceptEvent();
+                break;
+        }
+    }
+
     public void Refresh()
     {
         if (World is not { } w || !IsVisibleInTree()) return;
