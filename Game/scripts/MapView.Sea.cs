@@ -59,6 +59,35 @@ public partial class MapView
         _seaMaterial.SetShaderParameter("paper", PaperBlend());
     }
 
+    private ColorRect? _grade;
+    private ShaderMaterial? _gradeMaterial;
+
+    /// <summary>The colour grade, vignette and clouds over the map (shaders/grade.gdshader), above everything drawn here.</summary>
+    private void UpdateGrade()
+    {
+        if (_grade == null)
+        {
+            _gradeMaterial = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/grade.gdshader") };
+            _grade = new ColorRect { Material = _gradeMaterial, MouseFilter = MouseFilterEnum.Ignore };
+            _grade.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+            AddChild(_grade);
+        }
+        bool real = SeaShown && !Generated;
+        _grade.Visible = real;
+        if (!real) return;
+        var p0 = ToScreen(_project(new Vector2(0, 0)));
+        float perLon = ToScreen(_project(new Vector2(1, 0))).X - p0.X;
+        float perLat = ToScreen(_project(new Vector2(0, 1))).Y - p0.Y;
+        var degPerPx = new Vector2(1 / perLon, 1 / perLat);
+        _gradeMaterial!.SetShaderParameter("deg_per_px", degPerPx);
+        _gradeMaterial.SetShaderParameter("origin", -p0 * degPerPx);
+        _gradeMaterial.SetShaderParameter("size", Size);
+        // Clouds gather as the view widens, and clear for the paper chart.
+        float km = KmPerPixel();
+        float clouds = Mathf.SmoothStep(4f, 9f, km) * (1 - PaperBlend());
+        _gradeMaterial.SetShaderParameter("clouds", ShowRelief ? clouds : 0f);
+    }
+
     private static void LoadTerrain()
     {
         if (_terrainTried) return;
@@ -85,6 +114,7 @@ public partial class MapView
         if (Geo is null || Generated) return;
         LoadTerrain();
         var world = LonLatRect(-180, -90, 180, 90);
+        if (TerrainShown) return; // the land layer draws the ground and the paper chart itself
         if (_terrain != null && ShowRelief) DrawTextureRect(_terrain, world, false, new Color(1, 1, 1, TerrainAlpha));
         float paper = PaperBlend();
         if (_landMask != null && paper > 0) DrawTextureRect(_landMask, world, false, new Color(0.86f, 0.80f, 0.66f, 0.42f * paper));

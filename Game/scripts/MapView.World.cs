@@ -259,7 +259,8 @@ public partial class MapView
         if (_globeMesh != null && key == _meshKey) return;
         var fills = Globe!.States.Select(StateFill).ToArray();
         var colors = new Color[_meshVerts!.Length];
-        for (int i = 0; i < colors.Length; i++) colors[i] = _meshOwner![i] < 0 ? WorldLand : fills[_meshOwner[i]];
+        // Alpha is the tint over the real ground (land.gdshader): bare land shows the ground itself.
+        for (int i = 0; i < colors.Length; i++) colors[i] = _meshOwner![i] < 0 ? WorldLand with { A = 0 } : fills[_meshOwner[i]] with { A = StateTint };
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)Mesh.ArrayType.Max);
         arrays[(int)Mesh.ArrayType.Vertex] = _meshVerts;
@@ -299,7 +300,7 @@ public partial class MapView
         else if (Mode == MapMode.Revolution)
             c = sim is null ? new Color("4a4d52") : new Color("3a3233").Lerp(new Color("e0443a"), Mathf.Clamp((float)sim.Radicalization * 2.5f, 0, 1));
         else // political map: each state's colour, muted so the region stands out
-            c = Color.FromString(s.Color, new Color("777777")).Darkened(0.35f);
+            c = Color.FromString(s.Color, new Color("777777")).Darkened(TerrainShown ? 0.05f : 0.35f);
         return s.Id == SelectedState ? c.Lightened(0.25f) : c;
     }
 
@@ -310,12 +311,15 @@ public partial class MapView
         if (_meshVerts == null) BuildGlobeMesh(g);
         ColorGlobeMesh();
 
-        // ToScreen is affine: layout * s + o.
+        // ToScreen is affine: layout * s + o. The land layer draws the fills, under everything here.
         float s = _fitScale * _zoom;
         var o = (_fitOffset - Size / 2) * _zoom + Size / 2 + _pan;
-        DrawSetTransform(o, 0, new Vector2(s, s));
-        DrawMesh(_globeMesh!, null);
-        DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+        if (!LandActive)
+        {
+            DrawSetTransform(o, 0, new Vector2(s, s));
+            DrawMesh(_globeMesh!, null);
+            DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+        }
 
         var view = new Rect2(-o / s, Size / s); // the visible area, in layout space
         bool InRegion(Vector2 a, Vector2 b) => _zoom >= DetailZoom && g.Region.HasPoint((a + b) / 2);
@@ -334,8 +338,15 @@ public partial class MapView
         }
         foreach (var (line, box) in g.Coasts)
             if (box.Intersects(view)) DrawCulled(line, WorldCoast, 1.2f, InRegion);
+        // Borders as on Victoria 3's map: a broad soft shadow under a firm line with a light edge.
+        bool far = _zoom < DetailZoom;
         foreach (var (line, box) in g.Borders)
-            if (box.Intersects(view)) DrawCulled(line, WorldBorder, _zoom < DetailZoom ? 1f : 1.4f, InRegion);
+            if (box.Intersects(view))
+            {
+                DrawCulled(line, new Color(0, 0, 0, 0.22f), far ? 3f : 5.5f, InRegion);
+                DrawCulled(line, new Color(0.08f, 0.07f, 0.06f, 0.75f), far ? 1.2f : 2f, InRegion);
+                if (!far) DrawCulled(line, new Color(0.95f, 0.9f, 0.78f, 0.28f), 0.7f, InRegion);
+            }
         return true;
     }
 

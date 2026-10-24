@@ -195,8 +195,17 @@ The map is modelled on Victoria 3's:
   catch the light, shallow teal near the coast deepening to navy offshore, and broken foam
   where it meets the land. The water is anchored to longitude and latitude, so it stays put
   as you pan and zoom.
-- **Land cover:** Natural Earth's land cover (forest, grassland, desert, tundra, ice) tints the
-  political and map-mode colours lightly. It switches off with Relief.
+- **The ground:** the land is the real Earth, from NASA's Blue Marble (July 2004, about
+  1.85 km a pixel), graded toward a painted map and hill-shaded from elevation, so forests,
+  steppe, desert and mountains show. Countries and communes are a tint over it that keeps
+  the ground's light and shade (`Game/shaders/land.gdshader`), drawn by a land layer behind
+  the map. Around the region the full-resolution tiles are joined into one texture; elsewhere
+  a world overview is used. It switches off with Relief; generated and city maps keep flat
+  colours.
+- **Borders:** a broad soft shadow under a firm dark line with a light edge.
+- **Grade, vignette and clouds:** a light colour grade and vignette over the map, and drifting
+  clouds with their shadows as the view widens, clearing for the paper chart
+  (`Game/shaders/grade.gdshader`).
 - **The paper chart:** zoomed out toward the whole world, the sea turns to parchment with
   engraved lines following the coasts, and the countries become watercolour on paper.
 - **Inland maps:** Paris sits on land, not sea.
@@ -204,7 +213,8 @@ The map is modelled on Victoria 3's:
   country's main axis with a slight bow and sized to fit it, as on Victoria 3's map. They're
   cream over the sea and brown ink on the paper chart.
 - **Data:** `tools/geo/build_sea.py` builds the coast-distance field and the land-cover texture
-  in `Game/map/` from Natural Earth (public domain).
+  in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
+  ground (`Game/data/land/`) from NASA's Blue Marble and its elevation (public domain).
 
 ## Relief
 

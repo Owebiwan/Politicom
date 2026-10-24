@@ -221,6 +221,7 @@ public partial class MapView : Control
     public override void _Process(double delta)
     {
         _time += delta;
+        RedrawLand();
         if (World is not { } w) return;
         UpdateArmies((float)delta);
         if (AtWorldZoom) QueueRedraw(); // the region marker pulses
@@ -317,13 +318,18 @@ public partial class MapView : Control
     public override void _Draw()
     {
         // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
-        if (!SeaShown) DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : NeutralLand);
         if (World is not { } w) return;
+        // A city map has no sea: it sits on land (under the land layer, which draws the ground itself).
+        if (!SeaShown && !LandActive) DrawRect(new Rect2(Vector2.Zero, Size), Geo == null ? Background : NeutralLand);
         Layout(); // the projection the sea follows
+        Cells();  // generated and city maps settle their fit here: the land layer must follow it
         UpdateSea();
+        UpdateLand();
+        UpdateGrade();
+        bool landLayer = LandActive;
         var font = ThemeDB.FallbackFont;
         // A generated map's land goes under its neighbouring countries; real maps' land comes from the world layer.
-        if (Generated && _geoLayout is { } g0)
+        if (Generated && _geoLayout is { } g0 && !landLayer)
             foreach (var land in g0.LandFill) FillPolygon(Screen(land), NeutralLand);
         bool globe = DrawGlobe(font);
         bool detail = !AtWorldZoom;
@@ -346,8 +352,8 @@ public partial class MapView : Control
             foreach (var lake in g.Lakes) FillPolygon(Screen(lake), Sea);
         }
 
-        // Territories
-        foreach (var c in w.Communes)
+        // Territories (drawn by the land layer when there's a world map)
+        if (!landLayer) foreach (var c in w.Communes)
         {
             var fill = Fill(w, c);
             if (c.Id == _hover) fill = fill.Lightened(0.12f);

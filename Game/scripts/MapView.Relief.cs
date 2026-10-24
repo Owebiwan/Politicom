@@ -14,7 +14,8 @@ public partial class MapView
 
     internal const string ReliefDir = "res://data/relief/";
     private const int OverviewWidth = 5400, TileWidth = 1800, TileDeg = 30;
-    private static readonly Color ReliefTint = new(1, 1, 1, 0.8f);
+    /// <summary>Over the real ground (already hill-shaded) the relief only restores what the colours tint away.</summary>
+    private Color ReliefTint => new(1, 1, 1, TerrainShown ? 0.42f : 0.8f);
     private static ImageTexture? _reliefWorld;
     private static bool _reliefWorldTried;
     private static readonly Dictionary<(int Col, int Row), ImageTexture?> ReliefTiles = new();
