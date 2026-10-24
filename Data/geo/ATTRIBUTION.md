@@ -43,3 +43,10 @@
   (`Game/art/lore/`) are from **Wikimedia Commons** under free licences (public domain, CC0,
   CC BY, CC BY-SA), each credited, and toned to the game's style.
 
+
+## Music and sound
+
+- Music: recordings from **Wikimedia Commons** under public domain, CC0, CC BY or CC BY-SA
+  licences; each piece's performer, licence and source page are in `Data/audio/music.json`
+  and shown in the game as it plays. CC BY-SA pieces stay under CC BY-SA.
+- Interface sounds: **Kenney** (kenney.nl), RPG Audio, UI Audio and Interface Sounds, CC0.

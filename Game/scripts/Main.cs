@@ -162,6 +162,11 @@ public partial class Main : Control
             return;
         }
         Theme = UiTheme.Build();
+        AddChild(new Audio());
+        Audio.Instance!.TrackStarted += (title, _) =>
+        {
+            if (_menu == null && _toasts != null) _toasts.Show($"Now playing: {title}", new Color(0.75f, 0.68f, 0.52f), 5);
+        };
         BuildUi();
         SetWorld(_world);
         var args = OS.GetCmdlineUserArgs();
@@ -302,7 +307,8 @@ public partial class Main : Control
         {
             if (key.Keycode == Key.Escape && (_overlay != _menu || _inGame))
             {
-                CloseOverlay();
+                if (_overlay == _menu) ResumeGame();
+                else CloseOverlay();
                 GetViewport().SetInputAsHandled();
             }
             return;
@@ -336,7 +342,10 @@ public partial class Main : Control
     {
         _dayInTurn = 0;
         if (_world.Outcome != Outcome.Ongoing) return;
+        int occupied = _world.Communes.Count(c => c.Occupied);
         _world.Step();
+        if (_world.Communes.Count(c => c.Occupied) > occupied) Audio.Instance?.Play("sword", -6);
+        Audio.Instance?.PlayAge(Audio.AgeOf(_world.Year));
         // Like a Paradox popup: pause when the movement has a decision to make.
         var fresh = _world.Log.Skip(_seenEvents).ToList();
         if (fresh.Any(e => e.StopsTheClock)) SetSpeed(0);
@@ -443,6 +452,7 @@ public partial class Main : Control
 
     private void SetWorld(World world)
     {
+        if (_inGame) Audio.Instance?.PlayAge(Audio.AgeOf(world.Year));
         _world = world;
         _selectedState = null;
         _dayInTurn = 0;
@@ -478,6 +488,49 @@ public partial class Main : Control
 
     // ── Overlays ──────────────────────────────────────────────────────────────
 
+    /// <summary>Back from the start menu to the game under way, and to its music.</summary>
+    private void ResumeGame()
+    {
+        CloseOverlay();
+        Audio.Instance?.PlayAge(Audio.AgeOf(_world.Year));
+    }
+
+    /// <summary>Music and sound volumes (kept between sessions).</summary>
+    private void ShowSettings()
+    {
+        var audio = Audio.Instance!;
+        var grid = new GridContainer { Columns = 3 };
+        grid.AddThemeConstantOverride("h_separation", 16);
+        grid.AddThemeConstantOverride("v_separation", 14);
+        HSlider Slider(string label, float value)
+        {
+            grid.AddChild(new Label { Text = label, CustomMinimumSize = new Vector2(120, 0) });
+            var slider = new HSlider { MinValue = 0, MaxValue = 100, Step = 1, Value = value * 100, CustomMinimumSize = new Vector2(320, 24), SizeFlagsVertical = SizeFlags.ShrinkCenter };
+            grid.AddChild(slider);
+            var pct = new Label { Text = $"{value * 100:0}%", CustomMinimumSize = new Vector2(48, 0) };
+            slider.ValueChanged += v => pct.Text = $"{v:0}%";
+            grid.AddChild(pct);
+            return slider;
+        }
+        var music = Slider("Music", audio.MusicVolume);
+        var sound = Slider("Sounds", audio.SoundVolume);
+        var mute = new CheckBox { Text = "Mute everything", ButtonPressed = audio.Muted };
+        void Apply() => audio.SetVolumes((float)music.Value / 100, (float)sound.Value / 100, mute.ButtonPressed);
+        music.ValueChanged += _ => Apply();
+        sound.ValueChanged += _ => { Apply(); audio.Play("click"); };
+        mute.Toggled += _ => Apply();
+        var box = new VBoxContainer();
+        box.AddThemeConstantOverride("separation", 12);
+        box.AddChild(grid);
+        box.AddChild(mute);
+        box.AddChild(new Label
+        {
+            Text = "Music from Wikimedia Commons (public domain and Creative Commons recordings, credited as each piece starts); interface sounds by Kenney (CC0).",
+            AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(540, 0), Modulate = new Color(1, 1, 1, 0.5f),
+        });
+        ShowOverlay("Settings", "", box, 620, ("Back", ShowStartMenu));
+    }
+
     private static readonly string[] MenuPaintings =
         { "uprising_paris", "uprising_catalonia", "uprising_ukraine", "uprising_industrial", "uprising_medieval", "assembly_paris", "uprising_earlymodern" };
 
@@ -487,7 +540,8 @@ public partial class Main : Control
     /// </summary>
     private void ShowStartMenu()
     {
-        CloseOverlay();
+        CloseOverlay(quiet: true);
+        Audio.Instance?.PlayAge("menu");
         SetSpeed(0);
         var dim = new ColorRect { Color = new Color(0.02f, 0.02f, 0.03f, 0.82f), MouseFilter = MouseFilterEnum.Stop };
         dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -537,7 +591,7 @@ public partial class Main : Control
             b.AddThemeFontOverride("font", UiTheme.Display);
             b.AddThemeFontSizeOverride("font_size", 20);
         }
-        if (_inGame) Item("Resume", "Back to the game under way.", CloseOverlay);
+        if (_inGame) Item("Resume", "Back to the game under way.", ResumeGame);
         var saves = Saves();
         if (saves.Count > 0) Item("Continue", $"Load the latest save: {saves[0].Meta.Name}.", () => LoadFrom(saves[0].Path));
         Item("Historical revolutions", "Paris 1871, the Free Territory 1918, Catalonia 1936, or a random map.", ShowIntro);
@@ -549,6 +603,7 @@ public partial class Main : Control
             });
         if (saves.Count > 0) Item("Load game", "Any saved game.", () => ShowLoadDialog(ShowStartMenu));
         Item("Leaderboard", "Your finished games, ranked by score.", () => ShowLeaderboard(ShowStartMenu));
+        Item("Settings", "Music and sound volumes.", ShowSettings);
         Item("Quit", "", () => GetTree().Quit());
 
         var credit = new Label
@@ -906,6 +961,7 @@ public partial class Main : Control
         void Act(PlayerAction action)
         {
             var result = w.Apply(action);
+            Audio.Instance?.Play(result.Ok ? "coins" : "error", result.Ok ? -8 : -4);
             CloseOverlay();
             _toasts.Show(result.Message, result.Ok ? new Color(0.5f, 0.85f, 0.55f) : new Color(0.95f, 0.45f, 0.4f), 8);
             Refresh();
@@ -956,6 +1012,7 @@ public partial class Main : Control
             _ => ("The federation has been destroyed", "Too few free communes remain for a federation."),
         };
         _map.Banner = title;
+        Audio.Instance?.Play(w.Outcome == Outcome.Survived ? "good" : "drum");
         int? rank = RecordOutcome(title);
         string ranked = rank is int r ? $"\n\n[color=#e3bd6b]{(r == 1 ? "A new best" : $"Number {r}")} on the leaderboard for {Esc(w.Scenario.Name)}.[/color]" : "";
         var chart = new HistoryChart { World = w, FontSize = 13, CustomMinimumSize = new Vector2(0, 220) };
@@ -973,7 +1030,8 @@ public partial class Main : Control
 
     private void ShowOverlay(string title, string body, Control? extra, float width, params (string Label, Action OnPress)[] buttons)
     {
-        CloseOverlay();
+        CloseOverlay(quiet: true);
+        Audio.Instance?.Play("open", -6);
         SetSpeed(0);
         var dim = new ColorRect { Color = new Color(0, 0, 0, 0.65f), MouseFilter = MouseFilterEnum.Stop };
         dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -1008,8 +1066,11 @@ public partial class Main : Control
         _overlay = dim;
     }
 
-    private void CloseOverlay()
+    private void CloseOverlay() => CloseOverlay(quiet: false);
+
+    private void CloseOverlay(bool quiet)
     {
+        if (_overlay != null && !quiet) Audio.Instance?.Play("close", -8);
         _overlay?.QueueFree();
         _overlay = _menu = null;
     }
@@ -1017,6 +1078,7 @@ public partial class Main : Control
     private void Do(PlayerAction action)
     {
         var result = _world.Apply(action);
+        Audio.Instance?.Play(result.Ok ? "coins" : "error", result.Ok ? -8 : -4);
         _feedback.Text = result.Message;
         _feedback.AddThemeColorOverride("font_color", result.Ok ? new Color(0.5f, 0.85f, 0.55f) : new Color(0.95f, 0.45f, 0.4f));
         Refresh();
@@ -1154,6 +1216,7 @@ public partial class Main : Control
 
         // ── Everything else, one tab at a time ──
         _tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill };
+        _tabs.TabChanged += _ => Audio.Instance?.Play("page", -12);
         side.AddChild(_tabs);
 
         var overview = Tab("Overview");
@@ -1504,6 +1567,7 @@ public partial class Main : Control
             _popupDecision = pending?.Id;
             _popup = BuildPopup(heading, body, e, buttons);
             AddChild(_popup);
+            Audio.Instance?.Play(e.Severity == Severity.Decision ? "bell" : e.Severity == Severity.Danger ? "drum" : "page", e.Severity == Severity.Decision ? -8 : -4);
             return;
         }
     }
@@ -1657,6 +1721,7 @@ public partial class Main : Control
 
     private void OnCommuneClicked(int id, bool shift)
     {
+        Audio.Instance?.Play("tick", -4);
         _tabs.CurrentTab = CommuneTab;
         if (shift && _map.Selected is int sel && sel != id) _map.Secondary = id;
         else

@@ -216,6 +216,27 @@ The map is modelled on Victoria 3's:
   in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
   ground (`Data/land/`, mirrored into the game) from NASA's Blue Marble and its elevation (public domain).
 
+## Music and sound
+
+- **Music:** the start menu plays songs of the movement (Hijos del pueblo, A las barricadas,
+  the black Internationale, Warszawianka). A game plays music of its age, shuffled and
+  crossfaded, changing when a long game reaches a new age:
+  - ancient: the Epitaph of Seikilos, guqin, Kevin MacLeod;
+  - medieval: Machaut, chant, the Cantigas de Santa Maria, an estampie;
+  - early modern: Dowland, Bach, Handel, Vivaldi, Purcell;
+  - industrial: Beethoven, Chopin, Dvořák;
+  - modern: Satie, Debussy, Dvořák.
+  Each piece is credited as it starts ("Now playing").
+- **Interface sounds:** clicks, a book opening and closing for windows, a page for tabs and
+  news, coins for spending influence, a bell for decisions, a drum for bad news and defeat,
+  a sword when a commune falls.
+- **Settings** (start menu): music and sound volumes and mute, kept in `user://settings.cfg`.
+- **Data:** `tools/audio/build_audio.py` fetches the music from Wikimedia Commons (public
+  domain, CC0, CC BY and CC BY-SA only, checked per file), evens its loudness, trims it to four
+  minutes and encodes it to `Game/audio/music/`, with credits in `Data/audio/music.json`.
+  Interface sounds are from Kenney's RPG Audio, UI Audio and Interface Sounds packs (CC0),
+  plus a bell and a drum synthesised by the tool.
+
 ## Relief
 
 Real maps (the historical scenarios, open starts and the world view) are shaded with

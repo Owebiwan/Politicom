@@ -12,3 +12,4 @@ __pycache__/
 *.pyc
 tools/ui/.art_cache/
 tools/ui/.lore_cache/
+tools/audio/.cache/
