@@ -23,7 +23,7 @@ public partial class Main : Control
     private int _seenEvents;
 
     private Label _header = null!, _stage = null!, _scores = null!, _feedback = null!;
-    private RichTextLabel _influence = null!;
+    private readonly Dictionary<string, RichTextLabel> _status = new();
     private DriftMeter _driftMeter = null!;
     private Button _stepButton = null!;
     private HistoryChart _history = null!;
@@ -911,9 +911,27 @@ public partial class Main : Control
         };
         view.AddChild(_reliefToggle);
 
-        _influence = AddRich(side);
-        _influence.MouseFilter = MouseFilterEnum.Stop;
-        _influence.TooltipText = "Influence is the movement's only resource. It regenerates every turn from political education, wellbeing and the press, up to 100.\nIt pays for schools, pamphlets, mediation, projects, congresses, recall.";
+        // The status line: one item per resource, each with its own description on hover.
+        var status = new HFlowContainer();
+        status.AddThemeConstantOverride("h_separation", 16);
+        side.AddChild(status);
+        foreach (var (key, tip) in new[]
+        {
+            ("influence", "Influence: the movement's only spendable resource. It regenerates every turn from political education, wellbeing and the press, up to 100.\nIt pays for schools, pamphlets, mediation, projects, congresses and recall."),
+            ("commune", "Communes in the federation: free and federated now, out of those you began with. Occupied or seceded communes don't count."),
+            ("enthusiasm", "Enthusiasm: the revolution's spirit. It wears down over a long war, with hunger, lost communes, hierarchy and conscription, and is renewed by culture, towns rising and revolutions abroad.\nIt scales production, militias, how far your ideas spread, and how many answer a call for volunteers."),
+            ("militia", "Militia: people under arms across the federation, in thousands. More fighters defend better but work less.\nCall for volunteers in a commune (Commune tab), or impose conscription (Movement tab)."),
+            ("gold", "Gold: from the treasuries or from events. It buys arms, grain or machines abroad (Movement tab). While it sits, the committee guarding it adds drift every turn."),
+        })
+        {
+            var item = new RichTextLabel
+            {
+                BbcodeEnabled = true, FitContent = true, ScrollActive = false, AutowrapMode = TextServer.AutowrapMode.Off,
+                MouseFilter = MouseFilterEnum.Stop, TooltipText = tip,
+            };
+            status.AddChild(item);
+            _status[key] = item;
+        }
         _stage = AddLabel(side, 14);
         _stage.AddThemeFontOverride("font", UiTheme.Display);
         _driftMeter = new DriftMeter();
@@ -1061,10 +1079,13 @@ public partial class Main : Control
         var w = _world;
         UpdateHeader();
         _stepButton.Text = $"+1 {w.Turn}";
-        _influence.Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#9a9283](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]   " +
-                          $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" + (w.Communes.Count > w.InitialCommuneCount ? $" [color=#9a9283](began {w.InitialCommuneCount})[/color]" : $"/{w.InitialCommuneCount}") + "   " +
-                          $"{UiTheme.Img("enthusiasm")} {w.Enthusiasm:P0}   {UiTheme.Img("militia")} {w.Fighters:0.0}k" +
-                          (w.Gold > 0 ? $"   {UiTheme.Img("gold")} {w.Gold:0}" : "");
+        _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#9a9283](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
+        _status["commune"].Text = $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" +
+            (w.Communes.Count > w.InitialCommuneCount ? $" [color=#9a9283](began {w.InitialCommuneCount})[/color]" : $"/{w.InitialCommuneCount}");
+        _status["enthusiasm"].Text = $"{UiTheme.Img("enthusiasm")} {w.Enthusiasm:P0}";
+        _status["militia"].Text = $"{UiTheme.Img("militia")} {w.Fighters:0.0}k";
+        _status["gold"].Text = $"{UiTheme.Img("gold")} {w.Gold:0}";
+        _status["gold"].Visible = w.Gold > 0;
 
         _stage.Text = $"{DriftEffects.Name(w.Drift.Stage)} — {w.Drift.Value:0.0}" + (w.Drift.NextThreshold is { } t ? $"  (next stage at {t:0})" : "");
         _driftMeter.QueueRedraw();
