@@ -25,7 +25,7 @@ SLOTS = {
     "war_earlymodern": ["Thirty Years War battle painting", "pikemen battle 16th century painting"],
     "war_industrial": ["Franco-Prussian War battle painting", "1848 barricade battle painting"],
     "war_modern": ["Russian Civil War 1919 soldiers photograph", "World War I infantry advance photograph"],
-    "uprising_ancient": ["Mons Sacer secession", "Spartacus revolt 19th century illustration", "Tiberius Gracchus death painting", "Roman plebeians revolt engraving"],
+    "uprising_ancient": ["Spartacus slaves revolt illustration", "Death of Tiberius Gracchus", "secession plebs Mons Sacer", "Spartacus Hermann Vogel", "slave revolt ancient Rome painting"],
     "uprising_medieval": ["Jacquerie Froissart miniature", "Peasants Revolt 1381 Froissart"],
     "uprising_earlymodern": ["German Peasants War woodcut", "peasants war 1525 woodcut"],
     "uprising_industrial": ["Paris Commune barricade 1871 photograph", "barricade 1848 painting"],
@@ -68,7 +68,8 @@ SLOTS = {
     "uprising_contemporary": ["civil rights march 1963 photograph", "protest march 1960s photograph"],
 }
 
-OK_LICENCES = ("public domain", "pd", "cc0")
+# Free licences: public domain, CC0, and CC BY / CC BY-SA (any use, with the credit the game shows).
+OK_LICENCES = ("public domain", "pd", "cc0", "cc by", "cc-by")
 
 
 def api(params):

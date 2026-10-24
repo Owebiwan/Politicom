@@ -116,7 +116,7 @@ def process(slot, pick, credits):
         info = api_info(pick["file"])
         meta = info.get("extmetadata", {})
         lic = meta.get("LicenseShortName", {}).get("value", "")
-        if not any(k in lic.lower() for k in ("public domain", "pd", "cc0")):
+        if not any(k in lic.lower() for k in ("public domain", "pd", "cc0", "cc by", "cc-by")) or "nc" in lic.lower() or "nd" in lic.lower().replace("and", ""):
             print(f"{slot}: skipped, licence is {lic!r}")
             return
         # Downloads are cached (tools/ui/.art_cache/, not committed), so re-toning needs no network.

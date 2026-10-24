@@ -31,6 +31,7 @@
 - The ornaments (`Game/ui/`: frames, plates, buttons, tabs, medallions, dividers) are drawn in
   code by `tools/ui/build_ornaments.py`; the clock emblems and switches were drawn for this project.
 - Event pictures (`Game/art/events/`): public-domain works and photographs from **Wikimedia
-  Commons**, each checked as public domain or CC0. They are cropped and toned by
+  Commons**, each under a free licence: public domain, CC0, or CC BY / CC BY-SA (any use with
+  attribution; never non-commercial or no-derivatives licences). They are cropped and toned by
   `tools/ui/process_event_art.py`. Each picture's author, date, licence and source page are
   in `Data/events/art_credits.json` and shown under it in the game.

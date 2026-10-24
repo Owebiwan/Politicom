@@ -237,7 +237,7 @@ How they play:
   gains little from them.
 - **Blows to the enemy** are scaled to its strength, so no single event decides a war.
 - **Pictures:** event pop-ups open with a picture in a gilt frame. These are
-  public-domain period art from Wikimedia Commons: medieval chronicles, Bruegel, engravings
+  freely licensed period art from Wikimedia Commons (public domain, CC0, CC BY or CC BY-SA): medieval chronicles, Bruegel, engravings
   from illustrated papers, and photographs of 1871, 1917, 1919 and 1946.
   - **One style:** each picture is toned to the same sepia engraving
     (`tools/ui/process_event_art.py`), so paintings, woodcuts and photographs read as one
