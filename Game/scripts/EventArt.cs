@@ -26,7 +26,7 @@ internal static class EventArt
         ("trade", new[] { "bank", "gold", "trade", "merchant", "privateer", "sanction", "treasur", "sell", "arms for", "buy" }),
         ("hunger", new[] { "famine", "hunger", "starv", "requisition", "hoard", "drought", "bread" }),
         ("harvest", new[] { "harvest", "commons", "fences", "granar", "grain", "seed", "manor" }),
-        ("work", new[] { "workshop", "machine", "factory", "guild", "engineer", "mill", "strike", "works" }),
+        ("work", new[] { "workshop", "machine", "factory", "guild", "engineer", "mill", "general strike", "on strike", "strikers", "works" }),
         ("assembly", new[] { "assembly", "council", "elect", "congress", "committee", "ministr", "coalition", "constitution", "governor", "delegat", "federate", "kinship", "commissar" }),
         ("uprising", new[] { "revolt", "rises", "rising", "barricade", "revolution", "insurrect", "gladiator", "slave", "rolls burn" }),
         ("war", new[] { "offensive", "battle", "army", "front", "deserter", "mercenar", "levy", "conscript", "defect", "campaign", "raid", "squad", "spy", "war", "bomb", "intervenes", "falls to" }),
