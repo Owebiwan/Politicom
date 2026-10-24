@@ -838,7 +838,7 @@ public partial class Main : Control
         {
             Visible = false,
             AnchorTop = 1, AnchorBottom = 1,
-            OffsetLeft = 16, OffsetRight = 1016, OffsetTop = -420, OffsetBottom = -56,
+            OffsetLeft = 16, OffsetRight = 1016, OffsetTop = -470, OffsetBottom = -56,
         };
         _communeList.CommuneChosen += id =>
         {

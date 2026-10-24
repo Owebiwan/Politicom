@@ -26,18 +26,14 @@ public partial class CommuneList : PanelContainer
 
     public override void _Ready()
     {
-        CustomMinimumSize = new Vector2(1000, 360);
-        AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.07f, 0.08f, 0.1f, 0.94f),
-            CornerRadiusTopLeft = 8, CornerRadiusTopRight = 8, CornerRadiusBottomLeft = 8, CornerRadiusBottomRight = 8,
-            ContentMarginLeft = 10, ContentMarginRight = 10, ContentMarginTop = 8, ContentMarginBottom = 10,
-        });
+        CustomMinimumSize = new Vector2(1000, 400);
+        AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(22));
         var v = new VBoxContainer();
         AddChild(v);
-        var title = new Label { Text = "COMMUNES — click a title to sort, a row to select (C closes)", Modulate = new Color(0.6f, 0.75f, 0.95f) };
-        title.AddThemeFontSizeOverride("font_size", 12);
-        v.AddChild(title);
+        v.AddChild(UiTheme.SectionTitle("Communes", "commune"));
+        var hint = new Label { Text = "Click a title to sort, a row to select. C closes.", Modulate = new Color(1, 1, 1, 0.55f) };
+        hint.AddThemeFontSizeOverride("font_size", 13);
+        v.AddChild(hint);
 
         _tree = new Tree
         {

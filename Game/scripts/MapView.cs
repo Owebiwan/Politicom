@@ -520,10 +520,14 @@ public partial class MapView : Control
     private void DrawBanner(Font font)
     {
         if (Banner is not { } banner) return;
-        var size = font.GetStringSize(banner, HorizontalAlignment.Left, -1, 28);
-        var at = new Vector2((Size.X - size.X) / 2, 48);
-        DrawRect(new Rect2(at - new Vector2(16, 34), size + new Vector2(32, 20)), new Color(0, 0, 0, 0.75f));
-        DrawString(font, at, banner, HorizontalAlignment.Left, -1, 28, Colors.White);
+        // On a title plate at the foot of the map, clear of the notices at the top.
+        var face = UiTheme.Display;
+        var size = face.GetStringSize(banner, HorizontalAlignment.Left, -1, 26);
+        var plate = new Rect2(new Vector2((Size.X - size.X) / 2 - 56, Size.Y - LegendHeight - 78), new Vector2(size.X + 112, 52));
+        DrawStyleBox(UiTheme.TitlePlateStyle(), plate);
+        var at = new Vector2(plate.Position.X + 56, plate.Position.Y + 35);
+        DrawString(face, at + new Vector2(0, 2), banner, HorizontalAlignment.Left, -1, 26, new Color(0, 0, 0, 0.6f));
+        DrawString(face, at, banner, HorizontalAlignment.Left, -1, 26, UiTheme.GoldBright);
     }
 
     private Vector2[] Screen(Vector2[] layout) => layout.Select(ToScreen).ToArray();
