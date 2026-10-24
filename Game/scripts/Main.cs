@@ -757,11 +757,30 @@ public partial class Main : Control
         play.Pressed += () =>
         {
             if (picker.Selected is not { } id) return;
-            StartScenario(OpenStartGenerator.Generate(Current(), _sandbox!, id, seed, length: turns == 104 ? null : turns, scope: (OpenScope)scope.Selected));
+            var atlas = Current();
+            var scenario = OpenStartGenerator.Generate(atlas, _sandbox!, id, seed, length: turns == 104 ? null : turns, scope: (OpenScope)scope.Selected);
+            StartScenario(scenario);
+            if (atlas.State(id) is { } st) ShowOpening(atlas, st, scenario);
         };
         Refresh();
 
         ShowOverlay("Where does the movement rise?", "", content, 1240, ("Back", ShowIntro));
+    }
+
+    /// <summary>The opening of an open-world game: the country's history beside what the movement faces.</summary>
+    private void ShowOpening(Politicom.Sim.Global.Atlas atlas, Politicom.Sim.Global.AtlasState st, ScenarioDefinition scenario)
+    {
+        var row = new HBoxContainer();
+        row.AddThemeConstantOverride("separation", 22);
+        row.AddChild(Lore.Panel(atlas, st, 420));
+        var text = new RichTextLabel
+        {
+            BbcodeEnabled = true, FitContent = true, ScrollActive = false,
+            CustomMinimumSize = new Vector2(380, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            Text = $"{UiTheme.DisplayText(Esc(scenario.Name), 18)}\n\n{Esc(scenario.Description)}",
+        };
+        row.AddChild(text);
+        ShowOverlay("The movement rises", "", row, 900, ("Begin", CloseOverlay));
     }
 
     private static ulong NewSeed() => (ulong)Random.Shared.Next(1, 1_000_000);
