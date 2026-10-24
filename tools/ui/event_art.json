@@ -406,5 +406,21 @@
    0.5,
    0.4
   ]
+ },
+ "hunger_paris": {
+  "file": "File:Boucherie à Paris.jpg",
+  "caption": "Queueing at a butcher's during the siege of Paris, 1870–71",
+  "focus": [
+   0.5,
+   0.6
+  ]
+ },
+ "harvest_ukraine": {
+  "file": "File:Serebryakova Harvest 1915.jpg",
+  "caption": "Harvest, by Zinaida Serebriakova (1915)",
+  "focus": [
+   0.5,
+   0.45
+  ]
  }
 }
