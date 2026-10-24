@@ -47,6 +47,9 @@ dotnet run --project Sim.Cli -c Release -- batch --runs 300
 1. Install **Godot 4.7+ .NET edition** (`brew install --cask godot-mono`, or from godotengine.org).
 2. Open `Game/project.godot`, press **Build**, then **Run**.
 
+The game opens on a start menu: continue the quick-save, choose a historical revolution (or a
+random map), or start in the open world. Esc brings the menu back during a game.
+
 Controls:
 - Click a commune to select it; shift-click a second commune for mediation or railways.
 - Space pauses, 1–3 set the speed, and `.` advances one week.
@@ -425,9 +428,12 @@ the farms on the towns' goods, so the columns show where the federation depends 
     - below −0.60: intervention, adding to the enemy it backs (up to +60% of that enemy's strength)
   - **Weight:** each state's weight is its power, scaled down by distance.
   - **Volunteers** also come from radicalized workers anywhere, like the International Brigades.
-  - **Your diplomacy:** *send delegates* (warm a state; fascists barely listen), *agitate
+  - **Your diplomacy:** *send emissaries* (warm a state; fascists barely listen), *agitate
     workers* (radicalize it; its government resents it) and an *international appeal* (double
     the volunteers for a while).
+  - **Other countries' cities** are on the map (the era's largest, capitals ringed in gold).
+    Click one to send emissaries or agitators there; the map flags cities with a mission in
+    the last half year, and saves keep the missions.
   - **Where to see it:** the World tab, the Diplomacy and Revolution map modes, clicking any
     country, or `world` / `delegates` / `agitate` / `appeal` in the terminal.
 - **Revolutions abroad:** your contagion radicalizes every state's workers, more strongly

@@ -205,6 +205,9 @@ public partial class MapView : Control
     /// <summary>A country clicked outside the federation.</summary>
     public event Action<string>? StateClicked;
 
+    /// <summary>A foreign city clicked: its state's id and the city's name.</summary>
+    public event Action<string, string>? CityClicked;
+
     /// <summary>The country highlighted on the map (the one open in the World tab).</summary>
     public string? SelectedState { get; set; }
 
@@ -267,6 +270,7 @@ public partial class MapView : Control
                     if (wasClick)
                     {
                         if (!AtWorldZoom && Hit(button.Position) is int id) CommuneClicked?.Invoke(id, button.ShiftPressed);
+                        else if (HitCity(button.Position) is { } city) CityClicked?.Invoke(city.State.Id, city.City.Name);
                         else if (HitState(button.Position) is { } st) StateClicked?.Invoke(st.Id);
                     }
                 }
@@ -286,7 +290,13 @@ public partial class MapView : Control
                 }
                 _mouse = motion.Position;
                 var hit = AtWorldZoom ? null : Hit(motion.Position);
-                var hoverState = hit is null ? HitState(motion.Position) : null;
+                var hoverCity = hit is null ? HitCity(motion.Position) : null;
+                var hoverState = hit is null && hoverCity is null ? HitState(motion.Position) : null;
+                if (hoverCity?.City != _hoverCity?.City)
+                {
+                    _hoverCity = hoverCity;
+                    QueueRedraw();
+                }
                 if (hoverState != _hoverState)
                 {
                     _hoverState = hoverState;
@@ -511,8 +521,10 @@ public partial class MapView : Control
             }
         }
 
+        DrawForeignCities(font, taken);
         DrawLegend(font);
         if (_hover is int h) DrawTooltip(font, w, w.Communes[h]);
+        else if (_hoverCity is { } hc) DrawCityTooltip(font, hc.State, hc.City);
         else if (_hoverState is { } hs) DrawStateTooltip(font, hs);
         DrawBanner(font);
     }

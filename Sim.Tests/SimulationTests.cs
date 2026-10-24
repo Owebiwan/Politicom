@@ -612,7 +612,7 @@ public class SimulationTests
         var germany = w.States.Single(s => s.Id == "DEU");
         double before = britain.Stance, fascistBefore = germany.Stance;
         Assert.True(w.Apply(new SendDelegates("GBR")).Ok);
-        Assert.True(w.Apply(new SendDelegates("DEU")).Ok);
+        Assert.True(w.Apply(new SendDelegates("DEU", "Hamburg")).Ok);
         Assert.True(britain.Stance - before > germany.Stance - fascistBefore); // fascists barely listen
         double rad = britain.Radicalization;
         Assert.True(w.Apply(new AgitateWorkers("GBR")).Ok);
@@ -621,6 +621,8 @@ public class SimulationTests
 
         var restored = World.LoadJson(w.SaveJson(), w.Techs);
         Assert.Equal(britain.Stance, restored.States.Single(s => s.Id == "GBR").Stance);
+        // Only missions to a named city are marked on the map.
+        Assert.Equal(new Mission("DEU", "Hamburg", w.Tick, false), Assert.Single(restored.Missions));
     }
 
     [Fact]

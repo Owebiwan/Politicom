@@ -21,10 +21,10 @@ public sealed record SetWarCommittee(bool Active) : PlayerAction;
 public sealed record SetForeignTrade(bool Active) : PlayerAction;
 public sealed record AnswerAllyOffer(bool Accept) : PlayerAction;
 public sealed record HoldCommune(int Commune) : PlayerAction;
-/// <summary>Send delegates to win a foreign state's sympathy.</summary>
-public sealed record SendDelegates(string StateId) : PlayerAction;
-/// <summary>Agitate a foreign state's workers: they radicalize, and the state resents it.</summary>
-public sealed record AgitateWorkers(string StateId) : PlayerAction;
+/// <summary>Send delegates (emissaries) to win a foreign state's sympathy, optionally to one of its cities.</summary>
+public sealed record SendDelegates(string StateId, string? City = null) : PlayerAction;
+/// <summary>Agitate a foreign state's workers, optionally in one city: they radicalize, and the state resents it.</summary>
+public sealed record AgitateWorkers(string StateId, string? City = null) : PlayerAction;
 /// <summary>Expose a rival party's cells in a commune and its neighbours.</summary>
 public sealed record ExposeCells(int Commune) : PlayerAction;
 /// <summary>Send arms and organizers to a revolution under way abroad.</summary>
@@ -457,8 +457,10 @@ internal static class ActionSystem
         // Fascist governments barely listen; everyone listens less the further they already lean.
         double resistance = s.Ideology == Global.Ideology.Fascist ? 0.3 : 1;
         s.Stance = Math.Clamp(s.Stance + b.DelegateEffect * resistance * (1 - 0.5 * Math.Max(0, s.Stance)), -1, 1);
-        w.Emit(Severity.Info, $"Delegates of the movement tour {s.Name}: meetings, newspapers, unions. It is now {Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}).");
-        return ActionResult.Done($"Delegates sent to {s.Name}: stance {s.Stance:+0.00;-0.00}.");
+        w.RecordMission(s.Id, a.City, agitation: false);
+        string where = a.City is { } city ? $"{city}, {s.Name}" : s.Name;
+        w.Emit(Severity.Info, $"Emissaries of the movement tour {where}: meetings, newspapers, unions. {s.Name} is now {Global.StateText.Stance(s.Stance)} ({s.Stance:+0.00;-0.00}).");
+        return ActionResult.Done($"Emissaries sent to {where}: stance {s.Stance:+0.00;-0.00}.");
     }
 
     private static ActionResult Agitate(World w, AgitateWorkers a)
@@ -468,7 +470,8 @@ internal static class ActionSystem
         if (!Spend(w, b.CostAgitate)) return Broke(w, b.CostAgitate);
         s.Radicalization = Math.Min(1, s.Radicalization + b.AgitateEffect * (1 - s.Radicalization));
         s.Stance = Math.Clamp(s.Stance - 0.04, -1, 1);
-        return ActionResult.Done($"Agitators reach the workers of {s.Name}: {s.Radicalization:P0} radicalized. Its government notices.");
+        w.RecordMission(s.Id, a.City, agitation: true);
+        return ActionResult.Done($"Agitators reach the workers of {a.City ?? s.Name}{(a.City != null ? $" ({s.Name})" : "")}: {s.Radicalization:P0} radicalized. Its government notices.");
     }
 
     private static ActionResult Expose(World w, ExposeCells a)

@@ -56,6 +56,7 @@ public sealed class SaveGame
     public double FoodPrice { get; set; } = 1;
     public double GoodsPrice { get; set; } = 1;
     public ProjectKind? LastProposalKind { get; set; }
+    public List<Mission>? Missions { get; set; }
     public double Enthusiasm { get; set; } = 0.8;
     public double Gold { get; set; }
     public bool Conscription { get; set; }

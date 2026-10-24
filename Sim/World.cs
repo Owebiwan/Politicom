@@ -96,6 +96,16 @@ public sealed class World
     /// <summary>Turn of the last commune proposal.</summary>
     public int LastProposal { get; internal set; } = -999;
     public ProjectKind? LastProposalKind { get; internal set; }
+    /// <summary>The movement's missions abroad (emissaries and agitators), latest last; the map marks their cities.</summary>
+    public List<Mission> Missions { get; internal set; } = new();
+
+    internal void RecordMission(string state, string? city, bool agitation)
+    {
+        if (city is null) return;
+        Missions.Add(new Mission(state, city, Tick, agitation));
+        if (Missions.Count > 40) Missions.RemoveAt(0);
+    }
+
     /// <summary>Turn of the last random event.</summary>
     public int LastRandomEvent { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
@@ -356,6 +366,7 @@ public sealed class World
         FoodPrice = FoodPrice,
         GoodsPrice = GoodsPrice,
         LastProposalKind = LastProposalKind,
+        Missions = Missions.ToList(),
         Enthusiasm = Enthusiasm,
         Gold = Gold,
         Conscription = Conscription,
@@ -412,6 +423,7 @@ public sealed class World
             FoodPrice = s.FoodPrice,
             GoodsPrice = s.GoodsPrice,
             LastProposalKind = s.LastProposalKind,
+            Missions = s.Missions?.ToList() ?? new(),
             Enthusiasm = s.Enthusiasm,
             Gold = s.Gold,
             Conscription = s.Conscription,
@@ -572,3 +584,6 @@ public sealed class World
         }
     }
 }
+
+/// <summary>A mission abroad: emissaries (or agitators) sent to a city of a foreign state on a given turn.</summary>
+public sealed record Mission(string StateId, string City, int Tick, bool Agitation);

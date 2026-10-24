@@ -28,6 +28,9 @@ public partial class Main : Control
     private Button _stepButton = null!;
     private HistoryChart _history = null!;
     private Control? _overlay;
+    /// <summary>The start menu, while it's open; and whether a game has been started or loaded since launch.</summary>
+    private Control? _menu;
+    private bool _inGame;
     private CommuneList _communeList = null!;
     private TabContainer _tabs = null!;
     private const int CommuneTab = 2;
@@ -71,7 +74,7 @@ public partial class Main : Control
         _delegatesButton.Disabled = _agitateButton.Disabled = selected is null || selected.Sister;
         _supportButton.Visible = selected is { Uprising: > 0 };
         _supportButton.Text = $"Support the rising ({w.Balance.CostSupportUprising:0})";
-        _delegatesButton.Text = $"Send delegates ({w.Balance.CostDelegates:0})";
+        _delegatesButton.Text = $"Send emissaries ({w.Balance.CostDelegates:0})";
         _agitateButton.Text = $"Agitate workers ({w.Balance.CostAgitate:0})";
         // The selected country's lore, rebuilt only when the selection changes.
         string? loreKey = selected is null ? null : $"{_map.Globe?.Era}:{selected.Id}";
@@ -162,7 +165,8 @@ public partial class Main : Control
         BuildUi();
         SetWorld(_world);
         var args = OS.GetCmdlineUserArgs();
-        if (Array.IndexOf(args, "--screenshot") < 0 || Array.IndexOf(args, "--intro") >= 0) ShowIntro();
+        if (Array.IndexOf(args, "--screenshot") < 0 || Array.IndexOf(args, "--menu") >= 0) ShowStartMenu();
+        else if (Array.IndexOf(args, "--intro") >= 0) ShowIntro();
         HandleScreenshotArgs();
     }
 
@@ -236,6 +240,10 @@ public partial class Main : Control
             GetViewport().PushInput(new InputEventMouseMotion { Position = scrollAt, GlobalPosition = scrollAt });
             for (int k = 0; k < 6; k++) GetViewport().PushInput(new InputEventPanGesture { Position = scrollAt, Delta = new Vector2(0, 3) });
         }
+        int focusAt = Array.IndexOf(args, "--focus");
+        int zoomAt = Array.IndexOf(args, "--zoom");
+        if (focusAt >= 0 && focusAt + 1 < args.Length)
+            _map.FocusOn(int.Parse(args[focusAt + 1]), zoomAt >= 0 && zoomAt + 1 < args.Length ? float.Parse(args[zoomAt + 1], System.Globalization.CultureInfo.InvariantCulture) : 2.5f);
         // --click X,Y (fractions of the window): a real mouse press and release, for testing input paths.
         for (int i = 0; i + 1 < args.Length; i++)
         {
@@ -251,10 +259,6 @@ public partial class Main : Control
         if (tabAt >= 0 && tabAt + 1 < args.Length) _tabs.CurrentTab = int.Parse(args[tabAt + 1]);
         Refresh();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-        int focusAt = Array.IndexOf(args, "--focus");
-        int zoomAt = Array.IndexOf(args, "--zoom");
-        if (focusAt >= 0 && focusAt + 1 < args.Length)
-            _map.FocusOn(int.Parse(args[focusAt + 1]), zoomAt >= 0 && zoomAt + 1 < args.Length ? float.Parse(args[zoomAt + 1], System.Globalization.CultureInfo.InvariantCulture) : 2.5f);
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         GetViewport().GetTexture().GetImage().SavePng(path);
         GetTree().Quit();
@@ -293,7 +297,7 @@ public partial class Main : Control
         if (e is not InputEventKey { Pressed: true, Echo: false } key) return;
         if (_overlay != null)
         {
-            if (key.Keycode == Key.Escape)
+            if (key.Keycode == Key.Escape && (_overlay != _menu || _inGame))
             {
                 CloseOverlay();
                 GetViewport().SetInputAsHandled();
@@ -312,6 +316,7 @@ public partial class Main : Control
                 _map.QueueRedraw();
                 break;
             case Key.Escape when _communeList.Visible: ToggleCommuneList(); break;
+            case Key.Escape: ShowStartMenu(); break;
             case Key.Space: SetSpeed(_speed == 0 ? 1 : 0); break;
             case Key.Key1: SetSpeed(1); break;
             case Key.Key2: SetSpeed(2); break;
@@ -468,6 +473,88 @@ public partial class Main : Control
 
     // ── Overlays ──────────────────────────────────────────────────────────────
 
+    private static readonly string[] MenuPaintings =
+        { "uprising_paris", "uprising_catalonia", "uprising_ukraine", "uprising_industrial", "uprising_medieval", "assembly_paris", "uprising_earlymodern" };
+
+    /// <summary>
+    /// The start menu: a period painting, the title, and the ways in: continue the quick-save, a
+    /// historical revolution, the open world, or back to the game under way.
+    /// </summary>
+    private void ShowStartMenu()
+    {
+        CloseOverlay();
+        SetSpeed(0);
+        var dim = new ColorRect { Color = new Color(0.02f, 0.02f, 0.03f, 0.82f), MouseFilter = MouseFilterEnum.Stop };
+        dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        var center = new CenterContainer();
+        center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        dim.AddChild(center);
+        var column = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
+        column.AddThemeConstantOverride("separation", 16);
+        center.AddChild(column);
+
+        var paintings = MenuPaintings.Where(n => ResourceLoader.Exists($"res://art/events/{n}.jpg")).ToArray();
+        if (paintings.Length > 0)
+        {
+            var name = paintings[Random.Shared.Next(paintings.Length)];
+            var frame = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ShrinkCenter };
+            frame.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(5));
+            frame.AddChild(new TextureRect
+            {
+                Texture = GD.Load<Texture2D>($"res://art/events/{name}.jpg"), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered, CustomMinimumSize = new Vector2(640, 267),
+            });
+            column.AddChild(frame);
+        }
+
+        var title = new Label { Text = "POLITICOM", HorizontalAlignment = HorizontalAlignment.Center };
+        title.AddThemeFontOverride("font", new FontVariation { BaseFont = UiTheme.DisplayBold, SpacingGlyph = 10 });
+        title.AddThemeFontSizeOverride("font_size", 64);
+        title.AddThemeColorOverride("font_color", new Color("e3bd6b"));
+        title.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.8f));
+        title.AddThemeConstantOverride("shadow_offset_y", 3);
+        column.AddChild(title);
+        var subtitle = new Label { Text = "Free communes against the state, from antiquity to the modern age", HorizontalAlignment = HorizontalAlignment.Center, Modulate = new Color(1, 1, 1, 0.75f) };
+        subtitle.AddThemeFontOverride("font", UiTheme.BodyItalic);
+        subtitle.AddThemeFontSizeOverride("font_size", 19);
+        column.AddChild(subtitle);
+
+        var panel = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ShrinkCenter };
+        panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(26));
+        column.AddChild(panel);
+        var buttons = new VBoxContainer();
+        buttons.AddThemeConstantOverride("separation", 10);
+        panel.AddChild(buttons);
+        void Item(string label, string tooltip, Action onPress)
+        {
+            var b = AddButton(buttons, label, tooltip, onPress);
+            b.CustomMinimumSize = new Vector2(340, 46);
+            b.AddThemeFontOverride("font", UiTheme.Display);
+            b.AddThemeFontSizeOverride("font_size", 20);
+        }
+        if (_inGame) Item("Resume", "Back to the game under way.", CloseOverlay);
+        if (FileAccess.FileExists(SavePath)) Item("Continue", "Load the quick-save.", LoadGame);
+        Item("Historical revolutions", "Paris 1871, the Free Territory 1918, Catalonia 1936, or a random map.", ShowIntro);
+        if (_sandbox != null && OpenEras.Any(HasAtlas))
+            Item("Open world", "Any country, in any era from antiquity to today: choose it on the map.", () =>
+            {
+                var eras = OpenEras.Where(HasAtlas).ToArray();
+                ShowCountryMap(eras, Math.Max(0, Array.IndexOf(eras, "1936")), NewSeed(), 104);
+            });
+        Item("Quit", "", () => GetTree().Quit());
+
+        var credit = new Label
+        {
+            Text = "Pictures from Wikimedia Commons · histories from Wikipedia (CC BY-SA) · maps from Natural Earth and historical-basemaps",
+            HorizontalAlignment = HorizontalAlignment.Center, Modulate = new Color(1, 1, 1, 0.4f),
+        };
+        credit.AddThemeFontSizeOverride("font_size", 12);
+        column.AddChild(credit);
+
+        AddChild(dim);
+        _overlay = _menu = dim;
+    }
+
     private void ShowIntro()
     {
         var list = new VBoxContainer();
@@ -521,8 +608,8 @@ public partial class Main : Control
 
             [b]The dilemma.[/b] Almost everything that helps you win the war (a war committee, government arms, conscription, appointed commanders) pushes [color=#f2c94c]hierarchy drift[/color] up. At 25, 50 and 75 drift, permanent councils, then commissars, then a police force take over, each with real bonuses. At 100 a state has crystallized and the revolution is over, however strong the society is. Political education, recall and rotation are the brakes.
 
-            [b]Winning.[/b] Hold out as a free federation until the scenario ends; you're scored on survival, quality of life, spread and freedom. [b]Controls:[/b] click a commune, shift-click a second; Space pauses, 1–3 set speed; scroll or pinch to zoom, drag to move the map.
-            """, scroll, PickerWidth);
+            [b]Winning.[/b] Hold out as a free federation until the scenario ends; you're scored on survival, quality of life, spread and freedom. [b]Controls:[/b] click a commune, shift-click a second; Space pauses, 1–3 set speed; scroll or pinch to zoom, drag to move the map; Esc opens the menu.
+            """, scroll, PickerWidth, ("Main menu", ShowStartMenu));
     }
 
     private const float PickerWidth = 1040;
@@ -783,10 +870,57 @@ public partial class Main : Control
         ShowOverlay("The movement rises", "", row, 900, ("Begin", CloseOverlay));
     }
 
+    /// <summary>A foreign city clicked on the map: send emissaries or agitators there, or back a rising.</summary>
+    private void ShowMission(string stateId, string city)
+    {
+        var w = _world;
+        if (w.States.FirstOrDefault(s => s.Id == stateId) is not { } state) return;
+        var b = w.Balance;
+        SelectState(stateId);
+        var row = new HBoxContainer();
+        row.AddThemeConstantOverride("separation", 22);
+        if (_map.Globe is { } atlas && atlas.State(stateId) is { } st) row.AddChild(Lore.Panel(atlas, st, 300));
+        var right = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(380, 0) };
+        right.AddThemeConstantOverride("separation", 10);
+        row.AddChild(right);
+        var last = w.Missions.LastOrDefault(m => m.StateId == stateId && m.City == city);
+        var text = new RichTextLabel
+        {
+            BbcodeEnabled = true, FitContent = true, ScrollActive = false,
+            Text = $"{UiTheme.DisplayText(Esc(city), 20)}\n[color=#c9a25b]{Esc(state.Name)} · {Politicom.Sim.Global.StateText.Name(state.Ideology)}[/color]\n\n" +
+                   $"{Politicom.Sim.Global.StateText.Stance(state.Stance)} toward you ([b]{state.Stance:+0.00;-0.00}[/b]) — {Politicom.Sim.Global.StateText.Actions(state.Actions)}\n" +
+                   $"Workers radicalized: [b]{state.Radicalization:P0}[/b]" + (state.Repression > 0.05 ? $" · repression {state.Repression:P0}" : "") + "\n" +
+                   (state.Uprising > 0 ? $"[color=#f2c94c][b]Revolution under way[/b], decided in {w.Turns(state.Uprising)}.[/color]\n" : "") +
+                   (last != null ? $"[color=#9aa0a8]Your {(last.Agitation ? "agitators" : "emissaries")} were here {w.Turns(w.Tick - last.Tick)} ago.[/color]\n" : "") +
+                   $"\nInfluence in hand: [b]{w.Influence:0}[/b]",
+        };
+        right.AddChild(text);
+        void Act(PlayerAction action)
+        {
+            var result = w.Apply(action);
+            CloseOverlay();
+            _toasts.Show(result.Message, result.Ok ? new Color(0.5f, 0.85f, 0.55f) : new Color(0.95f, 0.45f, 0.4f), 8);
+            Refresh();
+        }
+        Button Mission(string label, string tooltip, double cost, PlayerAction action)
+        {
+            var button = AddButton(right, $"{label} ({cost:0})", tooltip, () => Act(action));
+            button.Disabled = w.Influence < cost;
+            button.Alignment = HorizontalAlignment.Left;
+            return button;
+        }
+        Mission("Send emissaries", $"Meetings, newspapers and unions in {city}: {state.Name} warms toward you. Fascist governments barely listen.", b.CostDelegates, new SendDelegates(stateId, city));
+        Mission("Agitate the workers", $"Radicalize the workers of {city}. {state.Name}'s government notices and cools toward you.", b.CostAgitate, new AgitateWorkers(stateId, city));
+        if (state.Uprising > 0)
+            Mission("Support the rising", "Arms and organizers for the revolution under way: a better chance it wins, and a little drift at home.", b.CostSupportUprising, new SupportUprising(stateId));
+        ShowOverlay($"A mission to {city}", "", row, 780, ("Close", CloseOverlay));
+    }
+
     private static ulong NewSeed() => (ulong)Random.Shared.Next(1, 1_000_000);
 
     private void StartScenario(ScenarioDefinition scenario)
     {
+        _inGame = true;
         _scenario = scenario;
         NewGame();
         Say($"{scenario.Name} begins.");
@@ -861,7 +995,7 @@ public partial class Main : Control
     private void CloseOverlay()
     {
         _overlay?.QueueFree();
-        _overlay = null;
+        _overlay = _menu = null;
     }
 
     private void Do(PlayerAction action)
@@ -884,6 +1018,7 @@ public partial class Main : Control
         _map = new MapView { World = _world, SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsStretchRatio = 3 };
         _map.CommuneClicked += OnCommuneClicked;
         _map.StateClicked += SelectState;
+        _map.CityClicked += ShowMission;
         root.AddChild(_map);
 
         // Top-right of the map, clear of the commune list (bottom-left). They fade after a few seconds.
@@ -1110,7 +1245,7 @@ public partial class Main : Control
         worldTab.AddChild(_stateLore);
         var stateActions = new HFlowContainer();
         worldTab.AddChild(stateActions);
-        _delegatesButton = AddButton(stateActions, "Send delegates", "Meetings, newspapers and unions: the state warms toward you. Fascist governments barely listen.", () =>
+        _delegatesButton = AddButton(stateActions, "Send emissaries", "Meetings, newspapers and unions: the state warms toward you. Fascist governments barely listen.", () =>
         {
             if (_selectedState is { } id) Do(new SendDelegates(id));
         });
@@ -1527,6 +1662,7 @@ public partial class Main : Control
             // The world's own copy of the scenario has been mutated by play, so look up (or regenerate) the original.
             _scenario = FindScenario(world.Scenario.Id) ?? _scenario;
             CloseOverlay();
+            _inGame = true;
             SetWorld(world);
             Say($"Loaded {world.Turn} {world.Tick} ({world.Format(world.Date, "d MMMM yyyy")}).");
         }
