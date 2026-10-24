@@ -215,6 +215,49 @@ Real maps (the historical scenarios, open starts and the world view) are shaded 
 - **Building it:** `tools/geo/build_relief.py` builds the tiles (about 32 MB); see
   `tools/geo/README.md`.
 
+## Communes' proposals, scarcity prices and the ledger
+
+Three features that bring the game closer to Victoria 3, keeping the anarchist premise:
+
+- **Communes propose their own projects.** Every few weeks a commune puts a plan before the
+  movement, and you can back it (influence; the project starts with that commune at its
+  heart and its neighbours invited) or let it lapse (its people are disappointed). Plans
+  come from need:
+  - **Famine relief:** where a commune is starving.
+  - **A defensive campaign:** where a front is giving way.
+  - **An athenaeum:** where political education is thin.
+  - **A railway:** between industrial towns at least 15 km apart.
+  - **Collectivizing the works:** once no front is losing.
+
+  The same kind of plan isn't proposed twice running. The balanced AI backs proposals, except
+  the planners' collectivization.
+- **Scarcity prices.** Food and goods each have a price: 1 means about four weeks of stores
+  in hand, and the price rises as stores run down (0.4 to 3), moving over weeks rather than
+  overnight. No money changes hands between communes; prices are what scarcity costs:
+  - **Trade:** food sold abroad buys goods at the ratio of the two prices.
+  - **Gold:** gold buys less of whatever the federation is short of, because merchants know.
+  - **Wellbeing:** dear food weighs on industrial towns, which don't grow their own.
+
+  Prices show in the Resources section.
+- **The ledger (L).** A Victoria-style grid of charts, from the first week to now: food and
+  goods in store, both prices, wellbeing, enthusiasm, militia, gold, science, culture, drift,
+  communes, trust, influence and enemy strength. Each chart shows its current value and its
+  range.
+
+## Civilisations: lore and pictures
+
+Every civilisation on the world maps (634 across the 16 eras) has a short history from
+**Wikipedia** (CC BY-SA 4.0, credited), with a freely licensed picture from **Wikimedia
+Commons** where its article has one. Flags are skipped.
+- **Where it shows:** beside the open-start country map, and in the World tab for the
+  selected country.
+- **Era line:** a line built from the map data says what the state is in that era: its
+  regime, capital, power and neighbours.
+- **Building it:** `tools/ui/build_lore.py` fetches the text in one fast pass and the
+  pictures in a slow, resumable one, and only accepts an article that describes a people,
+  polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
+  the indigenous peoples of that region.
+
 ## Random events and pop-ups
 
 Besides each scenario's scripted dilemmas, **random events** happen: about one every couple of

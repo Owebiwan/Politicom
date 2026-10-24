@@ -84,6 +84,12 @@ internal static class EventSystem
         }
         if (e.PartyInfluence != 0)
             foreach (var c in w.Federation) c.PartyInfluence = Math.Clamp(c.PartyInfluence + e.PartyInfluence * (1 - c.PartyInfluence), 0, 1);
+        if (e.StartProject is { } project)
+        {
+            int? Id(string name) => name.Length == 0 ? null : w.Communes.FirstOrDefault(c => c.Name == name && c.InFederation)?.Id;
+            var started = ActionSystem.Propose(w, new ProposeProject(project, Id(e.ProjectTarget), Id(e.ProjectTarget2)), free: true);
+            if (!started.Ok) w.Emit(Severity.Info, $"The proposal lapses: {started.Message}");
+        }
         if (e.Federate.Length > 0) Global.RevolutionSystem.Federate(w, e.Federate);
         foreach (var (id, delta) in e.Stances)
             if (w.States.FirstOrDefault(s => s.Id == id) is { } state)

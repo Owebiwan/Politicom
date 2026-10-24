@@ -53,6 +53,10 @@ def api_info(title):
 
 
 def tone(img, focus=(0.5, 0.45)):
+    return tone_to(img, W, H, focus)
+
+
+def tone_to(img, W, H, focus=(0.5, 0.45)):
     # Crop to 12:5 around the focus.
     img = ImageOps.exif_transpose(img).convert("RGB")
     # Scans carry borders, mounts and captions at the edges: trim them first.

@@ -66,7 +66,10 @@ public sealed record GameEvent(int Tick, DateOnly Date, Severity Severity, strin
 public enum Outcome { Ongoing, Survived, Destroyed, BecameState }
 
 /// <summary>One week's headline numbers, kept for charts and the end-of-game summary.</summary>
-public sealed record WeekRecord(int Tick, double Drift, int Federated, int Occupied, int Seceded, double MeanTrust, double Influence, double EnemyStrength);
+/// <summary>One turn's headline numbers, kept for charts, the ledger and the end-of-game summary.</summary>
+public sealed record WeekRecord(int Tick, double Drift, int Federated, int Occupied, int Seceded, double MeanTrust, double Influence, double EnemyStrength,
+    double Food = 0, double Goods = 0, double FoodPrice = 1, double GoodsPrice = 1, double Enthusiasm = 0, double Fighters = 0,
+    double Gold = 0, double Science = 0, double Culture = 0, double Wellbeing = 0);
 
 /// <summary>Success is measured over time on four scores, not by conquest. Each runs 0..100.</summary>
 public sealed class Scores

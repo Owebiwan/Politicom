@@ -237,6 +237,19 @@ public sealed class Balance
     public double GoldMachines { get; set; } = 0.03;
     public double PurchaseDrift { get; set; } = 1;
 
+    // ── Scarcity prices ────────────────────────────────────────────────────
+    /// <summary>Weeks of stores at which a price is 1.</summary>
+    public double PriceWeeks { get; set; } = 4;
+    /// <summary>Wellbeing industrial towns lose per point the food price is above 1.</summary>
+    public double DearFoodWellbeing { get; set; } = 0.06;
+
+    // ── Communes' own proposals ────────────────────────────────────────────
+    /// <summary>Weeks between a commune's proposals at least, and the chance each week after that.</summary>
+    public double ProposalGap { get; set; } = 7;
+    public double ProposalRate { get; set; } = 0.25;
+    /// <summary>Influence to back a commune's proposal (cheaper than proposing it yourself).</summary>
+    public double CostBackProposal { get; set; } = 6;
+
     // ── Random events and risings ──────────────────────────────────────────
     /// <summary>Chance per week of a random event, once the gap since the last has passed.</summary>
     public double RandomEventRate { get; set; } = 0.12;

@@ -35,3 +35,8 @@
   attribution; never non-commercial or no-derivatives licences). They are cropped and toned by
   `tools/ui/process_event_art.py`. Each picture's author, date, licence and source page are
   in `Data/events/art_credits.json` and shown under it in the game.
+- Civilisation lore (`Data/lore/lore.json`): excerpts from **Wikipedia** articles, licensed
+  **CC BY-SA 4.0**. Each names its article and is credited in the game. Pictures
+  (`Game/art/lore/`) are from **Wikimedia Commons** under free licences (public domain, CC0,
+  CC BY, CC BY-SA), each credited, and toned to the game's style.
+

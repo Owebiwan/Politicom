@@ -36,6 +36,8 @@ public partial class Main : Control
     private Button _appealButton = null!, _delegatesButton = null!, _agitateButton = null!, _supportButton = null!;
     private VBoxContainer _stateList = null!;
     private string? _selectedState;
+    private VBoxContainer _stateLore = null!;
+    private string? _loreShown;
 
     private void SelectState(string id)
     {
@@ -71,6 +73,15 @@ public partial class Main : Control
         _supportButton.Text = $"Support the rising ({w.Balance.CostSupportUprising:0})";
         _delegatesButton.Text = $"Send delegates ({w.Balance.CostDelegates:0})";
         _agitateButton.Text = $"Agitate workers ({w.Balance.CostAgitate:0})";
+        // The selected country's lore, rebuilt only when the selection changes.
+        string? loreKey = selected is null ? null : $"{_map.Globe?.Era}:{selected.Id}";
+        if (loreKey != _loreShown)
+        {
+            _loreShown = loreKey;
+            foreach (var child in _stateLore.GetChildren()) child.QueueFree();
+            if (selected != null && _map.Globe is { } atlas && atlas.State(selected.Id) is { } st)
+                _stateLore.AddChild(Lore.Panel(atlas, st, 330));
+        }
         _stateDetail.Text = selected is null
             ? "[color=#808590]Click a country on the map, or one below.[/color]"
             : $"[b]{Esc(selected.Name)}[/b] — {Politicom.Sim.Global.StateText.Name(selected.Ideology)}, weight {selected.Weight:0.0} (power {selected.Power:0}, {(selected.Proximity >= 1 ? "a neighbour" : $"{selected.Proximity:P0} interest at this distance")})\n" +
@@ -197,6 +208,7 @@ public partial class Main : Control
             SetSpeed(0);
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
+        if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
         {
@@ -292,6 +304,7 @@ public partial class Main : Control
         {
             case Key.C: ToggleCommuneList(); break;
             case Key.K: ShowTechTree(); break;
+            case Key.L: ShowLedger(); break;
             case Key.W: ToggleWorldView(); break;
             case Key.R: _reliefToggle.ButtonPressed = !_reliefToggle.ButtonPressed; break;
             case Key.T:
@@ -683,8 +696,20 @@ public partial class Main : Control
         var hint = new Label { Text = "Click a country in colour to start there. Grey ones have too few cities on the map. Scroll or pinch to zoom, drag to move.", Modulate = new Color(1, 1, 1, 0.6f) };
         top.AddChild(hint);
 
-        var picker = new StatePicker { CustomMinimumSize = new Vector2(1180, 560) };
-        content.AddChild(picker);
+        // The map, with the chosen (or hovered) country's lore beside it.
+        var middle = new HBoxContainer();
+        middle.AddThemeConstantOverride("separation", 14);
+        content.AddChild(middle);
+        var picker = new StatePicker { CustomMinimumSize = new Vector2(840, 560) };
+        middle.AddChild(picker);
+        var loreScroll = new ScrollContainer { CustomMinimumSize = new Vector2(330, 560), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        middle.AddChild(loreScroll);
+        void ShowLore(string? id)
+        {
+            foreach (var child in loreScroll.GetChildren()) child.QueueFree();
+            if (id != null && Current().State(id) is { } st) loreScroll.AddChild(Lore.Panel(Current(), st, 314));
+            else loreScroll.AddChild(new Label { Text = "Point at a country to read about it.", Modulate = new Color(1, 1, 1, 0.5f) });
+        }
 
         var bottom = new HBoxContainer();
         bottom.AddThemeConstantOverride("separation", 16);
@@ -719,8 +744,13 @@ public partial class Main : Control
             play.Disabled = picker.Selected is null;
             play.Text = picker.Selected is { } id && atlas.State(id) is { } st ? $"Play {Politicom.Sim.Global.StateText.Country(st.Name)}" : "Play";
             info.Text = Describe(picker.Hovered ?? picker.Selected);
+            ShowLore(picker.Hovered ?? picker.Selected);
         }
-        picker.StateHovered += id => info.Text = Describe(id ?? picker.Selected);
+        picker.StateHovered += id =>
+        {
+            info.Text = Describe(id ?? picker.Selected);
+            ShowLore(id ?? picker.Selected);
+        };
         scope.ItemSelected += _ => info.Text = Describe(picker.Hovered ?? picker.Selected);
         picker.StateChosen += _ => Refresh();
         era.ItemSelected += _ => Refresh();
@@ -898,6 +928,7 @@ public partial class Main : Control
         _worldButton = AddButton(view, "World", "Zoom out to the whole world, or back to the region (W).", ToggleWorldView);
         AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
         AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
+        AddButton(view, "Ledger", "The federation's history: stores, prices, wellbeing, enthusiasm, militia, gold, science, culture, drift (L).", ShowLedger);
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show.", CustomMinimumSize = new Vector2(150, 0) };
         foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {mode}", (int)mode);
         _mapMode.ItemSelected += index =>
@@ -1056,6 +1087,8 @@ public partial class Main : Control
         _appealButton = AddButton(appeal, "International appeal", "Appeal to the workers of the world: twice the volunteers for a while. Sympathetic states warm a little.", () => Do(new InternationalAppeal()));
         Section(worldTab, "Selected country");
         _stateDetail = AddRich(worldTab);
+        _stateLore = new VBoxContainer();
+        worldTab.AddChild(_stateLore);
         var stateActions = new HFlowContainer();
         worldTab.AddChild(stateActions);
         _delegatesButton = AddButton(stateActions, "Send delegates", "Meetings, newspapers and unions: the state warms toward you. Fascist governments barely listen.", () =>
@@ -1186,6 +1219,13 @@ public partial class Main : Control
         }
     }
 
+    private void ShowLedger()
+    {
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(1080, 620), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        scroll.AddChild(new LedgerView(_world));
+        ShowOverlay("Ledger", "The federation week by week. Each chart runs from the first week to now.", scroll, 1140, ("Close", CloseOverlay));
+    }
+
     /// <summary>The federation's food and goods: what it holds, makes and needs, and where it falls short.</summary>
     private static string ResourcesText(World w)
     {
@@ -1206,6 +1246,8 @@ public partial class Main : Control
         var text = $"{UiTheme.Img("food")} [b]Food[/b] {food:0} in store, {foodMade:0} {(w.Scenario.FoodImports > 0 ? "grown and imported" : "grown")} against {foodNeed:0} eaten a {turn} ({Rate(foodMade, foodNeed)}) · " +
                    $"{(foodNeed > 0 ? food / foodNeed : 0):0} {turn}s in reserve\n" +
                    $"{UiTheme.Img("goods")} [b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
+        string Dear(double p) => p > 1.3 ? "#f07060" : p < 0.8 ? "#70d080" : "#e4dccb";
+        text += $"\n{UiTheme.Img("treasury")} [b]Prices[/b] food [color={Dear(w.FoodPrice)}]{w.FoodPrice:0.00}[/color] · goods [color={Dear(w.GoodsPrice)}]{w.GoodsPrice:0.00}[/color] [color=#9a9283](1 = four weeks in store; scarcity raises them)[/color]";
         var from = new List<string>();
         if (w.LastArms > 0.05) from.Add($"arms {w.LastArms:0.0}");
         if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");

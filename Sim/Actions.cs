@@ -157,7 +157,10 @@ internal static class ActionSystem
         return ActionResult.Done($"Mediated {x.Name} ↔ {y.Name}: trust now {w.Trust[x.Id, y.Id]:P0}.");
     }
 
-    private static ActionResult Propose(World w, ProposeProject a)
+    private static ActionResult Propose(World w, ProposeProject a) => Propose(w, a, free: false);
+
+    /// <summary>Starts a project; free when a commune proposed it and the movement backed it (paid in the decision).</summary>
+    internal static ActionResult Propose(World w, ProposeProject a, bool free)
     {
         var b = w.Balance;
         var def = ProjectCatalog.Get(a.Kind);
@@ -170,7 +173,7 @@ internal static class ActionSystem
             return ActionResult.Fail("Those two communes are already joined by rail.");
         if (w.ActiveProjects.Any(p => p.Kind == a.Kind && p.Target == a.Target && p.Target2 == a.Target2))
             return ActionResult.Fail("That project is already under way.");
-        if (!Spend(w, b.CostPropose)) return Broke(w, b.CostPropose);
+        if (!free && !Spend(w, b.CostPropose)) return Broke(w, b.CostPropose);
 
         var project = new Project
         {
@@ -345,6 +348,9 @@ internal static class ActionSystem
         if (w.States.Count > 0 && seller is null) return ActionResult.Fail("No state will sell to the federation.");
         // Middlemen take more the more of the world refuses to trade; smugglers take a third.
         double value = seller is null ? 0.66 : 1 - 0.5 * w.Embargo;
+        // Merchants know what the federation is short of: scarce things cost more.
+        double price = a.What switch { Purchase.Grain => w.FoodPrice, Purchase.Arms => w.GoodsPrice, _ => 1 };
+        value /= Math.Clamp(price, 0.6, 2.5);
         var members = w.Federation.ToList();
         string what;
         switch (a.What)

@@ -119,6 +119,32 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
+    {
+        var w = NewWorld();
+        w.Step();
+        double food = w.FoodPrice;
+        foreach (var c in w.Communes) c.Food *= 0.1;
+        for (int i = 0; i < 6; i++) w.Step();
+        Assert.True(w.FoodPrice > food + 0.3, $"{food} -> {w.FoodPrice}");
+        Assert.InRange(w.FoodPrice, 0.4, 3);
+        Assert.Equal(w.FoodPrice, World.LoadJson(w.SaveJson(), w.Techs).FoodPrice, 6);
+        Assert.Equal(w.FoodPrice, w.History[^1].FoodPrice, 6);
+    }
+
+    [Fact]
+    public void Communes_propose_projects_and_backing_one_starts_it()
+    {
+        var w = NewWorld();
+        for (int i = 0; i < 60 && !w.PendingEvents.Any(p => p.Id.StartsWith("proposal_")); i++) w.Step();
+        var proposal = w.PendingEvents.First(p => p.Id.StartsWith("proposal_"));
+        int before = w.ActiveProjects.Count();
+        w.Influence = 50;
+        Assert.True(w.Apply(new ChooseEventOption(proposal.Id, 0)).Ok);
+        Assert.Equal(before + 1, w.ActiveProjects.Count());
+    }
+
+    [Fact]
     public void Volunteers_strengthen_a_front_at_the_cost_of_work_and_conscription_adds_drift()
     {
         var calm = NewWorld();
@@ -545,11 +571,15 @@ public class SimulationTests
         foreach (var s in w.States) s.Stance = 0.1; // nobody embargoes
         w.Step();
         Assert.Equal(0, w.Embargo, 6);
-        double open = w.LastImports / w.LastExports;
+        // The rate moves with scarcity prices too; compare it with them taken out.
+        double Rate() => w.LastImports / w.LastExports / Math.Clamp(w.FoodPrice / w.GoodsPrice, 0.4, 2.5);
+        double open = Rate();
         foreach (var s in w.States.Where(s => s.Ideology != Global.Ideology.Communist)) s.Stance = -0.9;
-        w.Step();
+        w.Step(); // the embargo is declared (diplomacy comes after trade within a turn)
         Assert.True(w.Embargo > 0.5, $"embargo {w.Embargo}");
-        Assert.True(w.LastImports / w.LastExports < open);
+        foreach (var s in w.States.Where(s => s.Ideology != Global.Ideology.Communist)) s.Stance = -0.9;
+        w.Step(); // and trade under it
+        Assert.True(Rate() < open);
     }
 
     [Fact]
@@ -1110,12 +1140,13 @@ public class SimulationTests
     {
         var w = NewWorld();
         w.Run(11);
-        var pending = Assert.Single(w.PendingEvents);
+        // Random events and communes' proposals may be waiting too; this is about the scripted one.
+        var pending = Assert.Single(w.PendingEvents, p => !p.Id.StartsWith("random_") && !p.Id.StartsWith("proposal_"));
         Assert.Equal("cnt_joins_government", pending.Id);
         double influence = w.Influence;
         var result = w.Apply(new ChooseEventOption(pending.Id, 1)); // stay outside
         Assert.True(result.Ok, result.Message);
-        Assert.Empty(w.PendingEvents);
+        Assert.DoesNotContain(w.PendingEvents, p => p.Id == pending.Id);
         Assert.Equal(influence - 5, w.Influence, 6);
     }
 
@@ -1124,7 +1155,7 @@ public class SimulationTests
     {
         var w = NewWorld();
         w.Run(11);
-        Assert.Single(w.PendingEvents);
+        Assert.Contains(w.PendingEvents, p => p.Id == "cnt_joins_government");
         w.Run(5);
         Assert.DoesNotContain(w.PendingEvents, p => p.Id == "cnt_joins_government");
         Assert.Contains(w.Log, e => e.Text.StartsWith("Into the Generalitat?: with no answer"));

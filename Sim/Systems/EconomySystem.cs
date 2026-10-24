@@ -9,6 +9,7 @@ internal static class EconomySystem
     public static void Run(World w)
     {
         Produce(w);
+        Prices(w);
         Trade(w);
         foreach (var food in new[] { true, false })
         {
@@ -18,6 +19,28 @@ internal static class EconomySystem
         Shortages(w);
         Ledgers(w);
         Wellbeing(w);
+    }
+
+    /// <summary>
+    /// Scarcity prices: how dear food and goods are in the federation, from its stores against
+    /// what it uses (1 = about four weeks in hand). No money changes hands between communes; the
+    /// prices are what scarcity costs: they set what trade and gold buy abroad, and dear food
+    /// weighs on the towns that don't grow their own.
+    /// </summary>
+    private static void Prices(World w)
+    {
+        var members = w.Federation.ToList();
+        if (members.Count == 0) return;
+        double Price(double stock, double use)
+        {
+            double weeks = stock / Math.Max(0.01, use);
+            return Math.Clamp(Math.Sqrt(w.Balance.PriceWeeks / Math.Max(0.25, weeks)), 0.4, 3);
+        }
+        double food = Price(members.Sum(c => Math.Max(0, c.Food)), members.Sum(c => w.FoodDemand(c)) / w.Weeks);
+        double goods = Price(members.Sum(c => Math.Max(0, c.Goods)), members.Sum(c => w.GoodsDemand(c)) / w.Weeks);
+        double k = Math.Min(1, 0.25 * w.Weeks); // prices move over weeks, not overnight
+        w.FoodPrice += (food - w.FoodPrice) * k;
+        w.GoodsPrice += (goods - w.GoodsPrice) * k;
     }
 
     private static void Produce(World w)
@@ -68,7 +91,8 @@ internal static class EconomySystem
             c.Food -= sold;
             w.LastExports += sold;
         }
-        w.LastImports = w.LastExports * b.TradeRate * (1 - w.Embargo);
+        // Food sold abroad buys goods at the ratio of the federation's own scarcity prices.
+        w.LastImports = w.LastExports * b.TradeRate * (1 - w.Embargo) * Math.Clamp(w.FoodPrice / w.GoodsPrice, 0.4, 2.5);
         if (w.LastImports <= 0) return;
         // Arms go to the front first, the rest by population.
         var fronts = members.Where(c => c.Front).ToList();
@@ -231,6 +255,7 @@ internal static class EconomySystem
                             - 0.04 * stage
                             - (c.Front ? 0.15 * (1 - c.Control) : 0)
                             - (w.RecallPenaltyTicks > 0 ? 0.03 : 0);
+            if (c.Kind == CommuneKind.Industrial) target -= w.Balance.DearFoodWellbeing * Math.Max(0, w.FoodPrice - 1);
             c.Wellbeing = Math.Clamp(c.Wellbeing + (target - c.Wellbeing) * 0.15, 0, 1);
         }
     }

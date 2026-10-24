@@ -90,6 +90,12 @@ public sealed class World
     /// <summary>Production, militia and contagion multiplier from enthusiasm (1 at the start).</summary>
     public double EnthusiasmFactor => 1 + Balance.EnthusiasmEffect * (Enthusiasm - Balance.StartEnthusiasm);
 
+    /// <summary>Scarcity prices in the federation (1 = about four weeks of stores in hand).</summary>
+    public double FoodPrice { get; internal set; } = 1;
+    public double GoodsPrice { get; internal set; } = 1;
+    /// <summary>Turn of the last commune proposal.</summary>
+    public int LastProposal { get; internal set; } = -999;
+    public ProjectKind? LastProposalKind { get; internal set; }
     /// <summary>Turn of the last random event.</summary>
     public int LastRandomEvent { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
@@ -346,6 +352,10 @@ public sealed class World
         Breakthroughs = Breakthroughs,
         TechLevelStart = TechLevelStart,
         LastRandomEvent = LastRandomEvent,
+        LastProposal = LastProposal,
+        FoodPrice = FoodPrice,
+        GoodsPrice = GoodsPrice,
+        LastProposalKind = LastProposalKind,
         Enthusiasm = Enthusiasm,
         Gold = Gold,
         Conscription = Conscription,
@@ -398,6 +408,10 @@ public sealed class World
             Breakthroughs = s.Breakthroughs,
             TechLevelStart = s.TechLevelStart,
             LastRandomEvent = s.LastRandomEvent,
+            LastProposal = s.LastProposal,
+            FoodPrice = s.FoodPrice,
+            GoodsPrice = s.GoodsPrice,
+            LastProposalKind = s.LastProposalKind,
             Enthusiasm = s.Enthusiasm,
             Gold = s.Gold,
             Conscription = s.Conscription,
@@ -434,6 +448,7 @@ public sealed class World
         RefreshTechShares();
         EventSystem.Run(this);
         RandomEventSystem.Run(this);
+        ProposalSystem.Run(this);
         EconomySystem.Run(this);
         EducationSystem.Run(this);
         ResearchSystem.Run(this);
@@ -514,7 +529,9 @@ public sealed class World
         var edges = Trust.Edges().Where(e => Communes[e.A].InFederation && Communes[e.B].InFederation).ToList();
         History.Add(new WeekRecord(Tick, Drift.Value, Federation.Count(), _communes.Count(c => c.Occupied),
             _communes.Count(c => !c.Occupied && !c.Federated),
-            edges.Count == 0 ? 0 : edges.Average(e => Trust[e.A, e.B]), Influence, Enemies.Sum(e => e.EffectiveStrength)));
+            edges.Count == 0 ? 0 : edges.Average(e => Trust[e.A, e.B]), Influence, Enemies.Sum(e => e.EffectiveStrength),
+            Federation.Sum(c => Math.Max(0, c.Food)), Federation.Sum(c => Math.Max(0, c.Goods)), FoodPrice, GoodsPrice, Enthusiasm, Fighters,
+            Gold, LastScience, Mean(c => c.Culture), Mean(c => c.Wellbeing)));
     }
 
     private void CheckOutcome()

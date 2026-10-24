@@ -115,6 +115,9 @@ public sealed class Balanced : IPolicy
 
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(crisis && w.Drift.Value < 15));
         Helpers.AcceptFederation(w);
+        // Back communes' own proposals, unless it's the planners' collectivization or influence is short.
+        foreach (var pending in w.PendingEvents.Where(p => p.Id.StartsWith("proposal_") && !p.Id.Contains("Collectivization")).ToList())
+            if (w.Influence > b.CostBackProposal + 10) w.Apply(new ChooseEventOption(pending.Id, 0));
         Helpers.AnswerEvents(w, e => e.Drift + e.EnemyStrength * (crisis ? 6 : 3) - e.Influence * 0.05 - e.Wellbeing * 10 - e.Trust * 20);
 
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);

@@ -32,6 +32,10 @@ public sealed class EventEffects
     public double Population { get; set; }
     /// <summary>Culture added in the affected communes.</summary>
     public double Culture { get; set; }
+    /// <summary>A project to start (a commune's proposal the movement backs), with its target communes by name.</summary>
+    public ProjectKind? StartProject { get; set; }
+    public string ProjectTarget { get; set; } = "";
+    public string ProjectTarget2 { get; set; } = "";
     /// <summary>Gold gained (or spent).</summary>
     public double Gold { get; set; }
     /// <summary>Change in the revolution's enthusiasm.</summary>
@@ -77,6 +81,7 @@ public sealed class EventEffects
         Add(Drift, "drift");
         Add(Food, "food per thousand people" + scope);
         Add(Gold, "gold");
+        if (StartProject is { } kind) parts.Add($"starts a {ProjectCatalog.Get(kind).Name.ToLowerInvariant()}");
         Add(Enthusiasm * 100, "% enthusiasm");
         Add(Population * 100, "% population" + scope);
         Add(Culture * 100, "% culture" + scope);
