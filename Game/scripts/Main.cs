@@ -242,7 +242,7 @@ public partial class Main : Control
             if (args[i] != "--click") continue;
             var xy = args[i + 1].Split(',').Select(v => float.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
             var clickAt = GetViewport().GetFinalTransform() * (GetViewport().GetVisibleRect().Size * new Vector2(xy[0], xy[1])); // window coordinates
-            for (int f = 0; f < 3; f++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            for (int f = 0; f < 12; f++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             GetViewport().PushInput(new InputEventMouseMotion { Position = clickAt, GlobalPosition = clickAt });
             GetViewport().PushInput(new InputEventMouseButton { Position = clickAt, GlobalPosition = clickAt, ButtonIndex = MouseButton.Left, Pressed = true, ButtonMask = MouseButtonMask.Left });
             GetViewport().PushInput(new InputEventMouseButton { Position = clickAt, GlobalPosition = clickAt, ButtonIndex = MouseButton.Left, Pressed = false });

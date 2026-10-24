@@ -105,8 +105,8 @@
 "title": "Pygmy peoples",
 "extract": "In anthropology, pygmy peoples are ethnic groups whose average height is unusually short. The term pygmyism is used to describe the phenotype of endemic short stature for populations in which adult men are on average less than 150 cm tall.",
 "url": "https://en.wikipedia.org/wiki/Pygmy_peoples",
-"image": "",
-"credit": "",
+"image": "north_american_pacific_foraging_hunting__01627b",
+"credit": "JMGRACIA100 · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Living_on_the_rainforest.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Living_on_the_rainforest.jpg/330px-Living_on_the_rainforest.jpg"
 },
@@ -114,8 +114,8 @@
 "title": "Indigenous peoples of the Americas",
 "extract": "The Indigenous peoples of the Americas, also called Indians, Amerindians, Indigenous Americans or simply Natives, are the peoples who are native to the Americas or the Western Hemisphere. Their ancestors are among the pre-Columbian population of South or North America, including Central America and the Caribbean. Indigenous peoples live throughout the Americas.",
 "url": "https://en.wikipedia.org/wiki/Indigenous_peoples_of_the_Americas",
-"image": "",
-"credit": "",
+"image": "caribbean_hunter_gatherers_8f2b65",
+"credit": "Locoluis · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Distribution_of_Indigenous_Peoples_in_the_Americas.svg/3840px-Distribution_of_Indigenous_Peoples_in_the_Americas.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Distribution_of_Indigenous_Peoples_in_the_Americas.svg/330px-Distribution_of_Indigenous_Peoples_in_the_Americas.svg.png"
 },
@@ -123,8 +123,8 @@
 "title": "Aboriginal Tasmanians",
 "extract": "Aboriginal Tasmanians are the Aboriginal people of Tasmania, a large island south of mainland Australia. Aboriginal people lived in Tasmania for tens of thousands of years before European settlement. Around 6000 BCE, rising sea levels flooded the Bass Strait and separated Tasmania from mainland Australia.",
 "url": "https://en.wikipedia.org/wiki/Aboriginal_Tasmanians",
-"image": "",
-"credit": "",
+"image": "tasmanian_hunter_gatherers_769800",
+"credit": "Benjamin Duterrau (1768–1851) · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg/330px-Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg"
 },
@@ -132,8 +132,8 @@
 "title": "Madagascar",
 "extract": "Madagascar, officially the Republic of Madagascar, is an island country in the Indian Ocean that includes the island of Madagascar and numerous smaller peripheral islands. Lying off the southeastern coast of Africa, it is the world's fourth-largest island, the second-largest island country, and the 46th-largest country overall. Its capital and largest city is Antananarivo.",
 "url": "https://en.wikipedia.org/wiki/Madagascar",
-"image": "",
-"credit": "",
+"image": "madagascar_b5bcce",
+"credit": "M.Bitton · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Madagascar_%28centered_orthographic_projection%29.svg/960px-Madagascar_%28centered_orthographic_projection%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Madagascar_%28centered_orthographic_projection%29.svg/330px-Madagascar_%28centered_orthographic_projection%29.svg.png"
 },
@@ -144,7 +144,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Flag_of_Yemen.svg/960px-Flag_of_Yemen.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Flag_of_Yemen.svg/330px-Flag_of_Yemen.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Flag_of_Yemen.svg/330px-Flag_of_Yemen.svg.png",
+"noimage": true
 },
 "Sweden": {
 "title": "Sweden",
@@ -153,7 +154,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/4c/Flag_of_Sweden.svg/1920px-Flag_of_Sweden.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/4c/Flag_of_Sweden.svg/330px-Flag_of_Sweden.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/4c/Flag_of_Sweden.svg/330px-Flag_of_Sweden.svg.png",
+"noimage": true
 },
 "Netherlands": {
 "title": "Netherlands",
@@ -162,14 +164,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/960px-Flag_of_the_Netherlands.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/330px-Flag_of_the_Netherlands.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/330px-Flag_of_the_Netherlands.svg.png",
+"noimage": true
 },
 "Ainu": {
 "title": "Ainu people",
 "extract": "The Ainu are an indigenous ethnic group who reside in northern Japan and southeastern Russia, including Hokkaido and the Tōhoku region of Honshu, as well as the land surrounding the Sea of Okhotsk, such as Sakhalin, the Kuril Islands, the Kamchatka Peninsula, and the Khabarovsk Krai. They have occupied these areas, known to them as \"Ainu Mosir\", since before the arrival of the modern Yamato and Russians.",
 "url": "https://en.wikipedia.org/wiki/Ainu_people",
-"image": "",
-"credit": "",
+"image": "ainu_9895b5",
+"credit": "Torbenbrinker · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/6/61/AinuSan.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/AinuSan.jpg/330px-AinuSan.jpg"
 },
@@ -180,7 +183,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/1/12/Flag_of_Poland.svg/1280px-Flag_of_Poland.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/1/12/Flag_of_Poland.svg/330px-Flag_of_Poland.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/1/12/Flag_of_Poland.svg/330px-Flag_of_Poland.svg.png",
+"noimage": true
 },
 "Mali": {
 "title": "Mali",
@@ -189,7 +193,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/960px-Flag_of_Mali.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/330px-Flag_of_Mali.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/330px-Flag_of_Mali.svg.png",
+"noimage": true
 },
 "Denmark": {
 "title": "Denmark",
@@ -198,7 +203,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_Denmark.svg/960px-Flag_of_Denmark.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_Denmark.svg/330px-Flag_of_Denmark.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_Denmark.svg/330px-Flag_of_Denmark.svg.png",
+"noimage": true
 },
 "Ottoman Empire": {
 "title": "Ottoman Empire",
@@ -207,7 +213,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg/1280px-Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg/330px-Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg/330px-Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg.png",
+"noimage": true
 },
 "Ethiopia": {
 "title": "Ethiopia",
@@ -216,7 +223,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/1280px-Flag_of_Ethiopia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/330px-Flag_of_Ethiopia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/330px-Flag_of_Ethiopia.svg.png",
+"noimage": true
 },
 "Morocco": {
 "title": "Morocco",
@@ -225,7 +233,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/960px-Flag_of_Morocco.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/330px-Flag_of_Morocco.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/330px-Flag_of_Morocco.svg.png",
+"noimage": true
 },
 "Afghanistan": {
 "title": "Afghanistan",
@@ -234,14 +243,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/1280px-Flag_of_the_Taliban.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
+"noimage": true
 },
 "Nepal": {
 "title": "Nepal",
 "extract": "Nepal, officially Federal Democratic Republic of Nepal, is a landlocked country in South Asia. It is mainly situated in the Himalayas, but also includes parts of the Indo-Gangetic Plain. It borders the Tibet Autonomous Region of China to the north, and India to the south, east, and west, while it is narrowly separated from Bangladesh by the Siliguri Corridor, and from Bhutan by the Indian state of Sikkim.",
 "url": "https://en.wikipedia.org/wiki/Nepal",
-"image": "",
-"credit": "",
+"image": "nepal_7fef6b",
+"credit": "Biplab Anand · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/1920px-Emblem_of_Nepal.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/330px-Emblem_of_Nepal.svg.png"
 },
@@ -249,8 +259,8 @@
 "title": "Ancient Paleo-Siberian",
 "extract": "In archaeogenetics, the term Ancient Paleo-Siberian is the name given to an ancestral component that represents the lineage of the hunter-gatherer people of the 15th–10th millennia before present, in northern and northeastern Siberia.",
 "url": "https://en.wikipedia.org/wiki/Ancient_Paleo-Siberian",
-"image": "",
-"credit": "",
+"image": "paleo_siberian_hunter_gatherers_b07836",
+"credit": "naturalearthdata.com, offered to the Public Domain per Terms of Use · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Map_of_the_Ancient_Paleo-Siberians.png/3840px-Map_of_the_Ancient_Paleo-Siberians.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Map_of_the_Ancient_Paleo-Siberians.png/330px-Map_of_the_Ancient_Paleo-Siberians.png"
 },
@@ -258,8 +268,8 @@
 "title": "Indigenous peoples of the Americas",
 "extract": "The Indigenous peoples of the Americas, also called Indians, Amerindians, Indigenous Americans or simply Natives, are the peoples who are native to the Americas or the Western Hemisphere. Their ancestors are among the pre-Columbian population of South or North America, including Central America and the Caribbean. Indigenous peoples live throughout the Americas.",
 "url": "https://en.wikipedia.org/wiki/Indigenous_peoples_of_the_Americas",
-"image": "",
-"credit": "",
+"image": "eastern_north_american_hunter_gatherers_fa8b36",
+"credit": "Locoluis · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Distribution_of_Indigenous_Peoples_in_the_Americas.svg/3840px-Distribution_of_Indigenous_Peoples_in_the_Americas.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Distribution_of_Indigenous_Peoples_in_the_Americas.svg/330px-Distribution_of_Indigenous_Peoples_in_the_Americas.svg.png"
 },
@@ -267,8 +277,8 @@
 "title": "Ket people",
 "extract": "Kets are a Yeniseian-speaking people in Siberia. During the Russian Empire, they were known as Ostyaks, without differentiating them from several other Siberian people. Later, they became known as Yenisei Ostyaks because they lived in the middle and lower basin of the Yenisei River in the Krasnoyarsk Krai district of Russia.",
 "url": "https://en.wikipedia.org/wiki/Ket_people",
-"image": "",
-"credit": "",
+"image": "finno_ugric_taiga_hunter_gatherers_10b34a",
+"credit": "Fridtjof Nansen · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/No-nb_bldsa_3f077.jpg/3840px-No-nb_bldsa_3f077.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/No-nb_bldsa_3f077.jpg/330px-No-nb_bldsa_3f077.jpg"
 },
@@ -276,8 +286,8 @@
 "title": "Athabaskan languages",
 "extract": "Athabaskan, also known as Dene, is a large branch of the Na-Dene language family of North America, located in western North America in three areal language groups: Northern, Pacific Coast and Southern. Kari and Potter (2010:10) place the total territory of the 53 Athabaskan languages at 4,022,000 square kilometres (1,553,000 sq mi).",
 "url": "https://en.wikipedia.org/wiki/Athabaskan_languages",
-"image": "",
-"credit": "",
+"image": "athabaskan_9bf2e1",
+"credit": "Noahedits · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Athabaskan_languages.svg/960px-Athabaskan_languages.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Athabaskan_languages.svg/330px-Athabaskan_languages.svg.png"
 },
@@ -288,7 +298,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/960px-Flag_of_Japan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/330px-Flag_of_Japan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/330px-Flag_of_Japan.svg.png",
+"noimage": true
 },
 "Philippines": {
 "title": "Philippines",
@@ -297,7 +308,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/1280px-Flag_of_the_Philippines.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/330px-Flag_of_the_Philippines.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/330px-Flag_of_the_Philippines.svg.png",
+"noimage": true
 },
 "Cambodia": {
 "title": "Cambodia",
@@ -306,7 +318,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_Cambodia.svg/1280px-Flag_of_Cambodia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_Cambodia.svg/330px-Flag_of_Cambodia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_Cambodia.svg/330px-Flag_of_Cambodia.svg.png",
+"noimage": true
 },
 "Congo": {
 "title": "History of the Democratic Republic of the Congo",
@@ -324,7 +337,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/1280px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/330px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/330px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png",
+"noimage": true
 },
 "Paraguay": {
 "title": "Paraguay",
@@ -333,14 +347,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/1280px-Flag_of_Paraguay.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/330px-Flag_of_Paraguay.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/330px-Flag_of_Paraguay.svg.png",
+"noimage": true
 },
 "Bantu peoples": {
 "title": "Bantu peoples",
 "extract": "The Bantu peoples are an ethnolinguistic grouping of approximately 400 distinct Indigenous African ethnic groups who speak Bantu languages. The languages are native to countries spread over a vast area from West Africa, to Central Africa, Southeast Africa, East Africa and into Southern Africa. Bantu people also inhabit southern areas of Northeast African states.",
 "url": "https://en.wikipedia.org/wiki/Bantu_peoples",
-"image": "",
-"credit": "",
+"image": "bantu_peoples_7721e6",
+"credit": "Edricson · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/1/12/Bantu_zones.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Bantu_zones.png/330px-Bantu_zones.png"
 },
@@ -348,8 +363,8 @@
 "title": "Tibet",
 "extract": "Tibet is a region in the western part of East Asia, covering much of the Tibetan Plateau. It is the homeland of the Tibetans. Other ethnic groups also reside on the plateau, including Mongols, the Lhoba, Monpa, Qiang, Sherpa, and since the 20th century, Han and Hui peoples.",
 "url": "https://en.wikipedia.org/wiki/Tibet",
-"image": "",
-"credit": "",
+"image": "tibet_bbae7b",
+"credit": "University of Texas Libraries · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Tibet-claims.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Tibet-claims.jpg/330px-Tibet-claims.jpg"
 },
@@ -366,8 +381,8 @@
 "title": "Holy Roman Empire",
 "extract": "The Holy Roman Empire, also known as the Holy Roman Empire of the German Nation after 1512, was a polity comprising and controlling much of Central Europe and Western Europe, headed by the Holy Roman Emperor and characterized by a decentralized political structure. It developed in the Early Middle Ages, and lasted for a millennium until its dissolution in 1806 during the Napoleonic Wars.",
 "url": "https://en.wikipedia.org/wiki/Holy_Roman_Empire",
-"image": "",
-"credit": "",
+"image": "holy_roman_empire_c3d433",
+"credit": "David Liuzzo, eagle by N3MO · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Banner_of_the_Holy_Roman_Emperor_with_haloes_%281430-1806%29.svg/960px-Banner_of_the_Holy_Roman_Emperor_with_haloes_%281430-1806%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Banner_of_the_Holy_Roman_Emperor_with_haloes_%281430-1806%29.svg/330px-Banner_of_the_Holy_Roman_Emperor_with_haloes_%281430-1806%29.svg.png"
 },
@@ -378,14 +393,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg/960px-The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg/330px-The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg/330px-The_flag_of_the_%27Kingdom_of_Dongola%27_%28Makuria%29_in_the_%22Book_of_all_kingdoms%22_%28C._1350%29.svg.png",
+"noimage": true
 },
 "Thule": {
 "title": "Thule",
 "extract": "Thule is the most northerly location mentioned in ancient Greek and Roman literature and cartography. First written of by the Greek explorer Pytheas of Massalia in about 320 BC, it was often described by later writers as an island north of Ireland or Britain, despite that Pytheas never explicitly described it as an island. Modern interpretations have included Orkney, Shetland, Northern Scotland, the Faroe Islands, and Iceland.",
 "url": "https://en.wikipedia.org/wiki/Thule",
-"image": "",
-"credit": "",
+"image": "thule_6543b3",
+"credit": "Olaus Magnus · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/4/44/Thule_carta_marina_Olaus_Magnus.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Thule_carta_marina_Olaus_Magnus.jpg/330px-Thule_carta_marina_Olaus_Magnus.jpg"
 },
