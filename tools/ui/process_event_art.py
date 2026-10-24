@@ -103,7 +103,7 @@ def main():
     for slot, pick in picks.items():
         if only and slot not in only:
             continue
-        if not only and "--force" not in sys.argv and slot in credits and os.path.exists(os.path.join(OUT, slot + ".jpg")):
+        if not only and "--force" not in sys.argv and slot in credits and os.path.exists(os.path.join(OUT, slot.replace("#", "-") + ".jpg")):
             continue  # done already
         try:
             process(slot, pick, credits)
@@ -120,7 +120,7 @@ def process(slot, pick, credits):
             print(f"{slot}: skipped, licence is {lic!r}")
             return
         # Downloads are cached (tools/ui/.art_cache/, not committed), so re-toning needs no network.
-        cache = os.path.join(HERE, ".art_cache", slot + ".bin")
+        cache = os.path.join(HERE, ".art_cache", slot.replace("#", "-") + ".bin")
         if not os.path.exists(cache):
             url = info.get("thumburl") or info["url"]
             os.makedirs(os.path.dirname(cache), exist_ok=True)
@@ -130,7 +130,7 @@ def process(slot, pick, credits):
                 f.write(data)
             time.sleep(30)
         img = Image.open(cache)
-        tone(img, tuple(pick.get("focus", (0.5, 0.45)))).save(os.path.join(OUT, slot + ".jpg"), quality=86, optimize=True)
+        tone(img, tuple(pick.get("focus", (0.5, 0.45)))).save(os.path.join(OUT, slot.replace("#", "-") + ".jpg"), quality=86, optimize=True)
         artist = clean(meta.get("Artist", {}).get("value"))
         half = len(artist) // 2
         if len(artist) % 2 == 0 and artist[:half] == artist[half:]:

@@ -422,5 +422,93 @@
    0.5,
    0.45
   ]
+ },
+ "war_medieval#2": {
+  "file": "File:Batalha de Aljubarrota - Chroniques de Froissart (Holanda, c. 1450-1460).png",
+  "caption": "Knights in battle, from a medieval chronicle",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "war_industrial#2": {
+  "file": "File:Battle Scene from the Franco-Prussian War-Wilfrid Constant Beauquesne-1896.jpg",
+  "caption": "A cavalry charge, 19th century",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "war_modern#2": {
+  "file": "File:5th Siberian Polish Division 1919.jpg",
+  "caption": "Soldiers of the Russian Civil War",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "uprising_industrial#2": {
+  "file": "File:Barricade place Vendome Commune Paris 1871.jpg",
+  "caption": "A street barricade of the Paris Commune, 1871",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "uprising_modern#2": {
+  "file": "File:19170704 Riot on Nevsky prosp Petrograd.jpg",
+  "caption": "Demonstrators scattered by gunfire, Petrograd, July 1917",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "uprising_modern#3": {
+  "file": "File:Open Letter Demonstration of Estonians in Petrograd 1917 March 26th.jpg",
+  "caption": "A workers' demonstration, Petrograd, 1917",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "assembly_industrial#2": {
+  "file": "File:Geneva Congress of the First International, 1866.jpg",
+  "caption": "Delegates of the International Workingmen's Association",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "festival_industrial#2": {
+  "file": "File:Cesare Tiratelli Dorffest.jpg",
+  "caption": "A village festival, 19th century",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "town_medieval#2": {
+  "file": "File:Nuremberg chronicles - ULMA.png",
+  "caption": "A walled city, from the Nuremberg Chronicle",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "fire#2": {
+  "file": "File:The Great Fire of London.png",
+  "caption": "A city burning at night",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "faith_earlymodern#2": {
+  "file": "File:Francisco rizi-auto de fe.jpg",
+  "caption": "An auto-da-fé in the Plaza Mayor",
+  "focus": [
+   0.5,
+   0.5
+  ]
  }
 }

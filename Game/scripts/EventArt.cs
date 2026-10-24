@@ -53,10 +53,25 @@ internal static class EventArt
         return _credits;
     }
 
-    private static bool Has(string slot) => Credits().ContainsKey(slot) && ResourceLoader.Exists($"res://art/events/{slot}.jpg");
+    private static bool Exists(string slot) => Credits().ContainsKey(slot) && ResourceLoader.Exists($"res://art/events/{Uri(slot)}.jpg");
+    private static bool Has(string slot) => Exists(slot);
+    /// <summary>File name for a slot: variants "war_industrial#2" are stored as "war_industrial-2".</summary>
+    private static string Uri(string slot) => slot.Replace('#', '-');
+
+    /// <summary>The slot or one of its variants (slot#2, slot#3…), the same one for the same event.</summary>
+    private static string Variant(string slot, string key)
+    {
+        var all = new List<string> { slot };
+        for (int n = 2; Exists($"{slot}#{n}"); n++) all.Add($"{slot}#{n}");
+        uint h = 2166136261;
+        foreach (char ch in key) h = (h ^ ch) * 16777619;
+        return all[(int)(h % (uint)all.Count)];
+    }
 
     /// <summary>The picture slot for an event, or null if there's none to show.</summary>
-    public static string? Slot(World w, string title, string text)
+    public static string? Slot(World w, string title, string text) => Pick(w, title, text) is { } slot ? Variant(slot, title) : null;
+
+    private static string? Pick(World w, string title, string text)
     {
         string words = $" {title} {text} ".ToLowerInvariant();
         var matched = Themes.FirstOrDefault(t => t.Words.Any(words.Contains)).Theme;
@@ -94,7 +109,7 @@ internal static class EventArt
         frame.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(5));
         var picture = new TextureRect
         {
-            Texture = GD.Load<Texture2D>($"res://art/events/{slot}.jpg"),
+            Texture = GD.Load<Texture2D>($"res://art/events/{Uri(slot)}.jpg"),
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
             StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered,
             CustomMinimumSize = new Vector2(width - 10, (width - 10) * 5 / 12),

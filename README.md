@@ -245,6 +245,9 @@ How they play:
   - **Matching:** an event's words set its theme (war, uprising, assembly, hunger, harvest,
     work, faith, plague, fire, flood, refugees, festival, trade or press), and the game's
     year picks the age. The nearest age with a picture is used.
+  - **Variety:** the common themes (war, uprisings, assemblies, towns, fire, festivals, faith)
+    have several pictures. Each event always shows the same one, so a long game doesn't
+    repeat a single image.
   - **Scenario pictures:** the historical scenarios show their own history first: the
     Durruti Column and the barricades of 19 July 1936 in Catalonia; the cannons of
     Montmartre, the fallen Vendôme Column and the proclamation of the Commune in Paris; the
