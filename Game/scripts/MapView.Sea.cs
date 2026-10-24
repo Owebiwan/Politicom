@@ -86,6 +86,12 @@ public partial class MapView
         float km = KmPerPixel();
         float clouds = Mathf.SmoothStep(4f, 9f, km) * (1 - PaperBlend());
         _gradeMaterial.SetShaderParameter("clouds", ShowRelief ? clouds : 0f);
+        // Snow falls on a wintry view seen close in.
+        float lat = (-p0.Y + Size.Y / 2) * degPerPx.Y; // the view's middle latitude
+        float winter = lat >= 0 ? Winter(north: true) : Winter(north: false);
+        float line = 66 - 12 * winter; // as the land shader's snow line
+        float snowfall = ShowRelief ? winter * Mathf.SmoothStep(line - 6, line + 2, Mathf.Abs(lat)) * (1 - Mathf.SmoothStep(1.5f, 3f, km)) : 0f;
+        _gradeMaterial.SetShaderParameter("snowfall", snowfall);
     }
 
     private static void LoadTerrain()

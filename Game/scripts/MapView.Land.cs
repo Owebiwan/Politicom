@@ -100,6 +100,15 @@ public partial class MapView
 
     private Vector4 _detailRect;
 
+    /// <summary>How deep in winter a hemisphere is this turn: 1 in its coldest month, 0 from spring to autumn.</summary>
+    private float Winter(bool north)
+    {
+        if (World is not { } w) return 0;
+        int month = w.Date.Month;
+        if (!north) month = (month + 5) % 12 + 1;
+        return month switch { 1 => 1f, 2 => 0.85f, 12 => 0.7f, 3 => 0.35f, 11 => 0.25f, _ => 0f };
+    }
+
     /// <summary>
     /// Set while the map draws; the land layer is redrawn from <see cref="_Process"/>, since a
     /// redraw asked for during another item's drawing is dropped. (Its placement, set while
@@ -128,6 +137,8 @@ public partial class MapView
         _landMaterial.SetShaderParameter("paper", PaperBlend());
         if (!terrain) return;
         _landMaterial.SetShaderParameter("overview", Overview());
+        _landMaterial.SetShaderParameter("winter_north", Winter(north: true));
+        _landMaterial.SetShaderParameter("winter_south", Winter(north: false));
         // Layout → lon/lat: the projection is affine.
         var l0 = _project(Vector2.Zero);
         float perLon = _project(new Vector2(1, 0)).X - l0.X, perLat = _project(new Vector2(0, 1)).Y - l0.Y;
@@ -149,7 +160,7 @@ public partial class MapView
         if (Globe_Layout() is not { } g || World is not { } w) return;
         if (_meshVerts == null) BuildGlobeMesh(g);
         ColorGlobeMesh();
-        target.DrawMesh(_globeMesh!, null);
+        if (_globeMesh != null) target.DrawMesh(_globeMesh, null);
         bool terrain = TerrainShown;
         if (Generated && _geoLayout is { } g0)
             foreach (var land in g0.LandFill) Fill(target, land, NeutralLand);

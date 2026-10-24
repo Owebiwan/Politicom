@@ -175,12 +175,83 @@ public partial class MapView : Control
             FillPolygon(new[] { tip + dir * 7 * scale, tip + dir.Orthogonal() * 4 * scale, tip - dir.Orthogonal() * 4 * scale },
                 new Color(color, alpha * (0.5f + 0.5f * pulse)));
         }
-        // A soldier of the age, in the enemy's colour (the sprite is pale, so the colour tints it).
-        var soldier = UiTheme.Icon(World is { Year: < 1700 } ? "spearman" : "rifleman");
-        float side = 32 * scale;
-        var sprite = new Rect2(at - new Vector2(side / 2, side * 0.6f), new Vector2(side, side));
-        if (soldier != null) DrawTextureRect(soldier, sprite, false, new Color(color.Lightened(0.25f), alpha));
-        DrawString(font, new Vector2(at.X - 20, sprite.End.Y + 9), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
+        // A company of soldiers of the age in the enemy's colour: more figures the stronger the
+        // army, in two ranks under its standard.
+        bool early = World is { Year: < 1700 };
+        int figures = (int)Mathf.Clamp(Mathf.Round(1.5f + Mathf.Sqrt(strength) * 1.3f), 2, 7);
+        float side = 24 * scale;
+        var bottom = Vector2.Zero;
+        for (int i = figures - 1; i >= 0; i--) // back rank first
+        {
+            int rank = i % 2, file = i / 2;
+            var pos = at + new Vector2((file - (figures - 1) / 4f) * side * 0.36f + rank * side * 0.18f, side * 0.3f - rank * side * 0.2f);
+            DrawFigure(pos, side * 0.75f, rank == 1 ? color.Darkened(0.2f) : color, color.Darkened(0.5f), alpha, early);
+            bottom = new Vector2(Mathf.Max(bottom.X, pos.X), Mathf.Max(bottom.Y, pos.Y));
+        }
+        DrawStandard(at + new Vector2(-side * 0.55f - (figures - 1) * side * 0.1f, -side * 0.15f), side, color, alpha);
+        DrawString(font, new Vector2(at.X - 20, bottom.Y + 12), $"{strength:0.0}", HorizontalAlignment.Center, 40, 10, new Color(color.Lightened(0.3f), alpha));
+    }
+
+    /// <summary>
+    /// A small standing figure, feet at `foot`, `h` pixels tall: legs, a coat in `coat`, a head,
+    /// and the arms of the age (a spear and round shield before 1700, a rifle after). Soldiers
+    /// wear helmets in `trim`; militia go bareheaded with a scarf in `trim`.
+    /// </summary>
+    private void DrawFigure(Vector2 foot, float h, Color coat, Color trim, float alpha, bool early, bool bareheaded = false)
+    {
+        var ink = new Color(0.06f, 0.05f, 0.05f, alpha);
+        float w = h * 0.3f;
+        var hip = foot + new Vector2(0, -h * 0.42f);
+        float lw = Mathf.Max(1.2f, h * 0.09f);
+        DrawLine(hip, foot + new Vector2(-w * 0.35f, 0), ink, lw, true);
+        DrawLine(hip, foot + new Vector2(w * 0.35f, 0), ink, lw, true);
+        var neck = foot + new Vector2(0, -h * 0.8f);
+        DrawColoredPolygon(new[] { hip + new Vector2(-w * 0.55f, 0), hip + new Vector2(w * 0.55f, 0), neck + new Vector2(w * 0.5f, 0), neck + new Vector2(-w * 0.5f, 0) }, new Color(coat, alpha));
+        DrawColoredPolygon(new[] { hip + new Vector2(-w * 0.55f, 0), neck + new Vector2(-w * 0.5f, 0), neck + new Vector2(-w * 0.1f, 0), hip + new Vector2(-w * 0.1f, 0) }, new Color(coat.Lightened(0.18f), alpha)); // lit side
+        var head = neck + new Vector2(0, -h * 0.1f);
+        DrawCircle(head, h * 0.1f, new Color(0.85f, 0.7f, 0.58f, alpha));
+        if (bareheaded) DrawLine(neck + new Vector2(-w * 0.45f, h * 0.02f), neck + new Vector2(w * 0.45f, h * 0.02f), new Color(trim, alpha), Mathf.Max(1.2f, h * 0.07f)); // a scarf
+        else DrawArc(head + new Vector2(0, -h * 0.01f), h * 0.12f, Mathf.Pi, Mathf.Tau, 8, new Color(trim, alpha), Mathf.Max(1.5f, h * 0.08f)); // a helmet
+        if (early)
+        {
+            DrawLine(foot + new Vector2(w * 0.6f, 0), foot + new Vector2(w * 0.6f, -h * 1.25f), new Color(0.35f, 0.26f, 0.16f, alpha), Mathf.Max(1, h * 0.05f), true);
+            DrawColoredPolygon(new[] { foot + new Vector2(w * 0.6f, -h * 1.38f), foot + new Vector2(w * 0.5f, -h * 1.22f), foot + new Vector2(w * 0.7f, -h * 1.22f) }, new Color(0.75f, 0.75f, 0.72f, alpha));
+            DrawCircle(hip + new Vector2(-w * 0.45f, -h * 0.12f), h * 0.17f, new Color(trim.Lightened(0.15f), alpha));
+            DrawArc(hip + new Vector2(-w * 0.45f, -h * 0.12f), h * 0.17f, 0, Mathf.Tau, 12, ink, 1);
+        }
+        else
+        {
+            // A rifle at the slope, over the right shoulder.
+            DrawLine(hip + new Vector2(w * 0.1f, h * 0.02f), neck + new Vector2(w * 0.75f, -h * 0.32f), new Color(0.3f, 0.22f, 0.14f, alpha), Mathf.Max(1.1f, h * 0.06f), true);
+        }
+    }
+
+    /// <summary>A standard on its pole, the cloth rippling in the wind.</summary>
+    private void DrawStandard(Vector2 foot, float side, Color cloth, float alpha, Color? lower = null)
+    {
+        var top = foot + new Vector2(0, -side * 1.15f);
+        DrawLine(foot, top, new Color(0.25f, 0.2f, 0.15f, alpha), Mathf.Max(1.2f, side * 0.05f), true);
+        float w = side * 0.55f, h = side * 0.36f;
+        const int n = 8;
+        var upperEdge = new Vector2[n + 1];
+        var lowerEdge = new Vector2[n + 1];
+        for (int i = 0; i <= n; i++)
+        {
+            float u = i / (float)n;
+            float wave = Mathf.Sin((float)_time * 4 + u * 5) * h * 0.12f * u;
+            upperEdge[i] = top + new Vector2(u * w, wave);
+            lowerEdge[i] = top + new Vector2(u * w, h + wave);
+        }
+        if (lower is { } second)
+        {
+            // Diagonally divided, as the CNT-FAI flag: black above, red below.
+            var mid = new Vector2[n + 1];
+            for (int i = 0; i <= n; i++) mid[i] = upperEdge[i].Lerp(lowerEdge[i], 1 - i / (float)n);
+            DrawColoredPolygon(upperEdge.Concat(mid.Reverse()).ToArray(), new Color(cloth, alpha));
+            DrawColoredPolygon(mid.Concat(lowerEdge.Reverse()).ToArray(), new Color(second, alpha));
+        }
+        else DrawColoredPolygon(upperEdge.Concat(lowerEdge.Reverse()).ToArray(), new Color(cloth, alpha));
+        DrawPolyline(upperEdge.Concat(lowerEdge.Reverse()).Append(upperEdge[0]).ToArray(), new Color(0, 0, 0, alpha * 0.5f), 1, true);
     }
 
     /// <summary>The federation's militia at a front commune: a black-and-red flag sized by its defense.</summary>
@@ -188,9 +259,12 @@ public partial class MapView : Control
     {
         // A militiaman under the black-and-red flag, larger as the commune's defense grows.
         float scale = Mathf.Clamp(0.8f + Mathf.Sqrt(defense) * 0.25f, 0.8f, 1.6f) * Mathf.Sqrt(_zoom);
-        float side = 32 * scale;
-        if (UiTheme.Icon("militia") is { } militia)
-            DrawTextureRect(militia, new Rect2(at - new Vector2(side / 2, side * 0.6f), new Vector2(side, side)), false, new Color(1, 1, 1, alpha));
+        float side = 26 * scale;
+        int figures = (int)Mathf.Clamp(Mathf.Round(1 + defense * 0.8f), 1, 4);
+        bool early = World is { Year: < 1700 };
+        for (int i = figures - 1; i >= 0; i--)
+            DrawFigure(at + new Vector2(i * side * 0.3f, side * 0.3f - i * side * 0.05f), side * 0.75f, new Color(0.16f, 0.15f, 0.14f), new Color(0.78f, 0.15f, 0.12f), alpha, early, bareheaded: true);
+        DrawStandard(at + new Vector2(-side * 0.5f, -side * 0.1f), side, new Color(0.08f, 0.08f, 0.08f), alpha, new Color(0.75f, 0.12f, 0.1f));
     }
 
     public MapMode Mode { get; set; } = MapMode.Trust;
@@ -494,7 +568,8 @@ public partial class MapView : Control
                 _ => "town",
             };
             float side = SpriteSize(c);
-            if (UiTheme.Icon(town) is { } sprite)
+            if (Settlements) DrawSettlement(c, p, side, c.Id == Selected || c.Id == _hover);
+            else if (UiTheme.Icon(town) is { } sprite)
             {
                 var rect = new Rect2(p - new Vector2(side / 2, side / 2), new Vector2(side, side)); // a round pin, centred on the town
                 if (c.Id == Selected || c.Id == _hover) DrawCircle(p, side * 0.55f, new Color(1, 1, 1, 0.18f));
@@ -1074,6 +1149,9 @@ public partial class MapView : Control
     private static float Marker(Commune c) => 2.5f + Mathf.Sqrt((float)c.Population) * 0.45f;
 
     /// <summary>A settlement sprite's size: 24 px for a village, up to 40 for a city, grown a little with zoom.</summary>
+    /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
+    private bool Settlements => _zoom >= 0.6f;
+
     private float SpriteSize(Commune c) =>
         Mathf.Clamp(18 + Mathf.Sqrt((float)c.Population) * 2f, 22, 36) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f);
 

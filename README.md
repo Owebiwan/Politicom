@@ -216,6 +216,21 @@ The map is modelled on Victoria 3's:
   in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
   ground (`Data/land/`, mirrored into the game) from NASA's Blue Marble and its elevation (public domain).
 
+## Towns, armies and seasons on the map
+
+- **Settlements:** zoomed in, each commune is a small town of buildings in oblique view, lit
+  from the north-west like the terrain, more of them the more people live there. The age sets
+  the style: flat roofs and a temple in antiquity; steep roofs, a church spire and town walls
+  in the middle ages; domes after; factory sheds with smoking chimneys once industry comes;
+  blocks of flats with rows of windows in the twentieth century. Farming communes sit among
+  their fields; an occupied town is a smoking ruin. Zoomed out, towns are round emblems again.
+  (`Game/scripts/MapView.Settlements.cs`)
+- **Armies:** a company of soldiers of the age in the enemy's colour (spearmen with round
+  shields before 1700, riflemen after), more of them the stronger the army, under a standard
+  rippling in the wind. The militia at a front stand under the black-and-red flag.
+- **Seasons:** in winter, snow lies across the far north (or south) and its line creeps toward
+  the equator as the season deepens; close in on a snowy region, snow falls.
+
 ## Motion
 
 Windows and pop-ups ease in (fading up from slightly larger) with a soft shadow, over the

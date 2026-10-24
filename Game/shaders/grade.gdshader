@@ -9,6 +9,7 @@ uniform vec2 deg_per_px;  // degrees per pixel
 uniform vec2 size;
 uniform float clouds = 0.0; // 0..1: how cloudy the view is (from the zoom)
 uniform float grade = 1.0;  // 0 = off (city maps, generated maps keep their own look)
+uniform float snowfall = 0.0; // 0..1: falling snow over the view
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
@@ -45,6 +46,21 @@ void fragment() {
         float shadow = cloud(ll + vec2(-0.9, 0.7)) * clouds;  // shadows fall south-east
         col *= 1.0 - 0.28 * shadow;
         col = mix(col, vec3(0.93, 0.93, 0.9), c * 0.72);
+    }
+    if (snowfall > 0.0) {
+        // Three layers of flakes, near ones larger and faster, drifting as they fall.
+        for (int i = 0; i < 3; i++) {
+            float layer = float(i);
+            float cell = 26.0 + layer * 14.0;
+            vec2 p = px / cell + vec2(sin(TIME * 0.4 + layer) * 0.6, -TIME * (0.5 + layer * 0.35));
+            vec2 id = floor(p);
+            vec2 f = fract(p) - 0.5;
+            vec2 jitter = vec2(hash(id + layer * 7.1), hash(id + 3.3 + layer)) - 0.5;
+            float r = 0.05 + 0.04 * layer;
+            float flake = 1.0 - smoothstep(r * 0.5, r, length(f - jitter * 0.7));
+            flake *= step(0.55, hash(id * 1.7 + layer));
+            col = mix(col, vec3(0.96, 0.97, 1.0), flake * snowfall * (0.45 + 0.2 * layer));
+        }
     }
     COLOR = vec4(col, 1.0);
 }

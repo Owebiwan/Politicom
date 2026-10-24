@@ -46,6 +46,7 @@ public partial class MapView
             if (ReferenceEquals(value, _globe)) return;
             _globe = value;
             _globeLayout = null;
+            _retiredMesh = _globeMesh ?? _retiredMesh;
             _globeMesh = null;
             _meshVerts = null;
             QueueRedraw();
@@ -69,13 +70,14 @@ public partial class MapView
 
     private GlobeLayout? _globeLayout;
     private Vector2[]? _globeLayoutFor;
-    private ArrayMesh? _globeMesh;
+    private ArrayMesh? _globeMesh, _retiredMesh;
 
     private GlobeLayout? Globe_Layout()
     {
         if (Globe is null || Geo is null) return null;
         var layout = Layout(); // sets _project
         if (_globeLayout != null && ReferenceEquals(_globeLayoutFor, layout)) return _globeLayout;
+        _retiredMesh = _globeMesh ?? _retiredMesh;
         _globeMesh = null;
         _meshVerts = null;
         _globeLayoutFor = layout;
@@ -249,6 +251,7 @@ public partial class MapView
         _meshIndices = indices.ToArray();
         _meshOwner = owners.ToArray();
         _meshKey = (Mode, -1, null);
+        _retiredMesh = _globeMesh ?? _retiredMesh;
         _globeMesh = null;
     }
 
@@ -266,6 +269,8 @@ public partial class MapView
         arrays[(int)Mesh.ArrayType.Vertex] = _meshVerts;
         arrays[(int)Mesh.ArrayType.Color] = colors;
         arrays[(int)Mesh.ArrayType.Index] = _meshIndices!;
+        // The land layer redraws a frame later: keep the old mesh alive until it has.
+        _retiredMesh = _globeMesh ?? _retiredMesh;
         _globeMesh = new ArrayMesh();
         _globeMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
         _meshKey = key;
@@ -317,7 +322,7 @@ public partial class MapView
         if (!LandActive)
         {
             DrawSetTransform(o, 0, new Vector2(s, s));
-            DrawMesh(_globeMesh!, null);
+            if (_globeMesh != null) DrawMesh(_globeMesh, null);
             DrawSetTransform(Vector2.Zero, 0, Vector2.One);
         }
 

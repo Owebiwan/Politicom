@@ -14,6 +14,8 @@ uniform vec2 ll_origin;       // lon/lat of the layout's origin
 uniform vec2 ll_per_unit;     // lon/lat per layout unit
 uniform float paper = 0.0;    // 0 = terrain, 1 = paper chart
 uniform vec3 parchment = vec3(0.84, 0.78, 0.64);
+uniform float winter_north = 0.0; // 0..1: how deep in winter each hemisphere is
+uniform float winter_south = 0.0;
 
 varying vec2 ll;
 
@@ -35,6 +37,12 @@ void fragment() {
                 ground = mix(ground, d.rgb, d.a * smoothstep(0.0, 0.03, edge));
             }
         }
+        // Winter snow: down from the far north (or south) as the season deepens.
+        float w = ll.y >= 0.0 ? winter_north : winter_south;
+        float line = 66.0 - 12.0 * w;
+        float snow = w * smoothstep(line - 3.0, line + 3.0, abs(ll.y));
+        float glum = dot(ground, vec3(0.299, 0.587, 0.114));
+        ground = mix(ground, vec3(0.92, 0.93, 0.95) * (0.82 + 0.3 * glum), snow * 0.65);
         float lum = dot(ground, vec3(0.299, 0.587, 0.114));
         // The colour carries the ground's light: bright plains, dark forests and mountain shadow show through.
         vec3 tinted = c.rgb * (0.42 + 1.15 * lum) + (ground - lum) * 0.25;
