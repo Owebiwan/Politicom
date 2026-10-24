@@ -33,6 +33,9 @@ internal static class Lore
 
     public static Entry? For(string name) => All().TryGetValue(name, out var e) && e.Extract.Length > 0 ? e : null;
 
+    /// <summary>The entry for a state in an era: before 1800 a modern country's name means its older polity (the Mali Empire).</summary>
+    public static Entry? For(string name, int year) => (year < 1800 ? For(name + "@early") : null) ?? For(name);
+
     public static Texture2D? Picture(Entry e) =>
         e.Image.Length > 0 && ResourceLoader.Exists($"res://art/lore/{e.Image}.jpg") ? GD.Load<Texture2D>($"res://art/lore/{e.Image}.jpg") : null;
 
@@ -52,7 +55,7 @@ internal static class Lore
     {
         var box = new VBoxContainer { CustomMinimumSize = new Vector2(width, 0) };
         box.AddThemeConstantOverride("separation", 6);
-        var entry = For(s.Name);
+        var entry = For(s.Name, int.TryParse(atlas.Era, out var y) ? y : 1900);
         if (entry != null && Picture(entry) is { } tex)
         {
             var frame = new PanelContainer();

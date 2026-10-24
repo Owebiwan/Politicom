@@ -43,6 +43,8 @@ ALIASES = {
     "Qing Empire": "Qing dynasty", "UK": "United Kingdom of Great Britain and Ireland", "USSR": "Soviet Union",
     "Rome": "Roman Republic", "Etrurians": "Etruscan civilization", "Carthaginian Empire": "Ancient Carthage",
     "Imperial Japan (Fujiwara)": "Heian period", "Mongol Empire": "Mongol Empire", "Byzantine Empire": "Byzantine Empire",
+    "Saba": "Sabaeans", "Tiahuanaco Empire": "Tiwanaku", "Arctic marine mammal hunters": "Paleo-Eskimo",
+    "Manchu Empire": "Later Jin (1616–1636)", "Persia": "Safavid Iran", "Milograd culture": "Milograd culture",
 }
 
 
@@ -77,7 +79,16 @@ def summary(title, check=True):
     return s
 
 
-DESCRIPTIVE = re.compile(r"hunter|gatherer|forag|farmers|pastoral|herders|fishers|fichers|nomad|peoples|cultures?$", re.I)
+DESCRIPTIVE = re.compile(r"hunter|gatherer|forag|farmers|pastoral|herders|fishers|fichers|nomad|peoples|cultures$", re.I)
+
+
+def find_early(name):
+    """The pre-modern polity behind a modern country's name: the Mali Empire, the Kingdom of Benin."""
+    for t in [f"{name} Empire", f"Kingdom of {name}", f"{name} Kingdom", f"Empire of {name}", f"Sultanate of {name}", f"History of {name}"]:
+        s = summary(t)
+        if s and not re.search(r"\b(country|sovereign state|republic)\b", s.get("description") or "", re.I):
+            return s
+    return find(name)
 
 
 def find(name):
@@ -167,11 +178,18 @@ def images(lore):
 
 def main():
     names = {}
+    eras = {}
     for f in sorted(glob.glob(os.path.join(ROOT, "Data", "world", "*.json"))):
+        era = int(os.path.basename(f)[:-5])
         for s in json.load(open(f))["states"]:
             if len(s["cities"]) >= 7:
                 names.setdefault(s["name"], 0)
                 names[s["name"]] += 1
+                eras.setdefault(s["name"], set()).add(era)
+    # A name used both before 1800 and after (Mali, Benin) gets an early entry, "Name@early".
+    for n, es in list(eras.items()):
+        if min(es) < 1800 and max(es) >= 1800:
+            names[n + "@early"] = names[n]
     os.makedirs(OUT_IMG, exist_ok=True)
     os.makedirs(os.path.dirname(OUT_JSON), exist_ok=True)
     os.makedirs(CACHE, exist_ok=True)
@@ -182,7 +200,7 @@ def main():
     print(f"{len(names)} civilisations, {len(todo)} to do", flush=True)
     for i, name in enumerate(todo):
         try:
-            s = find(name)
+            s = find_early(name[:-6]) if name.endswith("@early") else find(name)
         except Exception as e:
             print(name, "failed:", e, flush=True)
             continue
