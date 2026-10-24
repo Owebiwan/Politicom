@@ -44,7 +44,9 @@ ALIASES = {
     "Rome": "Roman Republic", "Etrurians": "Etruscan civilization", "Carthaginian Empire": "Ancient Carthage",
     "Imperial Japan (Fujiwara)": "Heian period", "Mongol Empire": "Mongol Empire", "Byzantine Empire": "Byzantine Empire",
     "Saba": "Sabaeans", "Tiahuanaco Empire": "Tiwanaku", "Arctic marine mammal hunters": "Paleo-Eskimo",
-    "Manchu Empire": "Later Jin (1616–1636)", "Persia": "Safavid Iran", "Milograd culture": "Milograd culture",
+    "Manchu Empire": "Later Jin (1616–1636)", "Persia": "Qajar Iran", "Milograd culture": "Milograd culture",
+    "Alwa": "Alodia", "Oyo": "Oyo Empire", "Silia": "Silla", "Turingians": "Thuringii", "Jin Empire": "Jin dynasty (1115–1234)",
+    "Pegu": "Hanthawaddy kingdom", "Papu": "Papuan people", "Glades Culture": "Glades culture", "Marksville Culture": "Marksville culture",
 }
 
 
