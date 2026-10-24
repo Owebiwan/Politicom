@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/koguryo_06d6a4.jpg-5778ab6029da8c572c17f0a236
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/chim_empire_27b2ca.jpg-4e6718e6fa0a57a3ce4649
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

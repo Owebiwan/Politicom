@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/slavonic_tribes_ab8023.jpg-2576c04d2e3d2adfc0
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

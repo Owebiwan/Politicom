@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/malagasy_000f64.jpg-4e3815b343eee6e7d75b4573b
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

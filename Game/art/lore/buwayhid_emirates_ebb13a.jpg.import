@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/buwayhid_emirates_ebb13a.jpg-01344d5f0e0ecede
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/zapotec_empire_4f7b2b.jpg-62e58205d8d6cc967b2
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

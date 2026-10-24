@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/simhala_3a1c84.jpg-3ba4ba78593716920a82730a6c
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/kanem_d46256.jpg-35c8fe6e18370c70d1e2ea5578cb
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

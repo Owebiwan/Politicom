@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/bagan_e0d9e5.jpg-19f741d1ec2692b10e6431b04666
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

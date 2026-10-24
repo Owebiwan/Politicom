@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/saxons_33c8fa.jpg-5b3109f03b71e55acbf9a1c0f30
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
