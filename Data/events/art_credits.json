@@ -168,5 +168,40 @@
   "caption": "A city street, 19th century",
   "credit": "Drawn and engraved on steel by A. DickPrinted by J. &amp; G. Neale, 1831-11 · Public domain · Wikimedia Commons",
   "source": "https://commons.wikimedia.org/wiki/File:City_Hotel,_Broadway,_New_York_City.jpg"
+ },
+ "war_ancient": {
+  "caption": "The Battle of Zama, engraving by Cornelis Cort",
+  "credit": "between 1567 and 1578 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Cornelis_Cort_-_The_Battle_of_Zama_-_1990.563_-_Art_Institute_of_Chicago.jpg"
+ },
+ "harvest_ancient": {
+  "caption": "Harvest scenes, tomb of Menna, Thebes",
+  "credit": "Charles Wilkinson, circa 1400 B.C. Period: New Ki · CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Harvest_Scenes,_Tomb_of_Menna_MET_DT207673.jpg"
+ },
+ "faith_ancient": {
+  "caption": "The Oracle, by Camillo Miola",
+  "credit": "Camillo Miola (Biacca), 1880 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Camillo_Miola_(Biacca)_-_The_Oracle_-_72.PA.32_-_J._Paul_Getty_Museum.jpg"
+ },
+ "town_ancient": {
+  "caption": "The Forum Romanum, reconstructed (1866)",
+  "credit": "Constant Moyaux, 1866 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Depiction_of_the_Forum_Romanum_(1866).jpg"
+ },
+ "work_medieval": {
+  "caption": "Building the City of Ladies, from Christine de Pizan",
+  "credit": "Master of the City of Ladies, 15th century · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Meister_der_%27Cit%C3%A9_des_Dames%27_002.jpg"
+ },
+ "plague_medieval": {
+  "caption": "Burying the dead of the Black Death, Tournai, 1349",
+  "credit": "Pierart dou Tielt (fl. 1340-1360), circa 1353 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Doutielt3.jpg"
+ },
+ "plague_earlymodern": {
+  "caption": "The Plague of Ashdod, by Nicolas Poussin",
+  "credit": " · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:La_Peste_d%27Asdod_-_1630-1631_-_Nicolas_Poussin_-_Louvre_-_INV_7276_;_MR_2312.jpg"
  }
 }

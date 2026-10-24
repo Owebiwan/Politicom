@@ -270,5 +270,61 @@
    0.5,
    0.55
   ]
+ },
+ "war_ancient": {
+  "file": "File:Cornelis Cort - The Battle of Zama - 1990.563 - Art Institute of Chicago.jpg",
+  "caption": "The Battle of Zama, engraving by Cornelis Cort",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "harvest_ancient": {
+  "file": "File:Harvest Scenes, Tomb of Menna MET DT207673.jpg",
+  "caption": "Harvest scenes, tomb of Menna, Thebes",
+  "focus": [
+   0.5,
+   0.3
+  ]
+ },
+ "faith_ancient": {
+  "file": "File:Camillo Miola (Biacca) - The Oracle - 72.PA.32 - J. Paul Getty Museum.jpg",
+  "caption": "The Oracle, by Camillo Miola",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "town_ancient": {
+  "file": "File:Depiction of the Forum Romanum (1866).jpg",
+  "caption": "The Forum Romanum, reconstructed (1866)",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "work_medieval": {
+  "file": "File:Meister der 'Cité des Dames' 002.jpg",
+  "caption": "Building the City of Ladies, from Christine de Pizan",
+  "focus": [
+   0.65,
+   0.5
+  ]
+ },
+ "plague_medieval": {
+  "file": "File:Doutielt3.jpg",
+  "caption": "Burying the dead of the Black Death, Tournai, 1349",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "plague_earlymodern": {
+  "file": "File:La Peste d'Asdod - 1630-1631 - Nicolas Poussin - Louvre - INV 7276 ; MR 2312.jpg",
+  "caption": "The Plague of Ashdod, by Nicolas Poussin",
+  "focus": [
+   0.5,
+   0.6
+  ]
  }
 }
