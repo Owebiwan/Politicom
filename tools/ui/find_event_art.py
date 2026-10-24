@@ -20,6 +20,17 @@ UA = "PoliticomGame/1.0 (event art research; contact via project repository)"
 
 # slot: search queries, best first
 SLOTS = {
+    # Scenario pictures: checked before the general ones in that scenario.
+    "war_catalonia": ["Aragon front 1936 militia photograph", "Durruti column 1936", "milicianos frente de Aragón 1936"],
+    "uprising_catalonia": ["Barcelona July 1936 barricade photograph", "Barcelona 1936 street fighting", "CNT FAI Barcelona 1936"],
+    "assembly_catalonia": ["CNT assembly 1936", "colectividad 1936 asamblea", "Barcelona 1936 mitin CNT"],
+    "work_catalonia": ["collectivized factory Barcelona 1936", "colectivización Barcelona 1936", "tranvías Barcelona 1936 colectivizados"],
+    "war_paris": ["Paris Commune 1871 cannons Montmartre", "Semaine sanglante 1871", "Commune de Paris 1871 combat"],
+    "uprising_paris": ["Colonne Vendôme 1871 renversée", "barricade 1871 Commune de Paris photographie", "communards barricade 1871"],
+    "assembly_paris": ["Commune de Paris 1871 proclamation Hôtel de Ville", "club révolutionnaire 1871", "Commune de Paris séance 1871"],
+    "war_ukraine": ["Makhno army 1919", "Revolutionary Insurgent Army of Ukraine", "Makhnovshchina photograph"],
+    "uprising_ukraine": ["Nestor Makhno 1919 photograph", "Huliaipole 1919", "Makhnovists photograph"],
+
     "war_ancient": ["Battle of Zama painting", "Battle of Issus mosaic", "Roman soldiers battle painting 19th century"],
     "war_medieval": ["Froissart battle miniature", "medieval battle manuscript illumination"],
     "war_earlymodern": ["Thirty Years War battle painting", "pikemen battle 16th century painting"],

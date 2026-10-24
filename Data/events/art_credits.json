@@ -218,5 +218,40 @@
   "caption": "The death of Spartacus, by Hermann Vogel",
   "credit": "Hermann Vogel, 1882 · Public domain · Wikimedia Commons",
   "source": "https://commons.wikimedia.org/wiki/File:Tod_des_Spartacus_by_Hermann_Vogel.jpg"
+ },
+ "war_catalonia": {
+  "caption": "The international group of the Durruti Column, 1936",
+  "credit": "1936-11-23 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Groupe_International_de_la_Colonne_Durruti.jpg"
+ },
+ "uprising_catalonia": {
+  "caption": "A barricade in Barcelona, 19 July 1936",
+  "credit": "Juan Guzmán, 1936-07-19 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Barcelone_19_juillet_1936.jpg"
+ },
+ "war_paris": {
+  "caption": "The National Guard's cannons on Montmartre, 1871",
+  "credit": "Braquehais, Bruno, 1823-1875, between 1870 and 1871 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Rue_des_Rosiers-_Montmartre_Hills_WDL1248.jpg"
+ },
+ "uprising_paris": {
+  "caption": "The Vendôme Column pulled down by the Commune, May 1871",
+  "credit": "André Adolphe-Eugène Disdéri (1819 - 1889), 1871-05 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Colonne_vendome.jpg"
+ },
+ "assembly_paris": {
+  "caption": "The Commune proclaimed at the Hôtel de Ville, 28 March 1871",
+  "credit": "1871 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:ROUQUETTE(1871)_p213_Proclamation_de_la_Commune.jpg"
+ },
+ "war_ukraine": {
+  "caption": "Makhnovist insurgents under the black banner, c. 1920",
+  "credit": "circa 1920 · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Dnipro_Division_banner,_c._1920.jpg"
+ },
+ "uprising_ukraine": {
+  "caption": "Nestor Makhno and comrades",
+  "credit": "Taken in 1919. · Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Makhno_group.jpg"
  }
 }

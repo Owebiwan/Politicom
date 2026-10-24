@@ -64,6 +64,15 @@ internal static class EventArt
         // The theme in this age, then in the nearest ages (later first: a picture a little modern
         // beats one far too old), then the theme with no age. An event whose theme has no
         // picture gets a neutral town scene, never another theme's (no barricade for a fire).
+        // The historical scenarios have pictures of their own history, checked first.
+        string? place = w.Scenario.Id switch
+        {
+            var id when id.StartsWith("catalonia") => "catalonia",
+            var id when id.StartsWith("paris") => "paris",
+            var id when id.StartsWith("free_territory") => "ukraine",
+            _ => null,
+        };
+        if (place != null && Has($"{matched ?? "uprising"}_{place}")) return $"{matched ?? "uprising"}_{place}";
         foreach (var t in matched is null ? new[] { "uprising", "town" } : new[] { matched, "town" })
         {
             foreach (int d in new[] { 0, 1, -1, 2, -2, 3, -3 })

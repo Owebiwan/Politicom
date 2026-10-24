@@ -245,6 +245,10 @@ How they play:
   - **Matching:** an event's words set its theme (war, uprising, assembly, hunger, harvest,
     work, faith, plague, fire, flood, refugees, festival, trade or press), and the game's
     year picks the age. The nearest age with a picture is used.
+  - **Scenario pictures:** the historical scenarios show their own history first: the
+    Durruti Column and the barricades of 19 July 1936 in Catalonia; the cannons of
+    Montmartre, the fallen Vendôme Column and the proclamation of the Commune in Paris; the
+    Makhnovists' black banner and Makhno with his comrades in Ukraine.
   - **Adding a picture:** add an entry with its Commons file title to
     `tools/ui/event_art.json` and rerun the script. `tools/ui/find_event_art.py` lists
     public-domain candidates for a slot.

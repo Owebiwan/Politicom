@@ -350,5 +350,61 @@
    0.5,
    0.45
   ]
+ },
+ "war_catalonia": {
+  "file": "File:Groupe International de la Colonne Durruti.jpg",
+  "caption": "The international group of the Durruti Column, 1936",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "uprising_catalonia": {
+  "file": "File:Barcelone 19 juillet 1936.jpg",
+  "caption": "A barricade in Barcelona, 19 July 1936",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "war_paris": {
+  "file": "File:Rue des Rosiers- Montmartre Hills WDL1248.jpg",
+  "caption": "The National Guard's cannons on Montmartre, 1871",
+  "focus": [
+   0.5,
+   0.55
+  ]
+ },
+ "uprising_paris": {
+  "file": "File:Colonne vendome.jpg",
+  "caption": "The Vendôme Column pulled down by the Commune, May 1871",
+  "focus": [
+   0.5,
+   0.6
+  ]
+ },
+ "assembly_paris": {
+  "file": "File:ROUQUETTE(1871) p213 Proclamation de la Commune.jpg",
+  "caption": "The Commune proclaimed at the Hôtel de Ville, 28 March 1871",
+  "focus": [
+   0.5,
+   0.5
+  ]
+ },
+ "war_ukraine": {
+  "file": "File:Dnipro Division banner, c. 1920.jpg",
+  "caption": "Makhnovist insurgents under the black banner, c. 1920",
+  "focus": [
+   0.5,
+   0.45
+  ]
+ },
+ "uprising_ukraine": {
+  "file": "File:Makhno group.jpg",
+  "caption": "Nestor Makhno and comrades",
+  "focus": [
+   0.5,
+   0.4
+  ]
  }
 }
