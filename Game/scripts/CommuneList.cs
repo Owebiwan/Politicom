@@ -192,10 +192,11 @@ public partial class ToastStack : VBoxContainer
         var label = new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(420, 0) };
         label.AddThemeFontSizeOverride("font_size", 13);
         panel.AddChild(label);
+        Motion.SlideIn(panel);
         AddChild(panel);
         GetTree().CreateTimer(seconds).Timeout += () =>
         {
-            if (IsInstanceValid(panel)) panel.QueueFree();
+            if (IsInstanceValid(panel)) Motion.FadeOutAndFree(panel, 0.4f);
         };
     }
 }

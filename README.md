@@ -216,6 +216,13 @@ The map is modelled on Victoria 3's:
   in `Game/map/` from Natural Earth (public domain); `tools/geo/build_land.py` builds the
   ground (`Data/land/`, mirrored into the game) from NASA's Blue Marble and its elevation (public domain).
 
+## Motion
+
+Windows and pop-ups ease in (fading up from slightly larger) with a soft shadow, over the
+map and dashboard blurred and darkened behind them (`Game/shaders/backdrop.gdshader`), and
+fade away when closed. Notices grow in from the right and fade out; tab pages fade in; buttons
+glow under the pointer. All of it takes about a fifth of a second (`Game/scripts/Motion.cs`).
+
 ## Music and sound
 
 - **Music:** the start menu plays songs of the movement (Hijos del pueblo, A las barricadas,

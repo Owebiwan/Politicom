@@ -163,6 +163,7 @@ public partial class Main : Control
         }
         Theme = UiTheme.Build();
         AddChild(new Audio());
+        Motion.Install(GetTree());
         Audio.Instance!.TrackStarted += (title, _) =>
         {
             if (_menu == null && _toasts != null) _toasts.Show($"Now playing: {title}", new Color(0.75f, 0.68f, 0.52f), 5);
@@ -542,13 +543,14 @@ public partial class Main : Control
     {
         CloseOverlay(quiet: true);
         SetSpeed(0);
-        var dim = new ColorRect { Color = new Color(0.02f, 0.02f, 0.03f, 0.82f), MouseFilter = MouseFilterEnum.Stop };
-        dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        var dim = Motion.Backdrop(darken: 0.72f);
         var center = new CenterContainer();
         center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         dim.AddChild(center);
         var column = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         column.AddThemeConstantOverride("separation", 16);
+        column.Modulate = new Color(1, 1, 1, 0);
+        column.Ready += () => column.CreateTween().TweenProperty(column, "modulate:a", 1f, 0.35f);
         center.AddChild(column);
 
         var paintings = MenuPaintings.Where(n => ResourceLoader.Exists($"res://art/events/{n}.jpg")).ToArray();
@@ -1033,15 +1035,14 @@ public partial class Main : Control
         CloseOverlay(quiet: true);
         Audio.Instance?.Play("open", -6);
         SetSpeed(0);
-        var dim = new ColorRect { Color = new Color(0, 0, 0, 0.65f), MouseFilter = MouseFilterEnum.Stop };
-        dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        var dim = Motion.Backdrop();
         var center = new CenterContainer();
         center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         dim.AddChild(center);
 
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(width, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(30));
-        center.AddChild(panel);
+        center.AddChild(Motion.PopIn(panel));
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 14);
         panel.AddChild(v);
@@ -1071,7 +1072,7 @@ public partial class Main : Control
     private void CloseOverlay(bool quiet)
     {
         if (_overlay != null && !quiet) Audio.Instance?.Play("close", -8);
-        _overlay?.QueueFree();
+        Motion.FadeOutAndFree(_overlay);
         _overlay = _menu = null;
     }
 
@@ -1216,7 +1217,11 @@ public partial class Main : Control
 
         // ── Everything else, one tab at a time ──
         _tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill };
-        _tabs.TabChanged += _ => Audio.Instance?.Play("page", -12);
+        _tabs.TabChanged += i =>
+        {
+            Audio.Instance?.Play("page", -12);
+            if (_tabs.GetTabControl((int)i) is { } page) Motion.FadeIn(page);
+        };
         side.AddChild(_tabs);
 
         var overview = Tab("Overview");
@@ -1513,7 +1518,7 @@ public partial class Main : Control
 
     private void ClosePopup()
     {
-        _popup?.QueueFree();
+        Motion.FadeOutAndFree(_popup);
         _popup = null;
         _popupDecision = null;
         Refresh();
@@ -1574,8 +1579,7 @@ public partial class Main : Control
 
     private Control BuildPopup(string heading, string body, GameEvent e, List<(string Label, string Tooltip, Action OnPress)> buttons)
     {
-        var dim = new ColorRect { Color = new Color(0, 0, 0, 0.35f), MouseFilter = MouseFilterEnum.Stop };
-        dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        var dim = Motion.Backdrop(darken: 0.3f);
         var center = new CenterContainer();
         center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         dim.AddChild(center);
@@ -1589,7 +1593,7 @@ public partial class Main : Control
         };
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(700, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(30));
-        center.AddChild(panel);
+        center.AddChild(Motion.PopIn(panel));
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 12);
         panel.AddChild(v);
