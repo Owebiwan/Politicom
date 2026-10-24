@@ -381,8 +381,7 @@ public partial class MapView : Control
             }
         }
 
-        foreach (var c in w.Communes)
-            foreach (var piece in screen[c.Id]) Outline(piece, Border, 1.5f);
+        DrawCommuneBorders(w, screen);
 
         // Overlays on the borders: fronts, secession, selection
         foreach (var c in w.Communes)
@@ -547,6 +546,65 @@ public partial class MapView : Control
         var color = land.Lerp(NodeColor(w, c), 0.75f);
         if (!c.Federated) color = color.Lerp(new Color(color.V, color.V, color.V), 0.7f).Darkened(0.25f); // seceded: greyed
         return color;
+    }
+
+    /// <summary>
+    /// Borders as in Victoria 3: between neighbouring communes a thin, soft line; around the
+    /// whole (the edge of the federation, or a commune on its own) a firmer one. An edge two
+    /// territories share is inner; one only a single territory has is outer.
+    /// </summary>
+    private Vector2[][][]? _bordersFor;
+    private bool[][][] _outerEdge = System.Array.Empty<bool[][]>();
+
+    /// <summary>For each territory edge, whether it's on the outside: no other territory just beyond it.</summary>
+    private bool[][][] OuterEdges(Vector2[][][] cells)
+    {
+        if (ReferenceEquals(_bordersFor, cells)) return _outerEdge;
+        _bordersFor = cells;
+        var boxes = cells.Select(pieces => pieces.Select(p => p.Length == 0 ? new Rect2() : new Rect2(p[0], Vector2.Zero)).ToArray()).ToArray();
+        for (int i = 0; i < cells.Length; i++)
+            for (int k = 0; k < cells[i].Length; k++)
+                foreach (var v in cells[i][k]) boxes[i][k] = boxes[i][k].Expand(v);
+        bool Covered(Vector2 at, int except)
+        {
+            for (int i = 0; i < cells.Length; i++)
+            {
+                if (i == except) continue;
+                for (int k = 0; k < cells[i].Length; k++)
+                    if (boxes[i][k].Grow(1).HasPoint(at) && Geometry2D.IsPointInPolygon(at, cells[i][k])) return true;
+            }
+            return false;
+        }
+        _outerEdge = cells.Select((pieces, i) => pieces.Select(piece => Enumerable.Range(0, piece.Length).Select(k =>
+        {
+            var a = piece[k];
+            var b = piece[(k + 1) % piece.Length];
+            var mid = (a + b) / 2;
+            var n = (b - a).Orthogonal().Normalized() * 2.5f; // a little way across the edge, both sides
+            return !Covered(mid + n, i) && !Covered(mid - n, i);
+        }).ToArray()).ToArray()).ToArray();
+        return _outerEdge;
+    }
+
+    /// <summary>
+    /// Borders as in Victoria 3: between neighbouring communes a thin, soft line; around the
+    /// whole (the edge of the federation, or a commune on its own) a firmer one.
+    /// </summary>
+    private void DrawCommuneBorders(World w, Vector2[][][] screen)
+    {
+        var outer = OuterEdges(Cells());
+        var soft = new Color(Border, 0.32f);
+        var firm = new Color(Border, 0.85f);
+        for (int i = 0; i < screen.Length; i++)
+            for (int k = 0; k < screen[i].Length && k < outer[i].Length; k++)
+            {
+                var piece = screen[i][k];
+                for (int e = 0; e < piece.Length && e < outer[i][k].Length; e++)
+                {
+                    bool edge = outer[i][k][e];
+                    DrawLine(piece[e], piece[(e + 1) % piece.Length], edge ? firm : soft, edge ? 2f : 1f, true);
+                }
+            }
     }
 
     private void Outline(Vector2[] poly, Color color, float width)

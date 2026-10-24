@@ -206,10 +206,10 @@ Real maps (the historical scenarios, open starts and the world view) are shaded 
 **topographic relief** from Natural Earth (public domain).
 - **What it shows:** the Pyrenees, the Andes and the Alps stand out under the political and
   map-mode colours, while flat ground and sea are untouched.
-- **Detail:** a world overview is used when zoomed out. Closer in, 30° tiles at about 3.7 km a
-  pixel load as needed.
+- **Detail:** a world overview is used when zoomed out. Closer in, 30° tiles at about 1.85 km a
+  pixel (full resolution) load as needed.
 - **Turning it off:** use the **Relief** switch next to Trust links, or press **R**.
-- **Building it:** `tools/geo/build_relief.py` builds the tiles (about 9 MB); see
+- **Building it:** `tools/geo/build_relief.py` builds the tiles (about 32 MB); see
   `tools/geo/README.md`.
 
 ## Random events and pop-ups

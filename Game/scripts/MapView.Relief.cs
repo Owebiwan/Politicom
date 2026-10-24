@@ -13,7 +13,7 @@ public partial class MapView
     public bool ShowRelief { get; set; } = true;
 
     internal const string ReliefDir = "res://data/relief/";
-    private const int OverviewWidth = 5400, TileWidth = 900, TileDeg = 30;
+    private const int OverviewWidth = 5400, TileWidth = 1800, TileDeg = 30;
     private static readonly Color ReliefTint = new(1, 1, 1, 0.8f);
     private static ImageTexture? _reliefWorld;
     private static bool _reliefWorldTried;

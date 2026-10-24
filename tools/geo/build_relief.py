@@ -8,8 +8,8 @@ where slopes face away from the light and white where they face it, and transpar
 ground and sea. Laid over the political colours it shows mountains without hiding anything.
 
 - world.shade: the whole world at a quarter resolution (5400 x 2700), for zoomed-out views.
-- t_<col>_<row>.shade: 30° x 30° tiles at half resolution (900 x 900 plus a one-pixel border
-  from the neighbouring tiles, so they join without seams; about 3.7 km a pixel),
+- t_<col>_<row>.shade: 30° x 30° tiles at full resolution (1800 x 1800 plus a one-pixel border
+  from the neighbouring tiles, so they join without seams; about 1.85 km a pixel),
   loaded when the view is close enough to need them. Tiles that are all flat (open sea) are
   left out. Column 0 starts at 180° W, row 0 at 90° N.
 
@@ -19,8 +19,7 @@ importing them as textures.
 Usage:
   tools/geo/build_relief.py SR_HR.tif OUTPUT_DIR
 
-Needs numpy. SR_HR.tif is an uncompressed 8-bit TIFF, read directly. The relief is averaged
-down to half resolution and lightly blurred, so it shades smoothly when stretched.
+Needs numpy. SR_HR.tif is an uncompressed 8-bit TIFF, read directly. The relief is lightly blurred, so it shades smoothly when stretched.
 """
 import os
 import struct
@@ -116,9 +115,9 @@ def main():
     img = np.frombuffer(b"".join(rows), dtype=np.uint8).reshape(height, width)
     flat = int(np.bincount(img[::50].ravel(), minlength=256).argmax())  # flat ground and sea share the commonest value
     print(f"{width} x {height}, flat at {flat}")
-    d = smooth(halve(img.astype(np.float32) - flat))  # 10800 x 5400, ~3.7 km a pixel
+    d = smooth(img.astype(np.float32) - flat)  # full resolution, ~1.85 km a pixel, for the tiles
 
-    write(os.path.join(out, "world.shade"), smooth(halve(d)))  # 5400 x 2700 overview
+    write(os.path.join(out, "world.shade"), smooth(halve(halve(d))))  # 5400 x 2700 overview
 
     px = d.shape[1] * TILE_DEG // 360
     padded = np.pad(d, 1, mode="edge")

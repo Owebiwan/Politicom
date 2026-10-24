@@ -84,7 +84,7 @@ python3 -m venv /tmp/venv && /tmp/venv/bin/pip install numpy
 ```
 
 - **The world overview** (5400 × 2700) is drawn when zoomed out.
-- **The 30° tiles** (900 px, about 3.7 km a pixel, each with a one-pixel border from its
+- **The 30° tiles** (1800 px, about 1.85 km a pixel, each with a one-pixel border from its
   neighbours so they join without seams) are loaded as the view needs them. Tiles of open sea
   are left out.
 - **Smoothing:** the source is averaged down and lightly blurred, so it shades smoothly when a
