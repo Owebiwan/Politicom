@@ -646,7 +646,17 @@ for the effect fields).
 ## Saving and loading
 
 - **Terminal:** `save [file]` and `load [file]` while playing, or `politicom play --load FILE`.
-- **Godot:** the Save and Load buttons use one quick-save slot in Godot's user data folder.
+- **Godot:** Save names a save (or overwrites one); Load lists every save, newest first, to
+  load or delete; F5 quick-saves and F9 loads the quick-save. The start menu's Continue loads
+  the latest save. Saves live in Godot's user data folder (`saves/`, each with a small
+  `.meta.json` for the load screen).
+
+### Leaderboard
+
+Every finished game is ranked on a local leaderboard (`leaderboard.json` in the same folder)
+by its total score, the average of survival, quality of life, spread and freedom. The end
+screen says where the game placed; the leaderboard, from the start menu or the end screen,
+shows the top 100, for all scenarios or one.
 
 A save holds the full state, including the random-number generator, so a loaded game plays
 out exactly as it would have. Tests check this at three points in the game.

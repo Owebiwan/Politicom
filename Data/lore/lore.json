@@ -3727,8 +3727,8 @@
 "title": "Bengal",
 "extract": "Bengal is a geographical, ethnolinguistic, historically geopolitical region in South Asia north of the Bay of Bengal. It is politically divided between the sovereign state of Bangladesh, the Indian state of West Bengal, and Karimganj district in the Indian state of Assam.",
 "url": "https://en.wikipedia.org/wiki/Bengal",
-"image": "",
-"credit": "",
+"image": "bengal_d58bf8",
+"credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/8/88/Bengal_in_Asia.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Bengal_in_Asia.jpg/330px-Bengal_in_Asia.jpg"
 },
@@ -3736,8 +3736,8 @@
 "title": "Wendat people",
 "extract": "The Wendat people, also known as the Huron, are the peoples of the Wendat Confederacy in present-day southern Ontario, which was forcibly disbanded in the 1650s but reestablished in 1999. The Wendat Confederacy originally consisted of several nations and was one of the principal Indigenous powers of the Great Lakes region in the early 17th century. They were defeated and dispersed by the Haudenosaunee during the Beaver Wars.",
 "url": "https://en.wikipedia.org/wiki/Wendat_people",
-"image": "",
-"credit": "",
+"image": "huron_55a754",
+"credit": " · CC0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/2/28/Pair_of_Moccasins_MET_DT258622.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Pair_of_Moccasins_MET_DT258622.jpg/330px-Pair_of_Moccasins_MET_DT258622.jpg"
 },
@@ -3752,8 +3752,8 @@
 "title": "Austria-Hungary",
 "extract": "Austria-Hungary, also referred to as the Austro-Hungarian Empire and officially as the Austro-Hungarian Monarchy, was a multi-national empire in Central Europe under a constitutional dual monarchy that existed between 1867 and 1918. A military and diplomatic real union, it consisted of two largely self governing states with a single monarch who was titled both the Emperor of Austria and the Apostolic King of Hungary.",
 "url": "https://en.wikipedia.org/wiki/Austria-Hungary",
-"image": "",
-"credit": "",
+"image": "imperial_hungary_15fd44",
+"credit": " · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Coat_of_arms_of_Austria-Hungary_%281914%29.svg/960px-Coat_of_arms_of_Austria-Hungary_%281914%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Coat_of_arms_of_Austria-Hungary_%281914%29.svg/330px-Coat_of_arms_of_Austria-Hungary_%281914%29.svg.png"
 },
@@ -3764,7 +3764,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Delaware.svg/960px-Flag_of_Delaware.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Delaware.svg/330px-Flag_of_Delaware.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Delaware.svg/330px-Flag_of_Delaware.svg.png",
+"noimage": true
 },
 "Castille": {
 "title": "Kingdom of Castile",
@@ -3773,14 +3774,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Castile.svg/960px-Flag_of_Castile.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Castile.svg/330px-Flag_of_Castile.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Castile.svg/330px-Flag_of_Castile.svg.png",
+"noimage": true
 },
 "Aztec Empire": {
 "title": "Aztec Empire",
 "extract": "The Mexica Empire, also known as the Triple Alliance or historiographically as the Tenochca Empire but most accurately known as the Mexica, was an alliance of three Nahua city-states: Mexico-Tenochtitlan, Tetzcoco, and Tlacopan. These three city-states ruled that area in and around the Valley of Mexico from 1428 until the combined forces of the Spanish conquistadores and their native allies who ruled under Hernán Cortés defeated them in 1521.",
 "url": "https://en.wikipedia.org/wiki/Aztec_Empire",
-"image": "",
-"credit": "",
+"image": "aztec_empire_19970c",
+"credit": "File:Aztec Empire (orthographic projection).svg : Keepscases Derivative work : G · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Aztec_Empire_ME_%28orthographic_projection%29.svg/960px-Aztec_Empire_ME_%28orthographic_projection%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Aztec_Empire_ME_%28orthographic_projection%29.svg/330px-Aztec_Empire_ME_%28orthographic_projection%29.svg.png"
 },
@@ -3788,8 +3790,8 @@
 "title": "Hopi",
 "extract": "The Hopi are Native Americans who primarily live in northeastern Arizona. The majority are enrolled in the Hopi Tribe of Arizona and live on the Hopi Reservation in northeastern Arizona; however, some Hopi people are enrolled in the Colorado River Indian Tribes of the Colorado River Indian Reservation at the border of Arizona and California.",
 "url": "https://en.wikipedia.org/wiki/Hopi",
-"image": "",
-"credit": "",
+"image": "hopi_e215b1",
+"credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Hopi_woman_with_a_traditional_pot_and_traditional_clothing.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Hopi_woman_with_a_traditional_pot_and_traditional_clothing.png/330px-Hopi_woman_with_a_traditional_pot_and_traditional_clothing.png"
 },
@@ -3797,8 +3799,8 @@
 "title": "Algonquin people",
 "extract": "The Algonquin people are an Indigenous people who now live in Eastern Canada and parts of the United States. They speak the Algonquin language, which is part of the Algonquian language family. Culturally and linguistically, they are closely related to the Odawa, Potawatomi, Ojibwe, Mississaugas, and Nipissing, with whom they form the larger Anicinàpe (Anishinaabeg) group.",
 "url": "https://en.wikipedia.org/wiki/Algonquin_people",
-"image": "",
-"credit": "",
+"image": "algonquin_45406d",
+"credit": "DarrenBaker · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Anishinaabe-Anishinini_Distribution_Map.svg/1280px-Anishinaabe-Anishinini_Distribution_Map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Anishinaabe-Anishinini_Distribution_Map.svg/330px-Anishinaabe-Anishinini_Distribution_Map.svg.png"
 },
@@ -3815,8 +3817,8 @@
 "title": "Navajo",
 "extract": "The Navajo are an Indigenous People of the Southwestern United States. The Navajo term for themselves is Diné. Their language is Navajo, a Southern Athabaskan language.",
 "url": "https://en.wikipedia.org/wiki/Navajo",
-"image": "",
-"credit": "",
+"image": "navajo_504405",
+"credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Manuelito.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Manuelito.jpg/330px-Manuelito.jpg"
 },
@@ -3834,14 +3836,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_Malacca.svg/1280px-Flag_of_Malacca.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_Malacca.svg/330px-Flag_of_Malacca.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_Malacca.svg/330px-Flag_of_Malacca.svg.png",
+"noimage": true
 },
 "Wattasid Caliphate": {
 "title": "Wattasid dynasty",
 "extract": "The Wattasid dynasty was a ruling dynasty of Morocco. Like the Marinid dynasty, its rulers were of Zenata Berber descent. The two families were related, and the Marinids recruited many viziers from the Wattasids.",
 "url": "https://en.wikipedia.org/wiki/Wattasid_dynasty",
-"image": "",
-"credit": "",
+"image": "wattasid_caliphate_4bb657",
+"credit": "Vexilla Mundi · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Wattasid_dynasty_flag.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Wattasid_dynasty_flag.png/330px-Wattasid_dynasty_flag.png"
 },
@@ -3849,8 +3852,8 @@
 "title": "Calusa",
 "extract": "The Calusa were a Native American people of Florida's southwest coast. Calusa society developed from that of archaic peoples of the Everglades region. Previous Indigenous cultures had lived in the area for thousands of years.",
 "url": "https://en.wikipedia.org/wiki/Calusa",
-"image": "",
-"credit": "",
+"image": "calusa_ae5678",
+"credit": "KiwiNova · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Calusa-Chiefdom-Map.svg/1920px-Calusa-Chiefdom-Map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Calusa-Chiefdom-Map.svg/330px-Calusa-Chiefdom-Map.svg.png"
 },
@@ -3858,8 +3861,8 @@
 "title": "Venice",
 "extract": "Venice is a coastal city in northeastern Italy and the capital of the region of Veneto, as well as the Metropolitan City of Venice. It is built on a group of 126 islands that are separated by expanses of open water and by canals; portions of the city are linked by 472 bridges.",
 "url": "https://en.wikipedia.org/wiki/Venice",
-"image": "",
-"credit": "",
+"image": "venice_607d28",
+"credit": "kallerna · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Venezia_aerial_view.jpg/3840px-Venezia_aerial_view.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Venezia_aerial_view.jpg/330px-Venezia_aerial_view.jpg"
 },
@@ -3870,7 +3873,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Flag_of_the_Tzar_of_Muscovia.svg/960px-Flag_of_the_Tzar_of_Muscovia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Flag_of_the_Tzar_of_Muscovia.svg/330px-Flag_of_the_Tzar_of_Muscovia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Flag_of_the_Tzar_of_Muscovia.svg/330px-Flag_of_the_Tzar_of_Muscovia.svg.png",
+"noimage": true
 },
 "Spanish Habsburg": {
 "title": "Habsburg Spain",
@@ -3879,7 +3883,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Flag_of_Cross_of_Burgundy.svg/960px-Flag_of_Cross_of_Burgundy.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Flag_of_Cross_of_Burgundy.svg/330px-Flag_of_Cross_of_Burgundy.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Flag_of_Cross_of_Burgundy.svg/330px-Flag_of_Cross_of_Burgundy.svg.png",
+"noimage": true
 },
 "Mughal Empire": {
 "title": "Mughal Empire",
@@ -3888,14 +3893,15 @@
 "image": "",
 "credit": "",
 "src": "https://upload.wikimedia.org/wikipedia/en/5/51/Joppen1907India1700a.jpg",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/5/51/Joppen1907India1700a.jpg/330px-Joppen1907India1700a.jpg"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/5/51/Joppen1907India1700a.jpg/330px-Joppen1907India1700a.jpg",
+"noimage": true
 },
 "Safavid Empire": {
 "title": "Safavid Iran",
 "extract": "The Guarded Domains of Iran, commonly called Safavid Iran, Safavid Persia or the Safavid Empire, was one of the largest and longest-lasting Iranian empires. It was ruled by the Safavid dynasty from 1501 to 1736, though some historians date its fall to 1722, when Isfahan fell to the Afghans. It is often considered the beginning of modern Iranian history, as well as one of the gunpowder empires.",
 "url": "https://en.wikipedia.org/wiki/Safavid_Iran",
-"image": "",
-"credit": "",
+"image": "safavid_empire_644c06",
+"credit": "Safavid_Flag.png: Orange Tuesday (talk) The original uploader was Orange Tuesday · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Safavid_Flag.svg/960px-Safavid_Flag.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Safavid_Flag.svg/330px-Safavid_Flag.svg.png"
 },
@@ -3910,8 +3916,8 @@
 "title": "Yellowknives",
 "extract": "The Yellowknives, Yellow Knives, Copper Indians, Red Knives or T'atsaot'ine are Indigenous peoples of Canada, one of the five main groups of the First Nations Dene who live in the Northwest Territories. The name, which is also the source for the later community of Yellowknife, derives from the colour of the tools made from copper deposits.",
 "url": "https://en.wikipedia.org/wiki/Yellowknives",
-"image": "",
-"credit": "",
+"image": "t_atsaot_ine_13301b",
+"credit": "Robert Hood (c.1797-1822) · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/5/59/Akaithco_and_son.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Akaithco_and_son.jpg/330px-Akaithco_and_son.jpg"
 },
@@ -3919,8 +3925,8 @@
 "title": "Chukchi people",
 "extract": "The Chukchi are a Siberian ethnic group native to the Chukchi Peninsula, the shores of the Chukchi Sea and the Bering Sea region of the Arctic Ocean all within modern Russia. They speak the Chukchi language. The Chukchi originated from the people living around the Okhotsk Sea.",
 "url": "https://en.wikipedia.org/wiki/Chukchi_people",
-"image": "",
-"credit": "",
+"image": "chukchi_d42169",
+"credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Chukchi_family_old.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Chukchi_family_old.jpg/330px-Chukchi_family_old.jpg"
 },
@@ -3931,14 +3937,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_the_Khanate_of_Khiva.svg/960px-Flag_of_the_Khanate_of_Khiva.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_the_Khanate_of_Khiva.svg/330px-Flag_of_the_Khanate_of_Khiva.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_the_Khanate_of_Khiva.svg/330px-Flag_of_the_Khanate_of_Khiva.svg.png",
+"noimage": true
 },
 "Cree": {
 "title": "Cree",
 "extract": "The Cree are a North American Indigenous people, numbering more than 350,000 in Canada, where they form one of the country's largest First Nations macro-communities. There are numerous Cree peoples and several nations closely related to the Cree, these being the Plains Cree, Woodland Cree, Rocky Cree, Swampy Cree, Moose Cree, and East Cree with the Atikamekw, Innu, and Naskapi being closely related.",
 "url": "https://en.wikipedia.org/wiki/Cree",
-"image": "",
-"credit": "",
+"image": "cree_83d340",
+"credit": "Noahedits · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Cree_map.svg/960px-Cree_map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Cree_map.svg/330px-Cree_map.svg.png"
 },
@@ -3946,8 +3953,8 @@
 "title": "Warlord Era",
 "extract": "The Warlord Era was the period in the history of the Republic of China between 1916 and 1928, when control of the country was divided between rival military cliques of the Beiyang Army and other regional factions. It began after the death of Yuan Shikai, the President of China after the Xinhai Revolution. He took power by leveraging his position as Prime Minister of the Qing Dynasty to force the Emperor’s abdication in exchange for the presidency.",
 "url": "https://en.wikipedia.org/wiki/Warlord_Era",
-"image": "",
-"credit": "",
+"image": "post_ming_warlords_e60809",
+"credit": "U.S. Army · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Map_of_major_Chinese_warlord_coalitions_1925.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Map_of_major_Chinese_warlord_coalitions_1925.png/330px-Map_of_major_Chinese_warlord_coalitions_1925.png"
 },
@@ -3955,8 +3962,8 @@
 "title": "Polish–Lithuanian Commonwealth",
 "extract": "The Polish–Lithuanian Commonwealth, also referred to as Poland–Lithuania or the First Polish Republic, was a federative real union between the Kingdom of Poland and the Grand Duchy of Lithuania, existing from 1569 to 1795. This state was among the largest, most populated countries of 16th- to 18th-century Europe.",
 "url": "https://en.wikipedia.org/wiki/Polish%E2%80%93Lithuanian_Commonwealth",
-"image": "",
-"credit": "",
+"image": "polish_lithuanian_commonwealth_e52961",
+"credit": "Olek Remesz (wiki-pl: Orem, commons: Orem) · CC BY-SA 2.5 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Chor%C4%85giew_kr%C3%B3lewska_kr%C3%B3la_Zygmunta_III_Wazy.svg/960px-Chor%C4%85giew_kr%C3%B3lewska_kr%C3%B3la_Zygmunta_III_Wazy.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Chor%C4%85giew_kr%C3%B3lewska_kr%C3%B3la_Zygmunta_III_Wazy.svg/330px-Chor%C4%85giew_kr%C3%B3lewska_kr%C3%B3la_Zygmunta_III_Wazy.svg.png"
 },
@@ -3971,8 +3978,8 @@
 "title": "Shoshone",
 "extract": "The Shoshone or Shoshoni, also known by the endonym Newe, are an Indigenous people of the United States with four large cultural/linguistic divisions:Eastern Shoshone: Wyoming\nNorthern Shoshone: Southern Idaho\nWestern Shoshone: California, Nevada, and Northern Utah\nGoshute: western Utah, eastern Nevada",
 "url": "https://en.wikipedia.org/wiki/Shoshone",
-"image": "",
-"credit": "",
+"image": "shoshoni_1d1582",
+"credit": "Cyrus Thomas · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/9/99/Shoshone_group_American_Indian_Mongoloid.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Shoshone_group_American_Indian_Mongoloid.png/330px-Shoshone_group_American_Indian_Mongoloid.png"
 },
@@ -3980,8 +3987,8 @@
 "title": "Islam in India",
 "extract": "Islam is India's second-largest religion, with 14.2% of the country's population, or approximately 172.2 million people, identifying as adherents of Islam in a 2011 census. India has the third-largest number of Muslims in the world. Most of India's Muslims are Sunni, with Shia making up about 15% of the Muslim population.",
 "url": "https://en.wikipedia.org/wiki/Islam_in_India",
-"image": "",
-"credit": "",
+"image": "islamic_and_hindu_states_18b9dc",
+"credit": "ARVIND PATWAL · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Jama_Masjid%2C_Delhi_-_IMGL5299_%28cropped%29.jpg/3840px-Jama_Masjid%2C_Delhi_-_IMGL5299_%28cropped%29.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Jama_Masjid%2C_Delhi_-_IMGL5299_%28cropped%29.jpg/330px-Jama_Masjid%2C_Delhi_-_IMGL5299_%28cropped%29.jpg"
 },
@@ -3989,8 +3996,8 @@
 "title": "Kingdom of Ava",
 "extract": "The Ava Kingdom also known as Inwa Kingdom or Kingdom of Ava was the dominant kingdom that ruled upper Burma (Myanmar) from 1365 to 1555. Founded in 1365, the kingdom was the successor state to the petty kingdoms of Myinsaing, Pinya and Sagaing that had ruled central Burma since the collapse of the Pagan Kingdom in the late 13th century.",
 "url": "https://en.wikipedia.org/wiki/Kingdom_of_Ava",
-"image": "",
-"credit": "",
+"image": "ava_153495",
+"credit": "Hybernator · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Burma_in_1450.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Burma_in_1450.png/330px-Burma_in_1450.png"
 },
@@ -3998,8 +4005,8 @@
 "title": "Nogai Horde",
 "extract": "The Nogai Horde was a confederation founded by the Nogais that occupied the Pontic–Caspian steppe from about 1500 until they were pushed west by the Kalmyks and south by the Russians in the 17th century. The Mongol tribe called the Manghuds constituted a core of the Nogai Horde.",
 "url": "https://en.wikipedia.org/wiki/Nogai_Horde",
-"image": "",
-"credit": "",
+"image": "nogai_horde_999f5f",
+"credit": "Nogaju_orda.svg: Ausis derivative work: Hoodinski (talk) · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Nogay_Horde.svg/1280px-Nogay_Horde.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Nogay_Horde.svg/330px-Nogay_Horde.svg.png"
 },
@@ -4007,8 +4014,8 @@
 "title": "Shan States",
 "extract": "The Shan States were a collection of Shan (Tai) principalities called möng whose rulers bore the title saopha (sawbwa). The term \"Shan States\" was first used during the British rule in Burma as a geopolitical designation for certain autonomous areas of Burma, analogous to the princely states of British India.",
 "url": "https://en.wikipedia.org/wiki/Shan_States",
-"image": "",
-"credit": "",
+"image": "shan_states_5407e3",
+"credit": "User:Jolle · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/5/58/Shan_States-Map.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Shan_States-Map.png/330px-Shan_States-Map.png"
 },
@@ -4016,8 +4023,8 @@
 "title": "Tokugawa shogunate",
 "extract": "The Tokugawa shogunate, also known as the Edo shogunate, was the military government of Japan during the Edo period from 1603 to 1868.",
 "url": "https://en.wikipedia.org/wiki/Tokugawa_shogunate",
-"image": "",
-"credit": "",
+"image": "tokugawa_shogunate_b136dc",
+"credit": "Maproom · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Map_of_Japan_in_Provinces_in_time_of_Iyeyasu.jpg/3840px-Map_of_Japan_in_Provinces_in_time_of_Iyeyasu.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Map_of_Japan_in_Provinces_in_time_of_Iyeyasu.jpg/330px-Map_of_Japan_in_Provinces_in_time_of_Iyeyasu.jpg"
 },
@@ -4025,8 +4032,8 @@
 "title": "Assiniboine",
 "extract": "The Assiniboine are an Indigenous people of the Northern Plains. They are one of the First Nations in Canada, where they primarily live in Saskatchewan, with some living in Alberta and southwestern Manitoba, and they are a Native American people in the United States, where they primarily live in northern Montana, with some living in western North Dakota.",
 "url": "https://en.wikipedia.org/wiki/Assiniboine",
-"image": "",
-"credit": "",
+"image": "assiniboin_59a13b",
+"credit": "Karl Bodmer · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Assiniboin_indians_0065v.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Assiniboin_indians_0065v.jpg/330px-Assiniboin_indians_0065v.jpg"
 },
@@ -4034,8 +4041,8 @@
 "title": "Innu",
 "extract": "The Innu, also known as the Montagnais, are an Indigenous Canadian people inhabiting northeastern Labrador and some portions of Quebec. They refer to their traditional homeland as Nitassinan or Innu-assi.",
 "url": "https://en.wikipedia.org/wiki/Innu",
-"image": "",
-"credit": "",
+"image": "montagnais_innu_61b6cc",
+"credit": "AnonymousUnknown author · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Davis_Inlet_1903.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Davis_Inlet_1903.jpg/330px-Davis_Inlet_1903.jpg"
 },
@@ -4043,8 +4050,8 @@
 "title": "Ute people",
 "extract": "The Utes are an Indigenous people of the Great Basin and Colorado Plateau in present-day Utah, western Colorado, and northern New Mexico. Historically, their territory also included parts of Wyoming, Nevada, and Arizona.",
 "url": "https://en.wikipedia.org/wiki/Ute_people",
-"image": "",
-"credit": "",
+"image": "ute_807d5b",
+"credit": "Detroit Publishing Co. · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/7/78/Utes_chief_Severo_and_family%2C_1899.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Utes_chief_Severo_and_family%2C_1899.jpg/330px-Utes_chief_Severo_and_family%2C_1899.jpg"
 },
@@ -4052,8 +4059,8 @@
 "title": "Laotian Civil War",
 "extract": "The Laotian Civil War was waged between the Communist Pathet Lao and the Royal Lao Government from 23 May 1959 to 2 December 1975. The Kingdom of Laos was a covert theater during the Vietnam War with both sides receiving heavy external support in a proxy war between the global Cold War superpowers. The fighting also involved the North Vietnamese, South Vietnamese, American and Thai armies, both directly and through irregular proxies.",
 "url": "https://en.wikipedia.org/wiki/Laotian_Civil_War",
-"image": "",
-"credit": "",
+"image": "laotian_states_17d364",
+"credit": "CIA · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/6/62/Laos_1973-02_CIA.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Laos_1973-02_CIA.png/330px-Laos_1973-02_CIA.png"
 },
@@ -4061,8 +4068,8 @@
 "title": "Northern Paiute people",
 "extract": "The Northern Paiute people are a Numic people who have traditionally lived in the Great Basin region of the United States in what is now eastern California, western Nevada, and southeast Oregon. The Northern Paiute pre-contact lifestyle was well adapted to the harsh desert environment in which they lived. Each tribe or band occupied a specific territory, generally centered on a lake or wetland that supplied fish and waterfowl.",
 "url": "https://en.wikipedia.org/wiki/Northern_Paiute_people",
-"image": "",
-"credit": "",
+"image": "northern_paiute_44c188",
+"credit": "Noahedits · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Northern_Paiute_Mono_map.svg/960px-Northern_Paiute_Mono_map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Northern_Paiute_Mono_map.svg/330px-Northern_Paiute_Mono_map.svg.png"
 },
@@ -4073,7 +4080,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Atlas_Van_der_Hagen-KW1049B11_004-A_NEW_MAP_OF_THE_KINGDOME_of_ENGLAND%2C_Representing_the_Princedome_of_WALES%2C_and_other_PROVINCES%2C_CITIES%2C_MARKET_TOWNS%2C_with_the_ROADS_from_TOWN_to_TOWN.jpeg/3840px-thumbnail.jpeg",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Atlas_Van_der_Hagen-KW1049B11_004-A_NEW_MAP_OF_THE_KINGDOME_of_ENGLAND%2C_Representing_the_Princedome_of_WALES%2C_and_other_PROVINCES%2C_CITIES%2C_MARKET_TOWNS%2C_with_the_ROADS_from_TOWN_to_TOWN.jpeg/330px-thumbnail.jpeg"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Atlas_Van_der_Hagen-KW1049B11_004-A_NEW_MAP_OF_THE_KINGDOME_of_ENGLAND%2C_Representing_the_Princedome_of_WALES%2C_and_other_PROVINCES%2C_CITIES%2C_MARKET_TOWNS%2C_with_the_ROADS_from_TOWN_to_TOWN.jpeg/330px-thumbnail.jpeg",
+"noimage": true
 },
 "Illinois": {
 "title": "Illinois",
@@ -4082,7 +4090,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Illinois.svg/500px-Flag_of_Illinois.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Illinois.svg/330px-Flag_of_Illinois.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Illinois.svg/330px-Flag_of_Illinois.svg.png",
+"noimage": true
 },
 "Osage": {
 "title": "Osage Nation",
@@ -4091,14 +4100,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Flag_of_the_Osage_Nation_2025.svg/1280px-Flag_of_the_Osage_Nation_2025.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Flag_of_the_Osage_Nation_2025.svg/330px-Flag_of_the_Osage_Nation_2025.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Flag_of_the_Osage_Nation_2025.svg/330px-Flag_of_the_Osage_Nation_2025.svg.png",
+"noimage": true
 },
 "Mescalero": {
 "title": "Mescalero",
 "extract": "Mescalero or Mescalero Apache is an Apache tribe of Southern Athabaskan–speaking Native Americans. The tribe is federally recognized as the Mescalero Apache Tribe of the Mescalero Apache Reservation, located in south-central New Mexico.",
 "url": "https://en.wikipedia.org/wiki/Mescalero",
-"image": "",
-"credit": "",
+"image": "mescalero_59415c",
+"credit": "awmcphee · CC0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/2205R_Mescalero_Reservation_Locator_Map.svg/1280px-2205R_Mescalero_Reservation_Locator_Map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/2205R_Mescalero_Reservation_Locator_Map.svg/330px-2205R_Mescalero_Reservation_Locator_Map.svg.png"
 },
@@ -4106,8 +4116,8 @@
 "title": "Koryaks",
 "extract": "Koryaks are an Indigenous people of the Russian Far East who live immediately north of the Kamchatka Peninsula in Kamchatka Krai and inhabit the coastlands of the Bering Sea. The cultural borders of the Koryaks include Tigilsk in the south and the Anadyr basin in the north.",
 "url": "https://en.wikipedia.org/wiki/Koryaks",
-"image": "",
-"credit": "",
+"image": "koryaks_aae59e",
+"credit": "Rudolf Weber · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/2/25/Koryak_ceremony_of_starting_the_New_Fire.jpeg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Koryak_ceremony_of_starting_the_New_Fire.jpeg/330px-Koryak_ceremony_of_starting_the_New_Fire.jpeg"
 },
@@ -4118,14 +4128,15 @@
 "image": "",
 "credit": "",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Pouch%2C_Arapaho_%28Native_American%29%2C_Late_19th_or_early_20th_cent.%2C_08.434.jpg",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Pouch%2C_Arapaho_%28Native_American%29%2C_Late_19th_or_early_20th_cent.%2C_08.434.jpg/330px-Pouch%2C_Arapaho_%28Native_American%29%2C_Late_19th_or_early_20th_cent.%2C_08.434.jpg"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Pouch%2C_Arapaho_%28Native_American%29%2C_Late_19th_or_early_20th_cent.%2C_08.434.jpg/330px-Pouch%2C_Arapaho_%28Native_American%29%2C_Late_19th_or_early_20th_cent.%2C_08.434.jpg",
+"noimage": true
 },
 "Shawnee": {
 "title": "Shawnee",
 "extract": "The Shawnee are a Native American people of the Northeastern Woodlands. Their language, Shawnee, is an Algonquian language.",
 "url": "https://en.wikipedia.org/wiki/Shawnee",
-"image": "",
-"credit": "",
+"image": "shawnee_00f1f4",
+"credit": "Charles Bird King · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/7/75/Shawnee_Prophet%2C_Tenskwatawa.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Shawnee_Prophet%2C_Tenskwatawa.jpg/330px-Shawnee_Prophet%2C_Tenskwatawa.jpg"
 },
@@ -4133,8 +4144,8 @@
 "title": "Crow people",
 "extract": "The Crow, whose autonym is Apsáalooke, are Native Americans living primarily in southern Montana. Today, the Crow people have a federally recognized tribe, the Crow Tribe of Montana, with an Indian reservation, the Crow Indian Reservation, located in the south-central part of the state.",
 "url": "https://en.wikipedia.org/wiki/Crow_people",
-"image": "",
-"credit": "",
+"image": "crow_514d59",
+"credit": "Realbirdium (talk) (Uploads) · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Pauline_Small.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Pauline_Small.jpg/330px-Pauline_Small.jpg"
 },
@@ -4142,8 +4153,8 @@
 "title": "Kiowa",
 "extract": "Kiowa or Ǥáuigú people are a Native American tribe and an Indigenous people of the Great Plains of the United States. They migrated southward from western Montana into the Rocky Mountains in Colorado in the 17th and 18th centuries and eventually into the Southern Plains by the early 19th century. In 1867, the Kiowa were forced to a reservation in Southwestern Oklahoma.",
 "url": "https://en.wikipedia.org/wiki/Kiowa",
-"image": "",
-"credit": "",
+"image": "kiowa_977c35",
+"credit": "BPL · CC BY 2.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/e4/In_Summer%2C_Kiowa.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/In_Summer%2C_Kiowa.jpg/330px-In_Summer%2C_Kiowa.jpg"
 },
@@ -4160,8 +4171,8 @@
 "title": "Caddo",
 "extract": "The Caddo people comprise the Caddo Nation of Oklahoma, a federally recognized tribe headquartered in Binger, Oklahoma. They formerly spoke the Caddo language.",
 "url": "https://en.wikipedia.org/wiki/Caddo",
-"image": "",
-"credit": "",
+"image": "caddo_2ab611",
+"credit": "Uyvsdi · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/9/92/Caddo_cultural_club.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Caddo_cultural_club.jpg/330px-Caddo_cultural_club.jpg"
 },
@@ -4169,8 +4180,8 @@
 "title": "Wichita, Kansas",
 "extract": "Wichita is the most populous city in the U.S. state of Kansas and the county seat of Sedgwick County. As of the 2020 census, the population of the city was 397,532, and the Wichita metropolitan area had a population of 647,610. It is located in south-central Kansas along the Arkansas River.",
 "url": "https://en.wikipedia.org/wiki/Wichita%2C_Kansas",
-"image": "",
-"credit": "",
+"image": "wichita_731fb7",
+"credit": "Quintin Soloviev · CC BY 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Wichita%2C_Kansas_skyline.jpg/3840px-Wichita%2C_Kansas_skyline.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Wichita%2C_Kansas_skyline.jpg/330px-Wichita%2C_Kansas_skyline.jpg"
 },
@@ -4178,8 +4189,8 @@
 "title": "Erie, Pennsylvania",
 "extract": "Erie is a city on the south shore of Lake Erie and the county seat of Erie County, Pennsylvania, United States. It is the fifth-most populous city in Pennsylvania and the most populous in Northwestern Pennsylvania with a population of 94,831 as of the 2020 census. The Erie metropolitan area had a population of 270,876 in 2020.",
 "url": "https://en.wikipedia.org/wiki/Erie%2C_Pennsylvania",
-"image": "",
-"credit": "",
+"image": "erie_3a41e4",
+"credit": "User:Cards84664 · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/3/38/Erie_PA_skyline_from_tower_observation_deck_%28cropped%29.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Erie_PA_skyline_from_tower_observation_deck_%28cropped%29.jpg/330px-Erie_PA_skyline_from_tower_observation_deck_%28cropped%29.jpg"
 },
@@ -4187,8 +4198,8 @@
 "title": "Lanna Kingdom",
 "extract": "The Lanna Kingdom, also spelled Lan Na, was a kingdom centered in present-day Northern Thailand which existed from the 13th to 18th centuries.",
 "url": "https://en.wikipedia.org/wiki/Lanna_Kingdom",
-"image": "",
-"credit": "",
+"image": "lan_na_ca0e30",
+"credit": "Nicolas Eynaud · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/2/28/Southeast_Asian_history_-_Around_1540.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Southeast_Asian_history_-_Around_1540.png/330px-Southeast_Asian_history_-_Around_1540.png"
 },
@@ -4199,14 +4210,15 @@
 "image": "",
 "credit": "",
 "src": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Potawatomi_1920.gif",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Potawatomi_1920.gif/330px-Potawatomi_1920.gif"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Potawatomi_1920.gif/330px-Potawatomi_1920.gif",
+"noimage": true
 },
 "Yankton": {
 "title": "Yankton, South Dakota",
 "extract": "Yankton is a city in and the county seat of Yankton County, South Dakota, United States. It became a city in 1889.",
 "url": "https://en.wikipedia.org/wiki/Yankton%2C_South_Dakota",
-"image": "",
-"credit": "",
+"image": "yankton_fa860d",
+"credit": "National Park Service · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Yankton_and_the_Meridian_Bridge.JPG",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Yankton_and_the_Meridian_Bridge.JPG/330px-Yankton_and_the_Meridian_Bridge.JPG"
 },
@@ -4217,7 +4229,8 @@
 "image": "",
 "credit": "",
 "src": "https://upload.wikimedia.org/wikipedia/en/0/09/Tonkawa_Oklahoma_seal.png",
-"thumb": "https://upload.wikimedia.org/wikipedia/en/0/09/Tonkawa_Oklahoma_seal.png"
+"thumb": "https://upload.wikimedia.org/wikipedia/en/0/09/Tonkawa_Oklahoma_seal.png",
+"noimage": true
 },
 "Quapaw": {
 "title": "Quapaw",
@@ -4235,14 +4248,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Flag_of_Iowa.svg/960px-Flag_of_Iowa.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Flag_of_Iowa.svg/330px-Flag_of_Iowa.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Flag_of_Iowa.svg/330px-Flag_of_Iowa.svg.png",
+"noimage": true
 },
 "Atakapa": {
 "title": "Atakapa",
 "extract": "The Atakapa or Atacapa were an Indigenous people of the Southeastern Woodlands, who spoke the Atakapa language and historically lived along the Gulf of Mexico in what is now Texas and Louisiana.",
 "url": "https://en.wikipedia.org/wiki/Atakapa",
-"image": "",
-"credit": "",
+"image": "atakapa_50e02a",
+"credit": "Alexandre de Batz · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/8/89/Attakapasindian-1735-deBatz.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Attakapasindian-1735-deBatz.jpg/330px-Attakapasindian-1735-deBatz.jpg"
 },
@@ -4250,8 +4264,8 @@
 "title": "Essequibo (colony)",
 "extract": "Essequibo was a Dutch colony in the Guianas and later a county on the Essequibo River in the Guiana region on the north coast of South America. It was a colony of the Dutch West India Company between 1616 and 1792 and a colony of the Dutch state from 1792 until 1815. It was merged with Demerara in 1812 by the British who took control.",
 "url": "https://en.wikipedia.org/wiki/Essequibo_(colony)",
-"image": "",
-"credit": "",
+"image": "essequibo_bc8aad",
+"credit": "ZiaLater · CC0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Dutch_Essequibo_1800.svg/960px-Dutch_Essequibo_1800.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Dutch_Essequibo_1800.svg/330px-Dutch_Essequibo_1800.svg.png"
 },
@@ -4259,8 +4273,8 @@
 "title": "Rupert's Land",
 "extract": "Rupert's Land, or Prince Rupert's Land, was a territory in British America based on the Hudson Bay drainage basin. The right to \"sole trade and commerce\" over Rupert's Land was granted to the Hudson's Bay Company (HBC), based at York Factory, effectively giving that company a commercial monopoly over the area. The territory operated for 200 years from 1670 to 1870.",
 "url": "https://en.wikipedia.org/wiki/Rupert's_Land",
-"image": "",
-"credit": "",
+"image": "rupert_s_land_842281",
+"credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Hudson%27s_Bay_Company_Flag.svg/960px-Hudson%27s_Bay_Company_Flag.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Hudson%27s_Bay_Company_Flag.svg/330px-Hudson%27s_Bay_Company_Flag.svg.png"
 },
@@ -4271,14 +4285,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/1280px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/330px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/330px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png",
+"noimage": true
 },
 "Mahratta states": {
 "title": "Maratha Empire",
 "extract": "The Maratha Empire, also referred to as the Maratha Confederacy, was an early modern polity in the Indian subcontinent. For most of its existence, it comprised the realms of the Peshwa and four major independent Maratha states under the nominal leadership of the former and nominal loyalty to the Chhatrapatis who were successors of Shivaji.",
 "url": "https://en.wikipedia.org/wiki/Maratha_Empire",
-"image": "",
-"credit": "",
+"image": "mahratta_states_a01d31",
+"credit": " · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/8/87/India1760_1905.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/India1760_1905.jpg/330px-India1760_1905.jpg"
 },
@@ -4286,8 +4301,8 @@
 "title": "Athabaskan languages",
 "extract": "Athabaskan, also known as Dene, is a large branch of the Na-Dene language family of North America, located in western North America in three areal language groups: Northern, Pacific Coast and Southern. Kari and Potter (2010:10) place the total territory of the 53 Athabaskan languages at 4,022,000 square kilometres (1,553,000 sq mi).",
 "url": "https://en.wikipedia.org/wiki/Athabaskan_languages",
-"image": "",
-"credit": "",
+"image": "athabascan_dd65cc",
+"credit": "Noahedits · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Athabaskan_languages.svg/960px-Athabaskan_languages.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Athabaskan_languages.svg/330px-Athabaskan_languages.svg.png"
 },
@@ -4298,14 +4313,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/1280px-Flag_of_the_United_Kingdom_%283-5%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/330px-Flag_of_the_United_Kingdom_%283-5%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/330px-Flag_of_the_United_Kingdom_%283-5%29.svg.png",
+"noimage": true
 },
 "Lahore": {
 "title": "Lahore",
 "extract": "Lahore is the capital and largest city of the Pakistani province of Punjab. It is the second-largest city in Pakistan, after Karachi, and 27th largest in the world, with a population of over 14 million. Lahore is one of the country's major industrial, educational and economic hubs, and is considered the historic capital and cultural centre of the wider Punjab region.",
 "url": "https://en.wikipedia.org/wiki/Lahore",
-"image": "",
-"credit": "",
+"image": "lahore_8871c5",
+"credit": "Rohaan Bhatti · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Lahore_Fort_view_from_Baradari.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Lahore_Fort_view_from_Baradari.jpg/330px-Lahore_Fort_view_from_Baradari.jpg"
 },
@@ -4313,8 +4329,8 @@
 "title": "Ségou Empire",
 "extract": "The Ségou Empire was one of the largest states of West Africa in the 18th century. Along with Kaarta it was one of the most important successors of the Songhai Empire. Based on an earlier kingdom established in 1640, it grew into a powerful empire in the early 18th century under Bitòn Coulibaly.",
 "url": "https://en.wikipedia.org/wiki/S%C3%A9gou_Empire",
-"image": "",
-"credit": "",
+"image": "segu_82d51e",
+"credit": "Nicolas Eynaud · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/3/31/Africa_de_l%27O%C3%A8st_%28fin_s%C3%A8gle_XVIII%29.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Africa_de_l%27O%C3%A8st_%28fin_s%C3%A8gle_XVIII%29.png/330px-Africa_de_l%27O%C3%A8st_%28fin_s%C3%A8gle_XVIII%29.png"
 },
@@ -4331,8 +4347,8 @@
 "title": "Sindh",
 "extract": "Sindh is a province of Pakistan, located in the southeastern region of the country. It is the third-largest Pakistani province by land area and second-largest by population. It is bounded by the Arabian Sea to the south and borders the provinces of Balochistan to the west and Punjab to the north; in addition to sharing an international border with the Indian states of Gujarat and Rajasthan to the east.",
 "url": "https://en.wikipedia.org/wiki/Sindh",
-"image": "",
-"credit": "",
+"image": "sind_f886b1",
+"credit": "M.irfan44 · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Jinnah_Mausoleum.JPG/3840px-Jinnah_Mausoleum.JPG",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Jinnah_Mausoleum.JPG/330px-Jinnah_Mausoleum.JPG"
 },
@@ -4340,8 +4356,8 @@
 "title": "Multan",
 "extract": "Multan is a city in the Punjab province of Pakistan. Located along the eastern bank of the Chenab River, it is the sixth-largest city in the country; and serves as the administrative headquarters of its eponymous division and district. A major cultural, religious and economic centre of the Punjab region, Multan is one of the oldest continuously inhabited cities in Asia, with a history stretching deep into antiquity.",
 "url": "https://en.wikipedia.org/wiki/Multan",
-"image": "",
-"credit": "",
+"image": "multan_1f4d50",
+"credit": "Yaarahmadd · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Shrine_Shah_Rukn-e-Alam.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Shrine_Shah_Rukn-e-Alam.jpg/330px-Shrine_Shah_Rukn-e-Alam.jpg"
 },
@@ -4349,8 +4365,8 @@
 "title": "Golconda",
 "extract": "Golconda is a fortified citadel and ruined city located on the western outskirts of Hyderabad, Telangana, India. The fort was built by Kakatiya ruler Pratāparudra in the 11th century out of mud walls. It was ceded to the Bahmani Kings from Musunuri Nayakas during the reign of Bahmani Sultan Mohammed Shah I, during the first Bahmani–Vijayanagara War.",
 "url": "https://en.wikipedia.org/wiki/Golconda",
-"image": "",
-"credit": "",
+"image": "golconda_3ff1f1",
+"credit": "Bernard Gagnon · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Golconda_Fort_005.jpg/3840px-Golconda_Fort_005.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Golconda_Fort_005.jpg/330px-Golconda_Fort_005.jpg"
 },
@@ -4358,8 +4374,8 @@
 "title": "South Georgia rift",
 "extract": "The South Georgia Rift (SGR) or the South Georgia Rift Basin is a large rift valley in the southeastern United States. It is the largest of all rift valleys in the Eastern North American Margin (ENAM). The rift runs from the extreme western Florida panhandle and southeastern Alabama, through south and southeastern Georgia, into southeastern South Carolina, and then offshore into the Atlantic Ocean.",
 "url": "https://en.wikipedia.org/wiki/South_Georgia_rift",
-"image": "",
-"credit": "",
+"image": "rift_valley_states_01d3d5",
+"credit": "Daniels · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/b/ba/South_Georgia_Rift.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/South_Georgia_Rift.jpg/330px-South_Georgia_Rift.jpg"
 },
@@ -4367,8 +4383,8 @@
 "title": "Mysore",
 "extract": "Mysore, officially Mysuru, is a city in the southern Indian state of Karnataka. It is the administrative headquarters of Mysore district and Mysore division. As the traditional seat of the Wadiyar dynasty, the city functioned as the capital of the Kingdom of Mysore for almost six centuries.",
 "url": "https://en.wikipedia.org/wiki/Mysore",
-"image": "",
-"credit": "",
+"image": "mysore_405bb6",
+"credit": "Sathyaprakash01 · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/5/56/Mysuru_Montage.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Mysuru_Montage.jpg/330px-Mysuru_Montage.jpg"
 },
@@ -4379,7 +4395,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg/1280px-Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg/330px-Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg/330px-Flag_of_the_British_Straits_Settlements_%281925%E2%80%931946%29.svg.png",
+"noimage": true
 },
 "Carnatic": {
 "title": "Carnatic Sultanate",
@@ -4388,14 +4405,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Flag_of_Nawab.svg/330px-Flag_of_Nawab.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Flag_of_Nawab.svg/330px-Flag_of_Nawab.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Flag_of_Nawab.svg/330px-Flag_of_Nawab.svg.png",
+"noimage": true
 },
 "Dahomey": {
 "title": "Dahomey",
 "extract": "The Kingdom of Dahomey was a West African kingdom located within the present-day Republic of Benin that existed from approximately 1600 until 1904. It developed on the Abomey Plateau among the Fon people in the early 17th century and became a regional power in the 18th century by expanding south to conquer key cities like Whydah belonging to the Kingdom of Whydah on the Atlantic coast, which granted it unhindered access to the Atlantic Slave Trade.",
 "url": "https://en.wikipedia.org/wiki/Dahomey",
-"image": "",
-"credit": "",
+"image": "dahomey_ac9f05",
+"credit": "Samhanin · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Royal_banner_of_B%C3%A9hanzin_of_Dahomey.svg/960px-Royal_banner_of_B%C3%A9hanzin_of_Dahomey.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Royal_banner_of_B%C3%A9hanzin_of_Dahomey.svg/330px-Royal_banner_of_B%C3%A9hanzin_of_Dahomey.svg.png"
 },
@@ -4403,8 +4421,8 @@
 "title": "Kingdom of Ireland",
 "extract": "The Kingdom of Ireland was a dependency of England from 1542 to 1707, and then of Great Britain from 1707 to 1800. It was ruled by the monarchs of England and then of Great Britain in personal union, and was administered from Dublin Castle by a viceroy appointed by the English king: the Lord Lieutenant of Ireland. By the late 17th century, the state was dominated by the Protestant Anglo-Irish minority, known as the Protestant Ascendancy.",
 "url": "https://en.wikipedia.org/wiki/Kingdom_of_Ireland",
-"image": "",
-"credit": "",
+"image": "kingdom_of_ireland_66f2db",
+"credit": "TRAJAN 117 This W3C-unspecified vector image was created with Inkscape . · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Royal_Standard_of_Ireland_%281542%E2%80%931801%29.svg/1280px-Royal_Standard_of_Ireland_%281542%E2%80%931801%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Royal_Standard_of_Ireland_%281542%E2%80%931801%29.svg/330px-Royal_Standard_of_Ireland_%281542%E2%80%931801%29.svg.png"
 },
@@ -4412,8 +4430,8 @@
 "title": "Aboriginal Tasmanians",
 "extract": "Aboriginal Tasmanians are the Aboriginal people of Tasmania, a large island south of mainland Australia. Aboriginal people lived in Tasmania for tens of thousands of years before European settlement. Around 6000 BCE, rising sea levels flooded the Bass Strait and separated Tasmania from mainland Australia.",
 "url": "https://en.wikipedia.org/wiki/Aboriginal_Tasmanians",
-"image": "",
-"credit": "",
+"image": "aboriginal_tasmanians_cb2fdd",
+"credit": "Benjamin Duterrau (1768–1851) · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg/330px-Last_of_the_Tasmanians_Woodcut_6_-_Wooreddy.jpg"
 },
@@ -4424,7 +4442,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Royal_flag_of_France.svg/960px-Royal_flag_of_France.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Royal_flag_of_France.svg/330px-Royal_flag_of_France.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Royal_flag_of_France.svg/330px-Royal_flag_of_France.svg.png",
+"noimage": true
 },
 "United Kingdom of Great Britain and Ireland": {
 "title": "United Kingdom of Great Britain and Ireland",
@@ -4433,7 +4452,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/1280px-Flag_of_the_United_Kingdom_%283-5%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/330px-Flag_of_the_United_Kingdom_%283-5%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/330px-Flag_of_the_United_Kingdom_%283-5%29.svg.png",
+"noimage": true
 },
 "Turan": {
 "title": "Turan",
@@ -4451,14 +4471,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Flag_of_the_Sokoto_Caliphate.svg/960px-Flag_of_the_Sokoto_Caliphate.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Flag_of_the_Sokoto_Caliphate.svg/330px-Flag_of_the_Sokoto_Caliphate.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Flag_of_the_Sokoto_Caliphate.svg/330px-Flag_of_the_Sokoto_Caliphate.svg.png",
+"noimage": true
 },
 "Sweden–Norway": {
 "title": "Union between Sweden and Norway",
 "extract": "Sweden and Norway or Sweden–Norway, officially the United Kingdoms of Sweden and Norway, and known as the United Kingdoms, was a personal union of the separate kingdoms of Sweden and Norway under a common monarch and common foreign policy that lasted from 1814 until its peaceful dissolution in 1905.",
 "url": "https://en.wikipedia.org/wiki/Union_between_Sweden_and_Norway",
-"image": "",
-"credit": "",
+"image": "sweden_norway_44b1c0",
+"credit": "Jeltz · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Swedish_civil_ensign_%281844%E2%80%931905%29.svg/1280px-Swedish_civil_ensign_%281844%E2%80%931905%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Swedish_civil_ensign_%281844%E2%80%931905%29.svg/330px-Swedish_civil_ensign_%281844%E2%80%931905%29.svg.png"
 },
@@ -4469,14 +4490,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/960px-Flag_of_Portugal_%28official%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/330px-Flag_of_Portugal_%28official%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/330px-Flag_of_Portugal_%28official%29.svg.png",
+"noimage": true
 },
 "Assam": {
 "title": "Assam",
 "extract": "Assam is a state in Northeast India, located south of the Eastern Himalayas along the Brahmaputra Valley and Barak River valleys. It covers an area of 78,438 km2 (30,285 sq mi), and is the second largest state in northeastern India by area. As per the 2011 census, the state had a population of 31.2 million, and is the largest by population in the region.",
 "url": "https://en.wikipedia.org/wiki/Assam",
-"image": "",
-"credit": "",
+"image": "assam_44e032",
+"credit": "Diganta Talukdar · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Beauty_of_Kaziranga_National_Park.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Beauty_of_Kaziranga_National_Park.jpg/330px-Beauty_of_Kaziranga_National_Park.jpg"
 },
@@ -4484,8 +4506,8 @@
 "title": "Bunyoro",
 "extract": "Bunyoro, formally called the Kingdom of Bunyoro-Kitara, is a Bantu traditional monarchy in Western Uganda. It was one of the most powerful kingdoms in Central and East Africa from the 16th century to the 19th century. It is ruled by the King (Omukama) of Bunyoro-Kitara.",
 "url": "https://en.wikipedia.org/wiki/Bunyoro",
-"image": "",
-"credit": "",
+"image": "bunyoro_d48ceb",
+"credit": "Kasaijaivan · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Bunyoro-Kitara_Kingdom_Flag.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Bunyoro-Kitara_Kingdom_Flag.png/330px-Bunyoro-Kitara_Kingdom_Flag.png"
 },
@@ -4493,8 +4515,8 @@
 "title": "Kazembe",
 "extract": "Kazembe is a traditional kingdom in modern-day Zambia, and southeastern Congo. For more than 250 years, Kazembe has been an influential kingdom of the Kiluba-Chibemba, speaking the language of the Eastern Luba-Lunda people of south-central Africa.",
 "url": "https://en.wikipedia.org/wiki/Kazembe",
-"image": "",
-"credit": "",
+"image": "kazembe_060942",
+"credit": "ChaloNiZambia · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Mwata_Kazembe_at_Mtomboko_2017_01.webp/3840px-Mwata_Kazembe_at_Mtomboko_2017_01.webp",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Mwata_Kazembe_at_Mtomboko_2017_01.webp/330px-Mwata_Kazembe_at_Mtomboko_2017_01.webp"
 },
@@ -4505,7 +4527,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Buganda.svg/960px-Flag_of_Buganda.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Buganda.svg/330px-Flag_of_Buganda.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Buganda.svg/330px-Flag_of_Buganda.svg.png",
+"noimage": true
 },
 "Nkore": {
 "title": "Ankole",
@@ -4514,7 +4537,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Flag_of_Ankole.svg/960px-Flag_of_Ankole.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Flag_of_Ankole.svg/330px-Flag_of_Ankole.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Flag_of_Ankole.svg/330px-Flag_of_Ankole.svg.png",
+"noimage": true
 },
 "Cape Colony": {
 "title": "Cape Colony",
@@ -4523,7 +4547,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg/1280px-Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg/330px-Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg/330px-Flag_of_the_Cape_Colony_%281876%E2%80%931910%29.svg.png",
+"noimage": true
 },
 "Ceylon": {
 "title": "Sri Lanka",
@@ -4532,7 +4557,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/1280px-Flag_of_Sri_Lanka.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/330px-Flag_of_Sri_Lanka.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/330px-Flag_of_Sri_Lanka.svg.png",
+"noimage": true
 },
 "Fante": {
 "title": "Fante Confederacy",
@@ -4547,8 +4573,8 @@
 "title": "Hanover",
 "extract": "Hanover is the capital and largest city of the German state of Lower Saxony. Its population of 535,932 (2021) makes it the 13th-largest city in Germany as well as the fourth-largest in northern Germany after Berlin, Hamburg and Bremen. Hanover's urban area comprises the towns of Garbsen, Langenhagen and Laatzen and has a population of about 791,000 (2018).",
 "url": "https://en.wikipedia.org/wiki/Hanover",
-"image": "",
-"credit": "",
+"image": "hanover_e17043",
+"credit": "H. Helmlechner · CC BY-SA 4.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Hannover_Blick_Neues_Rathaus_01.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Hannover_Blick_Neues_Rathaus_01.jpg/330px-Hannover_Blick_Neues_Rathaus_01.jpg"
 },
@@ -4556,8 +4582,8 @@
 "title": "Cochinchina",
 "extract": "Cochinchina or Cochin-China is a historical exonym for part of Vietnam, depending on the contexts, usually for Southern Vietnam. Sometimes it referred to the whole of Vietnam, but it was commonly used to refer to the region south of the Gianh River.",
 "url": "https://en.wikipedia.org/wiki/Cochinchina",
-"image": "",
-"credit": "",
+"image": "cochin_china_3d67ae",
+"credit": "Taberd, Jean-Louis (1794-1840) · Public domain · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/d/dd/An_Nam_Dai_Quoc_Hoa_Do_by_Jean_Louis_Taberd_1838.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/An_Nam_Dai_Quoc_Hoa_Do_by_Jean_Louis_Taberd_1838.jpg/330px-An_Nam_Dai_Quoc_Hoa_Do_by_Jean_Louis_Taberd_1838.jpg"
 },
@@ -4568,14 +4594,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/960px-Flag_of_the_Netherlands.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/330px-Flag_of_the_Netherlands.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/330px-Flag_of_the_Netherlands.svg.png",
+"noimage": true
 },
 "French Republic (Versailles)": {
 "title": "Treaty of Versailles (1768)",
 "extract": "The Treaty of Versailles was a treaty concluded on 15 May 1768 at Versailles between the Republic of Genoa and France, in which Genoa sold Corsica to France.",
 "url": "https://en.wikipedia.org/wiki/Treaty_of_Versailles_(1768)",
-"image": "",
-"credit": "",
+"image": "french_republic_versailles_732d01",
+"credit": "Repubblica_di_Genova.png: Kayac1971 derivative work: Agne27 (talk) · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Genoa_and_Corsica.jpg",
 "thumb": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Genoa_and_Corsica.jpg"
 },
@@ -4586,14 +4613,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Flag_of_Germany_%281867%E2%80%931918%29.svg/960px-Flag_of_Germany_%281867%E2%80%931918%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Flag_of_Germany_%281867%E2%80%931918%29.svg/330px-Flag_of_Germany_%281867%E2%80%931918%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Flag_of_Germany_%281867%E2%80%931918%29.svg/330px-Flag_of_Germany_%281867%E2%80%931918%29.svg.png",
+"noimage": true
 },
 "Austria-Hungary": {
 "title": "Austria-Hungary",
 "extract": "Austria-Hungary, also referred to as the Austro-Hungarian Empire and officially as the Austro-Hungarian Monarchy, was a multi-national empire in Central Europe under a constitutional dual monarchy that existed between 1867 and 1918. A military and diplomatic real union, it consisted of two largely self governing states with a single monarch who was titled both the Emperor of Austria and the Apostolic King of Hungary.",
 "url": "https://en.wikipedia.org/wiki/Austria-Hungary",
-"image": "",
-"credit": "",
+"image": "austria_hungary_d7321a",
+"credit": " · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Coat_of_arms_of_Austria-Hungary_%281914%29.svg/960px-Coat_of_arms_of_Austria-Hungary_%281914%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Coat_of_arms_of_Austria-Hungary_%281914%29.svg/330px-Coat_of_arms_of_Austria-Hungary_%281914%29.svg.png"
 },
@@ -4604,7 +4632,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Flag_of_Egypt_%281882%E2%80%931922%29.svg/1280px-Flag_of_Egypt_%281882%E2%80%931922%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Flag_of_Egypt_%281882%E2%80%931922%29.svg/330px-Flag_of_Egypt_%281882%E2%80%931922%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Flag_of_Egypt_%281882%E2%80%931922%29.svg/330px-Flag_of_Egypt_%281882%E2%80%931922%29.svg.png",
+"noimage": true
 },
 "Kingdom of Portugal": {
 "title": "Kingdom of Portugal",
@@ -4613,14 +4642,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Flag_of_Portugal_%281830%E2%80%931910%29.svg/3840px-Flag_of_Portugal_%281830%E2%80%931910%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Flag_of_Portugal_%281830%E2%80%931910%29.svg/330px-Flag_of_Portugal_%281830%E2%80%931910%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Flag_of_Portugal_%281830%E2%80%931910%29.svg/330px-Flag_of_Portugal_%281830%E2%80%931910%29.svg.png",
+"noimage": true
 },
 "Sweden-Norway": {
 "title": "Union between Sweden and Norway",
 "extract": "Sweden and Norway or Sweden–Norway, officially the United Kingdoms of Sweden and Norway, and known as the United Kingdoms, was a personal union of the separate kingdoms of Sweden and Norway under a common monarch and common foreign policy that lasted from 1814 until its peaceful dissolution in 1905.",
 "url": "https://en.wikipedia.org/wiki/Union_between_Sweden_and_Norway",
-"image": "",
-"credit": "",
+"image": "sweden_norway_ff3dfa",
+"credit": "Jeltz · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Swedish_civil_ensign_%281844%E2%80%931905%29.svg/1280px-Swedish_civil_ensign_%281844%E2%80%931905%29.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Swedish_civil_ensign_%281844%E2%80%931905%29.svg/330px-Swedish_civil_ensign_%281844%E2%80%931905%29.svg.png"
 },
@@ -4631,7 +4661,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Serbia_%281835%E2%80%931882%29.svg/960px-Flag_of_Serbia_%281835%E2%80%931882%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Serbia_%281835%E2%80%931882%29.svg/330px-Flag_of_Serbia_%281835%E2%80%931882%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Serbia_%281835%E2%80%931882%29.svg/330px-Flag_of_Serbia_%281835%E2%80%931882%29.svg.png",
+"noimage": true
 },
 "Joseon": {
 "title": "Joseon",
@@ -4640,7 +4671,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Flag_of_Korea_%281882%E2%80%931910%29.svg/960px-Flag_of_Korea_%281882%E2%80%931910%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Flag_of_Korea_%281882%E2%80%931910%29.svg/330px-Flag_of_Korea_%281882%E2%80%931910%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Flag_of_Korea_%281882%E2%80%931910%29.svg/330px-Flag_of_Korea_%281882%E2%80%931910%29.svg.png",
+"noimage": true
 },
 "Empire of Brazil": {
 "title": "Empire of Brazil",
@@ -4649,7 +4681,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Brazil_%281853-1889%29.svg/1920px-Flag_of_Brazil_%281853-1889%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Brazil_%281853-1889%29.svg/330px-Flag_of_Brazil_%281853-1889%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Brazil_%281853-1889%29.svg/330px-Flag_of_Brazil_%281853-1889%29.svg.png",
+"noimage": true
 },
 "United States of Colombia": {
 "title": "United States of Colombia",
@@ -4658,7 +4691,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/960px-Flag_of_Colombia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/330px-Flag_of_Colombia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/330px-Flag_of_Colombia.svg.png",
+"noimage": true
 },
 "Ukrainian State": {
 "title": "Ukrainian State",
@@ -4667,7 +4701,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Flag_of_Ukraine_%281917%E2%80%931921%29.svg/1280px-Flag_of_Ukraine_%281917%E2%80%931921%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Flag_of_Ukraine_%281917%E2%80%931921%29.svg/330px-Flag_of_Ukraine_%281917%E2%80%931921%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Flag_of_Ukraine_%281917%E2%80%931921%29.svg/330px-Flag_of_Ukraine_%281917%E2%80%931921%29.svg.png",
+"noimage": true
 },
 "Soviet Russia": {
 "title": "Russian Soviet Federative Socialist Republic",
@@ -4676,7 +4711,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg/1280px-Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg/330px-Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg/330px-Flag_of_the_Russian_Soviet_Federative_Socialist_Republic_%281954%E2%80%931991%29.svg.png",
+"noimage": true
 },
 "Democratic Republic of Georgia": {
 "title": "Democratic Republic of Georgia",
@@ -4685,7 +4721,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg/1280px-Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg/330px-Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg/330px-Flag_of_Georgia_%281918%E2%80%931921%2C_4-5%29.svg.png",
+"noimage": true
 },
 "Republic of Armenia": {
 "title": "Armenia",
@@ -4694,7 +4731,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Flag_of_Armenia.svg/1280px-Flag_of_Armenia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Flag_of_Armenia.svg/330px-Flag_of_Armenia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Flag_of_Armenia.svg/330px-Flag_of_Armenia.svg.png",
+"noimage": true
 },
 "Azerbaijan Democratic Republic": {
 "title": "Azerbaijan Democratic Republic",
@@ -4703,7 +4741,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg/1280px-Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg/330px-Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg/330px-Flag_of_the_Democratic_Republic_of_Azerbaijan_%281918%29.svg.png",
+"noimage": true
 },
 "German Republic": {
 "title": "Weimar Republic",
@@ -4712,7 +4751,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Germany_%283-2%29.svg/960px-Flag_of_Germany_%283-2%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Germany_%283-2%29.svg/330px-Flag_of_Germany_%283-2%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Germany_%283-2%29.svg/330px-Flag_of_Germany_%283-2%29.svg.png",
+"noimage": true
 },
 "German-Austria": {
 "title": "Republic of German-Austria",
@@ -4721,7 +4761,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg/960px-Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg/330px-Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg/330px-Flag_of_Austria_%281230%E2%80%931934%2C_1945%E2%80%932000%29.svg.png",
+"noimage": true
 },
 "Hungarian People's Republic": {
 "title": "Hungarian People's Republic",
@@ -4730,7 +4771,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg/1280px-Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg/330px-Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg/330px-Flag_of_Hungary_%281949-1956%3B_1-2_aspect_ratio%29.svg.png",
+"noimage": true
 },
 "Kingdom of Serbs, Croats and Slovenes": {
 "title": "Kingdom of Yugoslavia",
@@ -4739,7 +4781,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/960px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/330px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/330px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png",
+"noimage": true
 },
 "Portuguese Republic": {
 "title": "Portugal",
@@ -4748,7 +4791,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/960px-Flag_of_Portugal_%28official%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/330px-Flag_of_Portugal_%28official%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/330px-Flag_of_Portugal_%28official%29.svg.png",
+"noimage": true
 },
 "Ethiopian Empire": {
 "title": "Ethiopian Empire",
@@ -4757,7 +4801,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Ethiopia_%281897%E2%80%931974%29.svg/960px-Flag_of_Ethiopia_%281897%E2%80%931974%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Ethiopia_%281897%E2%80%931974%29.svg/330px-Flag_of_Ethiopia_%281897%E2%80%931974%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Ethiopia_%281897%E2%80%931974%29.svg/330px-Flag_of_Ethiopia_%281897%E2%80%931974%29.svg.png",
+"noimage": true
 },
 "Najd and Hejaz": {
 "title": "Third Saudi state",
@@ -4766,7 +4811,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Flag_of_Saudi_Arabia.svg/960px-Flag_of_Saudi_Arabia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Flag_of_Saudi_Arabia.svg/330px-Flag_of_Saudi_Arabia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Flag_of_Saudi_Arabia.svg/330px-Flag_of_Saudi_Arabia.svg.png",
+"noimage": true
 },
 "Spanish Republic": {
 "title": "Second Spanish Republic",
@@ -4775,7 +4821,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Flag_of_Spain_%281931%E2%80%931939%29.svg/1280px-Flag_of_Spain_%281931%E2%80%931939%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Flag_of_Spain_%281931%E2%80%931939%29.svg/330px-Flag_of_Spain_%281931%E2%80%931939%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Flag_of_Spain_%281931%E2%80%931939%29.svg/330px-Flag_of_Spain_%281931%E2%80%931939%29.svg.png",
+"noimage": true
 },
 "Irish Free State": {
 "title": "Irish Free State",
@@ -4784,14 +4831,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Flag_of_Ireland.svg/1280px-Flag_of_Ireland.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Flag_of_Ireland.svg/330px-Flag_of_Ireland.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Flag_of_Ireland.svg/330px-Flag_of_Ireland.svg.png",
+"noimage": true
 },
 "German Reich": {
 "title": "German Reich",
 "extract": "German Reich was the constitutional name for the German nation state that existed from 1871 to 1945. The Reich became understood as deriving its authority and sovereignty entirely from a continuing unitary German Volk, with that authority and sovereignty being exercised at any one time over a unitary German \"state territory\" with variable boundaries and extent.",
 "url": "https://en.wikipedia.org/wiki/German_Reich",
-"image": "",
-"credit": "",
+"image": "german_reich_c1e70d",
+"credit": " · Public domain · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Atlas_Van_der_Hagen-KW1049B10_047-S._IMPERIUM_ROMANO-GERMANICUM_oder_DEUTSCHLAND_MIT_SEINEN_ANGR%C3%84NTZENDEN_K%C3%96NIGREICHEN_UND_PROVINCIEN_Neulich_entworffen_und_theils_gezeichnet_durch_IULIUM_REICHELT_Chur_Pfaltz.jpg/3840px-thumbnail.jpg",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Atlas_Van_der_Hagen-KW1049B10_047-S._IMPERIUM_ROMANO-GERMANICUM_oder_DEUTSCHLAND_MIT_SEINEN_ANGR%C3%84NTZENDEN_K%C3%96NIGREICHEN_UND_PROVINCIEN_Neulich_entworffen_und_theils_gezeichnet_durch_IULIUM_REICHELT_Chur_Pfaltz.jpg/330px-thumbnail.jpg"
 },
@@ -4802,7 +4850,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/State_flag_of_Austria_%281934%E2%80%931938%29.svg/1280px-State_flag_of_Austria_%281934%E2%80%931938%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/State_flag_of_Austria_%281934%E2%80%931938%29.svg/330px-State_flag_of_Austria_%281934%E2%80%931938%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/State_flag_of_Austria_%281934%E2%80%931938%29.svg/330px-State_flag_of_Austria_%281934%E2%80%931938%29.svg.png",
+"noimage": true
 },
 "Soviet Union": {
 "title": "Soviet Union",
@@ -4811,7 +4860,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/1280px-Flag_of_the_Soviet_Union.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/330px-Flag_of_the_Soviet_Union.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/330px-Flag_of_the_Soviet_Union.svg.png",
+"noimage": true
 },
 "Mongolian People's Republic": {
 "title": "Mongolian People's Republic",
@@ -4820,7 +4870,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg/1280px-Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg/330px-Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg/330px-Flag_of_the_Mongolian_People%27s_Republic_%281945%E2%80%931992%29.svg.png",
+"noimage": true
 },
 "Kingdom of Hungary": {
 "title": "Kingdom of Hungary",
@@ -4829,7 +4880,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Hungary_%281915-1918%3B_angels%29.svg/1280px-Flag_of_Hungary_%281915-1918%3B_angels%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Hungary_%281915-1918%3B_angels%29.svg/330px-Flag_of_Hungary_%281915-1918%3B_angels%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_Hungary_%281915-1918%3B_angels%29.svg/330px-Flag_of_Hungary_%281915-1918%3B_angels%29.svg.png",
+"noimage": true
 },
 "Kingdom of Yugoslavia": {
 "title": "Kingdom of Yugoslavia",
@@ -4838,14 +4890,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/960px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/330px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg/330px-Flag_of_Yugoslavia_%281918%E2%80%931941%29.svg.png",
+"noimage": true
 },
 "Kingdom of Albania": {
 "title": "Kingdom of Albania (medieval)",
 "extract": "The Kingdom of Albania was established by Charles of Anjou in the Albanian territories he conquered from the Byzantine Empire in 1271, with the help of the local Albanian nobility. The Kingdom of Albania was declared in late February 1272. The kingdom extended from the region of Durazzo south along the coast to Butrint.",
 "url": "https://en.wikipedia.org/wiki/Kingdom_of_Albania_(medieval)",
-"image": "",
-"credit": "",
+"image": "kingdom_of_albania_42db21",
+"credit": "Aigest · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Kingdom_of_Albania.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Kingdom_of_Albania.png/330px-Kingdom_of_Albania.png"
 },
@@ -4856,7 +4909,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Egypt_%281922-1958%29.svg/1280px-Flag_of_Egypt_%281922-1958%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Egypt_%281922-1958%29.svg/330px-Flag_of_Egypt_%281922-1958%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Egypt_%281922-1958%29.svg/330px-Flag_of_Egypt_%281922-1958%29.svg.png",
+"noimage": true
 },
 "Kingdom of Iraq": {
 "title": "Kingdom of Iraq",
@@ -4865,7 +4919,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Iraq_%281924%E2%80%931959%29.svg/960px-Flag_of_Iraq_%281924%E2%80%931959%29.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Iraq_%281924%E2%80%931959%29.svg/330px-Flag_of_Iraq_%281924%E2%80%931959%29.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Flag_of_Iraq_%281924%E2%80%931959%29.svg/330px-Flag_of_Iraq_%281924%E2%80%931959%29.svg.png",
+"noimage": true
 },
 "USSR": {
 "title": "Soviet Union",
@@ -4874,7 +4929,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/1280px-Flag_of_the_Soviet_Union.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/330px-Flag_of_the_Soviet_Union.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_Soviet_Union.svg/330px-Flag_of_the_Soviet_Union.svg.png",
+"noimage": true
 },
 "Antarctica": {
 "title": "Flag of Antarctica",
@@ -4889,8 +4945,8 @@
 "title": "Yugoslavia",
 "extract": "Yugoslavia was a country in Central Europe and the Balkans that existed from 1918 to 1992. It came into existence following World War I, under the name of the Kingdom of Serbs, Croats and Slovenes, from the merger of the Kingdom of Serbia with the provisional State of Slovenes, Croats and Serbs, and constituted the first union of South Slavic peoples as a sovereign state, following centuries of foreign rule over the region under the Ottoman Empire and the Habsburg monarchy.",
 "url": "https://en.wikipedia.org/wiki/Yugoslavia",
-"image": "",
-"credit": "",
+"image": "yugoslavia_2808c2",
+"credit": "Derivative work of History_of_Yugoslavia.svg by NikNaks Portions used contain pa · CC BY-SA 3.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/Yugoslavia_location_map.svg/500px-Yugoslavia_location_map.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/Yugoslavia_location_map.svg/330px-Yugoslavia_location_map.svg.png"
 },
@@ -4901,7 +4957,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/1280px-Flag_of_Germany.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/330px-Flag_of_Germany.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/330px-Flag_of_Germany.svg.png",
+"noimage": true
 },
 "East Germany": {
 "title": "East Germany",
@@ -4910,7 +4967,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Flag_of_the_German_Democratic_Republic.svg/1280px-Flag_of_the_German_Democratic_Republic.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Flag_of_the_German_Democratic_Republic.svg/330px-Flag_of_the_German_Democratic_Republic.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Flag_of_the_German_Democratic_Republic.svg/330px-Flag_of_the_German_Democratic_Republic.svg.png",
+"noimage": true
 },
 "Russia": {
 "title": "Russia",
@@ -4919,7 +4977,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f3/Flag_of_Russia.svg/960px-Flag_of_Russia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f3/Flag_of_Russia.svg/330px-Flag_of_Russia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f3/Flag_of_Russia.svg/330px-Flag_of_Russia.svg.png",
+"noimage": true
 },
 "Kazakhstan": {
 "title": "Kazakhstan",
@@ -4928,7 +4987,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/1280px-Flag_of_Kazakhstan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/330px-Flag_of_Kazakhstan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/330px-Flag_of_Kazakhstan.svg.png",
+"noimage": true
 },
 "Ukraine": {
 "title": "Ukraine",
@@ -4937,7 +4997,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/1280px-Flag_of_Ukraine.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/330px-Flag_of_Ukraine.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/330px-Flag_of_Ukraine.svg.png",
+"noimage": true
 },
 "Turkmenistan": {
 "title": "Turkmenistan",
@@ -4946,7 +5007,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Turkmenistan.svg/960px-Flag_of_Turkmenistan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Turkmenistan.svg/330px-Flag_of_Turkmenistan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Turkmenistan.svg/330px-Flag_of_Turkmenistan.svg.png",
+"noimage": true
 },
 "Uzbekistan": {
 "title": "Uzbekistan",
@@ -4955,7 +5017,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Flag_of_Uzbekistan.svg/1280px-Flag_of_Uzbekistan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Flag_of_Uzbekistan.svg/330px-Flag_of_Uzbekistan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Flag_of_Uzbekistan.svg/330px-Flag_of_Uzbekistan.svg.png",
+"noimage": true
 },
 "Germany": {
 "title": "Germany",
@@ -4964,7 +5027,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/1280px-Flag_of_Germany.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/330px-Flag_of_Germany.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/330px-Flag_of_Germany.svg.png",
+"noimage": true
 },
 "Byelarus": {
 "title": "Belarus",
@@ -4973,7 +5037,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Flag_of_Belarus.svg/1280px-Flag_of_Belarus.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Flag_of_Belarus.svg/330px-Flag_of_Belarus.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Flag_of_Belarus.svg/330px-Flag_of_Belarus.svg.png",
+"noimage": true
 },
 "Kyrgyzstan": {
 "title": "Kyrgyzstan",
@@ -4982,7 +5047,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Flag_of_Kyrgyzstan.svg/1280px-Flag_of_Kyrgyzstan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Flag_of_Kyrgyzstan.svg/330px-Flag_of_Kyrgyzstan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Flag_of_Kyrgyzstan.svg/330px-Flag_of_Kyrgyzstan.svg.png",
+"noimage": true
 },
 "Tajikistan": {
 "title": "Tajikistan",
@@ -4991,7 +5057,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Tajikistan.svg/960px-Flag_of_Tajikistan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Tajikistan.svg/330px-Flag_of_Tajikistan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Tajikistan.svg/330px-Flag_of_Tajikistan.svg.png",
+"noimage": true
 },
 "Bangladesh": {
 "title": "Bangladesh",
@@ -5000,7 +5067,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Flag_of_Bangladesh.svg/960px-Flag_of_Bangladesh.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Flag_of_Bangladesh.svg/330px-Flag_of_Bangladesh.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Flag_of_Bangladesh.svg/330px-Flag_of_Bangladesh.svg.png",
+"noimage": true
 },
 "Serbia": {
 "title": "Serbia",
@@ -5009,7 +5077,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Serbia.svg/1920px-Flag_of_Serbia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Serbia.svg/330px-Flag_of_Serbia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Serbia.svg/330px-Flag_of_Serbia.svg.png",
+"noimage": true
 },
 "Azerbaijan": {
 "title": "Azerbaijan",
@@ -5018,7 +5087,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Flag_of_Azerbaijan.svg/1280px-Flag_of_Azerbaijan.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Flag_of_Azerbaijan.svg/330px-Flag_of_Azerbaijan.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Flag_of_Azerbaijan.svg/330px-Flag_of_Azerbaijan.svg.png",
+"noimage": true
 },
 "Czech Republic": {
 "title": "Czech Republic",
@@ -5027,7 +5097,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_Czech_Republic.svg/960px-Flag_of_the_Czech_Republic.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_Czech_Republic.svg/330px-Flag_of_the_Czech_Republic.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_Czech_Republic.svg/330px-Flag_of_the_Czech_Republic.svg.png",
+"noimage": true
 },
 "Georgia": {
 "title": "History of Georgia (country)",
@@ -5045,7 +5116,8 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/1280px-Flag_of_Croatia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/330px-Flag_of_Croatia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/330px-Flag_of_Croatia.svg.png",
+"noimage": true
 },
 "Slovakia": {
 "title": "Slovakia",
@@ -5054,14 +5126,15 @@
 "image": "",
 "credit": "",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/960px-Flag_of_Slovakia.svg.png",
-"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/330px-Flag_of_Slovakia.svg.png"
+"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/330px-Flag_of_Slovakia.svg.png",
+"noimage": true
 },
 "Sasanian Empire": {
 "title": "Sasanian Empire",
 "extract": "The Sasanian Empire, officially Eranshahr, was an Iranian empire that was founded and ruled by the House of Sasan from 224 to 651 AD. Lasting for over four centuries, the length of the Sasanian dynasty's reign over ancient Iran was second only to that of the Arsacid dynasty of Parthia which immediately preceded it.",
 "url": "https://en.wikipedia.org/wiki/Sasanian_Empire",
-"image": "",
-"credit": "",
+"image": "sasanian_empire_e49dd6",
+"credit": "Original file by Ro4444, edited by me · CC BY 4.0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/The_Sasanian_Empire_at_its_apex_under_Khosrow_II.svg/3840px-The_Sasanian_Empire_at_its_apex_under_Khosrow_II.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/The_Sasanian_Empire_at_its_apex_under_Khosrow_II.svg/330px-The_Sasanian_Empire_at_its_apex_under_Khosrow_II.svg.png"
 },
@@ -5087,8 +5160,8 @@
 "title": "Byzantine Empire",
 "extract": "The Byzantine Empire, also known as the Eastern Roman Empire, was the continuation of the Eastern part of the Roman Empire centred on Constantinople during late antiquity and the Middle Ages. Having survived the fall of the Western Roman Empire in the 5th century AD, it endured until the fall of Constantinople to the Ottoman Empire in 1453. The term 'Byzantine Empire' was coined only after its demise; its citizens used the term 'Roman Empire' and called themselves 'Romans'.",
 "url": "https://en.wikipedia.org/wiki/Byzantine_Empire",
-"image": "",
-"credit": "",
+"image": "eastern_roman_empire_fb2037",
+"credit": "Mnohohrishnyi · CC0 · Wikimedia Commons",
 "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Eastern_Roman_Empire_565_CE.svg/1280px-Eastern_Roman_Empire_565_CE.svg.png",
 "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Eastern_Roman_Empire_565_CE.svg/330px-Eastern_Roman_Empire_565_CE.svg.png"
 },

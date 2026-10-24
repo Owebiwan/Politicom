@@ -213,6 +213,9 @@ public partial class Main : Control
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
+        if (Array.IndexOf(args, "--save") >= 0) QuickSave();
+        if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
+        if (Array.IndexOf(args, "--load") >= 0) ShowLoadDialog();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
         {
@@ -309,6 +312,8 @@ public partial class Main : Control
             case Key.C: ToggleCommuneList(); break;
             case Key.K: ShowTechTree(); break;
             case Key.L: ShowLedger(); break;
+            case Key.F5: QuickSave(); break;
+            case Key.F9: QuickLoad(); break;
             case Key.W: ToggleWorldView(); break;
             case Key.R: _reliefToggle.ButtonPressed = !_reliefToggle.ButtonPressed; break;
             case Key.T:
@@ -533,7 +538,8 @@ public partial class Main : Control
             b.AddThemeFontSizeOverride("font_size", 20);
         }
         if (_inGame) Item("Resume", "Back to the game under way.", CloseOverlay);
-        if (FileAccess.FileExists(SavePath)) Item("Continue", "Load the quick-save.", LoadGame);
+        var saves = Saves();
+        if (saves.Count > 0) Item("Continue", $"Load the latest save: {saves[0].Meta.Name}.", () => LoadFrom(saves[0].Path));
         Item("Historical revolutions", "Paris 1871, the Free Territory 1918, Catalonia 1936, or a random map.", ShowIntro);
         if (_sandbox != null && OpenEras.Any(HasAtlas))
             Item("Open world", "Any country, in any era from antiquity to today: choose it on the map.", () =>
@@ -541,6 +547,8 @@ public partial class Main : Control
                 var eras = OpenEras.Where(HasAtlas).ToArray();
                 ShowCountryMap(eras, Math.Max(0, Array.IndexOf(eras, "1936")), NewSeed(), 104);
             });
+        if (saves.Count > 0) Item("Load game", "Any saved game.", () => ShowLoadDialog(ShowStartMenu));
+        Item("Leaderboard", "Your finished games, ranked by score.", () => ShowLeaderboard(ShowStartMenu));
         Item("Quit", "", () => GetTree().Quit());
 
         var credit = new Label
@@ -927,6 +935,12 @@ public partial class Main : Control
         _toasts.Show("Tip: press Space or ▶ to start time. Click any commune to see it; press C for a list of all of them.", new Color(0.95f, 0.8f, 0.35f), 12);
     }
 
+    private void OnOutcomeAgain()
+    {
+        CloseOverlay();
+        OnOutcome();
+    }
+
     private void OnOutcome()
     {
         if (_world.Outcome == Outcome.Ongoing || _overlay != null) return;
@@ -942,14 +956,16 @@ public partial class Main : Control
             _ => ("The federation has been destroyed", "Too few free communes remain for a federation."),
         };
         _map.Banner = title;
+        int? rank = RecordOutcome(title);
+        string ranked = rank is int r ? $"\n\n[color=#e3bd6b]{(r == 1 ? "A new best" : $"Number {r}")} on the leaderboard for {Esc(w.Scenario.Name)}.[/color]" : "";
         var chart = new HistoryChart { World = w, FontSize = 13, CustomMinimumSize = new Vector2(0, 220) };
         ShowOverlay(title, $"""
             {verdict}
 
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 
-            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)}){(SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out var mapSize) ? $"\n\nSandbox map: seed {mapSeed}, {mapSize} communes." : "")}
-            """, chart, ("Keep looking", CloseOverlay), ("Play again", NewGame), ("Choose scenario", ShowIntro));
+            {w.Federation.Count()} of {w.InitialCommuneCount} communes free and federated · {w.Communes.Count(c => c.Occupied)} occupied · {w.Communes.Count(c => !c.Occupied && !c.Federated)} seceded · final drift {w.Drift.Value:0} ({DriftEffects.Name(w.Drift.Stage)}){(SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out var mapSize) ? $"\n\nSandbox map: seed {mapSeed}, {mapSize} communes." : "")}{ranked}
+            """, chart, ("Keep looking", CloseOverlay), ("Leaderboard", () => ShowLeaderboard(OnOutcomeAgain, ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId)), ("Play again", NewGame), ("Main menu", ShowStartMenu));
     }
 
     private void ShowOverlay(string title, string body, Control? extra, params (string Label, Action OnPress)[] buttons) =>
@@ -1074,8 +1090,8 @@ public partial class Main : Control
         _stepButton.Pressed += StepTurn;
         clock.AddChild(_stepButton);
         clock.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        AddButton(clock, "Save", "Save to a single quick-save slot.", SaveGame);
-        AddButton(clock, "Load", "Load the quick-save.", LoadGame);
+        AddButton(clock, "Save", "Save the game under a name (F5 quick-saves).", ShowSaveDialog);
+        AddButton(clock, "Load", "Load a saved game (F9 loads the quick-save).", () => ShowLoadDialog());
 
         var view = new HFlowContainer(); // wraps rather than widening the dashboard
         side.AddChild(view);
@@ -1636,41 +1652,6 @@ public partial class Main : Control
     // ── Save / load ───────────────────────────────────────────────────────────
 
     private const string SavePath = "user://quicksave.json";
-
-    private void SaveGame()
-    {
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        if (file is null)
-        {
-            Say($"Could not save: {FileAccess.GetOpenError()}");
-            return;
-        }
-        file.StoreString(_world.SaveJson());
-        Say($"Saved {_world.Turn} {_world.Tick} ({_world.Format(_world.Date, "d MMMM yyyy")}).");
-    }
-
-    private void LoadGame()
-    {
-        if (!FileAccess.FileExists(SavePath))
-        {
-            Say("There is no quick-save yet.");
-            return;
-        }
-        try
-        {
-            var world = World.LoadJson(FileAccess.GetFileAsString(SavePath), _techs);
-            // The world's own copy of the scenario has been mutated by play, so look up (or regenerate) the original.
-            _scenario = FindScenario(world.Scenario.Id) ?? _scenario;
-            CloseOverlay();
-            _inGame = true;
-            SetWorld(world);
-            Say($"Loaded {world.Turn} {world.Tick} ({world.Format(world.Date, "d MMMM yyyy")}).");
-        }
-        catch (Exception e)
-        {
-            Say($"Could not load the quick-save: {e.Message}");
-        }
-    }
 
     // ── Input helpers ─────────────────────────────────────────────────────────
 
