@@ -541,7 +541,6 @@ public partial class Main : Control
     private void ShowStartMenu()
     {
         CloseOverlay(quiet: true);
-        Audio.Instance?.PlayAge("menu");
         SetSpeed(0);
         var dim = new ColorRect { Color = new Color(0.02f, 0.02f, 0.03f, 0.82f), MouseFilter = MouseFilterEnum.Stop };
         dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -616,6 +615,7 @@ public partial class Main : Control
 
         AddChild(dim);
         _overlay = _menu = dim;
+        Audio.Instance?.PlayAge("menu"); // after the menu is up, so its songs aren't announced
     }
 
     private void ShowIntro()
