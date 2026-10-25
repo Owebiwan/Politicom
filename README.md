@@ -255,6 +255,11 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees
   elsewhere (Kenney Nature Kit, CC0), repainted in a painted map's greens, kept clear of towns
   (`Game/scripts/Map3D.Trees.cs`). Soldiers cast soft contact shadows.
+- **Railways and harbours** (`Game/scripts/Map3D.Transport.cs`, Kenney Train Kit, Pirate Kit and
+  Watercraft Pack, CC0): track laid over the terrain between linked communes, with a steam
+  train running out and back on every line that isn't cut; at each coastal town a jetty and a
+  ship of its age riding the swell: sailing boats before 1450, square-riggers until the
+  steamers, then cargo steamers, and a liner off the larger ports.
 - Zoomed out, the flat map's emblems take over again.
 
 ## Towns, armies and seasons on the map

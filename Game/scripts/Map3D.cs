@@ -82,6 +82,7 @@ public partial class Map3D : Control
         _groundMaterial.SetShaderParameter("haze", haze);
         SetUpObjects();
         SetUpTrees();
+        SetUpTransport();
 
         // The screen's colour grade, vignette and snowfall, then the flat legend and tooltips.
         AddChild(new BackBufferCopy { CopyMode = BackBufferCopy.CopyModeEnum.Viewport });
@@ -172,6 +173,7 @@ public partial class Map3D : Control
         _groundMaterial.SetShaderParameter("lift", lift);
         SyncObjects(lift);
         SyncTrees(lift);
+        SyncTransport(lift);
         _groundMaterial.SetShaderParameter("haze_near", Distance * 1.05f);
         _groundMaterial.SetShaderParameter("haze_far", Distance * 2.4f);
         _groundMaterial.SetShaderParameter("haze_amount", Mathf.Clamp(_tilt / Mathf.DegToRad(MaxTilt), 0, 1) * 0.85f);

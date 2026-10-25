@@ -413,6 +413,7 @@ public partial class MapView : Control
     {
         // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
         TownSpots.Clear();
+        RailSpots.Clear();
         ArmySpots.Clear();
         MilitiaSpots.Clear();
         if (World is not { } w) return;
@@ -465,6 +466,13 @@ public partial class MapView : Control
             var pa = ToScreen(w.Communes[a]);
             var pb = ToScreen(w.Communes[b]);
             bool cut = w.Communes[a].Occupied || w.Communes[b].Occupied;
+            if (ObjectsShown)
+            {
+                // The 3D map lays the track and runs the trains; here only the ballast under it.
+                RailSpots.Add((a, b, pa, pb, cut));
+                DrawLine(pa, pb, new Color(0.35f, 0.3f, 0.25f, cut ? 0.3f : 0.55f), 5f, true);
+                continue;
+            }
             DrawLine(pa, pb, new Color(RailBed, cut ? 0.4f : 0.95f), 4.5f, true);
             DrawDashedLine(pa, pb, new Color(RailTies, cut ? 0.25f : 0.8f), 2, 5);
         }
@@ -1231,6 +1239,7 @@ public partial class MapView : Control
     public readonly List<(int Id, Vector2 At, float Size)> TownSpots = new();
     public readonly List<(int Enemy, int Commune, Vector2 At, float Strength, Color Color, float Alpha, bool Attacking, Vector2 Towards, bool Moving)> ArmySpots = new();
     public readonly List<(int Commune, Vector2 At, float Defense, Vector2 Facing, bool UnderAttack)> MilitiaSpots = new();
+    public readonly List<(int A, int B, Vector2 From, Vector2 To, bool Cut)> RailSpots = new();
 
     /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
     private bool Settlements => _zoom >= 0.6f;
