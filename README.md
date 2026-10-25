@@ -47,8 +47,8 @@ dotnet run --project Sim.Cli -c Release -- batch --runs 300
 1. Install **Godot 4.7+ .NET edition** (`brew install --cask godot-mono`, or from godotengine.org).
 2. Open `Game/project.godot`, press **Build**, then **Run**.
 
-The game opens on a start menu: continue the quick-save, choose a historical revolution (or a
-random map), or start in the open world. Esc brings the menu back during a game.
+The game opens on a start menu: continue the latest save, choose a historical revolution, or
+start in the open world. Esc brings the menu back during a game.
 
 Controls:
 - Click a commune to select it; shift-click a second commune for mediation or railways.
@@ -60,6 +60,10 @@ If your Godot version differs from 4.7.2, Godot will offer to update the `Godot.
 version in `Game/Politicom.Game.csproj`. Accept it.
 
 ## Sandbox
+
+Sandbox games are no longer offered in the game (old sandbox saves still load). The generator
+stays: open-world starts use its event templates and its difficulty calibration, and the
+terminal and tests can still play `sandbox:SEED` maps.
 
 `Sim/Sandbox/SandboxGenerator.cs` builds an alternate-history region from a seed:
 - **The map:** fictional communes on a map, with one or two cities, towns around them and
@@ -146,15 +150,15 @@ choose.
 - **Which countries:** any with at least 6 cities on the map besides the capital. There are
   dozens per era.
 - **Whole country or a regional rising:** both are offered.
-  - **Whole country** (the default): the movement holds the country's largest cities, and the
-    government holds only the capital.
-  - **Regional rising:** the movement holds a stronghold, usually far from the capital, and
+  - **Regional rising** (the default in the game): the movement holds a stronghold, usually far from the capital, and
     the 9 cities nearest it; the government holds the rest of the country.
   - **Joining a regional rising:** the country's other towns (up to 30) watch, and may rise
     and join the federation, one at a time. That's likelier near the federation
     (`RisingReachKm`), when the enemy's own workers are radicalized, and where the movement's
     culture runs deep, and less likely as drift grows. A risen town gets its own territory
     on the map.
+  - **Whole country:** the movement holds the country's largest cities, and the government
+    holds only the capital.
   - **Terminal:** add `:region` to the id, e.g. `open:1500:FRANCE:2:region`.
 - **Revolutions abroad** are separate. Other countries' workers can rise too; a libertarian
   victory makes a sister federation that may offer to federate, and its cities then join yours.

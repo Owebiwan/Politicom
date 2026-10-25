@@ -617,9 +617,9 @@ public partial class Main : Control
         if (_inGame) Item("Resume", "Back to the game under way.", ResumeGame);
         var saves = Saves();
         if (saves.Count > 0) Item("Continue", $"Load the latest save: {saves[0].Meta.Name}.", () => LoadFrom(saves[0].Path));
-        Item("Historical revolutions", "Paris 1871, the Free Territory 1918, Catalonia 1936, or a random map.", ShowIntro);
+        Item("Historical revolutions", "Paris 1871, the Free Territory 1918 or Catalonia 1936.", ShowIntro);
         if (_sandbox != null && OpenEras.Any(HasAtlas))
-            Item("Open world", "Any country, in any era from antiquity to today: choose it on the map.", () =>
+            Item("Open world", "Any country, in any era from antiquity to today: choose it on the map. The movement rises in one region; a whole-country rising is an option.", () =>
             {
                 var eras = OpenEras.Where(HasAtlas).ToArray();
                 ShowCountryMap(eras, Math.Max(0, Array.IndexOf(eras, "1936")), NewSeed(), 104);
@@ -678,12 +678,7 @@ public partial class Main : Control
             list.AddChild(row);
             list.AddChild(new HSeparator());
         }
-        if (_sandbox != null) list.AddChild(SandboxRow());
-        if (_sandbox != null && OpenEras.Any(HasAtlas))
-        {
-            list.AddChild(new HSeparator());
-            list.AddChild(OpenWorldRow());
-        }
+        if (_sandbox != null && OpenEras.Any(HasAtlas)) list.AddChild(OpenWorldRow());
 
         // Four scenarios don't fit on a small screen with the rules above them: let the list scroll.
         var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(PickerWidth - 56, 470), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
@@ -729,54 +724,6 @@ public partial class Main : Control
     private const string LongerTooltip =
         "After the historical events, the war goes on: the enemy launches renewed offensives, and drift keeps building. " +
         "Every line of technology has a free path that brakes drift; in a long game you will need them.";
-
-    /// <summary>The Sandbox row: seed, size and Play. Generation (with calibration) takes well under a second.</summary>
-    private Control SandboxRow()
-    {
-        var box = new VBoxContainer();
-        var text = new RichTextLabel
-        {
-            BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(820, 0),
-            Text = UiTheme.DisplayText("Sandbox") + "  [color=#9aa0a8]a generated region · two years · one or two enemies[/color]\n"
-                   + "An alternate-history map with its own communes, fronts and dilemmas, tuned to be winnable but hard. Same seed, same map.",
-        };
-        text.AddThemeFontSizeOverride("normal_font_size", 14);
-        text.AddThemeFontSizeOverride("bold_font_size", 16);
-        box.AddChild(text);
-
-        var controls = new HBoxContainer();
-        controls.AddThemeConstantOverride("separation", 8);
-        controls.AddChild(new Label { Text = "Seed" });
-        var seed = new LineEdit { Text = NewSeed().ToString(), CustomMinimumSize = new Vector2(140, 0), MaxLength = 12 };
-        seed.TextChanged += t =>
-        {
-            string digits = new(t.Where(char.IsDigit).ToArray());
-            if (digits != t)
-            {
-                seed.Text = digits;
-                seed.CaretColumn = digits.Length;
-            }
-        };
-        controls.AddChild(seed);
-        AddButton(controls, "Random", "Pick a new seed.", () => seed.Text = NewSeed().ToString());
-        controls.AddChild(new Label { Text = "Communes" });
-        var size = new OptionButton();
-        foreach (var n in SandboxGenerator.Sizes) size.AddItem(n.ToString(), n);
-        size.Select(Array.IndexOf(SandboxGenerator.Sizes, SandboxGenerator.DefaultSize));
-        controls.AddChild(size);
-        var sandboxLength = LengthPicker(104, "week", LongerTooltip + " Longer maps take a few seconds to calibrate.");
-        controls.AddChild(sandboxLength);
-        controls.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        var play = AddButton(controls, "Play", "", () =>
-        {
-            ulong value = ulong.TryParse(seed.Text, out var v) ? v : NewSeed();
-            int turns = sandboxLength.GetSelectedId();
-            StartScenario(_sandbox!.Generate(value, size.GetSelectedId(), length: turns == 104 ? null : turns));
-        });
-        play.CustomMinimumSize = new Vector2(110, 40);
-        box.AddChild(controls);
-        return box;
-    }
 
     private static string[] OpenEras => OpenStartGenerator.Eras;
 
@@ -839,7 +786,7 @@ public partial class Main : Control
     }
 
     /// <summary>Whole country or a regional rising; item index = OpenScope.</summary>
-    private static OptionButton ScopePicker(OpenScope selected = OpenScope.Country)
+    private static OptionButton ScopePicker(OpenScope selected = OpenScope.Region)
     {
         var picker = new OptionButton
         {
@@ -854,7 +801,7 @@ public partial class Main : Control
     }
 
     /// <summary>The open start's world map: hover a country to see it, click to choose it, then Play.</summary>
-    private void ShowCountryMap(string[] eras, int eraIndex, ulong seed, int turns, OpenScope startScope = OpenScope.Country)
+    private void ShowCountryMap(string[] eras, int eraIndex, ulong seed, int turns, OpenScope startScope = OpenScope.Region)
     {
         var content = new VBoxContainer();
         content.AddThemeConstantOverride("separation", 10);
