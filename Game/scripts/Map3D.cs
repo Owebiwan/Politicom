@@ -34,6 +34,7 @@ public partial class Map3D : Control
     private Vector2 _extent, _offset;
     private Vector2 _mouse;
     private float _tilt;
+    private float _lift;
     private static ImageTexture? _height;
     private static bool _heightTried;
 
@@ -43,7 +44,11 @@ public partial class Map3D : Control
     private sealed partial class Hud : Control
     {
         public Map3D Owner = null!;
-        public override void _Draw() => Owner.Map.DrawUi(this, Owner._mouse);
+        public override void _Draw()
+        {
+            Owner.Map.DrawTownLabels(this, Owner.OnScreen);
+            Owner.Map.DrawUi(this, Owner._mouse);
+        }
     }
 
     public Map3D(MapView map)
@@ -76,7 +81,7 @@ public partial class Map3D : Control
             {
                 BackgroundMode = Godot.Environment.BGMode.Color, BackgroundColor = haze,
                 TonemapMode = Godot.Environment.ToneMapper.Linear,
-                AmbientLightSource = Godot.Environment.AmbientSource.Color, AmbientLightColor = new Color(0.78f, 0.8f, 0.86f), AmbientLightEnergy = 0.75f,
+                AmbientLightSource = Godot.Environment.AmbientSource.Color, AmbientLightColor = new Color(0.78f, 0.8f, 0.86f), AmbientLightEnergy = 0.6f,
             },
         });
         _groundMaterial.SetShaderParameter("haze", haze);
@@ -170,6 +175,7 @@ public partial class Map3D : Control
         _groundMaterial.SetShaderParameter("deg_per_px", deg);
         float lift = relief ? Exaggeration / Mathf.Max(0.05f, Map.KilometresPerPixel * 1000) : 0;
         lift = Mathf.Min(lift, 0.02f);
+        _lift = lift;
         _groundMaterial.SetShaderParameter("lift", lift);
         SyncObjects(lift);
         SyncTrees(lift);
@@ -182,6 +188,16 @@ public partial class Map3D : Control
         _postMaterial.SetShaderParameter("grade", real ? 1f : 0f);
         _postMaterial.SetShaderParameter("snowfall", real ? Map.Snowfall : 0f);
         _hud.QueueRedraw();
+    }
+
+    /// <summary>Where a point of the flat map (on the raised ground) appears on screen, or null if behind the camera.</summary>
+    private Vector2? OnScreen(Vector2 local)
+    {
+        if (_extent == Vector2.Zero) return null;
+        var (origin, deg) = Map.LonLatFrame;
+        var world = Ground(local, origin, deg, _lift);
+        if (_camera.IsPositionBehind(world)) return null;
+        return _camera.UnprojectPosition(world);
     }
 
     // ── Input: cast onto the ground, handed to the flat map in its coordinates ──

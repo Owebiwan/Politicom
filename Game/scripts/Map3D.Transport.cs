@@ -186,7 +186,8 @@ public partial class Map3D
             var holder = new Node3D { Position = new Vector3(i == 0 ? 0.35f : -0.4f, 0, i == 0 ? 0.75f : 1.0f), Rotation = new Vector3(0, Mathf.Pi / 2 + (float)(rng.NextDouble() - 0.5) * 0.6f, 0) };
             holder.SetMeta("ship", rng.NextDouble() * 6);
             root.AddChild(holder);
-            Model(holder, model, Vector3.Zero, Vector3.One * size);
+            // The kit's toy colours, recoloured: steel grey for steamers, dark timber for sailing ships.
+            Model(holder, model, Vector3.Zero, Vector3.One * size, tone: model.StartsWith("harbour/ship") ? new Color("6d7178") : new Color("8a6a4a"));
         }
         return root;
     }

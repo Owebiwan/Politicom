@@ -413,6 +413,7 @@ public partial class MapView : Control
     {
         // A city map (no coast) sits on land; otherwise the sea shader shows through behind the map.
         TownSpots.Clear();
+        TownLabels.Clear();
         RailSpots.Clear();
         ArmySpots.Clear();
         MilitiaSpots.Clear();
@@ -621,6 +622,14 @@ public partial class MapView : Control
             var size = font.GetStringSize(c.Name, HorizontalAlignment.Left, -1, 12);
             var rect = new Rect2(labelAt - new Vector2(0, size.Y - 3), size + new Vector2(0, c.Front && !c.Occupied ? 9 : 0));
             bool always = c.Id == Selected || c.Id == _hover;
+            if (ObjectsShown)
+            {
+                // With 3D towns the names go on the flat overlay above everything (Map3D places
+                // them under each town, on screen), so buildings never cover them.
+                TownLabels.Add((c.Id, p + new Vector2(0, SpriteSize(c) * 0.55f), c.Name, c.Occupied ? Muted : Label, always,
+                    c.Front && !c.Occupied ? (float)c.Control : -1, c.Front && !c.Occupied ? EnemyColor(w, c.Fronts.Min()) : Colors.Transparent));
+                continue;
+            }
             if (!always && taken.Any(t => t.Intersects(rect))) continue;
             taken.Add(rect);
 
@@ -1240,12 +1249,42 @@ public partial class MapView : Control
     public readonly List<(int Enemy, int Commune, Vector2 At, float Strength, Color Color, float Alpha, bool Attacking, Vector2 Towards, bool Moving)> ArmySpots = new();
     public readonly List<(int Commune, Vector2 At, float Defense, Vector2 Facing, bool UnderAttack)> MilitiaSpots = new();
     public readonly List<(int A, int B, Vector2 From, Vector2 To, bool Cut)> RailSpots = new();
+    /// <summary>Town names for the 3D map's overlay, most important first: town position, name, colour, always shown, front control (-1 if none) and the enemy's colour.</summary>
+    public readonly List<(int Id, Vector2 At, string Name, Color Color, bool Always, float Control, Color Enemy)> TownLabels = new();
+
+    /// <summary>Draws the 3D map's town names, each placed by `place` (map position to screen), skipping ones that would overlap.</summary>
+    public void DrawTownLabels(CanvasItem target, Func<Vector2, Vector2?> place)
+    {
+        var font = UiTheme.BodyMedium;
+        var taken = new List<Rect2>();
+        foreach (var (_, at, name, color, always, control, enemy) in TownLabels)
+        {
+            if (place(at) is not { } p) continue;
+            var size = font.GetStringSize(name, HorizontalAlignment.Left, -1, 13);
+            var plate = new Rect2(p + new Vector2(-size.X / 2 - 6, 4), new Vector2(size.X + 12, control >= 0 ? 24 : 18));
+            if (!always && taken.Any(t => t.Intersects(plate))) continue;
+            taken.Add(plate);
+            target.DrawRect(plate, new Color(0.05f, 0.05f, 0.06f, 0.62f));
+            target.DrawRect(plate, new Color(0.85f, 0.7f, 0.4f, 0.35f), false, 1);
+            var text = new Vector2(plate.Position.X + 6, plate.Position.Y + 14);
+            target.DrawString(font, text, name, HorizontalAlignment.Left, -1, 13, color);
+            if (control >= 0)
+            {
+                // Control meter under the name: held part light, lost part in the enemy's colour.
+                var bar = new Rect2(plate.Position + new Vector2(6, 17), new Vector2(plate.Size.X - 12, 3));
+                target.DrawRect(bar, enemy);
+                target.DrawRect(new Rect2(bar.Position, new Vector2(bar.Size.X * control, bar.Size.Y)), new Color("e9e4d8"));
+            }
+        }
+    }
 
     /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
     private bool Settlements => _zoom >= 0.6f;
 
     private float SpriteSize(Commune c) =>
-        Mathf.Clamp(18 + Mathf.Sqrt((float)c.Population) * 2f, 22, 36) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f);
+        Mathf.Clamp(18 + Mathf.Sqrt((float)c.Population) * 2f, 22, 36) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f)
+        // 3D towns keep growing as you close in, as Victoria 3's cities do, so their buildings can be read.
+        * (Objects3D ? Mathf.Clamp(_zoom / 2.5f, 1, 2.4f) : 1);
 
     /// <summary>The commune whose territory contains the point.</summary>
     private int? Hit(Vector2 at)

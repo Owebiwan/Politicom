@@ -35,7 +35,7 @@ public partial class Map3D
     }
 
     /// <summary>A model, placed (in its parent's units) and scaled; tinted if asked.</summary>
-    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0, Color? tint = null, Color? paint = null)
+    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0, Color? tint = null, Color? paint = null, Color? tone = null)
     {
         if (Scene(path)?.Instantiate() is not Node3D node) return null;
         node.Position = at;
@@ -43,11 +43,34 @@ public partial class Map3D
         node.RotationDegrees = new Vector3(0, turn, 0);
         if (tint is { } t) Tint(node, t);
         if (paint is { } p) Paint(node, p);
+        if (tone is { } t2) Recolor(node, t2);
         parent.AddChild(node);
         return node;
     }
 
     private static readonly Dictionary<Color, StandardMaterial3D> Paints = new();
+    private static readonly Dictionary<(Texture2D, Color), ShaderMaterial> Recolors = new();
+    private static Shader? _recolor;
+
+    /// <summary>Recolours a model to one tone, keeping its texture's detail as light and shade (shaders/recolor.gdshader).</summary>
+    private static void Recolor(Node node, Color tone)
+    {
+        _recolor ??= GD.Load<Shader>("res://shaders/recolor.gdshader");
+        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+            if (child is MeshInstance3D mesh)
+                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
+                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D { AlbedoTexture: { } tex })
+                    {
+                        if (!Recolors.TryGetValue((tex, tone), out var material))
+                        {
+                            material = new ShaderMaterial { Shader = _recolor };
+                            material.SetShaderParameter("tex", tex);
+                            material.SetShaderParameter("tone", tone);
+                            Recolors[(tex, tone)] = material;
+                        }
+                        mesh.SetSurfaceOverrideMaterial(i, material);
+                    }
+    }
 
     /// <summary>Paints a model one colour (the kits' own palettes are too bright for a period map).</summary>
     private static void Paint(Node node, Color color)
@@ -84,7 +107,13 @@ public partial class Map3D
     private void SetUpObjects()
     {
         _view.AddChild(_objects);
-        _view.AddChild(new DirectionalLight3D { RotationDegrees = new Vector3(-50, -35, 0), LightEnergy = 0.95f, LightColor = new Color(1, 0.96f, 0.88f) });
+        // Sunlight from the north-west, as the terrain is lit, with shadows between buildings and figures.
+        _view.AddChild(new DirectionalLight3D
+        {
+            RotationDegrees = new Vector3(-48, -35, 0), LightEnergy = 1.05f, LightColor = new Color(1, 0.95f, 0.86f),
+            ShadowEnabled = true, DirectionalShadowMode = DirectionalLight3D.ShadowMode.Parallel2Splits,
+            DirectionalShadowMaxDistance = 5000, ShadowBlur = 1.5f,
+        });
         _flagShader = GD.Load<Shader>("res://shaders/flag3d.gdshader");
         if (FileAccess.FileExists(MapView.LandDir + "height.land"))
         {
@@ -227,14 +256,38 @@ public partial class Map3D
         return root;
     }
 
+    /// <summary>
+    /// A house of the age: a core with a facade on each side (windows with shutters, small
+    /// windows, a door; timber-framed fronts on some medieval houses), a tiled gable roof, a dormer
+    /// on some, a chimney from the middle ages on. The pieces keep the kit's windows and frames and
+    /// take the town's colours over them.
+    /// </summary>
     private void House(Node3D root, Vector3 at, float u, float height, float turn, AgeKind age, int tone, Random rng)
     {
-        float storeys = height > 0.11f ? 1.4f : 1f;
-        if (age == AgeKind.Modern) storeys += 0.4f;
-        Model(root, "town/wall-block", at, new Vector3(u, u * storeys * 0.8f, u), turn, paint: age == AgeKind.Ancient ? new Color("ebe2cf") : WallPaint[tone]);
-        var top = at + new Vector3(0, u * storeys * 0.8f, 0);
-        // Roman houses had low tiled roofs; later ones are steeper.
-        Model(root, "town/roof-gable", top, new Vector3(u, u * (age == AgeKind.Ancient ? 0.55f : 0.9f), u), turn, paint: RoofPaint(age, tone));
+        var house = new Node3D { Position = at, RotationDegrees = new Vector3(0, turn, 0), Scale = Vector3.One * u };
+        root.AddChild(house);
+        float storeys = height > 0.11f ? 1.35f : 1f;
+        if (age == AgeKind.Modern) storeys += 0.35f;
+        float h = storeys * 0.8f;
+        var wall = age == AgeKind.Ancient ? new Color("efe6d4") : WallPaint[tone];
+        bool timber = age is AgeKind.Medieval or AgeKind.EarlyModern && rng.Next(3) == 0;
+        // The core, inside the facades.
+        Model(house, "town/wall-block", Vector3.Zero, new Vector3(0.82f, h, 0.82f), paint: wall.Darkened(0.08f));
+        // Facades: the panels sit on the +X face of their cell; turned, they make the four sides.
+        string window = age == AgeKind.Ancient ? "town/wall-window-small" : timber ? "town/wall-wood-window-shutters" : "town/wall-window-shutters";
+        string door = timber ? "town/wall-wood-door" : "town/wall-door";
+        for (int side = 0; side < 4; side++)
+        {
+            string piece = side == 0 ? door : side == 2 && rng.Next(2) == 0 ? "town/wall-window-small" : window;
+            Model(house, piece, Vector3.Zero, new Vector3(1, h, 1), side * 90, tone: wall);
+        }
+        var top = new Vector3(0, h, 0);
+        var roof = RoofPaint(age, tone);
+        float pitch = age == AgeKind.Ancient ? 0.55f : 0.9f;
+        bool dormer = age >= AgeKind.EarlyModern && rng.Next(3) == 0;
+        Model(house, dormer ? "town/roof-window" : "town/roof-gable", top, new Vector3(1, pitch, 1), tone: roof.Lightened(0.1f));
+        if (age >= AgeKind.Medieval && rng.Next(3) > 0)
+            Model(house, "town/chimney-top", top + new Vector3(-0.05f, pitch * 0.25f, 0.18f), new Vector3(0.8f, 0.9f, 0.8f), paint: new Color("8c6a58"));
     }
 
     private void Landmark(Node3D root, Vector3 at, AgeKind age)
