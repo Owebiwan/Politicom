@@ -66,13 +66,20 @@ public partial class Map3D
     private static Image? _landCover;
 
     /// <summary>Natural Earth's land cover (Game/map/terrain.webp): forest, grassland, cropland, desert, tundra, ice.</summary>
-    private static Image? LandCover()
+    internal static Image? LandCover()
     {
         if (_landCover != null) return _landCover;
         const string path = "res://map/terrain.webp";
-        if (!FileAccess.FileExists(path)) return null;
-        var image = new Image();
-        return image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) == Error.Ok ? _landCover = image : null;
+        // In the editor the file itself is there; an export has only the imported texture.
+        if (FileAccess.FileExists(path))
+        {
+            var raw = new Image();
+            if (raw.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) == Error.Ok) return _landCover = raw;
+        }
+        if (!ResourceLoader.Exists(path) || GD.Load<Texture2D>(path)?.GetImage() is not { } image) return null;
+        if (image.IsCompressed()) image.Decompress();
+        image.ClearMipmaps();
+        return _landCover = image;
     }
 
     /// <summary>Scatters the trees over woodland around the region (once per map).</summary>

@@ -116,10 +116,7 @@ public partial class MapView
     {
         if (_terrainTried) return;
         _terrainTried = true;
-        const string path = "res://map/terrain.webp";
-        if (!FileAccess.FileExists(path)) return;
-        var image = new Image();
-        if (image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) != Error.Ok) return;
+        if (Map3D.LandCover()?.Duplicate() is not Image image) return; // the file in the editor, the imported texture in an export
         image.GenerateMipmaps();
         _terrain = ImageTexture.CreateFromImage(image);
         // The same shape in white, for washing the land with parchment at world zoom.
