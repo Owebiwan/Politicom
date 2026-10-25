@@ -54,7 +54,7 @@ public partial class MapView
         return image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) == Error.Ok ? image : null;
     }
 
-    private static ImageTexture? Overview()
+    internal static ImageTexture? Overview()
     {
         if (_overviewTried) return _overview;
         _overviewTried = true;

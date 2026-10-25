@@ -250,6 +250,11 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   attacks. The **militia** are a mix of hooded and bareheaded fighters in their own clothes, with
   axes and knives early and rifles later, under the black-and-red flag, taking aim when a front
   is under attack. Each company faces its enemy, and its soldiers move out of step.
+- **Forests:** trees stand on the land wherever Natural Earth's land cover marks woodland
+  (not where the summer satellite picture is merely green, so steppe and cropland stay open),
+  in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees
+  elsewhere (Kenney Nature Kit, CC0), repainted in a painted map's greens, kept clear of towns
+  (`Game/scripts/Map3D.Trees.cs`). Soldiers cast soft contact shadows.
 - Zoomed out, the flat map's emblems take over again.
 
 ## Towns, armies and seasons on the map

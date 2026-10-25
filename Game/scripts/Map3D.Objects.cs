@@ -341,6 +341,27 @@ public partial class Map3D
         _drill[company] = (drill.Players, doing);
     }
 
+    private static PlaneMesh? _shadowDisc;
+
+    /// <summary>A flat disc, dark in the middle and fading out: a contact shadow.</summary>
+    private static PlaneMesh ShadowDisc()
+    {
+        if (_shadowDisc != null) return _shadowDisc;
+        var image = Image.CreateEmpty(64, 64, false, Image.Format.Rgba8);
+        for (int y = 0; y < 64; y++)
+            for (int x = 0; x < 64; x++)
+            {
+                float r = new Vector2(x - 31.5f, y - 31.5f).Length() / 32f;
+                image.SetPixel(x, y, new Color(0, 0, 0, 0.5f * Mathf.Clamp(1 - r * r, 0, 1)));
+            }
+        var material = new StandardMaterial3D
+        {
+            AlbedoTexture = ImageTexture.CreateFromImage(image), Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded, DepthDrawMode = BaseMaterial3D.DepthDrawModeEnum.Disabled,
+        };
+        return _shadowDisc = new PlaneMesh { Size = Vector2.One, Material = material };
+    }
+
     private static readonly string[] Weapons =
     {
         "1H_Sword_Offhand", "Badge_Shield", "Rectangle_Shield", "Round_Shield", "Spike_Shield", "1H_Sword", "2H_Sword",
@@ -400,6 +421,8 @@ public partial class Map3D
             hand.AddChild(rifle);
         }
         parent.AddChild(node);
+        // A soft shadow on the ground under each soldier.
+        parent.AddChild(new MeshInstance3D { Mesh = ShadowDisc(), Position = at + new Vector3(0.04f, 0.01f, 0.04f), Scale = new Vector3(0.42f, 1, 0.32f) });
         if (node.FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() is AnimationPlayer player) players.Add(player);
         return node;
     }
