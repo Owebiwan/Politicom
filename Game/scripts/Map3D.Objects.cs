@@ -21,6 +21,8 @@ public partial class Map3D
     private readonly Dictionary<int, (Node3D Node, string Key)> _towns = new();
     private readonly Dictionary<(int, int), (Node3D Node, int Count)> _armies = new();
     private readonly Dictionary<int, (Node3D Node, int Count)> _militia = new();
+    /// <summary>Each company's soldiers' animation players and what they're doing now.</summary>
+    private readonly Dictionary<Node3D, (List<AnimationPlayer> Players, string Doing)> _drill = new();
     private readonly Dictionary<string, PackedScene?> _scenes = new();
     private static Image? _heightImage;
     private Shader? _flagShader;
@@ -145,41 +147,45 @@ public partial class Map3D
 
         // Armies
         var armies = new HashSet<(int, int)>();
-        foreach (var (enemy, commune, at, strength, color, alpha, attacking) in Map.ArmySpots)
+        foreach (var (enemy, commune, at, strength, color, alpha, attacking, towards, moving) in Map.ArmySpots)
         {
             var key = (enemy, commune);
             armies.Add(key);
             int count = (int)Mathf.Clamp(Mathf.Round(1.5f + Mathf.Sqrt(strength) * 1.3f), 2, 7);
             if (!_armies.TryGetValue(key, out var army) || army.Count != count)
             {
-                army.Node?.QueueFree();
-                army = (BuildCompany(count, color.Lightened(0.15f), color, null, year), count);
+                if (army.Node != null) { _drill.Remove(army.Node); army.Node.QueueFree(); }
+                army = (BuildCompany(count, color.Lightened(0.1f), color, null, year, militia: false), count);
                 _armies[key] = army;
             }
             float scale = Mathf.Clamp(0.75f + Mathf.Sqrt(strength) * 0.35f, 0.75f, 2f) * Mathf.Sqrt(Map.Zoom);
             army.Node.Position = Ground(at, origin, deg, lift);
-            army.Node.Scale = Vector3.One * 13 * scale;
+            army.Node.Scale = Vector3.One * 21 * scale;
             army.Node.Visible = alpha > 0.3f;
+            Face(army.Node, at, towards);
+            Drill(army.Node, attacking ? "fight" : moving ? "march" : "stand", year);
         }
         foreach (var (key, army) in _armies)
             if (!armies.Contains(key)) army.Node.Visible = false;
 
         // Militia at the fronts
         var fronts = new HashSet<int>();
-        foreach (var (commune, at, defense) in Map.MilitiaSpots)
+        foreach (var (commune, at, defense, facing, underAttack) in Map.MilitiaSpots)
         {
             fronts.Add(commune);
             int count = (int)Mathf.Clamp(Mathf.Round(1 + defense * 0.8f), 1, 4);
             if (!_militia.TryGetValue(commune, out var band) || band.Count != count)
             {
-                band.Node?.QueueFree();
-                band = (BuildCompany(count, null, new Color(0.08f, 0.08f, 0.08f), new Color(0.75f, 0.12f, 0.1f), year), count);
+                if (band.Node != null) { _drill.Remove(band.Node); band.Node.QueueFree(); }
+                band = (BuildCompany(count, null, new Color(0.08f, 0.08f, 0.08f), new Color(0.75f, 0.12f, 0.1f), year, militia: true), count);
                 _militia[commune] = band;
             }
             float scale = Mathf.Clamp(0.8f + Mathf.Sqrt(defense) * 0.25f, 0.8f, 1.6f) * Mathf.Sqrt(Map.Zoom);
             band.Node.Position = Ground(at, origin, deg, lift);
-            band.Node.Scale = Vector3.One * 15 * scale;
+            band.Node.Scale = Vector3.One * 21 * scale;
             band.Node.Visible = true;
+            Face(band.Node, at, facing);
+            Drill(band.Node, underAttack ? "guard" : "stand", year);
         }
         foreach (var (key, band) in _militia)
             if (!fronts.Contains(key)) band.Node.Visible = false;
@@ -299,34 +305,127 @@ public partial class Map3D
         root.AddChild(particles);
     }
 
+    /// <summary>Turns a company to face a point of the flat map.</summary>
+    private static void Face(Node3D company, Vector2 at, Vector2 towards)
+    {
+        var d = towards - at;
+        if (d.LengthSquared() < 1) return;
+        company.Rotation = new Vector3(0, Mathf.Atan2(d.X, d.Y), 0); // models face +Z
+    }
+
     /// <summary>
-    /// A company: figures in two ranks (tinted in the army's colour, or in their own clothes for
-    /// militia), each with a rifle (a spear before 1700), and a standard. Units: one figure tall = 1.
+    /// Sets what a company's soldiers are doing: "stand", "march", "fight" (an army attacking) or
+    /// "guard" (militia holding a front under attack). Each soldier starts at a different moment,
+    /// so the ranks don't move in lockstep.
     /// </summary>
-    private Node3D BuildCompany(int count, Color? uniform, Color cloth, Color? lower, int year)
+    private void Drill(Node3D company, string doing, int year)
+    {
+        if (!_drill.TryGetValue(company, out var drill) || drill.Doing == doing) return;
+        bool firearms = year >= 1700;
+        string anim = doing switch
+        {
+            "march" => "Walking_A",
+            "fight" => firearms ? "2H_Ranged_Shooting" : "1H_Melee_Attack_Chop",
+            "guard" => firearms ? "2H_Ranged_Aiming" : "Blocking",
+            _ => firearms ? "2H_Melee_Idle" : "Idle",
+        };
+        var rng = new Random(company.GetInstanceId().GetHashCode());
+        foreach (var player in drill.Players)
+        {
+            if (!player.HasAnimation(anim)) continue;
+            player.GetAnimation(anim).LoopMode = Animation.LoopModeEnum.Linear;
+            player.Play(anim, customBlend: 0.3f);
+            player.Seek(rng.NextDouble() * player.CurrentAnimationLength, true);
+            player.SpeedScale = 0.9f + (float)rng.NextDouble() * 0.2f;
+        }
+        _drill[company] = (drill.Players, doing);
+    }
+
+    private static readonly string[] Weapons =
+    {
+        "1H_Sword_Offhand", "Badge_Shield", "Rectangle_Shield", "Round_Shield", "Spike_Shield", "1H_Sword", "2H_Sword",
+        "1H_Axe_Offhand", "Barbarian_Round_Shield", "1H_Axe", "2H_Axe", "Mug",
+        "Knife_Offhand", "1H_Crossbow", "2H_Crossbow", "Knife", "Throwable",
+    };
+
+    /// <summary>
+    /// One soldier (KayKit Adventurers, CC0, Game/models/soldiers), one unit tall. Armies before
+    /// 1700 are knights with sword and round shield; after, riflemen. Militia are hooded rogues and
+    /// barbarians in their own clothes, with axes early and rifles later. An army's uniform is its colour.
+    /// </summary>
+    private Node3D? Soldier(Node3D parent, string model, Vector3 at, bool firearms, Color? uniform, Random rng, List<AnimationPlayer> players)
+    {
+        if (Scene($"soldiers/{model}")?.Instantiate() is not Node3D node) return null;
+        node.Scale = Vector3.One / 2.2f;
+        node.Position = at;
+        node.RotationDegrees = new Vector3(0, (float)(rng.NextDouble() - 0.5) * 16, 0);
+        var keep = firearms ? Array.Empty<string>()
+            : model == "Knight" ? new[] { "1H_Sword", "Round_Shield" }
+            : model == "Barbarian" ? new[] { "1H_Axe" }
+            : new[] { "Knife" };
+        MeshInstance3D? crossbow = null;
+        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+        {
+            if (child is not MeshInstance3D mesh) continue;
+            string name = mesh.Name;
+            if (name is "2H_Crossbow" or "1H_Sword" && crossbow?.Name != "2H_Crossbow") crossbow = mesh;
+            if (Weapons.Contains(name)) mesh.Visible = keep.Contains(name);
+            if (name is "Knight_Cape" or "Barbarian_Cape" or "Rogue_Cape") mesh.Visible = !firearms && model == "Knight";
+            if (name == "Knight_Helmet")
+            {
+                // Before 1700 a knight's helm; after, a steel helmet (a darker shade of the uniform).
+                if (firearms && uniform is { } hu && mesh.Mesh.SurfaceGetMaterial(0) is BaseMaterial3D hm && hm.Duplicate() is BaseMaterial3D helmet)
+                {
+                    helmet.AlbedoColor = hu.Darkened(0.45f);
+                    mesh.SetSurfaceOverrideMaterial(0, helmet);
+                }
+            }
+            if (uniform is { } u && (name.Contains("Body") || name.Contains("Arm") || name.Contains("Leg") || name.Contains("Cape") || name.Contains("Hat")))
+                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
+                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m && m.Duplicate() is BaseMaterial3D copy)
+                    {
+                        copy.AlbedoColor = u;
+                        mesh.SetSurfaceOverrideMaterial(i, copy);
+                    }
+        }
+        // A rifle in place of the two-handed crossbow, held the same way.
+        if (firearms && crossbow?.GetParent() is Node3D hand)
+        {
+            var wood = new StandardMaterial3D { AlbedoColor = new Color(0.36f, 0.24f, 0.14f) };
+            var steel = new StandardMaterial3D { AlbedoColor = new Color(0.25f, 0.26f, 0.28f), Metallic = 0.6f, Roughness = 0.4f };
+            // The crossbow is held for aiming already; a sword points up the blade, so turn the rifle level.
+            var rifle = new Node3D { Transform = crossbow.Name == "2H_Crossbow" ? crossbow.Transform : crossbow.Transform * new Transform3D(new Basis(Vector3.Right, -Mathf.Pi / 2), Vector3.Zero) };
+            rifle.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.14f, 0.2f, 0.9f), Material = wood }, Position = new Vector3(0, 0, 0.1f) });
+            rifle.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.07f, 0.07f, 0.9f), Material = steel }, Position = new Vector3(0, 0.08f, 0.85f) });
+            hand.AddChild(rifle);
+        }
+        parent.AddChild(node);
+        if (node.FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() is AnimationPlayer player) players.Add(player);
+        return node;
+    }
+
+    /// <summary>
+    /// A company: soldiers in two ranks and a standard at the left of the front rank (plain in the
+    /// army's colour, or black over red for the militia). Units: one soldier tall = 1.
+    /// </summary>
+    private Node3D BuildCompany(int count, Color? uniform, Color cloth, Color? lower, int year, bool militia)
     {
         var root = new Node3D();
         _objects.AddChild(root);
-        bool early = year < 1700;
-        var arms = new StandardMaterial3D { AlbedoColor = early ? new Color(0.45f, 0.35f, 0.22f) : new Color(0.22f, 0.17f, 0.12f) };
-        string[] people = { "male-a", "male-b", "male-c", "male-d", "male-e", "male-f", "female-a", "female-b" };
+        bool firearms = year >= 1700;
+        var rng = new Random(count * 97 + (militia ? 1 : 0) + year);
+        var players = new List<AnimationPlayer>();
+        string[] militiaModels = firearms ? new[] { "Rogue_Hooded", "Rogue", "Barbarian" } : new[] { "Barbarian", "Rogue_Hooded", "Rogue" };
         for (int i = 0; i < count; i++)
         {
             int rank = i % 2, file = i / 2;
-            var at = new Vector3((file - (count - 1) / 4f) * 0.42f + rank * 0.2f, 0, -rank * 0.38f);
-            string who = uniform is null ? people[(i * 5 + count) % people.Length] : people[i % 6];
-            Model(root, $"people/character-{who}", at, Vector3.One * 1.5f, (i % 3 - 1) * 10, uniform);
-            // The weapon: a long thin shaft over the shoulder.
-            var shaft = new MeshInstance3D
-            {
-                Mesh = new BoxMesh { Size = new Vector3(0.05f, early ? 1.5f : 0.9f, 0.05f), Material = arms },
-                Position = at + new Vector3(0.2f, early ? 0.75f : 0.65f, 0.05f),
-                RotationDegrees = new Vector3(0, 0, early ? 0 : -25),
-            };
-            root.AddChild(shaft);
+            var at = new Vector3((file - (count - 1) / 4f) * 0.5f + rank * 0.22f, 0, -rank * 0.45f);
+            string model = militia ? militiaModels[i % militiaModels.Length] : "Knight";
+            Soldier(root, model, at, firearms, uniform, rng, players);
         }
-        // The standard, at the left of the front rank.
-        var foot = new Vector3(-(count - 1) / 4f * 0.42f - 0.45f, 0, 0.1f);
+        _drill[root] = (players, "");
+        // The standard.
+        var foot = new Vector3(-(count - 1) / 4f * 0.5f - 0.5f, 0, 0.1f);
         root.AddChild(new MeshInstance3D
         {
             Mesh = new CylinderMesh { TopRadius = 0.025f, BottomRadius = 0.025f, Height = 1.9f, Material = new StandardMaterial3D { AlbedoColor = new Color(0.3f, 0.22f, 0.14f) } },

@@ -55,3 +55,5 @@
 
 - Town, castle, city and character models in `Game/models/`: **Kenney** (kenney.nl), Fantasy
   Town Kit, Castle Kit, City Kit (Industrial, Commercial, Suburban) and Mini Characters, CC0.
+- Animated soldiers in `Game/models/soldiers/`: **Kay Lousberg**, KayKit Character Pack:
+  Adventurers 1.0 (github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0), CC0.

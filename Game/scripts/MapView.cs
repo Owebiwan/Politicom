@@ -557,7 +557,8 @@ public partial class MapView : Control
         {
             var c = w.Communes[commune];
             bool attacking = w.Enemies[enemy].CurrentOffensive != null && !c.Occupied;
-            if (ObjectsShown) ArmySpots.Add((enemy, commune, ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking));
+            if (ObjectsShown) ArmySpots.Add((enemy, commune, ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking,
+                ToScreen(c), army.Position.DistanceSquaredTo(army.Target) > 0.25f));
             DrawArmy(ToScreen(army.Position), army.Strength, EnemyColor(w, enemy), army.Alpha, attacking, ToScreen(c), font, figures: !ObjectsShown);
         }
         var pts = Layout();
@@ -570,7 +571,7 @@ public partial class MapView : Control
                 var p = pts[c.Id];
                 var toward = (centroid - p).LengthSquared() < 1 ? Vector2.Left : (centroid - p).Normalized();
                 var at = ToScreen(p + toward * MedianSpacing(pts) * 0.32f);
-                if (ObjectsShown) MilitiaSpots.Add((c.Id, at, (float)c.Defense));
+                if (ObjectsShown) MilitiaSpots.Add((c.Id, at, (float)c.Defense, ToScreen(p - toward * MedianSpacing(pts)), w.Enemies.Any(e => e.CurrentOffensive != null)));
                 else DrawMilitia(at, (float)c.Defense, 0.95f);
             }
         }
@@ -1228,8 +1229,8 @@ public partial class MapView : Control
     public bool ObjectsShown => Objects3D && Settlements && !AtWorldZoom;
     /// <summary>Filled as the map draws (map coordinates): towns with their size, armies, and militia at the fronts.</summary>
     public readonly List<(int Id, Vector2 At, float Size)> TownSpots = new();
-    public readonly List<(int Enemy, int Commune, Vector2 At, float Strength, Color Color, float Alpha, bool Attacking)> ArmySpots = new();
-    public readonly List<(int Commune, Vector2 At, float Defense)> MilitiaSpots = new();
+    public readonly List<(int Enemy, int Commune, Vector2 At, float Strength, Color Color, float Alpha, bool Attacking, Vector2 Towards, bool Moving)> ArmySpots = new();
+    public readonly List<(int Commune, Vector2 At, float Defense, Vector2 Facing, bool UnderAttack)> MilitiaSpots = new();
 
     /// <summary>Close in, towns are drawn as settlements; further out, as round emblems.</summary>
     private bool Settlements => _zoom >= 0.6f;

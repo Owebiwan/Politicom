@@ -243,9 +243,13 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   or slate later), a temple, a church tower or a domed tower; factories with brick chimneys
   trailing smoke once industry comes; blocks of flats in the twentieth century; broken walls
   where a town is occupied.
-- **Armies** are companies of figures in the enemy's colour, more of them the stronger the
-  army, with rifles (spears before 1700) under a standard rippling in the wind; the **militia**
-  stand in their own clothes under the black-and-red flag.
+- **Armies** are companies of animated soldiers (KayKit Adventurers, CC0, `Game/models/soldiers/`)
+  in the enemy's colour, more of them the stronger the army, under a standard rippling in the
+  wind: knights with sword, round shield and helm before 1700; after, riflemen in steel helmets.
+  They stand at ease, march while the army moves, and fire (or swing their swords) when it
+  attacks. The **militia** are a mix of hooded and bareheaded fighters in their own clothes, with
+  axes and knives early and rifles later, under the black-and-red flag, taking aim when a front
+  is under attack. Each company faces its enemy, and its soldiers move out of step.
 - Zoomed out, the flat map's emblems take over again.
 
 ## Towns, armies and seasons on the map
