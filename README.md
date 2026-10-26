@@ -50,6 +50,12 @@ dotnet run --project Sim.Cli -c Release -- batch --runs 300
 The game opens on a start menu: continue the latest save, choose a historical revolution, or
 start in the open world. Esc brings the menu back during a game.
 
+**Tutorial** (start menu): a guided first game in Revolutionary Catalonia. A panel at the
+top left takes you through ten steps (the movement, communes, hierarchy drift, schools and
+the expert trap, running the clock, the front and defensive campaigns, trust and mediation,
+technologies, the ledger), each moving on when you've done what it asks. You can leave it at
+any time and keep playing (`Game/scripts/Main.Tutorial.cs`).
+
 Controls:
 - Click a commune to select it; shift-click a second commune for mediation or railways.
 - Space pauses, 1–3 set the speed, and `.` advances one week.

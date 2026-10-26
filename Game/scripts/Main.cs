@@ -233,6 +233,7 @@ public partial class Main : Control
             SetSpeed(0);
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
+        if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
         if (Array.IndexOf(args, "--save") >= 0) QuickSave();
         if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
@@ -297,6 +298,7 @@ public partial class Main : Control
 
     public override void _Process(double delta)
     {
+        UpdateTutorial();
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
         _accumulator += delta;
         double secondsPerDay = SecondsPerTurn[_speed] / _world.Scenario.DaysPerTick;
@@ -377,6 +379,7 @@ public partial class Main : Control
 
     private TechTreePanel ShowTechTree()
     {
+        Did("techs");
         var panel = new TechTreePanel(_world, action =>
         {
             var result = _world.Apply(action);
@@ -615,6 +618,7 @@ public partial class Main : Control
             b.AddThemeFontSizeOverride("font_size", 20);
         }
         if (_inGame) Item("Resume", "Back to the game under way.", ResumeGame);
+        Item("Tutorial", "A guided first game in Revolutionary Catalonia, 1936: the movement, drift, schools, the front, trust, technologies.", StartTutorial);
         var saves = Saves();
         if (saves.Count > 0) Item("Continue", $"Load the latest save: {saves[0].Meta.Name}.", () => LoadFrom(saves[0].Path));
         Item("Historical revolutions", "Paris 1871, the Free Territory 1918 or Catalonia 1936.", ShowIntro);
@@ -955,6 +959,7 @@ public partial class Main : Control
 
     private void StartScenario(ScenarioDefinition scenario)
     {
+        if (_tutorial != null) EndTutorial();
         _inGame = true;
         _scenario = scenario;
         NewGame();
@@ -1049,6 +1054,7 @@ public partial class Main : Control
     {
         var result = _world.Apply(action);
         Audio.Instance?.Play(result.Ok ? "coins" : "error", result.Ok ? -8 : -4);
+        if (result.Ok) Did(action is FundSchool school ? $"FundSchool:{school.Track}" : action.GetType().Name);
         _feedback.Text = result.Message;
         _feedback.AddThemeColorOverride("font_color", result.Ok ? new Color(0.5f, 0.85f, 0.55f) : new Color(0.95f, 0.45f, 0.4f));
         Refresh();
@@ -1429,6 +1435,7 @@ public partial class Main : Control
 
     private void ShowLedger()
     {
+        Did("ledger");
         var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(1080, 620), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
         scroll.AddChild(new LedgerView(_world));
         ShowOverlay("Ledger", "The federation week by week. Each chart runs from the first week to now.", scroll, 1140, ("Close", CloseOverlay));
