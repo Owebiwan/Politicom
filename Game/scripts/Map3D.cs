@@ -114,6 +114,8 @@ public partial class Map3D : Control
         if (!FileAccess.FileExists(path)) return null;
         var image = new Image();
         if (image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) != Error.Ok) return null;
+        image.Convert(Image.Format.L8);
+        _heightImage = image; // kept for placing models on the ground
         return _height = ImageTexture.CreateFromImage(image);
     }
 

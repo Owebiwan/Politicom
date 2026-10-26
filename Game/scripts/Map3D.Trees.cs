@@ -66,6 +66,13 @@ public partial class Map3D
     private static Image? _landCover;
 
     /// <summary>Natural Earth's land cover (Game/map/terrain.webp): forest, grassland, cropland, desert, tundra, ice.</summary>
+    /// <summary>Frees the land cover image (32 MB) when nothing needs it until the next map.</summary>
+    internal static void ReleaseLandCover()
+    {
+        _landCover?.Dispose();
+        _landCover = null;
+    }
+
     internal static Image? LandCover()
     {
         if (_landCover != null) return _landCover;
@@ -121,6 +128,7 @@ public partial class Map3D
                     _trees[(int)kind].Add(new Tree(at, 0.75f + (float)rng.NextDouble() * 0.55f, (float)rng.NextDouble() * Mathf.Tau));
                 }
             }
+        ReleaseLandCover();
     }
 
     private void SyncTrees(float lift)

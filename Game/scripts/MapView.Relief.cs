@@ -26,7 +26,9 @@ public partial class MapView
         var image = new Image();
         if (image.LoadPngFromBuffer(FileAccess.GetFileAsBytes(path)) != Error.Ok) return null;
         image.GenerateMipmaps(); // smooth when shrunk
-        return ImageTexture.CreateFromImage(image);
+        var texture = ImageTexture.CreateFromImage(image);
+        image.Dispose();
+        return texture;
     }
 
     /// <summary>Screen rectangle of a longitude/latitude box (the projection is affine).</summary>

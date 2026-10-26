@@ -115,15 +115,7 @@ public partial class Map3D
             DirectionalShadowMaxDistance = 5000, ShadowBlur = 1.5f,
         });
         _flagShader = GD.Load<Shader>("res://shaders/flag3d.gdshader");
-        if (FileAccess.FileExists(MapView.LandDir + "height.land"))
-        {
-            var image = new Image();
-            if (image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(MapView.LandDir + "height.land")) == Error.Ok)
-            {
-                image.Convert(Image.Format.L8);
-                _heightImage = image;
-            }
-        }
+        Height(); // loads the elevation image too
     }
 
     /// <summary>The ground under a point of the flat map, raised as the terrain shader raises it.</summary>

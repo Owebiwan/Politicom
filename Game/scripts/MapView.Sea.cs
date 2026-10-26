@@ -119,6 +119,7 @@ public partial class MapView
         if (Map3D.LandCover()?.Duplicate() is not Image image) return; // the file in the editor, the imported texture in an export
         image.GenerateMipmaps();
         _terrain = ImageTexture.CreateFromImage(image);
+        Map3D.ReleaseLandCover();
         // The same shape in white, for washing the land with parchment at world zoom.
         var mask = (Image)image.Duplicate();
         mask.ClearMipmaps();
@@ -127,13 +128,15 @@ public partial class MapView
                 mask.SetPixel(x, y, new Color(1, 1, 1, mask.GetPixel(x, y).A));
         mask.GenerateMipmaps();
         _landMask = ImageTexture.CreateFromImage(mask);
+        image.Dispose();
+        mask.Dispose();
     }
 
     /// <summary>Land cover over the colours, and the parchment wash when zoomed out to the world.</summary>
     private void DrawTerrain()
     {
         if (Geo is null || Generated) return;
-        LoadTerrain();
+        if (!TerrainShown) LoadTerrain();
         var world = LonLatRect(-180, -90, 180, 90);
         if (TerrainShown) return; // the land layer draws the ground and the paper chart itself
         if (_terrain != null && ShowRelief) DrawTextureRect(_terrain, world, false, new Color(1, 1, 1, TerrainAlpha));

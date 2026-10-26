@@ -28,6 +28,8 @@ project/assembly_name="Politicom.Game"
 
 [rendering]
 
+lights_and_shadows/directional_shadow/size=2048
+
 textures/canvas_textures/default_texture_filter=3
 
 ; Required to export for Apple Silicon (arm64 / universal).

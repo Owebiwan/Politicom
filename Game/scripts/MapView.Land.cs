@@ -60,7 +60,9 @@ public partial class MapView
         _overviewTried = true;
         if (LoadLandImage(LandDir + "world.land") is not { } image) return null;
         image.GenerateMipmaps();
-        return _overview = ImageTexture.CreateFromImage(image);
+        _overview = ImageTexture.CreateFromImage(image);
+        image.Dispose();
+        return _overview;
     }
 
     /// <summary>
@@ -73,13 +75,15 @@ public partial class MapView
         if (Geo is null || Generated) return null;
         if (ReferenceEquals(_detailFor, Geo) && _detail != null) return (_detail, _detailRect);
         _detailFor = Geo;
+        _detail?.Dispose();
         _detail = null;
         var b = Geo.Bounds; // lon/lat
-        float cx = b.GetCenter().X, cy = b.GetCenter().Y;
-        int c0 = Mathf.Clamp((int)Mathf.Floor((Mathf.Max(b.Position.X - 20, cx - 55) + 180) / 30), 0, 11);
-        int c1 = Mathf.Clamp((int)Mathf.Floor((Mathf.Min(b.End.X + 20, cx + 55) + 180) / 30), 0, 11);
-        int r0 = Mathf.Clamp((int)Mathf.Floor((90 - Mathf.Min(b.End.Y + 14, cy + 40)) / 30), 0, 5);
-        int r1 = Mathf.Clamp((int)Mathf.Floor((90 - Mathf.Max(b.Position.Y - 14, cy - 40)) / 30), 0, 5);
+        // Full detail is only seen close in, around the region: the tiles under it and a few degrees
+        // round it (usually one to four); further out the world overview is sharp enough.
+        int c0 = Mathf.Clamp((int)Mathf.Floor((b.Position.X - 6 + 180) / 30), 0, 11);
+        int c1 = Mathf.Clamp((int)Mathf.Floor((b.End.X + 6 + 180) / 30), 0, 11);
+        int r0 = Mathf.Clamp((int)Mathf.Floor((90 - (b.End.Y + 5)) / 30), 0, 5);
+        int r1 = Mathf.Clamp((int)Mathf.Floor((90 - (b.Position.Y - 5)) / 30), 0, 5);
         const int tile = 1800;
         var image = Image.CreateEmpty((c1 - c0 + 1) * tile, (r1 - r0 + 1) * tile, false, Image.Format.Rgba8);
         bool any = false;
@@ -89,11 +93,17 @@ public partial class MapView
                 if (LoadLandImage($"{LandDir}t_{c}_{r}.land") is not { } t) continue;
                 t.Convert(Image.Format.Rgba8);
                 image.BlitRect(t, new Rect2I(0, 0, tile, tile), new Vector2I((c - c0) * tile, (r - r0) * tile));
+                t.Dispose(); // Godot images are only freed when .NET collects them otherwise
                 any = true;
             }
-        if (!any) return null;
+        if (!any)
+        {
+            image.Dispose();
+            return null;
+        }
         image.GenerateMipmaps();
         _detail = ImageTexture.CreateFromImage(image);
+        image.Dispose();
         _detailRect = new Vector4(-180 + c0 * 30, 90 - r0 * 30, -180 + (c1 + 1) * 30, 90 - (r1 + 1) * 30);
         return (_detail, _detailRect);
     }
