@@ -1232,6 +1232,7 @@ public partial class Main : Control
         AddButton(federation, "Recall delegates", "Drift down, experience lost for 4 turns.", () => Do(new RecallDelegates()));
         AddButton(federation, "Sponsor congress", "Spread techniques across the federation. Leaves a secretariat behind (drift).", () => Do(new SponsorCongress()));
 
+        BuildFigures(movement);
         Section(movement, "Gold");
         var gold = new HFlowContainer();
         movement.AddChild(gold);
@@ -1354,6 +1355,7 @@ public partial class Main : Control
             "100 A state: the revolution is over. Game lost.\n\n" +
             "A stage only reverts once drift falls 10 below its threshold. Brakes: political education, recall, mandates, rotation.";
         if (_communeList.Visible) _communeList.Refresh();
+        RefreshFigures();
         _history.QueueRedraw();
         var d = w.LastDrift;
         _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",

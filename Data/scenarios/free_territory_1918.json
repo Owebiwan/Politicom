@@ -143,6 +143,16 @@
   ],
 
   // Rural, low literacy, very militant. Mennonite colonies and Bolshevik-leaning towns are the weak links.
+  "figures": [
+    { "name": "Nestor Makhno", "role": "Commander", "commune": "Huliaipole", "ambition": 0.35, "prestige": 0.6,
+      "description": "Peasant, anarchist, the bat'ko. His Revolutionary Insurgent Army rides on tachankas and has never lost the steppe for long." },
+    { "name": "Maria Nikiforova", "role": "Commander", "commune": "Oleksandrivsk", "ambition": 0.2, "prestige": 0.4,
+      "description": "Marusya: bomb-thrower, freer of prisons, leader of her own Black Guard. She trusts no government, red or white." },
+    { "name": "Volin", "role": "Educator", "commune": "Pokrovske", "ambition": 0.08, "prestige": 0.35,
+      "description": "Vsevolod Eikhenbaum, back from exile: he chairs the cultural-educational section and the Nabat confederation's press." },
+    { "name": "Peter Arshinov", "role": "Orator", "commune": "Rosa Luxemburg commune", "ambition": 0.15, "prestige": 0.35,
+      "description": "Metalworker and Makhno's old cellmate, editor of the movement's paper, who speaks in the village assemblies." }
+  ],
   "communes": [
     { "name": "Huliaipole", "kind": "Agrarian", "lon": 36.26, "lat": 47.66, "population": 20, "collectivism": 0.8, "militancy": 0.9, "federalism": 0.6, "practical": 0.12, "political": 0.35, "techs": [ "militia_doctrine" ], "description": "Makhno's home town and the movement's centre: anarchist since the 1905 revolution." },
     { "name": "Rosa Luxemburg commune", "kind": "Agrarian", "lon": 36.15, "lat": 47.71, "population": 2, "collectivism": 1.0, "militancy": 0.4, "federalism": 0.4, "practical": 0.15, "political": 0.4, "description": "An agrarian commune on a former landowner's estate." },

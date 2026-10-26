@@ -21,6 +21,10 @@ public sealed record SetWarCommittee(bool Active) : PlayerAction;
 public sealed record SetForeignTrade(bool Active) : PlayerAction;
 public sealed record AnswerAllyOffer(bool Accept) : PlayerAction;
 public sealed record HoldCommune(int Commune) : PlayerAction;
+/// <summary>Send a notable figure to work in a commune.</summary>
+public sealed record PostFigure(int Figure, int Commune) : PlayerAction;
+/// <summary>Rotate a notable figure back to the ranks.</summary>
+public sealed record RotateFigure(int Figure) : PlayerAction;
 /// <summary>Send delegates (emissaries) to win a foreign state's sympathy, optionally to one of its cities.</summary>
 public sealed record SendDelegates(string StateId, string? City = null) : PlayerAction;
 /// <summary>Agitate a foreign state's workers, optionally in one city: they radicalize, and the state resents it.</summary>
@@ -101,6 +105,8 @@ internal static class ActionSystem
             HoldCommune a => Hold(w, a),
             ChooseEventOption a => Systems.EventSystem.Choose(w, a.EventId, a.Option),
             SendDelegates a => Delegates(w, a),
+            PostFigure a => Post(w, a),
+            RotateFigure a => Rotate(w, a),
             AgitateWorkers a => Agitate(w, a),
             InternationalAppeal => Appeal(w),
             SupportUprising a => Support(w, a),
@@ -447,6 +453,29 @@ internal static class ActionSystem
         w.BumpDrift(b.ForceStayDrift);
         w.Emit(Severity.Danger, $"{c.Name} is kept in the federation against its assembly's will. Everyone notices.", c.Id);
         return ActionResult.Done($"{c.Name} held by force.");
+    }
+
+    private static ActionResult Post(World w, PostFigure a)
+    {
+        if (w.Figures.FirstOrDefault(f => f.Id == a.Figure) is not { Alive: true } f) return ActionResult.Fail("No such figure, or they are dead.");
+        if (f.Resting > 0) return ActionResult.Fail($"{f.Name} is back in the ranks for {w.Turns(f.Resting)} more.");
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        if (f.Commune == c.Id) return ActionResult.Fail($"{f.Name} is already in {c.Name}.");
+        var b = w.Balance;
+        if (!Spend(w, b.CostPostFigure)) return Broke(w, b.CostPostFigure);
+        f.Commune = c.Id;
+        return ActionResult.Done($"{f.Name} goes to {c.Name}: {Figure.Does(f.Role)}.");
+    }
+
+    private static ActionResult Rotate(World w, RotateFigure a)
+    {
+        if (w.Figures.FirstOrDefault(f => f.Id == a.Figure) is not { Alive: true } f) return ActionResult.Fail("No such figure, or they are dead.");
+        if (f.Commune is null && !f.Empowered) return ActionResult.Fail($"{f.Name} is already in the ranks.");
+        var b = w.Balance;
+        if (!Spend(w, b.CostRotateFigure)) return Broke(w, b.CostRotateFigure);
+        Systems.FigureSystem.Rotate(w, f);
+        w.Emit(Severity.Good, $"{f.Name} goes back to the ranks. Mandates are temporary; their followers grumble.");
+        return ActionResult.Done($"{f.Name} rotated back to the ranks: prestige {f.Prestige:P0}, resting {w.Turns(f.Resting)}.");
     }
 
     private static ActionResult Delegates(World w, SendDelegates a)

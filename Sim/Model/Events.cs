@@ -24,6 +24,9 @@ public sealed class EventOption
     public EventEffects Effects { get; set; } = new();
 }
 
+/// <summary>What a decision does with a figure who asked for power.</summary>
+public enum FigureChoice { Empower, Rotate }
+
 public sealed class EventEffects
 {
     /// <summary>Food per thousand people in the affected communes (a harvest, a flood).</summary>
@@ -64,6 +67,11 @@ public sealed class EventEffects
     public string[] Secede { get; set; } = Array.Empty<string>();
     /// <summary>Added to every commune's party influence (a rival's cells gaining ground).</summary>
     public double PartyInfluence { get; set; }
+    /// <summary>A notable figure (by name) the choice concerns, and what happens to them.</summary>
+    public string Figure { get; set; } = "";
+    public FigureChoice? FigureChoice { get; set; }
+    /// <summary>A notable figure (by name) who dies (Durruti on the Madrid front).</summary>
+    public string KillFigure { get; set; } = "";
     /// <summary>A sister federation whose cities join yours (by state id).</summary>
     public string Federate { get; set; } = "";
     /// <summary>Changes to outside states' stance toward the federation, by state id.</summary>

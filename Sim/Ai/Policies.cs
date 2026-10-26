@@ -70,6 +70,7 @@ public sealed class Centralizer : IPolicy
         if (!w.WarCommittee) w.Apply(new SetWarCommittee(true));
         if (!w.ForeignTrade) w.Apply(new SetForeignTrade(true));
         if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(true));
+        Helpers.Figures(w, crisis: true, rotateAt: 2); // never rotates; grants whatever they ask (below)
         Helpers.AnswerEvents(w, e => e.EnemyStrength * 3 - e.Influence * 0.1);
         foreach (var s in w.PendingSecessions.ToList()) w.Apply(new HoldCommune(s.Commune));
         if (!w.IdeaNudges.ContainsKey("federal_statistics")) w.Apply(new CirculateIdea("federal_statistics"));
@@ -121,6 +122,7 @@ public sealed class Balanced : IPolicy
         Helpers.AnswerEvents(w, e => e.Drift + e.EnemyStrength * (crisis ? 6 : 3) - e.Influence * 0.05 - e.Wellbeing * 10 - e.Trust * 20);
 
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
+        Helpers.Figures(w, crisis, rotateAt: 0.3);
         if (margin < 5 && w.Influence >= b.CostRecall * DriftEffects.RecallCost(w.Drift.Stage)) w.Apply(new RecallDelegates());
 
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
@@ -203,6 +205,37 @@ internal static class Helpers
     }
 
     /// <summary>A cultural work where culture is thinnest (and the work isn't still being taken up).</summary>
+    /// <summary>
+    /// Figures where they help most: commanders to the weakest front (in a crisis) or the most pressed
+    /// one, orators where trust is thinnest, organizers where food is shortest, educators where political
+    /// education is lowest. Anyone whose prestige x ambition passes `rotateAt` goes back to the ranks.
+    /// </summary>
+    public static void Figures(World w, bool crisis, double rotateAt)
+    {
+        if (w.Tick % 4 != 1) return;
+        foreach (var f in w.Figures.Where(f => f.Alive && f.Resting == 0).ToList())
+        {
+            if (f.Commune != null && f.Hunger >= rotateAt && w.Influence > w.Balance.CostRotateFigure + 10)
+            {
+                w.Apply(new RotateFigure(f.Id));
+                continue;
+            }
+            var members = w.Federation.ToList();
+            if (members.Count == 0) return;
+            Commune? best = f.Role switch
+            {
+                FigureRole.Commander => members.Where(c => c.Front).OrderBy(c => c.Control - (c.Pressure > c.Defense ? 1 : 0)).FirstOrDefault(),
+                FigureRole.Orator => members.OrderBy(c => w.Trust.AverageTrust(c.Id)).FirstOrDefault(),
+                FigureRole.Organizer => members.OrderBy(c => c.Food / Math.Max(0.1, c.Population)).FirstOrDefault(),
+                _ => members.OrderBy(c => c.PoliticalEducation).FirstOrDefault(),
+            };
+            // Move only for a real gain: a commander to a worse front, the others once their post is in good shape.
+            if (best is null || best.Id == f.Commune) continue;
+            if (f.Commune is int now && w.Communes[now].InFederation && f.Role != FigureRole.Commander && (w.Tick / 4 + f.Id) % 3 != 0) continue; // settled in: move now and then
+            if (w.Influence > w.Balance.CostPostFigure + 12) w.Apply(new PostFigure(f.Id, best.Id));
+        }
+    }
+
     public static void CulturalWork(World w, CulturalWorkKind kind)
     {
         var c = w.Federation.Where(c => w.Tick - c.LastCulturalWork >= CulturalWorks.Cooldown(w))

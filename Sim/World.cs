@@ -98,6 +98,8 @@ public sealed class World
     public ProjectKind? LastProposalKind { get; internal set; }
     /// <summary>The movement's missions abroad (emissaries and agitators), latest last; the map marks their cities.</summary>
     public List<Mission> Missions { get; internal set; } = new();
+    /// <summary>The movement's notable figures, living and dead.</summary>
+    public List<Figure> Figures { get; internal set; } = new();
 
     internal void RecordMission(string state, string? city, bool agitation)
     {
@@ -313,6 +315,7 @@ public sealed class World
         world.Enthusiasm = balance.StartEnthusiasm;
         world.Gold = scenario.Gold;
         world.TechLevelStart = world.TechLevel;
+        FigureSystem.Create(world, new Rng(seed ^ 0xF16A5E5UL)); // its own stream, so the game's random draws are unchanged
         foreach (var e in world.Enemies) e.TechStart = e.TechLevel;
         world.Emit(Severity.Info, scenario.Description);
         return world;
@@ -367,6 +370,7 @@ public sealed class World
         GoodsPrice = GoodsPrice,
         LastProposalKind = LastProposalKind,
         Missions = Missions.ToList(),
+        Figures = Figures,
         Enthusiasm = Enthusiasm,
         Gold = Gold,
         Conscription = Conscription,
@@ -424,6 +428,7 @@ public sealed class World
             GoodsPrice = s.GoodsPrice,
             LastProposalKind = s.LastProposalKind,
             Missions = s.Missions?.ToList() ?? new(),
+            Figures = s.Figures ?? new(),
             Enthusiasm = s.Enthusiasm,
             Gold = s.Gold,
             Conscription = s.Conscription,
@@ -473,6 +478,7 @@ public sealed class World
         Global.TechLevelSystem.Run(this);
         RisingSystem.Run(this);
         MilitiaSystem.Run(this);
+        FigureSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);

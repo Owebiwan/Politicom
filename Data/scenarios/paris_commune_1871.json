@@ -115,6 +115,16 @@
   ],
 
   // Population in tens of thousands, abstracted. Kind: Mixed = market gardens on the edge.
+  "figures": [
+    { "name": "Jarosław Dąbrowski", "role": "Commander", "commune": "17th · Batignolles", "ambition": 0.35, "prestige": 0.45,
+      "description": "Polish officer and exile, commander of the Commune's western front: the one general the Guard trusts." },
+    { "name": "Louise Michel", "role": "Orator", "commune": "18th · Montmartre", "ambition": 0.05, "prestige": 0.5,
+      "description": "Schoolteacher of Montmartre, ambulance worker, rifle in hand at Issy. She calls the vigilance committees to the barricades." },
+    { "name": "Eugène Varlin", "role": "Organizer", "commune": "6th · Luxembourg", "ambition": 0.1, "prestige": 0.4,
+      "description": "Bookbinder, founder of the workers' cooperatives, member of the International: he runs the Commune's finances and its bread." },
+    { "name": "Gustave Courbet", "role": "Educator", "commune": "1st · Louvre", "ambition": 0.3, "prestige": 0.4,
+      "description": "The painter of Ornans, president of the Federation of Artists, who keeps the museums open and the Column coming down." }
+  ],
   "communes": [
     { "name": "1st · Louvre", "kind": "Industrial", "lon": 2.341, "lat": 48.862, "population": 8, "collectivism": -0.2, "militancy": -0.2, "federalism": 0.0, "practical": 0.4, "political": 0.15 },
     { "name": "2nd · Bourse", "kind": "Industrial", "lon": 2.342, "lat": 48.868, "population": 8, "collectivism": -0.3, "militancy": -0.3, "federalism": 0.0, "practical": 0.4, "political": 0.15 },

@@ -100,6 +100,29 @@ public sealed class Balance
     public double DelegateEffect { get; set; } = 0.12;
     public double AgitateEffect { get; set; } = 0.05;
     public double CostDelegates { get; set; } = 6;
+
+    // ── Notable figures ──
+    /// <summary>Defence a commander adds to their commune at prestige 0.5 (half that next door).</summary>
+    public double FigureDefense { get; set; } = 0.12;
+    public double FigureTrust { get; set; } = 0.004;
+    public double FigureEnthusiasm { get; set; } = 0.002;
+    /// <summary>Food and goods per thousand people per turn an organizer adds.</summary>
+    public double FigureProduce { get; set; } = 0.06;
+    public double FigureEducation { get; set; } = 0.006;
+    public double FigurePrestigeGain { get; set; } = 0.012;
+    public double FigureAmbitionGrowth { get; set; } = 0.006;
+    /// <summary>Drift per turn per unit of prestige x ambition, for each figure at work.</summary>
+    public double FigureDrift { get; set; } = 0.1;
+    /// <summary>Prestige x ambition at which a figure asks for power.</summary>
+    public double FigureBidThreshold { get; set; } = 0.42;
+    public double FigureEmpowerDrift { get; set; } = 4;
+    public double FigureDeathRate { get; set; } = 0.012;
+    public double FigureDeathEnthusiasm { get; set; } = 0.06;
+    public double FigureRotateWellbeing { get; set; } = 0.03;
+    public double FigureRotateDriftRelief { get; set; } = 1;
+    public int FigureRestTicks { get; set; } = 4;
+    public double CostPostFigure { get; set; } = 4;
+    public double CostRotateFigure { get; set; } = 2;
     public double CostAgitate { get; set; } = 6;
     public double CostAppeal { get; set; } = 12;
     public int AppealTicks { get; set; } = 12;

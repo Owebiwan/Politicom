@@ -1179,4 +1179,56 @@ public class SimulationTests
         Assert.True(balanced.Average(w => w.Scores.Survival) > passive.Average(w => w.Scores.Survival));
         Assert.True(balanced.Average(w => w.Scores.Total) > central.Average(w => w.Scores.Total));
     }
+
+    [Fact]
+    public void Historical_figures_work_where_they_are_and_Durruti_falls_on_schedule()
+    {
+        var w = NewWorld();
+        var durruti = w.Figures.Single(f => f.Name == "Buenaventura Durruti");
+        Assert.Equal(4, w.Figures.Count);
+        var bujaraloz = w.Communes.Single(c => c.Name == "Bujaraloz");
+        Assert.Equal(bujaraloz.Id, durruti.Commune);
+        // A commander strengthens the commune's defence.
+        double with = Sim.Systems.WarSystem.Defense(w, bujaraloz);
+        durruti.Commune = null;
+        double without = Sim.Systems.WarSystem.Defense(w, bujaraloz);
+        Assert.True(with > without * 1.05, $"{with} vs {without}");
+        durruti.Commune = bujaraloz.Id;
+        // The scripted event kills him, whichever option is chosen.
+        w.Run(25);
+        Assert.False(durruti.Alive);
+    }
+
+    [Fact]
+    public void An_ambitious_figure_asks_for_power_and_can_be_rotated_back_to_the_ranks()
+    {
+        var w = NewWorld();
+        var oliver = w.Figures.Single(f => f.Name == "Juan García Oliver");
+        oliver.Prestige = 0.9;
+        oliver.Ambition = 0.8;
+        double before = w.LastDrift.Figures;
+        w.Step();
+        Assert.True(w.LastDrift.Figures > before);
+        w.Step();
+        var bid = Assert.Single(w.PendingEvents, p => p.Id.StartsWith("figure_bid_"));
+        Assert.True(w.Apply(new ChooseEventOption(bid.Id, 1)).Ok); // rotate
+        Assert.Null(oliver.Commune);
+        Assert.True(oliver.Prestige < 0.5 && oliver.Resting > 0);
+        Assert.False(w.Apply(new PostFigure(oliver.Id, 0)).Ok); // resting
+        while (oliver.Resting > 0) w.Step();
+        Assert.True(w.Apply(new PostFigure(oliver.Id, 0)).Ok);
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        var again = restored.Figures.Single(f => f.Name == oliver.Name);
+        Assert.Equal(oliver.Prestige, again.Prestige);
+        Assert.Equal(oliver.Commune, again.Commune);
+    }
+
+    [Fact]
+    public void Generated_starts_get_one_figure_of_each_role()
+    {
+        var w = World.Create(Sandbox.Value.Generate(5, 20, calibrate: false), NewWorld().Techs, seed: 5);
+        Assert.Equal(Enum.GetValues<FigureRole>().Length, w.Figures.Select(f => f.Role).Distinct().Count());
+        Assert.All(w.Figures, f => Assert.StartsWith("The ", f.Name));
+    }
 }

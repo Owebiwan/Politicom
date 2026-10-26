@@ -61,9 +61,9 @@
       "defaultOption": 0,
       "options": [
         { "label": "Let the column elect its delegates", "description": "The militia stays self-managed, but loses its most experienced commander.",
-          "effects": { "drift": -2, "enemyStrength": 0.3, "communes": [ "Bujaraloz", "Pina de Ebro" ], "wellbeing": 0.05 } },
+          "effects": { "drift": -2, "enemyStrength": 0.3, "communes": [ "Bujaraloz", "Pina de Ebro" ], "wellbeing": 0.05, "killFigure": "Buenaventura Durruti" } },
         { "label": "Appoint a commander from the war committee", "description": "Continuity at the front, at the price of a chain of command.",
-          "effects": { "drift": 3, "enemyStrength": -0.3 } }
+          "effects": { "drift": 3, "enemyStrength": -0.3, "killFigure": "Buenaventura Durruti" } }
       ]
     },
     {
@@ -149,6 +149,16 @@
 
   // kind: Agrarian | Industrial | Mixed. Values run -1..1 (collectivist, militant, federalist).
   // Population in thousands, abstracted — Barcelona's syndicates stand in for the city.
+  "figures": [
+    { "name": "Buenaventura Durruti", "role": "Commander", "commune": "Bujaraloz", "ambition": 0.12, "prestige": 0.55,
+      "description": "Metalworker, bank robber, the best-loved militant of the CNT. His column of 3,000 marched on Zaragoza and holds the line at Bujaraloz." },
+    { "name": "Juan García Oliver", "role": "Organizer", "commune": "Barcelona transport collective", "ambition": 0.6, "prestige": 0.45,
+      "description": "Waiter and insurrectionist, the strategist of the July fighting. He organizes the militias' supply; in November he will become Minister of Justice." },
+    { "name": "Federica Montseny", "role": "Orator", "commune": "Sants textile syndicate", "ambition": 0.5, "prestige": 0.45,
+      "description": "Writer and the movement's finest speaker. Her rallies fill the bullrings; in November she will be the first woman minister in Spain." },
+    { "name": "Lucía Sánchez Saornil", "role": "Educator", "commune": "Poblenou metalworkers", "ambition": 0.08, "prestige": 0.35,
+      "description": "Poet and founder of Mujeres Libres: literacy classes, schools and training for thousands of working women." }
+  ],
   "communes": [
     { "name": "Sants textile syndicate", "kind": "Industrial", "lon": 2.13, "lat": 41.375, "population": 60, "collectivism": 0.7, "militancy": 0.3, "federalism": 0.6, "practical": 0.35, "political": 0.35, "techs": [ "collective_workshops", "ateneo_libraries" ], "description": "The CNT's heartland in Barcelona's textile mills." },
     { "name": "Poblenou metalworkers", "kind": "Industrial", "lon": 2.20, "lat": 41.40, "population": 55, "collectivism": 0.8, "militancy": 0.6, "federalism": 0.5, "practical": 0.4, "political": 0.3, "techs": [ "collective_workshops" ], "description": "Foundries and machine shops; soon converting to war work." },

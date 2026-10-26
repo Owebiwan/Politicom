@@ -98,7 +98,8 @@ internal static class WarSystem
                       * (b.ArmsShortageDefense + (1 - b.ArmsShortageDefense) * c.GoodsCoverage)
                       * (1 + b.StockpileDefense * Math.Clamp(c.Goods / (c.Population * b.StockpilePerPop), 0, 1))
                       * (w.RecallPenaltyTicks > 0 ? 0.9 : 1)
-                      * (1 + w.VolunteerDefense);
+                      * (1 + w.VolunteerDefense)
+                      * (1 + FigureSystem.Defense(w, c));
         return (own + support) * mult;
     }
 

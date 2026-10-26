@@ -431,6 +431,31 @@ How they play:
   **Show me** button. Several queue up, and a pop-up closes by itself if its decision was
   answered in the side panel or ran out of time.
 
+## Notable figures
+
+Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSystem.cs`):
+- **Historical scenarios** name real people: Durruti, García Oliver, Federica Montseny and
+  Lucía Sánchez Saornil in Catalonia; Makhno, Maria Nikiforova, Volin and Arshinov in the Free
+  Territory; Dąbrowski, Louise Michel, Eugène Varlin and Courbet in Paris. Durruti falls on the
+  Madrid front when the historical event comes. Open-world and generated starts get one of
+  each role, named for their trade and town ("The smith of Lyon").
+- **Roles:** a **commander** makes their commune (and, half as much, its neighbours) defend
+  better; an **orator** grows trust around them and the revolution's enthusiasm; an
+  **organizer** adds food and goods; an **educator** raises political education there and
+  next door.
+- **Prestige and ambition:** prestige grows with their work (a commander's faster while the
+  front holds); ambition grows with prestige, slower where political education is high.
+  Prestige x ambition adds hierarchy drift ("Figures gathering power"), and past about 0.42
+  they ask for power: **grant it** (twice as effective, +4 drift now and much more every turn)
+  or **rotate them back to the ranks** (prestige and ambition fall, a short rest, their
+  followers grumble, drift eases).
+- **Commanders** at a losing front may fall, which costs enthusiasm.
+- **Where to see them:** the Figures section of the Movement tab (send the selected commune a
+  figure, or rotate one), a ★ after the town's name on the map, and the commune's tooltip.
+- **Balance** (balanced AI, 200 games): Catalonia 96%, Free Territory 72% (from about 79%:
+  ambitious figures are a real pressure), Paris 43%; open starts 55–70%. The AI rotates
+  anyone past 0.3; the centralizer grants every request.
+
 ## Map modes
 
 Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution, plus:

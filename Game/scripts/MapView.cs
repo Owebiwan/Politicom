@@ -626,7 +626,7 @@ public partial class MapView : Control
             {
                 // With 3D towns the names go on the flat overlay above everything (Map3D places
                 // them under each town, on screen), so buildings never cover them.
-                TownLabels.Add((c.Id, p + new Vector2(0, SpriteSize(c) * 0.55f), c.Name, c.Occupied ? Muted : Label, always,
+                TownLabels.Add((c.Id, p + new Vector2(0, SpriteSize(c) * 0.55f), c.Name + (FiguresIn(w, c).Any() ? " ★" : ""), c.Occupied ? Muted : Label, always,
                     c.Front && !c.Occupied ? (float)c.Control : -1, c.Front && !c.Occupied ? EnemyColor(w, c.Fronts.Min()) : Colors.Transparent));
                 continue;
             }
@@ -868,6 +868,9 @@ public partial class MapView : Control
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
+    /// <summary>The living figures working in a commune.</summary>
+    private static IEnumerable<Figure> FiguresIn(World w, Commune c) => w.Figures.Where(f => f.Alive && f.Commune == c.Id);
+
     private void DrawTooltip(Font font, World w, Commune c)
     {
         string status = c.OccupiedBy is int by ? $"Occupied by the {w.Enemies[by].Name}" : c.Occupied ? "Occupied" : !c.Federated ? "Seceded" : c.Front ? $"Front — control {c.Control:P0}" : "Federated";
@@ -879,7 +882,7 @@ public partial class MapView : Control
             $"Education: practical {c.PracticalEducation:0.00}, political {c.PoliticalEducation:0.00}",
             $"Food {Math.Max(0, c.Food):0} · goods {Math.Max(0, c.Goods):0}" + (c.Starving ? " · STARVING" : ""),
             $"Discontent {c.Discontent:0.00}" + (c.FreeRiding > 0.2 ? $" · free-riding {c.FreeRiding:P0}" : ""),
-        };
+        }.Concat(FiguresIn(w, c).Select(f => $"★ {f.Name}, {Figure.RoleName(f.Role)}")).ToArray();
         float width = lines.Max(l => font.GetStringSize(l, HorizontalAlignment.Left, -1, 13).X) + 20;
         float height = lines.Length * 17 + 12;
         var at = UiMouse + new Vector2(16, 16);

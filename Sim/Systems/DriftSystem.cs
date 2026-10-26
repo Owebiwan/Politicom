@@ -17,6 +17,7 @@ internal static class DriftSystem
             Militarization = w.Ally.MilitarizationTicks > 0 ? b.MilitarizationDrift : 0,
             Conscription = w.Conscription ? b.ConscriptionDrift * w.Weeks : 0,
             Treasury = b.GoldHoldingDrift * w.Gold * w.Weeks,
+            Figures = FigureSystem.Drift(w),
             LargeProjects = w.ActiveProjects.Sum(p => b.LargeProjectDrift * Math.Max(0, p.Participants.Count - b.LargeProjectThreshold)),
             Events = w.PendingDriftBump,
             PoliticalEducationBrake = b.PoliticalBrake * w.Mean(c => c.PoliticalEducation),

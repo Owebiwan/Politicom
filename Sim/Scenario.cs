@@ -30,6 +30,8 @@ public sealed class ScenarioDefinition
     public List<HostileState> Enemies { get; set; } = new();
     public AllyState Ally { get; set; } = new();
     public List<CommuneDefinition> Communes { get; set; } = new();
+    /// <summary>The movement's notable figures; generated (one of each role) when a scenario names none.</summary>
+    public List<FigureDefinition> Figures { get; set; } = new();
     public List<EventDefinition> Events { get; set; } = new();
     /// <summary>Railway lines at the start, as pairs of commune names. A line also makes the two neighbours.</summary>
     public List<string[]> Railways { get; set; } = new();

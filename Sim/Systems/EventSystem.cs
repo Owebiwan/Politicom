@@ -91,6 +91,16 @@ internal static class EventSystem
             if (!started.Ok) w.Emit(Severity.Info, $"The proposal lapses: {started.Message}");
         }
         if (e.Federate.Length > 0) Global.RevolutionSystem.Federate(w, e.Federate);
+        if (e.KillFigure.Length > 0 && w.Figures.FirstOrDefault(f => f.Name == e.KillFigure) is { Alive: true } dead)
+        {
+            dead.Alive = false;
+            dead.Asking = false;
+        }
+        if (e.FigureChoice is { } choice && w.Figures.FirstOrDefault(f => f.Name == e.Figure) is { Alive: true } figure)
+        {
+            if (choice == FigureChoice.Empower) FigureSystem.Empower(w, figure);
+            else FigureSystem.Rotate(w, figure);
+        }
         foreach (var (id, delta) in e.Stances)
             if (w.States.FirstOrDefault(s => s.Id == id) is { } state)
                 state.Stance = Math.Clamp(state.Stance + delta, -1, 1);
