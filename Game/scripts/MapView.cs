@@ -6,7 +6,7 @@ using Politicom.Sim;
 
 namespace Politicom.Game;
 
-public enum MapMode { Trust, Education, Values, Wellbeing, Ideology, Diplomacy, Revolution, Culture }
+public enum MapMode { Trust, Education, Values, Wellbeing, Ideology, Diplomacy, Revolution, Culture, Food, Militia, Parties, Discontent }
 
 /// <summary>
 /// The map. With real geography (<see cref="GeoData"/>), communes sit at their true positions
@@ -806,6 +806,19 @@ public partial class MapView : Control
             case MapMode.Culture:
                 // Dark slate where the movement's ideas are thin, warm gold where they run deep.
                 return new Color("39404a").Lerp(new Color("f2c94c"), Mathf.Clamp((float)c.Culture * 2.5f, 0, 1));
+            case MapMode.Food:
+                // Weeks of stores in hand: starving rust, a fortnight sand, a month or more green.
+                if (c.Starving) return new Color("8f2f22");
+                return TrustColor(Mathf.Clamp((float)(c.Food / Math.Max(0.01, c.Population * w.Balance.FoodNeed * 4)), 0, 1) * 0.6f + 0.3f);
+            case MapMode.Militia:
+                // The share of the commune under arms, pale to the militia's deep red.
+                return new Color("d8cfb8").Lerp(new Color("8f1f1a"), Mathf.Clamp((float)(c.Mobilization / Math.Max(0.01, w.Balance.MaxMobilization)), 0, 1));
+            case MapMode.Parties:
+                // Rival parties' cells: clear where they have no hold, slate-violet where they're entrenched.
+                return new Color("cfc6b0").Lerp(new Color("3c2f5a"), Mathf.Clamp((float)c.PartyInfluence * 2.2f, 0, 1));
+            case MapMode.Discontent:
+                // Restless communes, which free-ride and may secede: calm sage to angry orange.
+                return High.Lerp(new Color("d9662b"), Mathf.Clamp((float)c.Discontent * 2f, 0, 1));
             case MapMode.Values:
                 return new Color(
                     (float)CommuneValues.To01(c.Values.Collectivism),
@@ -842,6 +855,10 @@ public partial class MapView : Control
             MapMode.Ideology => "Ideology — blue liberal, khaki conservative, grey fascist, dark red communist, violet monarchy, bronze empire, gold theocracy, green stateless peoples.",
             MapMode.Diplomacy => "Diplomacy — red hostile, grey neutral, green friendly toward the federation. Click a country for the World tab.",
             MapMode.Revolution => "Revolution — how radicalized each state's workers are: dark none, bright red near revolt.",
+            MapMode.Food => "Food — weeks of stores in hand: rust short, sand about a fortnight, green a month or more; dark red starving.",
+            MapMode.Militia => "Militia — the share of each commune under arms: pale few, deep red near the most the commune can field.",
+            MapMode.Parties => "Party cells — where rival parties have a hold: clear none, dark violet entrenched. Expose them in the Commune tab.",
+            MapMode.Discontent => "Discontent — calm green, angry orange. Discontented communes free-ride and may secede.",
             _ => "Wellbeing — rust low, sand middling, green high.",
         };
         Ui.DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));

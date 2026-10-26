@@ -422,6 +422,14 @@ How they play:
   **Show me** button. Several queue up, and a pop-up closes by itself if its decision was
   answered in the side panel or ran out of time.
 
+## Map modes
+
+Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution, plus:
+- **Food:** weeks of stores in hand in each commune (dark red where it's starving).
+- **Militia:** the share of each commune under arms, against the most it can field.
+- **Party cells:** where rival parties have a hold (expose them in the Commune tab).
+- **Discontent:** restless communes, which free-ride and may secede.
+
 ## What the player sees
 
 **The look.** The interface is modelled on Victoria 3:

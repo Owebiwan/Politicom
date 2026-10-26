@@ -1133,7 +1133,7 @@ public partial class Main : Control
         AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
         AddButton(view, "Ledger", "The federation's history: stores, prices, wellbeing, enthusiasm, militia, gold, science, culture, drift (L).", ShowLedger);
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show.", CustomMinimumSize = new Vector2(150, 0) };
-        foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {mode}", (int)mode);
+        foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {(mode == MapMode.Parties ? "Party cells" : mode.ToString())}", (int)mode);
         _mapMode.ItemSelected += index =>
         {
             _map.Mode = (MapMode)_mapMode.GetItemId((int)index);
