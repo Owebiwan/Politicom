@@ -35,7 +35,7 @@ public partial class Map3D
             _forests[k] = new MultiMeshInstance3D
             {
                 Multimesh = new MultiMesh { TransformFormat = MultiMesh.TransformFormatEnum.Transform3D, Mesh = mesh },
-                CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
+                CastShadow = GeometryInstance3D.ShadowCastingSetting.On,
             };
             _objects.AddChild(_forests[k]);
         }

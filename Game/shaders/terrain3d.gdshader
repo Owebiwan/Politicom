@@ -2,7 +2,9 @@
 // off-screen by MapView). Mountains are lifted (exaggerated, as on Victoria 3's map) and lit a
 // little from the north-west so their slopes catch the light; the distance fades into haze.
 shader_type spatial;
-render_mode unshaded, cull_disabled;
+// Lit only to receive shadows: in sunlight the colour is exactly the flat map's (the sun adds the
+// 40% that emission leaves out); in a building's or tree's shadow it falls to 60%.
+render_mode cull_disabled, ambient_light_disabled, specular_disabled;
 
 uniform sampler2D map_tex : source_color, filter_linear;
 uniform sampler2D height : filter_linear, repeat_enable;
@@ -37,9 +39,17 @@ void vertex() {
     }
 }
 
+uniform float shadow_depth = 0.4;
+
 void fragment() {
     vec3 c = texture(map_tex, UV).rgb * shade;
     float d = length(VERTEX);
     float f = smoothstep(haze_near, haze_far, d) * haze_amount;
-    ALBEDO = mix(c, haze, f);
+    // The haze is unaffected by shadow; the ground under it is.
+    ALBEDO = c * (1.0 - f);
+    EMISSION = c * (1.0 - f) * (1.0 - shadow_depth) + haze * f;
+}
+
+void light() {
+    DIFFUSE_LIGHT += vec3(ATTENUATION * shadow_depth);
 }

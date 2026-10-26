@@ -246,7 +246,9 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   every side (windows with shutters, small windows, a door; timber fronts on some medieval
   houses), a tiled roof, a dormer on some and a chimney from the middle ages on; the kit's
   textures are recoloured to the age's plaster and tiles by `Game/shaders/recolor.gdshader`, so
-  every window and frame still shows. Sunlight casts shadows between buildings and figures. In
+  every window and frame still shows. Sunlight from the north-west casts real shadows from buildings, figures, trees and ships onto
+  each other and onto the terrain (the ground is lit only to receive them, so its colours in
+  sunlight are exactly the flat map's). In
   3D, towns keep growing as you zoom in (up to 2.4 times), so their buildings can be read close
   up, and their names are drawn on plates on the overlay below each town, never covered by the
   buildings. Towns are painted for their age: houses

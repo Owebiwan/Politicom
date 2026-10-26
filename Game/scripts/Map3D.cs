@@ -73,6 +73,7 @@ public partial class Map3D : Control
         _groundMaterial.SetShaderParameter("map_tex", _flat.GetTexture());
         if (Height() is { } h) _groundMaterial.SetShaderParameter("height", h);
         _ground.MaterialOverride = _groundMaterial;
+        _ground.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off; // it receives shadows, it doesn't cast them
         _view.AddChild(_ground);
         var haze = new Color(0.11f, 0.15f, 0.2f);
         _view.AddChild(new WorldEnvironment
