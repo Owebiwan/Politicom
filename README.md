@@ -230,6 +230,9 @@ The map is three-dimensional, as Victoria 3's is (`Game/scripts/Map3D.cs`,
 - **Camera:** a perspective camera looks straight down over the world and tilts toward the
   horizon (up to 38°) as you zoom in, the distance fading into haze. Settings → "Tilt the map
   as you zoom in" turns the tilt off.
+- **Resolution:** the 3D view is rendered at the screen's own pixels (up to twice the
+  1600 x 900 layout, about 170 MB of memory; three times was barely sharper for 400 MB more),
+  with 2x anti-aliasing, and the flat map draped over it is drawn to match.
 - **How it fits together:** the flat map keeps its size and behaviour; it sits at the foot of
   a larger canvas (the area the tilted camera can see) and draws beyond its own edges into
   it. Pointer input is cast onto the ground and handed to the flat map in its coordinates, so

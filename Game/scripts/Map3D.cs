@@ -24,8 +24,12 @@ public partial class Map3D : Control
     public MapView Map { get; }
 
     private readonly SubViewport _flat = new() { RenderTargetUpdateMode = SubViewport.UpdateMode.Always, Size2DOverrideStretch = true, HandleInputLocally = false };
-    private readonly SubViewport _view = new() { OwnWorld3D = true, Msaa3D = Viewport.Msaa.Msaa4X, HandleInputLocally = false };
-    private readonly SubViewportContainer _container = new() { Stretch = true, MouseFilter = MouseFilterEnum.Ignore };
+    private readonly SubViewport _view = new() { OwnWorld3D = true, Msaa3D = Viewport.Msaa.Msaa2X, HandleInputLocally = false, RenderTargetUpdateMode = SubViewport.UpdateMode.Always };
+    /// <summary>Shows the 3D view. It's rendered at the screen's own pixels (up to <see cref="MaxResolution"/> times the layout's), not stretched up from the layout size.</summary>
+    private readonly TextureRect _container = new() { ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.Scale, MouseFilter = MouseFilterEnum.Ignore };
+    /// <summary>The 3D view's pixels per layout unit: the screen's (Retina, 5K) but no more than this, to bound memory.</summary>
+    private const float MaxResolution = 2f;
+    private float _resolution = 1;
     private readonly Camera3D _camera = new() { Fov = Fov, Near = 5, Far = 200000 };
     private readonly MeshInstance3D _ground = new();
     private readonly ShaderMaterial _groundMaterial = new();
@@ -66,8 +70,9 @@ public partial class Map3D : Control
         AddChild(_flat);
 
         _container.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        AddChild(_view);
         AddChild(_container);
-        _container.AddChild(_view);
+        _container.Texture = _view.GetTexture();
         _view.AddChild(_camera);
         _groundMaterial.Shader = GD.Load<Shader>("res://shaders/terrain3d.gdshader");
         _groundMaterial.SetShaderParameter("map_tex", _flat.GetTexture());
@@ -147,7 +152,13 @@ public partial class Map3D : Control
         _extent = new Vector2(Mathf.Ceil(Mathf.Max(Size.X, 2 * half) + 8), Mathf.Ceil(Mathf.Max(Size.Y, bottom + top) + 8));
         _offset = new Vector2((_extent.X - Size.X) / 2, _extent.Y - Size.Y - 4).Floor();
         // Render the flat map sharper than the screen (the near ground is enlarged), within texture limits.
-        float scale = Mathf.Min(1.6f, 6144f / Mathf.Max(_extent.X, _extent.Y));
+        // The screen's pixels per layout unit (the window is scaled up from the 1600 x 900 layout).
+        var window = GetWindow();
+        float screen = window.Size.X / Mathf.Max(1f, GetViewport().GetVisibleRect().Size.X);
+        _resolution = Mathf.Clamp(screen, 1, MaxResolution);
+        _view.Size = (Vector2I)(Size * _resolution).Ceil();
+        // The flat map draped over the ground, as sharp as the view (the near ground is a little enlarged), within texture limits.
+        float scale = Mathf.Min(_resolution * 1.25f, 7680f / Mathf.Max(_extent.X, _extent.Y));
         _flat.Size = (Vector2I)(_extent * scale).Ceil();
         _flat.Size2DOverride = (Vector2I)_extent;
         Map.Position = _offset;
@@ -200,13 +211,14 @@ public partial class Map3D : Control
         var (origin, deg) = Map.LonLatFrame;
         var world = Ground(local, origin, deg, _lift);
         if (_camera.IsPositionBehind(world)) return null;
-        return _camera.UnprojectPosition(world);
+        return _camera.UnprojectPosition(world) / _resolution; // the view's pixels, back to layout units
     }
 
     // ── Input: cast onto the ground, handed to the flat map in its coordinates ──
 
     private Vector2? ToMap(Vector2 screen)
     {
+        screen *= _resolution; // layout units to the view's pixels
         var origin = _camera.ProjectRayOrigin(screen);
         var normal = _camera.ProjectRayNormal(screen);
         if (Mathf.Abs(normal.Y) < 1e-4f) return null;
