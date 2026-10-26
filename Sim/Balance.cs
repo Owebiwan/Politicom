@@ -101,6 +101,25 @@ public sealed class Balance
     public double AgitateEffect { get; set; } = 0.05;
     public double CostDelegates { get; set; } = 6;
 
+    // ── Decisions at the front ──
+    /// <summary>Defence added at full fortification (+25%).</summary>
+    public double FortDefense { get; set; } = 0.25;
+    public double CostFortify { get; set; } = 8;
+    /// <summary>Goods per thousand people the works take from the commune.</summary>
+    public double FortifyGoods { get; set; } = 1.5;
+    public int FortifyTicks { get; set; } = 3;
+    /// <summary>Fortification added per turn of work (three turns: about 0.6).</summary>
+    public double FortifyRate { get; set; } = 0.2;
+    /// <summary>Fortification lost per turn while the front gives way.</summary>
+    public double FortWear { get; set; } = 0.03;
+    public double CostRaid { get; set; } = 6;
+    public int RaidCooldown { get; set; } = 4;
+    public double RaidExhaustion { get; set; } = 0.04;
+    /// <summary>Goods per thousand people captured by a successful raid.</summary>
+    public double RaidSpoils { get; set; } = 0.8;
+    /// <summary>Share of the commune's fighters lost when a raid fails.</summary>
+    public double RaidLosses { get; set; } = 0.15;
+
     // ── Notable figures ──
     /// <summary>Defence a commander adds to their commune at prestige 0.5 (half that next door).</summary>
     public double FigureDefense { get; set; } = 0.12;

@@ -123,6 +123,7 @@ public sealed class Balanced : IPolicy
 
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
         Helpers.Figures(w, crisis, rotateAt: 0.3);
+        Helpers.Front(w, crisis);
         if (margin < 5 && w.Influence >= b.CostRecall * DriftEffects.RecallCost(w.Drift.Stage)) w.Apply(new RecallDelegates());
 
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
@@ -234,6 +235,25 @@ internal static class Helpers
             if (f.Commune is int now && w.Communes[now].InFederation && f.Role != FigureRole.Commander && (w.Tick / 4 + f.Id) % 3 != 0) continue; // settled in: move now and then
             if (w.Influence > w.Balance.CostPostFigure + 12) w.Apply(new PostFigure(f.Id, best.Id));
         }
+    }
+
+    /// <summary>Dig in where the front is weakest; raid from where it holds firmly.</summary>
+    public static void Front(World w, bool crisis)
+    {
+        var b = w.Balance;
+        var fronts = w.Federation.Where(c => c.Front).ToList();
+        if (fronts.Count == 0) return;
+        // Influence spent here isn't spent on schools: only with drift well in hand.
+        double margin = (w.Drift.NextThreshold ?? 100) - w.Drift.Value;
+        if (margin < 15 || w.LastDrift.Net > 0.25) return;
+        if (w.Tick % 3 == 0 && w.Influence > b.CostFortify + 4
+            && fronts.Where(c => c.Fortifying == 0 && c.Fortification < 0.4 && c.Goods > c.Population * b.FortifyGoods * 2)
+                     .OrderBy(c => c.Defense - c.Pressure).FirstOrDefault() is { } weak
+            && weak.Pressure > weak.Defense)
+            w.Apply(new Fortify(weak.Id));
+        if (w.Tick % 5 == 2 && w.Influence > b.CostRaid + 4
+            && fronts.Where(c => w.Tick - c.LastRaid >= b.RaidCooldown && c.RaidChance >= 0.65).OrderByDescending(c => c.RaidChance).FirstOrDefault() is { } firm)
+            w.Apply(new Raid(firm.Id));
     }
 
     public static void CulturalWork(World w, CulturalWorkKind kind)

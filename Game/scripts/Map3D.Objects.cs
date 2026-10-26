@@ -166,6 +166,25 @@ public partial class Map3D
         foreach (var (id, town) in _towns)
             if (!seen.Contains(id)) town.Node.Visible = false;
 
+        // Fortifications: a ring of walls round a fortified town, taller as the works go up.
+        foreach (var (id, at, size) in Map.TownSpots)
+        {
+            var c = w.Communes[id];
+            int level = c.Occupied ? 0 : (int)Math.Ceiling(c.Fortification * 4); // 0..4
+            if (!_forts.TryGetValue(id, out var fort) || fort.Level != level)
+            {
+                fort.Node?.QueueFree();
+                fort = (level == 0 ? new Node3D() : BuildWalls(level), level);
+                if (level == 0) _objects.AddChild(fort.Node);
+                _forts[id] = fort;
+            }
+            fort.Node.Position = Ground(at, origin, deg, lift);
+            fort.Node.Scale = Vector3.One * size * 1.05f;
+            fort.Node.Visible = level > 0;
+        }
+        foreach (var (id, fort) in _forts)
+            if (!seen.Contains(id)) fort.Node.Visible = false;
+
         // Armies
         var armies = new HashSet<(int, int)>();
         foreach (var (enemy, commune, at, strength, color, alpha, attacking, towards, moving) in Map.ArmySpots)
@@ -210,6 +229,28 @@ public partial class Map3D
         }
         foreach (var (key, band) in _militia)
             if (!fronts.Contains(key)) band.Node.Visible = false;
+    }
+
+    private readonly Dictionary<int, (Node3D Node, int Level)> _forts = new();
+
+    /// <summary>A ring of earth-coloured wall segments round a town (town units), higher with each level of works.</summary>
+    private Node3D BuildWalls(int level)
+    {
+        var root = new Node3D();
+        _objects.AddChild(root);
+        const int segments = 12;
+        const float radius = 0.62f;
+        float length = Mathf.Tau * radius / segments * 1.05f;
+        float height = 0.04f + 0.035f * level;
+        for (int i = 0; i < segments; i++)
+        {
+            if (i == segments - 1) continue; // a gate
+            float a = i * Mathf.Tau / segments;
+            var at = new Vector3(Mathf.Cos(a) * radius, 0, Mathf.Sin(a) * radius / 0.62f * 0.75f);
+            // The wall model runs along X; turn each piece to the ring's tangent.
+            Model(root, "castle/wall", at, new Vector3(length, height, 0.06f), -Mathf.RadToDeg(a) - 90, paint: new Color("8a7356"));
+        }
+        return root;
     }
 
     private enum AgeKind { Ancient, Medieval, EarlyModern, Industrial, Modern }

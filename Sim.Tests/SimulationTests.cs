@@ -1231,4 +1231,30 @@ public class SimulationTests
         Assert.Equal(Enum.GetValues<FigureRole>().Length, w.Figures.Select(f => f.Role).Distinct().Count());
         Assert.All(w.Figures, f => Assert.StartsWith("The ", f.Name));
     }
+
+    [Fact]
+    public void Fortifying_a_front_commune_raises_its_defence_and_raids_have_consequences()
+    {
+        var w = NewWorld();
+        w.Step();
+        var front = w.Federation.First(c => c.Front);
+        double before = Sim.Systems.WarSystem.Defense(w, front);
+        Assert.True(w.Apply(new Fortify(front.Id)).Ok);
+        Assert.False(w.Apply(new Fortify(front.Id)).Ok); // already digging
+        Assert.False(w.Apply(new Fortify(w.Federation.First(c => !c.Front).Id)).Ok); // not on the front
+        w.Run(3);
+        Assert.True(front.Fortification > 0.3);
+        Assert.True(Sim.Systems.WarSystem.Defense(w, front) > before);
+
+        // A raid either tires the enemy or costs the commune fighters; then it must wait.
+        var enemy = w.Enemies[front.Fronts.Min()];
+        double exhaustion = enemy.Exhaustion, mobilization = front.Mobilization;
+        Assert.True(w.Apply(new Raid(front.Id)).Ok);
+        Assert.True(enemy.Exhaustion > exhaustion || front.Mobilization < mobilization);
+        Assert.False(w.Apply(new Raid(front.Id)).Ok);
+
+        var restored = World.LoadJson(w.SaveJson(), w.Techs);
+        Assert.Equal(front.Fortification, restored.Communes[front.Id].Fortification);
+        Assert.Equal(front.LastRaid, restored.Communes[front.Id].LastRaid);
+    }
 }

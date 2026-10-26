@@ -431,6 +431,22 @@ How they play:
   **Show me** button. Several queue up, and a pop-up closes by itself if its decision was
   answered in the side panel or ran out of time.
 
+## Decisions at the front
+
+Two actions for a front commune (Commune tab):
+- **Fortify** (8 influence, and goods from the commune's own store): earthworks and
+  barricades go up over three turns, to about 60% after one round (up to 100%), adding up to
+  +25% defence. The works wear down by 3% a turn while the front gives way. The map shows them
+  as a ring of walls round the town (a palisade on the flat map).
+- **Raid** (6 influence, once every four turns): a strike on the enemy. The chance (15–85%,
+  shown on the button) is better the more firmly the commune holds its line. Success tires
+  the enemy (+0.04 exhaustion), brings back captured arms and lifts enthusiasm; failure costs
+  15% of the commune's fighters and some ground.
+- The balanced AI fortifies communes that are losing ground and raids where the odds are
+  good, but only with drift well in hand: influence spent here isn't spent on schools.
+  Balance (200 games): Catalonia 96%, Free Territory 73%, Paris 49% (up from 43%: barricades
+  and raids help a besieged city), open starts 57–76%.
+
 ## Notable figures
 
 Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSystem.cs`):

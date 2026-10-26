@@ -85,6 +85,17 @@ public partial class MapView
         if (highlight) DrawEllipse(p, s * 0.55f, s * 0.33f, new Color(1, 0.95f, 0.75f, 0.22f));
         if (age == Age.Medieval && plan.Count >= 10 && !ruined)
             DrawArc(p, s * 0.47f, 0, Mathf.Tau, 40, new Color(0.55f, 0.5f, 0.42f, 0.9f), Mathf.Max(1.5f, s * 0.035f), true); // town walls
+        // Earthworks: a dark palisade ring, fuller as the works go up (the 3D map raises walls instead).
+        if (buildings && c.Fortification > 0.05 && !ruined)
+        {
+            int posts = (int)(10 + 30 * c.Fortification);
+            for (int i = 0; i < posts; i++)
+            {
+                float a = i * Mathf.Tau / posts;
+                var q = p + new Vector2(Mathf.Cos(a) * s * 0.55f, Mathf.Sin(a) * s * 0.33f);
+                DrawLine(q, q + new Vector2(0, -s * 0.06f), new Color(0.3f, 0.22f, 0.14f), Mathf.Max(1.5f, s * 0.025f));
+            }
+        }
         if (!buildings) return; // the 3D map stands its models here
         var dim = c.Federated || ruined ? Colors.White : new Color(0.72f, 0.72f, 0.72f);
         foreach (var b in plan)

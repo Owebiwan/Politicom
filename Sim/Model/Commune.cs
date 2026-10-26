@@ -71,6 +71,14 @@ public sealed class Commune
     public double Culture { get; set; }
     /// <summary>Turn of the last cultural work founded here.</summary>
     public int LastCulturalWork { get; set; } = -999;
+    /// <summary>Earthworks, barricades and trenches (0..1): defence at the front. Worn down while the front gives way.</summary>
+    public double Fortification { get; set; }
+    /// <summary>Turns of fortification work still to come.</summary>
+    public int Fortifying { get; set; }
+    /// <summary>Turn of the commune's last raid on the enemy.</summary>
+    public int LastRaid { get; set; } = -999;
+    /// <summary>A raid's chance of success: better the more firmly the commune holds its line.</summary>
+    [JsonIgnore] public double RaidChance => Math.Clamp(0.2 + 0.4 * Math.Min(2, Defense / Math.Max(0.01, Pressure)), 0.15, 0.85);
     /// <summary>Research produced last turn.</summary>
     [JsonInclude] public double Science { get; internal set; }
 

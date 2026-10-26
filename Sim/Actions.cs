@@ -21,6 +21,10 @@ public sealed record SetWarCommittee(bool Active) : PlayerAction;
 public sealed record SetForeignTrade(bool Active) : PlayerAction;
 public sealed record AnswerAllyOffer(bool Accept) : PlayerAction;
 public sealed record HoldCommune(int Commune) : PlayerAction;
+/// <summary>Dig in a front commune: earthworks and barricades over a few turns.</summary>
+public sealed record Fortify(int Commune) : PlayerAction;
+/// <summary>Strike the enemy from a front commune.</summary>
+public sealed record Raid(int Commune) : PlayerAction;
 /// <summary>Send a notable figure to work in a commune.</summary>
 public sealed record PostFigure(int Figure, int Commune) : PlayerAction;
 /// <summary>Rotate a notable figure back to the ranks.</summary>
@@ -106,6 +110,8 @@ internal static class ActionSystem
             ChooseEventOption a => Systems.EventSystem.Choose(w, a.EventId, a.Option),
             SendDelegates a => Delegates(w, a),
             PostFigure a => Post(w, a),
+            Fortify a => DoFortify(w, a),
+            Raid a => DoRaid(w, a),
             RotateFigure a => Rotate(w, a),
             AgitateWorkers a => Agitate(w, a),
             InternationalAppeal => Appeal(w),
@@ -453,6 +459,46 @@ internal static class ActionSystem
         w.BumpDrift(b.ForceStayDrift);
         w.Emit(Severity.Danger, $"{c.Name} is kept in the federation against its assembly's will. Everyone notices.", c.Id);
         return ActionResult.Done($"{c.Name} held by force.");
+    }
+
+    private static ActionResult DoFortify(World w, Fortify a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        if (!c.Front) return ActionResult.Fail($"{c.Name} isn't on the front.");
+        if (c.Fortifying > 0) return ActionResult.Fail($"{c.Name} is already digging in.");
+        if (c.Fortification >= 0.95) return ActionResult.Fail($"{c.Name} is as fortified as it can be.");
+        var b = w.Balance;
+        double goods = c.Population * b.FortifyGoods;
+        if (c.Goods < goods) return ActionResult.Fail($"{c.Name} hasn't the goods for the works ({goods:0} needed, {c.Goods:0} in store).");
+        if (!Spend(w, b.CostFortify)) return Broke(w, b.CostFortify);
+        c.Goods -= goods;
+        c.Fortifying = b.FortifyTicks;
+        return ActionResult.Done($"{c.Name} digs in: earthworks and barricades over {w.Turns(b.FortifyTicks)} ({goods:0} goods).");
+    }
+
+    private static ActionResult DoRaid(World w, Raid a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        if (!c.Front) return ActionResult.Fail($"{c.Name} isn't on the front.");
+        var b = w.Balance;
+        if (w.Tick - c.LastRaid < b.RaidCooldown) return ActionResult.Fail($"{c.Name}'s fighters are still recovering from the last raid.");
+        if (!Spend(w, b.CostRaid)) return Broke(w, b.CostRaid);
+        c.LastRaid = w.Tick;
+        var enemy = w.Enemies[c.Fronts.Min()];
+        double p = c.RaidChance;
+        if (w.Rng.Chance(p))
+        {
+            enemy.Exhaustion = Math.Min(1, enemy.Exhaustion + b.RaidExhaustion);
+            c.Goods += c.Population * b.RaidSpoils;
+            w.Enthusiasm = Math.Min(1, w.Enthusiasm + 0.02);
+            w.Emit(Severity.Good, $"A raid from {c.Name} strikes the {enemy.Name}: a depot burned, rifles and stores carried home.", c.Id);
+            return ActionResult.Done($"The raid from {c.Name} succeeds ({p:P0} chance): the {enemy.Name} tires, arms captured.");
+        }
+        c.Mobilization *= 1 - b.RaidLosses;
+        c.Control = Math.Max(0.05, c.Control - 0.05);
+        w.Enthusiasm = Math.Max(0, w.Enthusiasm - 0.02);
+        w.Emit(Severity.Danger, $"A raid from {c.Name} runs into the {enemy.Name}'s guns and is thrown back with losses.", c.Id);
+        return ActionResult.Done($"The raid from {c.Name} fails ({p:P0} chance): fighters lost, ground given up.");
     }
 
     private static ActionResult Post(World w, PostFigure a)

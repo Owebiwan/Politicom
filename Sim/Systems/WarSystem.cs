@@ -54,7 +54,15 @@ internal static class WarSystem
         var fallen = new List<Commune>();
         foreach (var c in allFronts)
         {
+            // Works go up a little each turn; they're worn down while the front gives way.
+            if (c.Fortifying > 0)
+            {
+                c.Fortifying--;
+                c.Fortification = Math.Min(1, c.Fortification + b.FortifyRate);
+                if (c.Fortifying == 0) w.Emit(Severity.Good, $"{c.Name}'s fortifications are finished.", c.Id);
+            }
             c.Defense = Defense(w, c) + campaign;
+            if (c.Pressure > c.Defense) c.Fortification = Math.Max(0, c.Fortification - b.FortWear);
             if (c.Pressure > c.Defense)
                 c.Control -= b.ControlLossRate * w.Scenario.WarPace * (c.Pressure - c.Defense) / c.Pressure;
             else
@@ -99,7 +107,8 @@ internal static class WarSystem
                       * (1 + b.StockpileDefense * Math.Clamp(c.Goods / (c.Population * b.StockpilePerPop), 0, 1))
                       * (w.RecallPenaltyTicks > 0 ? 0.9 : 1)
                       * (1 + w.VolunteerDefense)
-                      * (1 + FigureSystem.Defense(w, c));
+                      * (1 + FigureSystem.Defense(w, c))
+                      * (1 + w.Balance.FortDefense * c.Fortification);
         return (own + support) * mult;
     }
 

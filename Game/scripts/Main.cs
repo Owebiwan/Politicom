@@ -29,6 +29,7 @@ public partial class Main : Control
     private HistoryChart _history = null!;
     private Control? _overlay;
     private Map3D _map3d = null!;
+    private Button _fortifyButton = null!, _raidButton = null!;
 
     private static bool LoadTiltSetting()
     {
@@ -218,6 +219,8 @@ public partial class Main : Control
         if (selectAt >= 0 && selectAt + 1 < args.Length) OnCommuneClicked(int.Parse(args[selectAt + 1]), false);
         int policyAt = Array.IndexOf(args, "--policy");
         var policy = policyAt >= 0 && policyAt + 1 < args.Length ? Sim.Ai.Policies.Get(args[policyAt + 1]) : null;
+        if (Array.IndexOf(args, "--fortify") >= 0)
+            foreach (var c in _world.Federation.Where(c => c.Front).ToList()) _world.Apply(new Fortify(c.Id));
         for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++)
         {
             policy?.Act(_world);
@@ -1289,6 +1292,10 @@ public partial class Main : Control
                 () => WithSelected(id => new FoundCulturalWork(id, kind)));
         AddButton(actions, "Call for volunteers", "More of its people, and some of its neighbours', join the militia: stronger here, less work done. The call carries further when enthusiasm is high.",
             () => WithSelected(id => new CallVolunteers(id)));
+        _fortifyButton = AddButton(actions, "Fortify", "Dig in: earthworks and barricades over a few turns, from the commune's own goods. Up to +25% defence; worn down while the front gives way. Front communes only.",
+            () => WithSelected(id => new Fortify(id)));
+        _raidButton = AddButton(actions, "Raid", "Strike the enemy from here. Success tires the enemy and brings back arms; failure costs fighters and ground. The firmer the line holds, the better the odds. Front communes only.",
+            () => WithSelected(id => new Raid(id)));
         AddButton(actions, "Mediate", "Raise trust with the shift-selected neighbour.", () =>
         {
             if (_map.Selected is int a && _map.Secondary is int b) Do(new Mediate(a, b));
@@ -1356,6 +1363,18 @@ public partial class Main : Control
             "A stage only reverts once drift falls 10 below its threshold. Brakes: political education, recall, mandates, rotation.";
         if (_communeList.Visible) _communeList.Refresh();
         RefreshFigures();
+        // The front's buttons: only for a front commune, with the raid's odds.
+        var sel = _map.Selected is int si && w.Communes[si].InFederation ? w.Communes[si] : null;
+        bool front = sel is { Front: true };
+        _fortifyButton.Visible = _raidButton.Visible = front;
+        if (front)
+        {
+            _fortifyButton.Text = sel!.Fortifying > 0 ? $"Digging in ({w.Turns(sel.Fortifying)})" : $"Fortify ({w.Balance.CostFortify:0}) · works {sel.Fortification:P0}";
+            _fortifyButton.Disabled = sel.Fortifying > 0 || sel.Fortification >= 0.95;
+            int wait = w.Balance.RaidCooldown - (w.Tick - sel.LastRaid);
+            _raidButton.Text = wait > 0 ? $"Raid (ready in {w.Turns(wait)})" : $"Raid ({w.Balance.CostRaid:0}) · {sel.RaidChance:P0} chance";
+            _raidButton.Disabled = wait > 0;
+        }
         _history.QueueRedraw();
         var d = w.LastDrift;
         _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",
