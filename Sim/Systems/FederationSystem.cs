@@ -50,15 +50,7 @@ internal static class FederationSystem
         }
     }
 
-    internal static double Discontent(World w, Commune c)
-    {
-        double trust = w.Trust.AverageTrust(c.Id, n => w.Communes[n].InFederation);
-        return 0.45 * (1 - trust)
-               + 0.25 * (1 - c.Wellbeing)
-               + 0.15 * (1 - CommuneValues.To01(c.Values.Federalism))
-               + DriftEffects.SecessionPressure(w.Drift.Stage)
-               + (c.Starving ? 0.1 : 0);
-    }
+    internal static double Discontent(World w, Commune c) => Explain.Sum(Explain.Discontent(w, c));
 
     private static void Secede(World w, Commune c)
     {

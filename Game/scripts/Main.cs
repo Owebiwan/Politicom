@@ -282,6 +282,17 @@ public partial class Main : Control
         int zoomAt = Array.IndexOf(args, "--zoom");
         if (focusAt >= 0 && focusAt + 1 < args.Length)
             _map.FocusOn(int.Parse(args[focusAt + 1]), zoomAt >= 0 && zoomAt + 1 < args.Length ? float.Parse(args[zoomAt + 1], System.Globalization.CultureInfo.InvariantCulture) : 2.5f);
+        // --hover X,Y (fractions of the window): the pointer rests there long enough for a tooltip.
+        int hoverAt = Array.IndexOf(args, "--hover");
+        if (hoverAt >= 0 && hoverAt + 1 < args.Length)
+        {
+            var xy = args[hoverAt + 1].Split(',').Select(v => float.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            var hover = GetViewport().GetFinalTransform() * (GetViewport().GetVisibleRect().Size * new Vector2(xy[0], xy[1]));
+            for (int f = 0; f < 6; f++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Input.WarpMouse(hover);
+            GetViewport().PushInput(new InputEventMouseMotion { Position = hover, GlobalPosition = hover });
+            await ToSignal(GetTree().CreateTimer(1.2), SceneTreeTimer.SignalName.Timeout);
+        }
         // --click X,Y (fractions of the window): a real mouse press and release, for testing input paths.
         for (int i = 0; i + 1 < args.Length; i++)
         {
@@ -1692,12 +1703,54 @@ public partial class Main : Control
             $"Values: collectivism {c.Values.Collectivism:+0.0;-0.0}, militancy {c.Values.Militancy:+0.0;-0.0}, federalism {c.Values.Federalism:+0.0;-0.0}\n" +
             $"Education: practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0}), political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})" +
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
-            $"Food {Math.Max(0, c.Food):0} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · wellbeing {c.Wellbeing:P0}\n" +
-            $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · discontent {c.Discontent:0.00}\n" +
+            $"{Hint($"Food {Math.Max(0, c.Food):0}", FoodLines(w, c))} (+{c.FoodProduced:0.0}) · goods {Math.Max(0, c.Goods):0} (+{c.GoodsProduced:0.0}) · " +
+            $"{Hint($"wellbeing {c.Wellbeing:P0}", PartLines(Explain.Wellbeing(w, c), "Wellbeing moves 15% of the way each turn toward", pct: true))}\n" +
+            $"Aid given {c.AidGiven:0.0} / received {c.AidReceived:0.0} · free-riding {c.FreeRiding:P0} · " +
+            $"{Hint($"discontent {c.Discontent:0.00}", PartLines(Explain.Discontent(w, c), "Discontent (a commune may vote to leave past about 0.6)"))}\n" +
+            (c.Front && !c.Occupied ? DefenseLine(w, c) + "\n" : "") +
             $"Militia {c.Mobilization:P0} of its people ({c.Population * c.Mobilization:0.0} thousand) · culture {c.Culture:P0} · science {c.Science:0.00} a {w.Turn}" + (w.Tick - c.LastCulturalWork < CulturalWorks.Cooldown(w) ? " · taking up a cultural work" : "") + "\n" +
             (c.PartyInfluence > 0.01 ? $"[color=#e07a6a]Party cells: {c.PartyInfluence:P0}[/color] — a rival party's hold here, adding drift\n" : "") +
             $"Techs: {(c.Techs.Count == 0 ? "none" : string.Join(", ", c.Techs.Where(t => !w.CommonKnowledge(w.Techs[t])).Select(t => w.Techs[t].Name)))}\n" +
             $"Neighbours (trust): {neighbours}";
+    }
+
+    // ── Why a number is what it is: hover tooltips in rich text ──
+
+    /// <summary>Rich text that shows `lines` as a tooltip on hover, dotted-underlined to say so.</summary>
+    private static string Hint(string shown, IEnumerable<string> lines)
+    {
+        string tip = string.Join("\n", lines).Replace("\"", "'").Replace("[", "(").Replace("]", ")");
+        return $"[hint=\"{tip}\"][u]{shown}[/u][/hint]";
+    }
+
+    private static IEnumerable<string> PartLines(IEnumerable<Part> parts, string title, bool pct = false)
+    {
+        var list = parts.ToList();
+        string F(double v) => pct ? $"{v * 100:+0;-0} pts" : $"{v:+0.00;-0.00}";
+        yield return $"{title}: {(pct ? $"{Explain.Sum(list):P0}" : $"{Explain.Sum(list):0.00}")}";
+        foreach (var p in list.Where(p => Math.Abs(p.Value) > 0.0005).OrderByDescending(p => Math.Abs(p.Value)))
+            yield return $"   {F(p.Value)}  {p.Label}";
+    }
+
+    private static IEnumerable<string> FoodLines(World w, Commune c)
+    {
+        double eaten = c.Population * w.Balance.FoodNeed;
+        yield return $"Food in store: {Math.Max(0, c.Food):0} ({Math.Max(0, c.Food) / Math.Max(0.01, eaten):0.0} {w.Turn}s of eating)";
+        yield return $"   +{c.FoodProduced:0.0}  grown this {w.Turn}";
+        yield return $"   -{eaten:0.0}  eaten ({c.Population:0}k people)";
+        if (c.AidReceived > 0.05 || c.AidGiven > 0.05) yield return $"   aid lately: received {c.AidReceived:0.0}, given {c.AidGiven:0.0}";
+        if (c.Starving) yield return "Starving: wellbeing and trust suffer, and it may leave.";
+    }
+
+    private static string DefenseLine(World w, Commune c)
+    {
+        var (added, factors) = Explain.Defense(w, c);
+        var lines = new List<string> { $"Defence: {c.Defense:0.00} against pressure {c.Pressure:0.00}" + (c.Pressure > c.Defense ? " (losing ground)" : " (holding)") };
+        foreach (var p in added) lines.Add($"   +{p.Value:0.00}  {p.Label}");
+        foreach (var f in factors.OrderByDescending(f => Math.Abs(f.Value - 1))) lines.Add($"   x{f.Value:0.00}  {f.Label}");
+        string state = c.Pressure > c.Defense ? $"[color=#f07060]{Hint($"defence {c.Defense:0.0} vs pressure {c.Pressure:0.0}", lines)}[/color]"
+                                              : $"[color=#70d080]{Hint($"defence {c.Defense:0.0} vs pressure {c.Pressure:0.0}", lines)}[/color]";
+        return $"Front: {state}";
     }
 
     private void RefreshProjects()

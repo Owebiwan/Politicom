@@ -494,6 +494,24 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
   ambitious figures are a real pressure), Paris 43%; open starts 55–70%. The AI rotates
   anyone past 0.3; the centralizer grants every request.
 
+## Why a number is what it is
+
+In the Commune tab, underlined numbers explain themselves on hover, part by part, as Victoria
+3's tooltips do (`Sim/Explain.cs`):
+- **Wellbeing:** what it is moving toward (it closes 15% of the gap each turn): food and goods
+  in store, education, hierarchy, ground lost at the front, recalled delegates, dear food in a
+  factory town.
+- **Discontent:** little trust in its neighbours, low wellbeing, its values, hierarchy,
+  starvation; past about 0.6 a commune may vote to leave.
+- **Food:** stores in weeks of eating, grown and eaten this turn, recent aid.
+- **Defence at the front** (green while holding, red while losing ground): its own militia
+  and its neighbours' (added), then every factor that multiplies them: techniques, hierarchy,
+  the war committee, arms, stockpiles, recalled delegates, foreign volunteers, commanders,
+  fortifications.
+
+The simulation computes these numbers through the same breakdowns, so the tooltip and the
+number never disagree.
+
 ## Map modes
 
 Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution, plus:

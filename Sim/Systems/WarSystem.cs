@@ -94,32 +94,15 @@ internal static class WarSystem
                 w.Enemies[k].Exhaustion = Math.Min(1, w.Enemies[k].Exhaustion + b.GuerrillaExhaustion);
     }
 
+    /// <summary>Militia and neighbours' support, times every factor (see <see cref="Explain.Defense"/>, which it is computed from).</summary>
     internal static double Defense(World w, Commune c)
     {
-        var b = w.Balance;
-        double own = Militia(w, c);
-        double support = 0;
-        foreach (var n in w.Trust.Neighbors(c.Id))
-        {
-            var d = w.Communes[n];
-            if (d.Occupied || d.Front) continue;
-            support += w.Trust[c.Id, n] * Militia(w, d) * b.NeighborSupport * (d.Federated ? 1 : 0.3) * (w.Rail(c.Id, n) ? b.RailSupport : 1);
-        }
-        double mult = (1 + w.LocalEffect(c, e => e.Defense))
-                      * (1 + DriftEffects.Defense(w.Drift.Stage))
-                      * (w.WarCommittee ? 1 + b.WarCommitteeDefense : 1)
-                      * (w.Ally.MilitarizationTicks > 0 ? 1 + b.MilitarizationDefense : 1)
-                      * (b.ArmsShortageDefense + (1 - b.ArmsShortageDefense) * c.GoodsCoverage)
-                      * (1 + b.StockpileDefense * Math.Clamp(c.Goods / (c.Population * b.StockpilePerPop), 0, 1))
-                      * (w.RecallPenaltyTicks > 0 ? 0.9 : 1)
-                      * (1 + w.VolunteerDefense)
-                      * (1 + FigureSystem.Defense(w, c))
-                      * (1 + w.Balance.FortDefense * c.Fortification);
-        return (own + support) * mult;
+        var (added, factors) = Explain.Defense(w, c);
+        return Explain.Sum(added) * Explain.Product(factors);
     }
 
     /// <summary>A commune's militia: its people under arms (relative to what it would field anyway), their militancy and spirit.</summary>
-    private static double Militia(World w, Commune c) =>
+    internal static double Militia(World w, Commune c) =>
         c.Population * w.Balance.MilitiaPerPop * (c.Mobilization / w.BaselineMobilization(c))
         * (0.6 + 0.4 * CommuneValues.To01(c.Values.Militancy)) * w.EnthusiasmFactor;
 

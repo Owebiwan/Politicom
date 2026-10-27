@@ -244,18 +244,9 @@ internal static class EconomySystem
 
     private static void Wellbeing(World w)
     {
-        var b = w.Balance;
-        int stage = (int)w.Drift.Stage;
         foreach (var c in w.Active)
         {
-            double foodSecurity = c.Starving ? 0 : Math.Clamp(c.Food / (c.Population * b.FoodNeed * 2), 0, 1);
-            double goodsSecurity = c.GoodsShort ? 0 : Math.Clamp(c.Goods / (c.Population * b.GoodsNeed * 2), 0, 1);
-            double target = 0.2 + 0.4 * foodSecurity + 0.2 * goodsSecurity
-                            + 0.1 * c.PoliticalEducation + 0.1 * c.PracticalEducation
-                            - 0.04 * stage
-                            - (c.Front ? 0.15 * (1 - c.Control) : 0)
-                            - (w.RecallPenaltyTicks > 0 ? 0.03 : 0);
-            if (c.Kind == CommuneKind.Industrial) target -= w.Balance.DearFoodWellbeing * Math.Max(0, w.FoodPrice - 1);
+            double target = Explain.Sum(Explain.Wellbeing(w, c));
             c.Wellbeing = Math.Clamp(c.Wellbeing + (target - c.Wellbeing) * 0.15, 0, 1);
         }
     }
