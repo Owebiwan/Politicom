@@ -14,7 +14,7 @@ namespace Politicom.Game;
 /// </summary>
 public partial class Main : Control
 {
-    private static readonly double[] SecondsPerTurn = { 0, 1.0, 0.45, 0.15 };
+    private static readonly double[] SecondsPerTurn = { 0, 1.0, 0.45, 0.15, 0.04 }; // 4: campaign speed (key only)
 
     private World _world = null!;
     private MapView _map = null!;
@@ -353,6 +353,7 @@ public partial class Main : Control
             case Key.Key1: SetSpeed(1); break;
             case Key.Key2: SetSpeed(2); break;
             case Key.Key3: SetSpeed(3); break;
+            case Key.Key4: SetSpeed(4); break;
             case Key.Period: StepTurn(); break;
             default: return;
         }
@@ -719,12 +720,16 @@ public partial class Main : Control
     }
 
     /// <summary>Historical length, or a longer war up to 500 turns.</summary>
-    private static OptionButton LengthPicker(int historical, string turn, string tooltip)
+    private static OptionButton LengthPicker(int historical, string turn, string tooltip, bool campaigns = false)
     {
         var picker = new OptionButton { TooltipText = tooltip };
         picker.AddItem($"Historical · {historical} {turn}s", historical);
         foreach (int n in new[] { 250, 500 })
             if (n > historical) picker.AddItem($"{n} {turn}s", n);
+        // Campaigns: decades. Peace doesn't end them; treaties are made and broken.
+        if (campaigns)
+            foreach (var (years, n) in new[] { (10, 520), (25, 1300), (50, 2600) })
+                picker.AddItem($"Campaign · {years} years", n);
         return picker;
     }
 
@@ -772,7 +777,7 @@ public partial class Main : Control
         controls.AddChild(new Label { Text = "Seed" });
         var seed = new LineEdit { Text = NewSeed().ToString(), CustomMinimumSize = new Vector2(110, 0), MaxLength = 12 };
         controls.AddChild(seed);
-        var openLength = LengthPicker(104, "week", LongerTooltip + " Generation takes a few seconds.");
+        var openLength = LengthPicker(104, "week", LongerTooltip + " Campaigns run for decades: peace doesn't end them, treaties are broken, and the world moves on (press 4 for the fastest speed). Generation takes a few seconds.", campaigns: true);
         controls.AddChild(openLength);
         var scope = ScopePicker();
         controls.AddChild(scope);
@@ -821,7 +826,11 @@ public partial class Main : Control
         top.AddChild(era);
         var scope = ScopePicker(startScope);
         top.AddChild(scope);
-        var hint = new Label { Text = "Click a country in colour to start there. Grey ones have too few cities on the map. Scroll or pinch to zoom, drag to move.", Modulate = new Color(1, 1, 1, 0.6f) };
+        var lengthPick = LengthPicker(104, "week", LongerTooltip + " Campaigns run for decades: peace doesn't end them, treaties are broken (press 4 for the fastest speed).", campaigns: true);
+        lengthPick.Select(Math.Max(0, lengthPick.GetItemIndex(turns)));
+        lengthPick.ItemSelected += _ => turns = lengthPick.GetSelectedId();
+        top.AddChild(lengthPick);
+        var hint = new Label { Text = "Click a country in colour to start there. Grey ones have too few cities. Scroll or pinch to zoom.", Modulate = new Color(1, 1, 1, 0.6f) };
         top.AddChild(hint);
 
         // The map, with the chosen (or hovered) country's lore beside it.
@@ -1117,7 +1126,7 @@ public partial class Main : Control
         {
             var b = new Button
             {
-                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed",
+                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed; 4 is fastest, for campaigns",
                 CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
             };
             b.Pressed += () => SetSpeed(speed);
@@ -1751,7 +1760,7 @@ public partial class Main : Control
     {
         _speed = speed;
         _accumulator = 0;
-        for (int i = 0; i < _speedButtons.Count; i++) _speedButtons[i].SetPressedNoSignal(i == speed);
+        for (int i = 0; i < _speedButtons.Count; i++) _speedButtons[i].SetPressedNoSignal(i == Math.Min(speed, 3));
     }
 
     private void Say(string text)

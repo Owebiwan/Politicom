@@ -158,6 +158,13 @@ public static class OpenStartGenerator
         string? hero = year < 1789 ? $"the {(year < 500 ? "war leader" : "captain")} of {defs[Math.Min(defs.Count - 1, 1 + rng.Next(Math.Max(1, defs.Count - 1)))].Name}" : null;
         scenario.Events = sandbox.PickEvents(rng, year, country, defs[0].Name, defs, scenario.Enemies, hero);
         WorldSetup.Attach(scenario, atlas);
+        // Campaigns are calibrated on their first two years, which the enemy's strength decides; decades
+        // later the outcome turns on peace, treaties and drift. (It's also far quicker.)
+        if (length is int campaign && campaign > ScenarioDefinition.CampaignTurns)
+        {
+            var opening = calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario;
+            return opening.WithLength(campaign);
+        }
         if (length is int turns) scenario = scenario.WithLength(turns);
         return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario; // real maps vary more than generated ones
     }

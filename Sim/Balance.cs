@@ -129,6 +129,15 @@ public sealed class Balance
     public int PeaceRefusalGap { get; set; } = 20;
     /// <summary>Drift from making peace: delegates at a table with a government.</summary>
     public double PeaceDrift { get; set; } = 3;
+    /// <summary>Ceilings on drift sums that grow over decades (short games stay far below them).</summary>
+    public double TechDriftCeiling { get; set; } = 0.25;
+    public double TechBrakeCeiling { get; set; } = 0.3;
+    public double ProjectDriftCeiling { get; set; } = 0.15;
+    /// <summary>Campaigns: years a treaty holds for certain, then the yearly chance it is broken.</summary>
+    public double TreatyYears { get; set; } = 4;
+    public double TreatyBreakPerYear { get; set; } = 0.2;
+    /// <summary>Campaigns: drift brake per week while no commune is on a front.</summary>
+    public double PeaceDriftBrake { get; set; } = 0.2;
 
     // ── Notable figures ──
     /// <summary>Defence a commander adds to their commune at prestige 0.5 (half that next door).</summary>

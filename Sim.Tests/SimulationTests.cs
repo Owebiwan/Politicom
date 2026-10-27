@@ -914,14 +914,15 @@ public class SimulationTests
     }
 
     [Fact]
-    public void Games_can_run_past_their_history_up_to_500_turns()
+    public void Games_can_run_past_their_history_up_to_the_campaign_cap()
     {
         var historical = World.Load(DataDir, "catalonia_1936");
         var longer = World.Load(DataDir, "catalonia_1936@300");
         Assert.Equal(135, historical.Scenario.EndTick);
         Assert.Equal(300, longer.Scenario.EndTick);
         Assert.Equal("catalonia_1936@300", longer.Scenario.Id);
-        Assert.Equal(500, World.Load(DataDir, "catalonia_1936@900").Scenario.EndTick); // capped
+        Assert.False(longer.Scenario.IsCampaign);
+        Assert.Equal(ScenarioDefinition.MaxTurns, World.Load(DataDir, "catalonia_1936@9000").Scenario.EndTick); // capped
         Assert.Equal("catalonia_1936", World.Load(DataDir, "catalonia_1936@20").Scenario.Id); // never shorter than history
 
         var enemy = longer.Scenario.Enemies[0];
@@ -1296,5 +1297,27 @@ public class SimulationTests
             w.Step();
         }
         Assert.DoesNotContain(w.PendingEvents, p => p.Id.StartsWith("peace_"));
+    }
+
+    [Fact]
+    public void In_a_campaign_peace_does_not_end_the_game_and_treaties_can_be_broken()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1936");
+        var scenario = Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "FRA", 5, length: 1300, calibrate: false);
+        Assert.True(scenario.IsCampaign);
+        var w = World.Create(scenario, NewWorld().Techs, seed: 5);
+        w.Run(10);
+        var front = w.Federation.Where(c => c.Front).Select(c => c.Id).ToList();
+        foreach (var e in w.Enemies) Sim.Systems.PeaceSystem.MakePeace(w, e);
+        w.Step();
+        Assert.Equal(Outcome.Ongoing, w.Outcome); // a campaign plays on in peacetime
+
+        // After the treaty's sure years, some enemy breaks the peace and its old front reopens.
+        var b = w.Balance;
+        b.TreatyBreakPerYear = 52; // certain, once the treaty may be broken
+        int sure = (int)(b.TreatyYears * 52 / w.Weeks);
+        for (int i = 0; i < sure + 2 && w.Enemies.All(e => e.AtPeace) && w.Outcome == Outcome.Ongoing; i++) w.Step();
+        Assert.Contains(w.Enemies, e => !e.AtPeace);
+        Assert.Contains(w.Communes, c => c.Front && front.Contains(c.Id));
     }
 }

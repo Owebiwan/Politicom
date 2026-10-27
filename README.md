@@ -814,6 +814,23 @@ Long games are hard:
   final day. A longer game asks whether you can.
 - **Sandbox:** maps are calibrated at the chosen length.
 
+### Campaigns
+
+Open-world starts can also run as **campaigns** of 10, 25 or 50 years (520, 1,300 or 2,600
+weekly turns; anything over 500 turns is a campaign, `--length 2600` in the terminal). Press 4
+for the fastest speed. A campaign plays differently:
+- **Peace doesn't end it.** Make peace with every enemy and the game goes on in peacetime.
+- **Treaties are broken.** After four sure years of peace, an enemy may break the treaty
+  (about one chance in five a year): its old front reopens and a new offensive follows.
+- **Peacetime brakes drift.** While no commune is on a front, the militias go home and the
+  assemblies take back what the war gave away (a drift brake, "Peacetime: the militias go
+  home").
+- **What grows with the decades levels off.** Drift from double-edged technologies, from their
+  brakes and from large projects rises toward a ceiling instead of without end, so a long game
+  settles into a balance; renewed offensives stop growing after the eighth.
+- Ordinary games (up to 500 turns) are unchanged; in them, peace with every enemy ends the game
+  and counts the rest as survived.
+
 ## Historical events
 
 Catalonia has six scripted decisions in its `events` list:

@@ -569,9 +569,13 @@ public sealed class World
                 ? "Most communes have gone their own way. They are still free, but the federation has dissolved."
                 : "Too few free communes remain. The federation has been destroyed.");
         }
-        else if (Enemies.Count > 0 && Enemies.All(e => e.AtPeace))
+        else if (Enemies.Count > 0 && Enemies.All(e => e.AtPeace) && !Scenario.IsCampaign)
         {
             Outcome = Outcome.Survived;
+            // The rest of the game would have been lived in peace: count it as survived.
+            double held = Math.Min(1, Federation.Count() / (double)InitialCommuneCount);
+            Scores.SurvivalSum += held * Math.Max(0, Scenario.EndTick - Tick);
+            Scores.Survival = 100 * Scores.SurvivalSum / Math.Max(1, Scenario.EndTick);
             Emit(Severity.Good, $"Peace with every enemy: the federation stands, recognized, in {Format(Date, "MMMM yyyy")}.");
         }
         else if (Tick >= Scenario.EndTick)

@@ -58,9 +58,11 @@ public sealed class DriftBreakdown
     public double PoliticalEducationBrake { get; set; }
     public double TechnologyBrake { get; set; }
     public double CultureBrake { get; set; }
+    /// <summary>Campaigns at peace: the militias go home and the assemblies take back what the war gave away.</summary>
+    public double PeaceBrake { get; set; }
 
     [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects + Conscription + Treasury + Figures;
-    [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake + CultureBrake;
+    [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake + CultureBrake + PeaceBrake;
     [JsonIgnore] public double Net => Pressure - Brakes + Events;
 
     public IEnumerable<(string Label, double Value)> Items()
@@ -81,6 +83,7 @@ public sealed class DriftBreakdown
         yield return ("Political education", -PoliticalEducationBrake);
         yield return ("Mandates, recall, rotation", -TechnologyBrake);
         yield return ("A culture of freedom", -CultureBrake);
+        yield return ("Peacetime: the militias go home", -PeaceBrake);
     }
 }
 

@@ -41,6 +41,10 @@ public sealed class HostileState
     [JsonInclude] public int LastGain { get; internal set; }
     /// <summary>Turn it last offered terms (and was refused).</summary>
     [JsonInclude] public int LastPeaceOffer { get; internal set; } = -999;
+    /// <summary>Turn peace was made (campaigns: treaties can be broken some years later).</summary>
+    [JsonInclude] public int PeaceSince { get; internal set; }
+    /// <summary>The communes its front ran through when peace was made, for a war resumed.</summary>
+    [JsonInclude] public List<int> PeaceFront { get; internal set; } = new();
 }
 
 /// <summary>The nominal ally that offers arms in exchange for centralization.</summary>

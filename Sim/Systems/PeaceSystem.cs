@@ -23,6 +23,7 @@ internal static class PeaceSystem
     {
         if (!Applies(w) || w.Tick < 8) return;
         var b = w.Balance;
+        if (w.Scenario.IsCampaign) BreakTreaties(w);
         for (int k = 0; k < w.Enemies.Count; k++)
         {
             var e = w.Enemies[k];
@@ -60,11 +61,40 @@ internal static class PeaceSystem
         }
     }
 
+    /// <summary>
+    /// Campaigns: after some years of peace an enemy may break the treaty. Its old front reopens
+    /// (where those communes are still free) and a fresh offensive follows.
+    /// </summary>
+    private static void BreakTreaties(World w)
+    {
+        var b = w.Balance;
+        for (int k = 0; k < w.Enemies.Count; k++)
+        {
+            var e = w.Enemies[k];
+            if (!e.AtPeace || (w.Tick - e.PeaceSince) * w.Weeks < b.TreatyYears * 52) continue;
+            if (!w.Rng.Chance(b.TreatyBreakPerYear * w.Weeks / 52)) continue;
+            var front = e.PeaceFront.Select(id => w.Communes[id]).Where(c => c.InFederation).ToList();
+            if (front.Count == 0) front = w.Federation.OrderBy(c => c.Population).Take(2).ToList();
+            if (front.Count == 0) continue;
+            e.AtPeace = false;
+            e.LastGain = w.Tick;
+            e.LastPeaceOffer = w.Tick;
+            foreach (var c in front) c.Fronts.Add(k);
+            double typical = e.Offensives.Count > 0 ? e.Offensives.Average(o => o.Strength) : e.Strength * 0.5;
+            e.Offensives.Add(new Offensive { Name = $"The {e.Name}'s new war", Tick = w.Tick + 2, Duration = 8, Strength = Math.Round(typical, 1) });
+            int years = (int)((w.Tick - e.PeaceSince) * w.Weeks / 52);
+            w.Emit(Severity.Danger, $"The {e.Name} breaks the peace after {years} years. Its army marches on {string.Join(", ", front.Take(3).Select(c => c.Name))}.",
+                pause: true, title: $"The {e.Name} breaks the peace");
+        }
+    }
+
     public static void MakePeace(World w, HostileState e)
     {
         if (e.AtPeace) return;
         e.AtPeace = true;
+        e.PeaceSince = w.Tick;
         int k = w.Enemies.ToList().IndexOf(e);
+        e.PeaceFront = w.Communes.Where(c => c.Fronts.Contains(k)).Select(c => c.Id).ToList();
         foreach (var c in w.Communes) c.Fronts.Remove(k);
         w.Emit(Severity.Good, $"Peace with the {e.Name}. Its front closes; the militias come home.", title: "Peace");
     }

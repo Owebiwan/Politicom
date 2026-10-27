@@ -78,7 +78,10 @@ public sealed class ScenarioDefinition
         return length is int turns ? scenario.WithLength(turns) : scenario;
     }
 
-    public const int MaxTurns = 500;
+    public const int MaxTurns = 2600;
+    /// <summary>Games longer than this are campaigns: peace doesn't end them, and treaties can be broken.</summary>
+    public const int CampaignTurns = 500;
+    [System.Text.Json.Serialization.JsonIgnore] public bool IsCampaign => EndTick > CampaignTurns;
     internal static double RenewedBase = 0.6;
     internal static double RenewedGrowth = 0.06;
 
@@ -122,7 +125,8 @@ public sealed class ScenarioDefinition
                     Name = $"A renewed offensive by the {e.Name}",
                     Tick = tick,
                     Duration = Math.Max(3, Math.Min(last.Duration, interval / 2)),
-                    Strength = Math.Round(typical * (RenewedBase + RenewedGrowth * k), 1),
+                    // Each renewed offensive is a little stronger, up to a point: decades of war don't grow without end.
+                    Strength = Math.Round(typical * (RenewedBase + RenewedGrowth * Math.Min(k, 8)), 1),
                 });
         }
         return copy;

@@ -8,7 +8,9 @@ internal static class DriftSystem
         var d = new DriftBreakdown
         {
             Baseline = b.BaselineDrift,
-            Technology = w.SocietyEffect(e => e.DriftPerTick),
+            // In campaigns, sums that grow with the decades (technologies, their brakes, a federation's size)
+            // level off, so a long game settles into a balance instead of running away. Shorter games are untouched.
+            Technology = Level(w, w.SocietyEffect(e => e.DriftPerTick), b.TechDriftCeiling),
             ExpertTrap = b.ExpertTrapRate * w.Mean(c => c.ExpertGap),
             WarCommittee = w.WarCommittee ? b.WarCommitteeDrift : 0,
             WarStress = b.WarStressDrift * LosingShare(w),
@@ -18,11 +20,12 @@ internal static class DriftSystem
             Conscription = w.Conscription ? b.ConscriptionDrift * w.Weeks : 0,
             Treasury = b.GoldHoldingDrift * w.Gold * w.Weeks,
             Figures = FigureSystem.Drift(w),
-            LargeProjects = w.ActiveProjects.Sum(p => b.LargeProjectDrift * Math.Max(0, p.Participants.Count - b.LargeProjectThreshold)),
+            LargeProjects = Level(w, w.ActiveProjects.Sum(p => b.LargeProjectDrift * Math.Max(0, p.Participants.Count - b.LargeProjectThreshold)), b.ProjectDriftCeiling),
             Events = w.PendingDriftBump,
             PoliticalEducationBrake = b.PoliticalBrake * w.Mean(c => c.PoliticalEducation),
-            TechnologyBrake = w.SocietyEffect(e => e.DriftBrake),
+            TechnologyBrake = Level(w, w.SocietyEffect(e => e.DriftBrake), b.TechBrakeCeiling),
             CultureBrake = b.CultureDriftBrake * CultureSystem.Mean(w) * w.Weeks,
+            PeaceBrake = w.Scenario.IsCampaign && !w.Communes.Any(c => c.Front) ? b.PeaceDriftBrake * w.Weeks : 0,
         };
         w.PendingDriftBump = 0;
         w.LastDrift = d;
@@ -47,6 +50,9 @@ internal static class DriftSystem
                 + DriftEffects.Describe(stage), pause: rising, title: rising ? $"Hierarchy hardens: {DriftEffects.Name(stage)}" : "");
         }
     }
+
+    /// <summary>In a campaign: close to x while x is small, never more than the ceiling. Otherwise x as it is.</summary>
+    private static double Level(World w, double x, double ceiling) => w.Scenario.IsCampaign ? ceiling * Math.Tanh(x / ceiling) : x;
 
     /// <summary>Share of front communes currently losing ground (pressure above defense).</summary>
     private static double LosingShare(World w)
