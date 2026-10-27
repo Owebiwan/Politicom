@@ -434,12 +434,12 @@ How they play:
 ## Endings and peace
 
 - **Endings** (`Sim/Systems/Endings.cs`): a finished game ends with one of several endings,
-  from the outcome and how it was reached: *The revolution spreads* (two or more sister
-  federations abroad), *A recognized autonomy* (peace with every enemy), *A free society* (high
-  freedom and quality of life), *The federation endured, in name* (drift past 50), *The
+  from the outcome and how it was reached: *The revolution spreads* (a sister federation
+  abroad), *A recognized autonomy* (peace with every enemy), *A free society* (freedom
+  75+ and quality of life 50+), *The federation endured, in name* (drift past 50), *The
   federation endured*, *You won the war and lost the revolution* (a state formed), *The
-  federation has dissolved*, *Crushed, but remembered* (destroyed, but its ideas spread
-  abroad), *The federation has been destroyed*. An epilogue follows: what became of each
+  federation has dissolved*, *Crushed, but remembered* (destroyed, but after holding out for
+  60% of the game, or with its ideas spread abroad), *The federation has been destroyed*. An epilogue follows: what became of each
   figure, how many communes ended free, which fortifications held, whether its culture and any
   sister federations outlived the war. The leaderboard records the ending.
 - **Peace** (open-world starts only; the historical scenarios keep their history,

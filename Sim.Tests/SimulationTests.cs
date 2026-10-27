@@ -1300,6 +1300,32 @@ public class SimulationTests
     }
 
     [Fact]
+    public void A_sample_of_countries_in_every_era_plays_to_the_end_saves_and_has_an_ending()
+    {
+        var techs = NewWorld().Techs;
+        int played = 0;
+        foreach (var era in Sim.Open.OpenStartGenerator.Eras)
+        {
+            var atlas = Sim.Global.Atlas.Load(DataDir, era);
+            foreach (var state in Sim.Open.OpenStartGenerator.Playable(atlas).Where((_, i) => i % 9 == 0))
+            {
+                var w = World.Create(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, state.Id, 7, calibrate: false, scope: Sim.Open.OpenScope.Region), techs, seed: 7);
+                var policy = new Balanced();
+                while (w.Outcome == Outcome.Ongoing)
+                {
+                    policy.Act(w);
+                    w.Step();
+                }
+                Assert.Equal(w.Tick, World.LoadJson(w.SaveJson(), techs).Tick);
+                Assert.False(string.IsNullOrEmpty(Endings.Of(w).Title), $"{era} {state.Id}");
+                Assert.NotEmpty(Endings.Epilogue(w));
+                played++;
+            }
+        }
+        Assert.True(played > 50, $"only {played} games");
+    }
+
+    [Fact]
     public void In_a_campaign_peace_does_not_end_the_game_and_treaties_can_be_broken()
     {
         var atlas = Sim.Global.Atlas.Load(DataDir, "1936");

@@ -16,19 +16,19 @@ public static class Endings
         {
             Outcome.BecameState => ("You won the war and lost the revolution",
                 "Hierarchy drift reached its final threshold. A state crystallized out of the councils, commissars and police."),
-            Outcome.Survived when sisters >= 2 => ("The revolution spreads",
-                $"Free communes still govern themselves in {when}, and {sisters} other countries have risen and federated with them. Borders are beginning to mean less."),
+            Outcome.Survived when sisters >= 1 => ("The revolution spreads",
+                $"Free communes still govern themselves in {when}, and {(sisters == 1 ? "another country has" : $"{sisters} other countries have")} risen and federated with them. Borders are beginning to mean less."),
             Outcome.Survived when peace => ("A recognized autonomy",
                 $"Every government that fought the federation has made peace with it. In {when} the free communes stand, recognized by their enemies, their militias at home."),
             Outcome.Survived when w.Drift.Value >= 50 => ("The federation endured, in name",
                 $"The communes survived to {when}, but commissars and permanent councils run much of what the assemblies once decided. It is a federation in name; whether it is free is another question."),
-            Outcome.Survived when s.Freedom >= 70 && s.QualityOfLife >= 55 => ("A free society",
+            Outcome.Survived when s.Freedom >= 75 && s.QualityOfLife >= 50 => ("A free society",
                 $"In {when} the communes are fed, educated and still their own masters. The assemblies decide; delegates are recalled; nobody rules."),
             Outcome.Survived => ("The federation endured", $"Free communes still governed themselves in {when}."),
             _ when w.Communes.Count(c => !c.Occupied && !c.Federated) > w.Communes.Count(c => c.Occupied) =>
                 ("The federation has dissolved", "Most communes went their own way. They are still free, but there is no federation left to hold together."),
-            _ when s.Spread >= 40 => ("Crushed, but remembered",
-                "The federation was destroyed, but its ideas have gone further than its militias ever did. Workers abroad tell its story, and some of them are already organizing."),
+            _ when s.Survival >= 60 || s.Spread >= 10 => ("Crushed, but remembered",
+                "The federation was destroyed, but it held out long enough to be remembered, and its ideas have gone further than its militias ever did. Workers abroad tell its story, and some of them are already organizing."),
             _ => ("The federation has been destroyed", "Too few free communes remain for a federation."),
         };
     }
