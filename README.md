@@ -465,6 +465,9 @@ Two actions for a front commune (Commune tab):
   good, but only with drift well in hand: influence spent here isn't spent on schools.
   Balance (200 games): Catalonia 96%, Free Territory 73%, Paris 49% (up from 43%: barricades
   and raids help a besieged city), open starts 57–76%.
+- Paris was then brought back to its intended difficulty: Bloody Week's strength rose from 26
+  to 29, and the balanced player again survives about a third of games (34%; 20% at 32, 50% at
+  26). The educator never outlasts it.
 
 ## Notable figures
 
