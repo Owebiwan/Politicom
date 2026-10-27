@@ -82,6 +82,34 @@ public static class Explain
         return (added, factors);
     }
 
+    /// <summary>An enemy's effective strength: its army, any offensive and intervening states (added), then what wears it down.</summary>
+    public static (List<Part> Added, List<Part> Factors) Enemy(World w, HostileState e, Offensive? offensive)
+    {
+        var added = new List<Part> { new("Its army", e.Strength) };
+        if (offensive != null) added.Add(new(offensive.Name, offensive.Strength));
+        if (e.Intervention > 0) added.Add(new("Intervening states", e.Intervention));
+        var factors = new List<Part>
+        {
+            new($"Its own workers radicalized ({e.Radicalization:P0})", 1 - 0.4 * e.Radicalization),
+            new($"Exhaustion ({e.Exhaustion:P0})", 1 - Math.Clamp(e.Exhaustion, 0, 0.6)),
+            new("Its technology against yours", Global.TechLevelSystem.EnemyEdge(w, e)),
+        };
+        return (added, factors);
+    }
+
+    /// <summary>Weeks of eating (and of goods use) the federation holds in store; prices follow them.</summary>
+    public static (double Food, double Goods) StockWeeks(World w)
+    {
+        var members = w.Federation.ToList();
+        if (members.Count == 0) return (0, 0);
+        double food = members.Sum(c => Math.Max(0, c.Food)) / Math.Max(0.01, members.Sum(c => w.FoodDemand(c)) / w.Weeks);
+        double goods = members.Sum(c => Math.Max(0, c.Goods)) / Math.Max(0.01, members.Sum(c => w.GoodsDemand(c)) / w.Weeks);
+        return (food, goods);
+    }
+
+    /// <summary>The price stores of so many weeks set (1 at four weeks; dearer when short).</summary>
+    public static double PriceFor(World w, double weeks) => Math.Clamp(Math.Sqrt(w.Balance.PriceWeeks / Math.Max(0.25, weeks)), 0.4, 3);
+
     public static double Sum(IEnumerable<Part> parts) => parts.Sum(p => p.Value);
     public static double Product(IEnumerable<Part> parts) => parts.Aggregate(1.0, (a, p) => a * p.Value);
 }

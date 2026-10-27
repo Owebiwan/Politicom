@@ -38,10 +38,8 @@ internal static class WarSystem
                 w.Emit(Severity.Danger, $"{offensive.Name} begins.");
             e.CurrentOffensive = offensive;
 
-            e.EffectiveStrength = (e.Strength + (offensive?.Strength ?? 0) + e.Intervention)
-                                  * (1 - 0.4 * e.Radicalization)
-                                  * (1 - Math.Clamp(e.Exhaustion, 0, 0.6))
-                                  * Global.TechLevelSystem.EnemyEdge(w, e);
+            var (added, factors) = Explain.Enemy(w, e, offensive);
+            e.EffectiveStrength = Explain.Sum(added) * Explain.Product(factors);
 
             int enemy = k;
             var fronts = w.Active.Where(c => c.Fronts.Contains(enemy)).ToList();

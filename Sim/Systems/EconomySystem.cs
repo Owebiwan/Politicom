@@ -29,15 +29,9 @@ internal static class EconomySystem
     /// </summary>
     private static void Prices(World w)
     {
-        var members = w.Federation.ToList();
-        if (members.Count == 0) return;
-        double Price(double stock, double use)
-        {
-            double weeks = stock / Math.Max(0.01, use);
-            return Math.Clamp(Math.Sqrt(w.Balance.PriceWeeks / Math.Max(0.25, weeks)), 0.4, 3);
-        }
-        double food = Price(members.Sum(c => Math.Max(0, c.Food)), members.Sum(c => w.FoodDemand(c)) / w.Weeks);
-        double goods = Price(members.Sum(c => Math.Max(0, c.Goods)), members.Sum(c => w.GoodsDemand(c)) / w.Weeks);
+        if (!w.Federation.Any()) return;
+        var (foodWeeks, goodsWeeks) = Explain.StockWeeks(w);
+        double food = Explain.PriceFor(w, foodWeeks), goods = Explain.PriceFor(w, goodsWeeks);
         double k = Math.Min(1, 0.25 * w.Weeks); // prices move over weeks, not overnight
         w.FoodPrice += (food - w.FoodPrice) * k;
         w.GoodsPrice += (goods - w.GoodsPrice) * k;

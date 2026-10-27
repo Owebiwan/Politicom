@@ -1403,7 +1403,9 @@ public partial class Main : Control
         }
         _history.QueueRedraw();
         var d = w.LastDrift;
-        _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\nLast {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}: " + string.Join(", ",
+        var driftLines = new List<string> { $"Hierarchy drift last {w.Turn}: {d.Net:+0.00;-0.00}" };
+        driftLines.AddRange(d.Items().Where(i => Math.Abs(i.Value) >= 0.005).OrderByDescending(i => i.Value).Select(i => $"   {i.Value:+0.00;-0.00}  {i.Label}"));
+        _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\n{Hint($"Last {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}", driftLines)}: " + string.Join(", ",
             d.Items().Where(i => Math.Abs(i.Value) > 0.005).OrderByDescending(i => Math.Abs(i.Value)).Take(5)
                 .Select(i => $"{Esc(i.Label)} [color={(i.Value > 0 ? "#f07060" : "#70d080")}]{(i.Value > 0 ? "+" : "")}{i.Value:0.00}[/color]"));
 
@@ -1412,7 +1414,7 @@ public partial class Main : Control
             int k = w.Enemies.ToList().IndexOf(e);
             var fronts = w.Active.Where(c => c.Fronts.Contains(k))
                 .Select(c => $"{Esc(c.Name)} [color={(c.Defense >= c.Pressure ? "#70d080" : "#f07060")}]{c.Control:P0}[/color]");
-            return $"{UiTheme.Img("enemy")} [b][color={e.Color}]{Esc(e.Name)}[/color][/b]: strength {e.EffectiveStrength:0.0}"
+            return $"{UiTheme.Img("enemy")} [b][color={e.Color}]{Esc(e.Name)}[/color][/b]: {Hint($"strength {e.EffectiveStrength:0.0}", EnemyLines(w, e))}"
                    + (e.CurrentOffensive is { } o ? $"  [color=#f07060][b]{Esc(o.Name)}[/b][/color]" : "")
                    + $" · exhaustion {e.Exhaustion:P0} · its workers radicalized {e.Radicalization:P0}"
                    + (Politicom.Sim.Global.TechLevelSystem.EnemyEdge(w, e) is var edge and > 1.005 ? $" · [color=#f07060]+{edge - 1:P0} from better weapons[/color]" : "")
@@ -1509,7 +1511,7 @@ public partial class Main : Control
                    $"{(foodNeed > 0 ? food / foodNeed : 0):0} {turn}s in reserve\n" +
                    $"{UiTheme.Img("goods")} [b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
         string Dear(double p) => p > 1.3 ? "#f07060" : p < 0.8 ? "#70d080" : "#e4dccb";
-        text += $"\n{UiTheme.Img("treasury")} [b]Prices[/b] food [color={Dear(w.FoodPrice)}]{w.FoodPrice:0.00}[/color] · goods [color={Dear(w.GoodsPrice)}]{w.GoodsPrice:0.00}[/color] [color=#9a9283](1 = four weeks in store; scarcity raises them)[/color]";
+        text += $"\n{UiTheme.Img("treasury")} [b]Prices[/b] {Hint($"food [color={Dear(w.FoodPrice)}]{w.FoodPrice:0.00}[/color] · goods [color={Dear(w.GoodsPrice)}]{w.GoodsPrice:0.00}[/color]", PriceLines(w))} [color=#9a9283](1 = four weeks in store; scarcity raises them)[/color]";
         var from = new List<string>();
         if (w.LastArms > 0.05) from.Add($"arms {w.LastArms:0.0}");
         if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");
@@ -1730,6 +1732,24 @@ public partial class Main : Control
         yield return $"{title}: {(pct ? $"{Explain.Sum(list):P0}" : $"{Explain.Sum(list):0.00}")}";
         foreach (var p in list.Where(p => Math.Abs(p.Value) > 0.0005).OrderByDescending(p => Math.Abs(p.Value)))
             yield return $"   {F(p.Value)}  {p.Label}";
+    }
+
+    private static IEnumerable<string> EnemyLines(World w, HostileState e)
+    {
+        var (added, factors) = Explain.Enemy(w, e, e.CurrentOffensive);
+        yield return $"Effective strength: {e.EffectiveStrength:0.00}" + (e.AtPeace ? " (at peace)" : "");
+        foreach (var p in added) yield return $"   +{p.Value:0.00}  {p.Label}";
+        foreach (var f in factors.Where(f => Math.Abs(f.Value - 1) > 0.001)) yield return $"   x{f.Value:0.00}  {f.Label}";
+        yield return "Its pressure is shared out among the communes on its front.";
+    }
+
+    private static IEnumerable<string> PriceLines(World w)
+    {
+        var (food, goods) = Explain.StockWeeks(w);
+        yield return "Prices follow the federation's stores (1.00 at four weeks in hand):";
+        yield return $"   food: {food:0.0} weeks of eating in store -> {Explain.PriceFor(w, food):0.00}";
+        yield return $"   goods: {goods:0.0} weeks of use in store -> {Explain.PriceFor(w, goods):0.00}";
+        yield return "They move a quarter of the way each week. Dear food hurts factory towns and pays more in trade.";
     }
 
     private static IEnumerable<string> FoodLines(World w, Commune c)

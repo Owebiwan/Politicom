@@ -509,6 +509,10 @@ In the Commune tab, underlined numbers explain themselves on hover, part by part
   the war committee, arms, stockpiles, recalled delegates, foreign volunteers, commanders,
   fortifications.
 
+On the Overview tab: **last week's drift** (every source and brake), **prices** (weeks of
+food and goods in store, and the price each sets), and **each enemy's strength** (its army, any
+offensive, intervening states; then its radicalized workers, exhaustion and technology).
+
 The simulation computes these numbers through the same breakdowns, so the tooltip and the
 number never disagree.
 
