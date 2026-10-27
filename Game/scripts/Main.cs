@@ -205,7 +205,17 @@ public partial class Main : Control
         // Let the default map draw first, as it does behind the intro, so switching exercises the real path.
         for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         int scenarioAt = Array.IndexOf(args, "--scenario");
-        if (scenarioAt >= 0 && scenarioAt + 1 < args.Length && FindScenario(args[scenarioAt + 1]) is { } chosen)
+        // A short name ("catalonia") matches the scenario whose id starts with it.
+        string? asked = scenarioAt >= 0 && scenarioAt + 1 < args.Length ? args[scenarioAt + 1] : null;
+        if (asked != null && FindScenario(asked) is null && _scenarios.FirstOrDefault(s => s.Id.StartsWith(asked + "_")) is { } byPrefix)
+            asked = byPrefix.Id;
+        if (asked != null && FindScenario(asked) is null)
+        {
+            GD.PushError($"--scenario: no scenario '{asked}'. Known: {string.Join(", ", _scenarios.Select(s => s.Id))}, sandbox:SEED, open:ERA:STATE.");
+            GetTree().Quit(1);
+            return;
+        }
+        if (asked != null && FindScenario(asked) is { } chosen)
         {
             _scenario = chosen;
             int seedAt = Array.IndexOf(args, "--seed");
