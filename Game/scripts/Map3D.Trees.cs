@@ -20,6 +20,7 @@ public partial class Map3D
 
     private readonly MultiMeshInstance3D[] _forests = new MultiMeshInstance3D[TreeModels.Length];
     private List<Tree>[]? _trees;
+    private object? _treesKey;
     private object? _treesFor;
 
     private void SetUpTrees()
@@ -138,6 +139,10 @@ public partial class Map3D
         if (!shown) return;
         PlantForests();
         var (origin, deg) = Map.LonLatFrame;
+        // Only when the view, the relief or the towns change: not every frame.
+        var key = (origin, deg, lift, _offset, Map.Zoom, Map.TownSpots.Count, _trees);
+        if (key.Equals(_treesKey)) return;
+        _treesKey = key;
         // A tree is about a third the height of a town's houses.
         float size = 11 * Mathf.Clamp(Mathf.Sqrt(Map.Zoom), 0.7f, 1.6f);
         var view = new Rect2(-_offset, _extent).Grow(20);

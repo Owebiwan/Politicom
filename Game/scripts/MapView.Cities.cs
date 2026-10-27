@@ -20,6 +20,8 @@ public partial class MapView
     private Politicom.Sim.World? _cityLayoutWorld;
     /// <summary>The cities drawn last frame, in screen space, for clicks and hovering.</summary>
     private readonly List<(ForeignCity City, Vector2 At)> _citiesShown = new();
+    private readonly List<(ForeignCity City, Vector2 At)> _cityPick = new();
+    private object? _cityPickKey;
     private (AtlasState State, City City)? _hoverCity;
 
     private List<ForeignCity> CityLayout(GlobeLayout g)
@@ -41,19 +43,32 @@ public partial class MapView
     {
         _citiesShown.Clear();
         if (Globe_Layout() is not { } g || World is not { } w) return;
+        var layout = CityLayout(g);
         var view = ViewRect.Grow(-4);
         var communes = w.Communes.Select(c => ToScreen(c)).ToList();
         var recent = w.Missions.Where(m => m.Tick >= w.Tick - 26).ToList();
         string sprite = w.Year < 1750 ? "oldtown" : "town";
         var icon = UiTheme.Icon(sprite);
         var flag = UiTheme.Icon("t_flag");
-        foreach (var f in CityLayout(g))
+        // Which cities show depends only on the view and where the communes are: worked out again
+        // when those change, not on every frame of an animation.
+        var key = (_pan, _zoom, Size, ViewRect, w.Communes.Count, g);
+        if (!key.Equals(_cityPickKey))
         {
-            if (_citiesShown.Count >= 160) break;
-            var p = ToScreen(f.At);
-            if (!view.HasPoint(p)) continue;
-            if (communes.Any(c => c.DistanceSquaredTo(p) < 20 * 20)) continue;
-            if (_citiesShown.Any(s => s.At.DistanceSquaredTo(p) < 24 * 24)) continue;
+            _cityPickKey = key;
+            _cityPick.Clear();
+            foreach (var f in layout)
+            {
+                if (_cityPick.Count >= 160) break;
+                var p = ToScreen(f.At);
+                if (!view.HasPoint(p)) continue;
+                if (communes.Any(c => c.DistanceSquaredTo(p) < 20 * 20)) continue;
+                if (_cityPick.Any(s => s.At.DistanceSquaredTo(p) < 24 * 24)) continue;
+                _cityPick.Add((f, p));
+            }
+        }
+        foreach (var (f, p) in _cityPick)
+        {
             _citiesShown.Add((f, p));
 
             float side = Mathf.Clamp(11 + 2.5f * Mathf.Log(Mathf.Max(f.City.Pop, 10_000) / 100_000f) / Mathf.Log(10), 10, 17);
@@ -68,12 +83,14 @@ public partial class MapView
                 DrawTextureRect(flag, new Rect2(p + new Vector2(side * 0.15f, -side * 1.25f), new Vector2(12, 12)), false, new Color("e0443a"));
 
             var labelAt = p + new Vector2(side * 0.62f + 3, 4);
-            var size = font.GetStringSize(f.City.Name, HorizontalAlignment.Left, -1, 11);
+            var line = ShapedLabel(f.City.Name, 11);
+            var size = line.GetSize();
             var rect = new Rect2(labelAt - new Vector2(0, size.Y - 3), size);
             if (!hovered && taken.Any(t => t.Intersects(rect))) continue;
             taken.Add(rect);
-            DrawStringOutline(font, labelAt, f.City.Name, HorizontalAlignment.Left, -1, 11, 4, Border);
-            DrawString(font, labelAt, f.City.Name, HorizontalAlignment.Left, -1, 11, f.Capital ? new Color("e8d3a0") : new Color(0.72f, 0.72f, 0.7f));
+            var top = labelAt - new Vector2(0, (float)line.GetLineAscent());
+            line.DrawOutline(GetCanvasItem(), top, 4, Border);
+            line.Draw(GetCanvasItem(), top, f.Capital ? new Color("e8d3a0") : new Color(0.72f, 0.72f, 0.7f));
         }
     }
 
@@ -85,6 +102,17 @@ public partial class MapView
         _hoverCity = null;
         _hoverState = null;
         QueueRedraw();
+    }
+
+    private static readonly Dictionary<(string, int), TextLine> ShapedLabels = new();
+
+    /// <summary>A label's shaped text, kept: shaping hundreds of names every redraw is the costly part of drawing them.</summary>
+    private static TextLine ShapedLabel(string text, int size)
+    {
+        if (ShapedLabels.TryGetValue((text, size), out var line)) return line;
+        line = new TextLine();
+        line.AddString(text, ThemeDB.FallbackFont, size);
+        return ShapedLabels[(text, size)] = line;
     }
 
     private (AtlasState State, City City)? HitCity(Vector2 at)

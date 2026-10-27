@@ -341,28 +341,58 @@ public partial class MapView
                 if (box.Intersects(view)) DrawCulled(line, WorldBorder, 1.6f, OnEdge);
             return true;
         }
-        foreach (var (line, box) in g.Coasts)
-            if (box.Intersects(view)) DrawCulled(line, WorldCoast, 1.2f, InRegion);
-        // Borders as on Victoria 3's map: a broad soft shadow under a firm line with a light edge.
-        bool far = _zoom < DetailZoom;
-        foreach (var (line, box) in g.Borders)
-            if (box.Intersects(view))
-            {
-                DrawCulled(line, new Color(0, 0, 0, 0.22f), far ? 3f : 5.5f, InRegion);
-                DrawCulled(line, new Color(0.08f, 0.07f, 0.06f, 0.75f), far ? 1.2f : 2f, InRegion);
-                if (!far) DrawCulled(line, new Color(0.95f, 0.9f, 0.78f, 0.28f), 0.7f, InRegion);
-            }
+        // The lines in screen space are worked out again only when the view changes (not on every
+        // frame of an animation), then drawn from the list.
+        var key = (_pan, _zoom, Size, ViewRect, g);
+        if (!key.Equals(_globeLinesKey))
+        {
+            _globeLinesKey = key;
+            _globeLines.Clear();
+            foreach (var (line, box) in g.Coasts)
+                if (box.Intersects(view)) Culled(line, WorldCoast, 1.2f, InRegion, true);
+            // Borders as on Victoria 3's map: a broad soft shadow under a firm line with a light edge.
+            bool far = _zoom < DetailZoom;
+            foreach (var (line, box) in g.Borders)
+                if (box.Intersects(view))
+                {
+                    Culled(line, new Color(0, 0, 0, 0.22f), far ? 3f : 5.5f, InRegion, false); // a soft shadow needs no edge smoothing
+                    Culled(line, new Color(0.08f, 0.07f, 0.06f, 0.75f), far ? 1.2f : 2f, InRegion, true);
+                    if (!far) Culled(line, new Color(0.95f, 0.9f, 0.78f, 0.28f), 0.7f, InRegion, false);
+                }
+        }
+        foreach (var (pts, color, width, smooth) in _globeLines) DrawPolyline(pts, color, width, smooth);
         return true;
     }
 
     // Inside the region its own, more detailed coast and borders replace the world's.
 
-    private void DrawCulled(Vector2[] line, Color color, float width, Func<Vector2, Vector2, bool> skip)
+    private readonly List<(Vector2[] Points, Color Color, float Width, bool Smooth)> _globeLines = new();
+    private object? _globeLinesKey;
+
+    /// <summary>Like <see cref="DrawCulled"/>, but collects the screen-space runs for <see cref="_globeLines"/>.</summary>
+    private void Culled(Vector2[] line, Color color, float width, Func<Vector2, Vector2, bool> skip, bool smooth)
+    {
+        var run = new List<Vector2>();
+        for (int i = 0; i + 1 < line.Length; i++)
+        {
+            if (skip(line[i], line[i + 1]))
+            {
+                if (run.Count >= 2) _globeLines.Add((run.ToArray(), color, width, smooth));
+                run.Clear();
+                continue;
+            }
+            if (run.Count == 0) run.Add(ToScreen(line[i]));
+            run.Add(ToScreen(line[i + 1]));
+        }
+        if (run.Count >= 2) _globeLines.Add((run.ToArray(), color, width, smooth));
+    }
+
+    private void DrawCulled(Vector2[] line, Color color, float width, Func<Vector2, Vector2, bool> skip, bool smooth = true)
     {
         var run = new List<Vector2>();
         void Flush()
         {
-            if (run.Count >= 2) DrawPolyline(run.ToArray(), color, width, true);
+            if (run.Count >= 2) DrawPolyline(run.ToArray(), color, width, smooth);
             run.Clear();
         }
         for (int i = 0; i + 1 < line.Length; i++)

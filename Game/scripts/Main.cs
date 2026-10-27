@@ -241,9 +241,24 @@ public partial class Main : Control
         if (clockAt >= 0 && clockAt + 1 < args.Length)
         {
             CloseOverlay();
-            SetSpeed(1);
-            await ToSignal(GetTree().CreateTimer(double.Parse(args[clockAt + 1], System.Globalization.CultureInfo.InvariantCulture)), SceneTreeTimer.SignalName.Timeout);
+            int speedAt = Array.IndexOf(args, "--speed");
+            SetSpeed(speedAt >= 0 && speedAt + 1 < args.Length ? int.Parse(args[speedAt + 1]) : 1);
+            int startTick = _world.Tick;
+            ulong startMs = Time.GetTicksMsec();
+            double seconds = double.Parse(args[clockAt + 1], System.Globalization.CultureInfo.InvariantCulture);
+            int wanted = _speed;
+            // With --policy, the AI answers the decisions that pause the clock, and the clock runs on.
+            while (Time.GetTicksMsec() - startMs < seconds * 1000 && _world.Outcome == Outcome.Ongoing)
+            {
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                if (_speed == 0 && policy != null)
+                {
+                    policy.Act(_world);
+                    SetSpeed(wanted);
+                }
+            }
             SetSpeed(0);
+            GD.Print($"clock: {_world.Tick - startTick} turns in {(Time.GetTicksMsec() - startMs) / 1000.0:0.0} s, {Engine.GetFramesPerSecond()} fps");
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
@@ -323,6 +338,7 @@ public partial class Main : Control
     public override void _Process(double delta)
     {
         UpdateTutorial();
+        if (_uiStale && (_speed < 3 || Time.GetTicksMsec() - _lastRefresh >= 200)) Refresh();
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
         _accumulator += delta;
         double secondsPerDay = SecondsPerTurn[_speed] / _world.Scenario.DaysPerTick;
@@ -397,7 +413,15 @@ public partial class Main : Control
             if (e.StopsTheClock && PopupsEnabled) QueuePopup(e);
             else _toasts.Show(Shorten(e.Text), e.Severity == Severity.Decision ? new Color(0.38f, 0.85f, 0.95f) : new Color(0.95f, 0.4f, 0.35f));
         }
-        Refresh();
+        _seenEvents = _world.Log.Count;
+        // At the fast speeds turns come quicker than anyone can read: the dashboard catches up a few
+        // times a second (and at once when the clock stops), the map every turn.
+        if (_speed >= 3 && _world.Outcome == Outcome.Ongoing && Time.GetTicksMsec() - _lastRefresh < 200)
+        {
+            _uiStale = true;
+            _map.QueueRedraw();
+        }
+        else Refresh();
         ShowTips();
         OnOutcome();
     }
@@ -1365,8 +1389,13 @@ public partial class Main : Control
 
     // ── Refresh ───────────────────────────────────────────────────────────────
 
+    private ulong _lastRefresh;
+    private bool _uiStale;
+
     private void Refresh()
     {
+        _lastRefresh = Time.GetTicksMsec();
+        _uiStale = false;
         var w = _world;
         UpdateHeader();
         _stepButton.Text = $"+1 {w.Turn}";
