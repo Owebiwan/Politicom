@@ -645,11 +645,10 @@ public partial class MapView : Control
             DrawString(font, labelAt, c.Name, HorizontalAlignment.Left, -1, 12, c.Occupied ? Muted : Label);
             if (c.Front && !c.Occupied)
             {
-                // Control meter under the name: held part light, lost part in the enemy's colour.
-                var bar = new Rect2(labelAt + new Vector2(0, 5), new Vector2(34, 4));
+                // Control meter under the name: green where it holds, red filling in from the left as ground is lost.
+                var bar = new Rect2(labelAt + new Vector2(0, 5), new Vector2(26, 3));
                 DrawRect(bar.Grow(1), Border);
-                DrawRect(bar, EnemyColor(w, c.Fronts.Min()));
-                DrawRect(new Rect2(bar.Position, new Vector2(bar.Size.X * (float)c.Control, bar.Size.Y)), new Color("e9e4d8"));
+                DrawControlBar(this, bar, (float)c.Control);
             }
         }
 
@@ -1280,6 +1279,16 @@ public partial class MapView : Control
     /// <summary>Town names for the 3D map's overlay, most important first: town position, name, colour, always shown, front control (-1 if none) and the enemy's colour.</summary>
     public readonly List<(int Id, Vector2 At, string Name, Color Color, bool Always, float Control, Color Enemy)> TownLabels = new();
 
+    private static readonly Color HeldColor = new("5fb36a"), LostColor = new("d9443a");
+
+    /// <summary>A front town's control: red from the left for the ground lost, green for what it still holds.</summary>
+    private static void DrawControlBar(CanvasItem target, Rect2 bar, float control)
+    {
+        float lost = bar.Size.X * Mathf.Clamp(1 - control, 0, 1);
+        target.DrawRect(bar, HeldColor);
+        if (lost > 0) target.DrawRect(new Rect2(bar.Position, new Vector2(lost, bar.Size.Y)), LostColor);
+    }
+
     /// <summary>Draws the 3D map's town names, each placed by `place` (map position to screen), skipping ones that would overlap.</summary>
     public void DrawTownLabels(CanvasItem target, Func<Vector2, Vector2?> place)
     {
@@ -1289,7 +1298,7 @@ public partial class MapView : Control
         {
             if (place(at) is not { } p) continue;
             var size = font.GetStringSize(name, HorizontalAlignment.Left, -1, 13);
-            var plate = new Rect2(p + new Vector2(-size.X / 2 - 6, 4), new Vector2(size.X + 12, control >= 0 ? 24 : 18));
+            var plate = new Rect2(p + new Vector2(-size.X / 2 - 6, 4), new Vector2(size.X + 12, control >= 0 ? 23 : 18));
             if (!always && taken.Any(t => t.Intersects(plate))) continue;
             taken.Add(plate);
             target.DrawRect(plate, new Color(0.05f, 0.05f, 0.06f, 0.62f));
@@ -1298,10 +1307,10 @@ public partial class MapView : Control
             target.DrawString(font, text, name, HorizontalAlignment.Left, -1, 13, color);
             if (control >= 0)
             {
-                // Control meter under the name: held part light, lost part in the enemy's colour.
-                var bar = new Rect2(plate.Position + new Vector2(6, 17), new Vector2(plate.Size.X - 12, 3));
-                target.DrawRect(bar, enemy);
-                target.DrawRect(new Rect2(bar.Position, new Vector2(bar.Size.X * control, bar.Size.Y)), new Color("e9e4d8"));
+                // Control meter under the name: green where it holds, red filling in from the left as ground is lost.
+                float width = Mathf.Min(30, plate.Size.X - 12);
+                var bar = new Rect2(plate.Position + new Vector2((plate.Size.X - width) / 2, 18), new Vector2(width, 2));
+                DrawControlBar(target, bar, control);
             }
         }
     }
