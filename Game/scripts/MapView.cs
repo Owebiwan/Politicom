@@ -293,16 +293,24 @@ public partial class MapView : Control
         TextureFilter = TextureFilterEnum.LinearWithMipmaps; // the relief is stretched far beyond its pixels
     }
 
+    private double _lastAnimated;
+
     public override void _Process(double delta)
     {
         _time += delta;
         RedrawLand();
         if (World is not { } w) return;
         UpdateArmies((float)delta);
-        if (AtWorldZoom) QueueRedraw(); // the region marker pulses
+        // Animations (the pulsing marker, armies sliding, columns marching, pulsing outlines) redraw the
+        // map at most 30 times a second: just as smooth to the eye, half the cost of a large map.
+        if (_time - _lastAnimated < 1.0 / 30) return;
         bool moving = _armies.Values.Any(a => a.Position.DistanceSquaredTo(a.Target) > 0.25f || (a.Alpha > 0 && a.Alpha < 1));
         bool marching = w.ActiveProjects.Any(p => p.Kind == ProjectKind.DefensiveCampaign) || w.OffensiveUnderway;
-        if (moving || marching || w.PendingSecessions.Count > 0 || w.Ally.OfferPending) QueueRedraw();
+        if (AtWorldZoom || moving || marching || w.PendingSecessions.Count > 0 || w.Ally.OfferPending)
+        {
+            _lastAnimated = _time;
+            QueueRedraw();
+        }
     }
 
     private bool _feeding;
