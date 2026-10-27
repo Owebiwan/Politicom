@@ -120,6 +120,16 @@ public sealed class Balance
     /// <summary>Share of the commune's fighters lost when a raid fails.</summary>
     public double RaidLosses { get; set; } = 0.15;
 
+    // ── Peace (open-world starts) ──
+    /// <summary>Turns an enemy must go without taking a commune before it considers terms (scaled by turn length).</summary>
+    public double PeaceStalemateWeeks { get; set; } = 40;
+    /// <summary>Exhaustion that counts as much as a full stalemate.</summary>
+    public double PeaceExhaustion { get; set; } = 0.3;
+    public double PeaceOfferRate { get; set; } = 0.15;
+    public int PeaceRefusalGap { get; set; } = 20;
+    /// <summary>Drift from making peace: delegates at a table with a government.</summary>
+    public double PeaceDrift { get; set; } = 3;
+
     // ── Notable figures ──
     /// <summary>Defence a commander adds to their commune at prestige 0.5 (half that next door).</summary>
     public double FigureDefense { get; set; } = 0.12;

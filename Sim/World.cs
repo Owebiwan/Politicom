@@ -479,6 +479,7 @@ public sealed class World
         RisingSystem.Run(this);
         MilitiaSystem.Run(this);
         FigureSystem.Run(this);
+        PeaceSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
@@ -567,6 +568,11 @@ public sealed class World
             Emit(Severity.Danger, seceded > occupied
                 ? "Most communes have gone their own way. They are still free, but the federation has dissolved."
                 : "Too few free communes remain. The federation has been destroyed.");
+        }
+        else if (Enemies.Count > 0 && Enemies.All(e => e.AtPeace))
+        {
+            Outcome = Outcome.Survived;
+            Emit(Severity.Good, $"Peace with every enemy: the federation stands, recognized, in {Format(Date, "MMMM yyyy")}.");
         }
         else if (Tick >= Scenario.EndTick)
         {

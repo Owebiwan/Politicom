@@ -23,6 +23,12 @@ internal static class WarSystem
         for (int k = 0; k < w.Enemies.Count; k++)
         {
             var e = w.Enemies[k];
+            if (e.AtPeace)
+            {
+                e.EffectiveStrength = 0;
+                e.CurrentOffensive = null;
+                continue;
+            }
             if (e.GrowthUntil is not int until || w.Tick < until)
                 e.Strength += e.Growth * (1 + 0.5 * e.Radicalization); // neighbours see a threat
             e.Exhaustion = Math.Max(0, e.Exhaustion - b.ExhaustionDecay);
@@ -120,6 +126,7 @@ internal static class WarSystem
     private static void Occupy(World w, Commune c, int enemy)
     {
         var e = w.Enemies[enemy];
+        e.LastGain = w.Tick;
         c.Occupied = true;
         c.OccupiedBy = enemy;
         c.Fronts.Clear();

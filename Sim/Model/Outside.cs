@@ -35,6 +35,12 @@ public sealed class HostileState
     [JsonInclude] public double Intervention { get; internal set; }
     [JsonInclude] public Offensive? CurrentOffensive { get; internal set; }
     [JsonInclude] public double EffectiveStrength { get; internal set; }
+    /// <summary>Has made peace with the federation: its front is closed (what it took, it keeps).</summary>
+    [JsonInclude] public bool AtPeace { get; internal set; }
+    /// <summary>Turn it last took a commune (or the war began).</summary>
+    [JsonInclude] public int LastGain { get; internal set; }
+    /// <summary>Turn it last offered terms (and was refused).</summary>
+    [JsonInclude] public int LastPeaceOffer { get; internal set; } = -999;
 }
 
 /// <summary>The nominal ally that offers arms in exchange for centralization.</summary>

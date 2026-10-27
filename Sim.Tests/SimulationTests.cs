@@ -1257,4 +1257,44 @@ public class SimulationTests
         Assert.Equal(front.Fortification, restored.Communes[front.Id].Fortification);
         Assert.Equal(front.LastRaid, restored.Communes[front.Id].LastRaid);
     }
+
+    [Fact]
+    public void A_worn_enemy_offers_peace_in_open_starts_and_peace_with_all_ends_the_game()
+    {
+        var atlas = Sim.Global.Atlas.Load(DataDir, "1936");
+        var w = World.Create(Sim.Open.OpenStartGenerator.Generate(atlas, Sandbox.Value, "FRA", 5, calibrate: false), NewWorld().Techs, seed: 5);
+        w.Run(10);
+        foreach (var e in w.Enemies) { e.Exhaustion = 0.5; e.LastGain = w.Tick; }
+        PendingEvent? offer = null;
+        for (int i = 0; i < 60 && offer is null && w.Outcome == Outcome.Ongoing; i++)
+        {
+            foreach (var e in w.Enemies) e.Exhaustion = 0.5;
+            w.Step();
+            offer = w.PendingEvents.FirstOrDefault(p => p.Id.StartsWith("peace_"));
+        }
+        Assert.NotNull(offer);
+        double drift = w.Drift.Value;
+        Assert.True(w.Apply(new ChooseEventOption(offer!.Id, 0)).Ok);
+        var enemy = w.Enemies.Single(e => e.AtPeace);
+        int k = w.Enemies.ToList().IndexOf(enemy);
+        Assert.DoesNotContain(w.Communes, c => c.Fronts.Contains(k));
+        foreach (var e in w.Enemies) e.AtPeace = true;
+        w.Step();
+        Assert.Equal(Outcome.Survived, w.Outcome);
+        Assert.Equal("A recognized autonomy", Endings.Of(w).Title);
+        Assert.NotEmpty(Endings.Epilogue(w));
+    }
+
+    [Fact]
+    public void Historical_scenarios_never_offer_peace()
+    {
+        var w = NewWorld();
+        foreach (var e in w.Enemies) { e.Exhaustion = 0.9; }
+        for (int i = 0; i < 40; i++)
+        {
+            foreach (var e in w.Enemies) e.Exhaustion = 0.9;
+            w.Step();
+        }
+        Assert.DoesNotContain(w.PendingEvents, p => p.Id.StartsWith("peace_"));
+    }
 }

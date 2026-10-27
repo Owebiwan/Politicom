@@ -91,6 +91,7 @@ internal static class EventSystem
             if (!started.Ok) w.Emit(Severity.Info, $"The proposal lapses: {started.Message}");
         }
         if (e.Federate.Length > 0) Global.RevolutionSystem.Federate(w, e.Federate);
+        if (e.MakePeace.Length > 0 && w.Enemies.FirstOrDefault(x => x.Name == e.MakePeace) is { } peaceWith) PeaceSystem.MakePeace(w, peaceWith);
         if (e.KillFigure.Length > 0 && w.Figures.FirstOrDefault(f => f.Name == e.KillFigure) is { Alive: true } dead)
         {
             dead.Alive = false;

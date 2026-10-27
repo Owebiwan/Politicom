@@ -982,14 +982,8 @@ public partial class Main : Control
         SetSpeed(0);
         var w = _world;
         var s = w.Scores;
-        (string title, string verdict) = w.Outcome switch
-        {
-            Outcome.Survived => ("The federation endured", $"Free communes still governed themselves in {w.Format(w.Date, "MMMM yyyy")}."),
-            Outcome.BecameState => ("You won the war and lost the revolution", "Hierarchy drift reached its final threshold. A state crystallized out of the councils, commissars and police."),
-            _ when w.Communes.Count(c => !c.Occupied && !c.Federated) > w.Communes.Count(c => c.Occupied)
-                => ("The federation has dissolved", "Most communes went their own way. They are still free, but there is no federation left to hold together."),
-            _ => ("The federation has been destroyed", "Too few free communes remain for a federation."),
-        };
+        (string title, string verdict) = Endings.Of(w);
+        string epilogue = string.Join("\n", Endings.Epilogue(w).Select(line => $"· {Esc(line)}"));
         _map.Banner = title;
         Audio.Instance?.Play(w.Outcome == Outcome.Survived ? "good" : "drum");
         int? rank = RecordOutcome(title);
@@ -997,6 +991,8 @@ public partial class Main : Control
         var chart = new HistoryChart { World = w, FontSize = 13, CustomMinimumSize = new Vector2(0, 220) };
         ShowOverlay(title, $"""
             {verdict}
+
+            [color=#c9a25b]{epilogue}[/color]
 
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 

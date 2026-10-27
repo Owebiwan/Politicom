@@ -70,6 +70,8 @@ public sealed class EventEffects
     /// <summary>A notable figure (by name) the choice concerns, and what happens to them.</summary>
     public string Figure { get; set; } = "";
     public FigureChoice? FigureChoice { get; set; }
+    /// <summary>An enemy (by name) the federation makes peace with.</summary>
+    public string MakePeace { get; set; } = "";
     /// <summary>A notable figure (by name) who dies (Durruti on the Madrid front).</summary>
     public string KillFigure { get; set; } = "";
     /// <summary>A sister federation whose cities join yours (by state id).</summary>

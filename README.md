@@ -431,6 +431,25 @@ How they play:
   **Show me** button. Several queue up, and a pop-up closes by itself if its decision was
   answered in the side panel or ran out of time.
 
+## Endings and peace
+
+- **Endings** (`Sim/Systems/Endings.cs`): a finished game ends with one of several endings,
+  from the outcome and how it was reached: *The revolution spreads* (two or more sister
+  federations abroad), *A recognized autonomy* (peace with every enemy), *A free society* (high
+  freedom and quality of life), *The federation endured, in name* (drift past 50), *The
+  federation endured*, *You won the war and lost the revolution* (a state formed), *The
+  federation has dissolved*, *Crushed, but remembered* (destroyed, but its ideas spread
+  abroad), *The federation has been destroyed*. An epilogue follows: what became of each
+  figure, how many communes ended free, which fortifications held, whether its culture and any
+  sister federations outlived the war. The leaderboard records the ending.
+- **Peace** (open-world starts only; the historical scenarios keep their history,
+  `Sim/Systems/PeaceSystem.cs`): an enemy offers terms once it is ready: a long stalemate (40
+  weeks without taking a commune), a long war, or exhaustion (raids and occupation wear it).
+  Making peace closes its front (it keeps what it took) for +3 drift; fighting on lifts
+  enthusiasm. Peace with every enemy ends the game early. The balanced AI accepts when drift
+  allows. Offers come only when the federation really holds: in about a third of France 1936
+  regional games, rarely when an enemy keeps taking communes.
+
 ## Decisions at the front
 
 Two actions for a front commune (Commune tab):
