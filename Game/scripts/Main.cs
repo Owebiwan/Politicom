@@ -340,6 +340,12 @@ public partial class Main : Control
         UpdateTutorial();
         if (_uiStale && (_speed < 3 || Time.GetTicksMsec() - _lastRefresh >= 200)) Refresh();
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
+        // No time passes while a pop-up or a window is open.
+        if (Blocked)
+        {
+            SetSpeed(0);
+            return;
+        }
         _accumulator += delta;
         double secondsPerDay = SecondsPerTurn[_speed] / _world.Scenario.DaysPerTick;
         while (_accumulator >= secondsPerDay && _speed != 0 && _world.Outcome == Outcome.Ongoing)
@@ -391,10 +397,21 @@ public partial class Main : Control
             case Key.Key2: SetSpeed(2); break;
             case Key.Key3: SetSpeed(3); break;
             case Key.Key4: SetSpeed(4); break;
-            case Key.Period: StepTurn(); break;
+            case Key.Period: StepByHand(); break;
             default: return;
         }
         GetViewport().SetInputAsHandled();
+    }
+
+    /// <summary>One turn at the player's request (+1 week, or "."): not while a pop-up or window is open.</summary>
+    private void StepByHand()
+    {
+        if (Blocked)
+        {
+            Say(_popup != null ? "Answer the pop-up first: time stands still while it's open." : "Close the window first: time stands still while it's open.");
+            return;
+        }
+        StepTurn();
     }
 
     private void StepTurn()
@@ -1179,7 +1196,7 @@ public partial class Main : Control
             _speedButtons.Add(b);
         }
         _stepButton = new Button { TooltipText = "Advance one turn (.)" };
-        _stepButton.Pressed += StepTurn;
+        _stepButton.Pressed += StepByHand;
         clock.AddChild(_stepButton);
         clock.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
         AddButton(clock, "Save", "Save the game under a name (F5 quick-saves).", ShowSaveDialog);
@@ -1868,8 +1885,16 @@ public partial class Main : Control
         else Say("Select a commune on the map first.");
     }
 
+    /// <summary>A pop-up or a window is open: the clock stays stopped until it's closed.</summary>
+    private bool Blocked => _popup != null || _overlay != null;
+
     private void SetSpeed(int speed)
     {
+        if (speed > 0 && Blocked)
+        {
+            speed = 0;
+            Say(_popup != null ? "Answer the pop-up first: time stands still while it's open." : "Close the window first: time stands still while it's open.");
+        }
         _speed = speed;
         _accumulator = 0;
         for (int i = 0; i < _speedButtons.Count; i++) _speedButtons[i].SetPressedNoSignal(i == Math.Min(speed, 3));
