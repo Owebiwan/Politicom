@@ -1858,7 +1858,7 @@ public partial class Main : Control
     private void OnCommuneClicked(int id, bool shift)
     {
         Audio.Instance?.Play("tick", -4);
-        _tabs.CurrentTab = CommuneTab;
+        // The tab stays as it is: the Commune tab follows the selection when it's open.
         if (shift && _map.Selected is int sel && sel != id) _map.Secondary = id;
         else
         {
