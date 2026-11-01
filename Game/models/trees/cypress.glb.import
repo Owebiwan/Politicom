@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cpwg7l5dygjr0"
-path="res://.godot/imported/tree_pineDefaultA.glb-4c211bb0a3fa678b87cf543af23c24f7.scn"
+uid="uid://blj780yvp06cb"
+path="res://.godot/imported/cypress.glb-1dfc61598e203db7e83169fefbe471b3.scn"
 
 [deps]
 
-source_file="res://models/nature/tree_pineDefaultA.glb"
-dest_files=["res://.godot/imported/tree_pineDefaultA.glb-4c211bb0a3fa678b87cf543af23c24f7.scn"]
+source_file="res://models/trees/cypress.glb"
+dest_files=["res://.godot/imported/cypress.glb-1dfc61598e203db7e83169fefbe471b3.scn"]
 
 [params]
 

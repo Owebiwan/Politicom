@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://chd23pevt2cu1"
-path="res://.godot/imported/tree_oak_dark.glb-c426398f1a412db0e6cb2a60a16defc1.scn"
+uid="uid://ejsf275vbopt"
+path="res://.godot/imported/oak.glb-d01124940c22dfd19d14768428ff7baa.scn"
 
 [deps]
 
-source_file="res://models/nature/tree_oak_dark.glb"
-dest_files=["res://.godot/imported/tree_oak_dark.glb-c426398f1a412db0e6cb2a60a16defc1.scn"]
+source_file="res://models/trees/oak.glb"
+dest_files=["res://.godot/imported/oak.glb-d01124940c22dfd19d14768428ff7baa.scn"]
 
 [params]
 

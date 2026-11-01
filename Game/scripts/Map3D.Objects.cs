@@ -86,6 +86,32 @@ public partial class Map3D
         return new Vector3(px.X, y, px.Y);
     }
 
+    private object? _objectsFor;
+
+    /// <summary>
+    /// A new game or a loaded one: towns, works, armies, ports and trains are kept by commune id,
+    /// so the last world's must go (a port of 1936 must not linger in 1650).
+    /// </summary>
+    private void ForgetOldWorld()
+    {
+        if (ReferenceEquals(_objectsFor, Map.World)) return;
+        _objectsFor = Map.World;
+        foreach (var t in _towns.Values) t.Node.QueueFree();
+        foreach (var f in _forts.Values) f.Node.QueueFree();
+        foreach (var a in _armies.Values) a.Node.QueueFree();
+        foreach (var m in _militia.Values) m.Node.QueueFree();
+        foreach (var p in _ports.Values) p.QueueFree();
+        foreach (var cars in _trains.Values)
+            foreach (var car in cars) car.QueueFree();
+        _towns.Clear();
+        _forts.Clear();
+        _armies.Clear();
+        _militia.Clear();
+        _ports.Clear();
+        _trains.Clear();
+        _drill.Clear();
+    }
+
     private void SyncObjects(float lift)
     {
         bool shown = Map.ObjectsShown && Map.World is not null;

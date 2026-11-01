@@ -53,7 +53,8 @@
 
 ## 3D models
 
-- Tree and track models in `Game/models/`: **Kenney** (kenney.nl), Nature Kit and Train Kit, CC0.
+- Railway track in `Game/models/rail/`: **Kenney** (kenney.nl), Train Kit, CC0.
+- Trees in `Game/models/trees/`: made for this project by `tools/models/build_trees.py` (Blender).
 - Ships and quays in `Game/models/ships/` and fortifications in `Game/models/works/`: made for this
   project by `tools/models/build_ships.py` and `tools/models/build_works.py` (Blender).
 - Town buildings in `Game/models/buildings/`: made for this project by

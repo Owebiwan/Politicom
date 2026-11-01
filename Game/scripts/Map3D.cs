@@ -191,6 +191,7 @@ public partial class Map3D : Control
         lift = Mathf.Min(lift, 0.02f);
         _lift = lift;
         _groundMaterial.SetShaderParameter("lift", lift);
+        ForgetOldWorld();
         SyncObjects(lift);
         SyncTrees(lift);
         SyncTransport(lift);

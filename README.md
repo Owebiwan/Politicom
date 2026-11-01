@@ -295,9 +295,13 @@ Close in, towns, armies and militia are 3D models standing on the raised ground
   triangles. Run the script in Blender to rebuild or change them.
 - **Forests:** trees stand on the land wherever Natural Earth's land cover marks woodland
   (not where the summer satellite picture is merely green, so steppe and cropland stay open),
-  in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees
-  elsewhere (Kenney Nature Kit, CC0), repainted in a painted map's greens, kept clear of towns
-  (`Game/scripts/Map3D.Trees.cs`). Soldiers cast soft contact shadows.
+  in clumps, kept clear of towns (`Game/scripts/Map3D.Trees.cs`). They are made in Blender by
+  `tools/models/build_trees.py` (`Game/models/trees/`) and grow by climate: spruce, pine and
+  birch in the north and on high ground; oak, elm, birch and pine in temperate lands; oak,
+  umbrella pine and cypress round the Mediterranean; palms and evergreen broadleaf in the
+  tropics. They follow the seasons of the region's hemisphere: fresh green in spring, gold and
+  brown in October and November, the grey-brown of bare twigs in winter, snow on the conifers
+  where it lies on the ground; each tree a little lighter or darker than its neighbours. Soldiers cast soft contact shadows.
 - **Railways and harbours** (`Game/scripts/Map3D.Transport.cs`): track laid over the terrain
   between linked communes (Kenney Train Kit sleepers, CC0), with a train running out and back on
   every line that isn't cut. The trains are made for Politicom in Blender by
