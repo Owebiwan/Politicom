@@ -175,11 +175,11 @@ def oak(t, l, rng):
     for k in range(5):
         a = k * math.tau / 5 + rng.uniform(-0.3, 0.3)
         t.bough((0, 0, 0.3 + rng.uniform(0, 0.08)), (math.cos(a), math.sin(a), 0.75), 0.24, 0.035, rng, depth=1)
-    for k in range(5):
-        a = k * math.tau / 5 + 0.4
-        r = 0.2 if k else 0.24
-        l.blob((math.cos(a) * 0.17 * (k > 0), math.sin(a) * 0.17 * (k > 0), 0.68 + (0.08 if k == 0 else rng.uniform(-0.05, 0.03))),
-               r, rng, sz=0.8)
+    # A broad dome with clusters swelling from it, not spokes: from above it must read as one crown.
+    l.blob((0, 0, 0.72), 0.29, rng, sz=0.72, rough=0.1, subdiv=2)
+    for k in range(4):
+        a = k * math.tau / 4 + 0.4
+        l.blob((math.cos(a) * 0.12, math.sin(a) * 0.12, 0.64 + rng.uniform(-0.03, 0.03)), 0.19, rng, sz=0.75, rough=0.12)
 
 
 def elm(t, l, rng):
@@ -207,13 +207,13 @@ def birch(t, l, rng):
 
 
 def pine(t, l, rng):
-    t.tube((0, 0, 0), (0.03, 0.01, 0.8), 0.045, 0.022, "PineBark", seg=6)
-    for k, (h, a) in enumerate(((0.5, 0.3), (0.58, 2.4), (0.64, 4.4))):
-        d = (math.cos(a), math.sin(a), 0.5)
-        t.tube((0.02, 0.006, h), (0.02 + d[0] * 0.16, 0.006 + d[1] * 0.16, h + 0.08), 0.018, 0.01, "PineBark", seg=4)
-        l.blob((0.02 + d[0] * 0.17, 0.006 + d[1] * 0.17, h + 0.12), 0.16, rng, sz=0.55, rough=0.25)
-    l.blob((0.03, 0.01, 0.82), 0.22, rng, sz=0.55, rough=0.25)
-    l.blob((-0.08, 0.06, 0.7), 0.15, rng, sz=0.5, rough=0.25)
+    t.tube((0, 0, 0), (0.03, 0.01, 0.78), 0.045, 0.022, "PineBark", seg=6)
+    for h, a in ((0.6, 0.3), (0.66, 2.4), (0.7, 4.4)):  # boughs up into the crown
+        d = (math.cos(a), math.sin(a))
+        t.tube((0.025, 0.008, h), (0.025 + d[0] * 0.16, 0.008 + d[1] * 0.16, h + 0.1), 0.016, 0.01, "PineBark", seg=4)
+    # One broad, flat-topped dome of needles and a lower clump to one side.
+    l.blob((0.03, 0.01, 0.84), 0.27, rng, sz=0.45, rough=0.08, subdiv=2)
+    l.blob((-0.12, 0.08, 0.74), 0.15, rng, sz=0.5, rough=0.1)
 
 
 def spruce(t, l, rng):

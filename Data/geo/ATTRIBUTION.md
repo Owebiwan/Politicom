@@ -53,7 +53,6 @@
 
 ## 3D models
 
-- Railway track in `Game/models/rail/`: **Kenney** (kenney.nl), Train Kit, CC0.
 - Trees in `Game/models/trees/`: made for this project by `tools/models/build_trees.py` (Blender).
 - Ships and quays in `Game/models/ships/` and fortifications in `Game/models/works/`: made for this
   project by `tools/models/build_ships.py` and `tools/models/build_works.py` (Blender).
@@ -61,5 +60,5 @@
   `tools/models/build_buildings.py` (Blender).
 - Soldiers and militia in `Game/models/figures/`: made for this project by
   `tools/models/build_soldiers.py` (Blender).
-- Locomotives, carriages and wagons in `Game/models/trains/`: made for this project by
-  `tools/models/build_trains.py` (Blender). The Train Kit supplies only the track.
+- Locomotives, carriages, wagons and track in `Game/models/trains/`: made for this project by
+  `tools/models/build_trains.py` (Blender).

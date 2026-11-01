@@ -32,12 +32,16 @@ public partial class Map3D
     private void SetUpTransport()
     {
         Mesh? mesh = null;
-        if (Scene("rail/track-single")?.Instantiate() is Node3D node)
+        if (Scene("trains/track")?.Instantiate() is Node3D node) // tools/models/build_trains.py
         {
             if (node.FindChildren("*", "MeshInstance3D", true, false) is { Count: > 0 } found && found[0] is MeshInstance3D mi) mesh = mi.Mesh;
             node.Free();
         }
-        _track = new MultiMeshInstance3D { Multimesh = new MultiMesh { TransformFormat = MultiMesh.TransformFormatEnum.Transform3D, Mesh = mesh } };
+        _track = new MultiMeshInstance3D
+        {
+            Multimesh = new MultiMesh { TransformFormat = MultiMesh.TransformFormatEnum.Transform3D, Mesh = mesh },
+            MaterialOverride = BuildingMaterial(Colors.White),
+        };
         _objects.AddChild(_track);
     }
 

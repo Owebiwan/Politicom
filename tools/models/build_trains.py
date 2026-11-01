@@ -10,8 +10,9 @@ Builds Politicom's trains (Game/models/trains/<era>_<car>.glb) in Blender, from 
 
 Each car runs along -Y in Blender (+Z in Godot), wheels on the ground at z = 0, about 1.4 units
 wide (the locomotive and tender together about 3.6 long). Wheels turn and coupling rods go round
-in a looping "Run" animation; an empty named "Chimney" marks where the game puffs smoke. Shading
-(ambient occlusion) is baked with the colours into vertex colours.
+in a looping "Run" animation; an empty named "Chimney" marks where the game puffs smoke. Also
+one length of track (track.glb): ballast, sleepers and rails. Shading (ambient occlusion) is
+baked with the colours into vertex colours.
 
 Usage:
   blender --background --factory-startup --python tools/models/build_trains.py -- OUTPUT_DIR [--preview DIR]
@@ -35,6 +36,7 @@ COLORS = {
     "Brass": (0.78, 0.60, 0.25), "Steel": (0.42, 0.43, 0.45), "Wheel": (0.08, 0.08, 0.08),
     "Teak": (0.52, 0.30, 0.15), "Maroon": (0.36, 0.08, 0.08), "Oxide": (0.42, 0.17, 0.10),
     "Grey": (0.42, 0.42, 0.40), "Wood": (0.40, 0.31, 0.22), "Coal": (0.05, 0.05, 0.05),
+    "Ballast": (0.46, 0.43, 0.39), "Sleeper": (0.24, 0.18, 0.13), "Rail": (0.30, 0.29, 0.28),
     "Roof": (0.30, 0.30, 0.31), "Glass": (0.20, 0.24, 0.28), "Cream": (0.82, 0.76, 0.62),
 }
 MATS = list(COLORS)
@@ -504,7 +506,38 @@ def preview(root, png):
     bpy.ops.render.render(write_still=True)
 
 
+def track(path):
+    """One length of track, 1 unit along Y: a gravel bed, two sleepers, flat-bottomed rails at the trains' gauge."""
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    materials()
+    root = bpy.data.objects.new("Track", None)
+    bpy.context.scene.collection.objects.link(root)
+    p = Part("Body")
+    bed = [(-0.5, 0.0), (-0.36, 0.075), (0.36, 0.075), (0.5, 0.0)]  # a trapezoid of ballast
+    a = [p.bm.verts.new((x, -0.5, z)) for x, z in bed]
+    b = [p.bm.verts.new((x, 0.5, z)) for x, z in bed]
+    for i in range(3):
+        p.bm.faces.new((a[i], a[i + 1], b[i + 1], b[i]))
+    p.paint(a + b, "Ballast")
+    rng = __import__("random").Random(3)
+    for k in range(10):  # loose stones on the shoulders
+        x = rng.choice((-1, 1)) * rng.uniform(0.38, 0.46)
+        p.box((x, rng.uniform(-0.45, 0.45), 0.04), (0.03, 0.03, 0.02), "Ballast")
+    for y in (-0.25, 0.25):
+        p.box((0, y, 0.09), (0.9, 0.14, 0.035), "Sleeper")
+        for x in (-0.386, 0.386):
+            p.box((x, y, 0.111), (0.07, 0.1, 0.008), "Steel")  # chairs
+    for x in (-0.386, 0.386):
+        p.box((x, 0, 0.113), (0.05, 1.0, 0.008), "Rail")  # foot
+        p.box((x, 0, 0.13), (0.014, 1.0, 0.03), "Rail")  # web
+        p.box((x, 0, 0.145), (0.03, 1.0, 0.012), "Steel")  # head, polished by the wheels
+    p.to_object(root)
+    bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", export_vertex_color="ACTIVE", export_yup=True,
+                              export_animations=False)
+
+
 def main():
+    track(os.path.join(OUT, "track.glb"))
     n = 0
     for era in ("early", "late"):
         for car in CARS:
