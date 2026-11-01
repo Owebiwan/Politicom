@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c47qu3mwvjevl"
-path="res://.godot/imported/train-carriage-coal.glb-377a701443072f06dd96687d6a34934c.scn"
+uid="uid://ctpmwbfyyp0g"
+path="res://.godot/imported/late_coal.glb-66478be0e013f75e10a1d91294637e13.scn"
 
 [deps]
 
-source_file="res://models/rail/train-carriage-coal.glb"
-dest_files=["res://.godot/imported/train-carriage-coal.glb-377a701443072f06dd96687d6a34934c.scn"]
+source_file="res://models/trains/late_coal.glb"
+dest_files=["res://.godot/imported/late_coal.glb-66478be0e013f75e10a1d91294637e13.scn"]
 
 [params]
 

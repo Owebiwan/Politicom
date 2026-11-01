@@ -286,11 +286,18 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees
   elsewhere (Kenney Nature Kit, CC0), repainted in a painted map's greens, kept clear of towns
   (`Game/scripts/Map3D.Trees.cs`). Soldiers cast soft contact shadows.
-- **Railways and harbours** (`Game/scripts/Map3D.Transport.cs`, Kenney Train Kit, Pirate Kit and
-  Watercraft Pack, CC0): track laid over the terrain between linked communes, with a steam
-  train running out and back on every line that isn't cut; at each coastal town a jetty and a
-  ship of its age riding the swell: sailing boats before 1450, square-riggers until the
-  steamers, then cargo steamers, and a liner off the larger ports.
+- **Railways and harbours** (`Game/scripts/Map3D.Transport.cs`): track laid over the terrain
+  between linked communes (Kenney Train Kit sleepers, CC0), with a train running out and back on
+  every line that isn't cut. The trains are made for Politicom in Blender by
+  `tools/models/build_trains.py` (`Game/models/trains/`): before 1880 a 2-4-0 locomotive in
+  Brunswick green with red frames, brass dome and tall chimney, a four-wheeled tender, teak
+  three-compartment carriages, grey goods vans and wooden coal wagons; from 1880 a black 4-6-0
+  lined in red with smoke deflectors and a closed cab, a bogie tender, maroon bogie carriages,
+  oxide-red vans and steel coal wagons. Industrial towns run goods trains, others passenger
+  trains. The wheels turn, the coupling rods go round, smoke rises from the chimney, and
+  everything stops while the train waits at the station. At each coastal town a jetty and a ship
+  of its age riding the swell (Kenney Pirate Kit and Watercraft Pack, CC0): sailing boats before
+  1450, square-riggers until the steamers, then cargo steamers, and a liner off the larger ports.
 - Zoomed out, the flat map's emblems take over again.
 
 ## Towns, armies and seasons on the map

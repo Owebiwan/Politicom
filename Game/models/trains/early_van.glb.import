@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bghpm0pt82ua3"
-path="res://.godot/imported/train-locomotive-b.glb-3928e32762d9d3e2d2643f565cc58b0f.scn"
+uid="uid://mrnspg723lae"
+path="res://.godot/imported/early_van.glb-dadca83efc8ed6942d7cb5c056219fa1.scn"
 
 [deps]
 
-source_file="res://models/rail/train-locomotive-b.glb"
-dest_files=["res://.godot/imported/train-locomotive-b.glb-3928e32762d9d3e2d2643f565cc58b0f.scn"]
+source_file="res://models/trains/early_van.glb"
+dest_files=["res://.godot/imported/early_van.glb-dadca83efc8ed6942d7cb5c056219fa1.scn"]
 
 [params]
 

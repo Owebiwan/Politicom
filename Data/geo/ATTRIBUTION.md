@@ -57,3 +57,5 @@
   Town Kit, Castle Kit, City Kit (Industrial, Commercial, Suburban), Nature Kit, Train Kit, Pirate Kit, Watercraft Pack and Mini Characters, CC0.
 - Soldiers and militia in `Game/models/figures/`: made for this project by
   `tools/models/build_soldiers.py` (Blender).
+- Locomotives, carriages and wagons in `Game/models/trains/`: made for this project by
+  `tools/models/build_trains.py` (Blender). The Train Kit supplies only the track.

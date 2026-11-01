@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ctge652m2umr6"
-path="res://.godot/imported/train-carriage-box.glb-05d1dfc9738811ce46cac53f2ef52bdd.scn"
+uid="uid://df5bwd4vx4s8b"
+path="res://.godot/imported/late_locomotive.glb-1c314161170641b9c9b1fd7fc067f96a.scn"
 
 [deps]
 
-source_file="res://models/rail/train-carriage-box.glb"
-dest_files=["res://.godot/imported/train-carriage-box.glb-05d1dfc9738811ce46cac53f2ef52bdd.scn"]
+source_file="res://models/trains/late_locomotive.glb"
+dest_files=["res://.godot/imported/late_locomotive.glb-1c314161170641b9c9b1fd7fc067f96a.scn"]
 
 [params]
 

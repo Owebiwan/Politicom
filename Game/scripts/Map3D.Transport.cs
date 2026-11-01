@@ -16,6 +16,13 @@ namespace Politicom.Game;
 public partial class Map3D
 {
     private MultiMeshInstance3D? _track;
+    /// <summary>Each car's length in model units (tools/models/build_trains.py), buffers included.</summary>
+    private static readonly Dictionary<string, float> CarLength = new()
+    {
+        ["early_locomotive"] = 4.1f, ["late_locomotive"] = 5.4f,
+        ["early_van"] = 2.3f, ["late_van"] = 3.0f, ["early_coal"] = 2.2f, ["late_coal"] = 2.8f,
+        ["early_carriage"] = 2.8f, ["late_carriage"] = 3.8f,
+    };
     private readonly Dictionary<(int, int), Node3D[]> _trains = new();
     private readonly Dictionary<int, Node3D> _ports = new();
     /// <summary>Per commune: the direction (in lon/lat) toward open water, or null when inland.</summary>
@@ -57,17 +64,27 @@ public partial class Map3D
                 sleepers.Add(new Transform3D(basis, Ground(from + d * (s / length), origin, deg, lift)));
             if (cut) continue;
 
-            // A train: locomotive and two wagons, running out and back along the line.
+            // A train of its era, made up for its line: goods between factory towns, passengers otherwise.
             var key = (a, b);
             lines.Add(key);
             if (!_trains.TryGetValue(key, out var cars))
             {
-                cars = new[] { "rail/train-locomotive-a", "rail/train-carriage-coal", "rail/train-carriage-box" }
-                    .Select(path => Model(_objects, path, Vector3.Zero, Vector3.One)!).ToArray();
+                string era = w.Year < 1880 ? "early" : "late";
+                bool goods = w.Communes[a].Kind == Politicom.Sim.CommuneKind.Industrial && w.Communes[b].Kind == Politicom.Sim.CommuneKind.Industrial
+                             || (a + b) % 3 == 0;
+                var make = goods ? new[] { "locomotive", "coal", "van" } : new[] { "locomotive", "carriage", "carriage" };
+                cars = make.Select(car => Model(_objects, $"trains/{era}_{car}", Vector3.Zero, Vector3.One)!).ToArray();
+                for (int i = 0; i < cars.Length; i++)
+                {
+                    cars[i].SetMeta("length", CarLength[$"{era}_{make[i]}"]);
+                    if (make[i] == "locomotive" && cars[i].FindChild("Chimney", true, false) is Node3D chimney)
+                        Smoke(chimney, Vector3.Zero, 2.2f);
+                }
                 _trains[key] = cars;
             }
-            float carLength = 2.75f * tile * 0.85f;
-            float run = length - 2 * skip - 3 * carLength;
+            float unit = tile * 0.85f; // one model unit on the map
+            float total = cars.Sum(c => (float)c.GetMeta("length").AsDouble() * unit) + (cars.Length - 1) * 0.15f * unit;
+            float run = length - 2 * skip - total;
             if (run <= 0)
             {
                 foreach (var car in cars) car.Visible = false;
@@ -78,16 +95,27 @@ public partial class Map3D
             double phase = ((time + (a * 7 + b * 13) % 11) % period) / period;
             bool outward = phase < 0.5;
             double p = outward ? phase * 2 : (1 - phase) * 2;
-            float head = skip + 3 * carLength + run * Mathf.Clamp((float)(p * 1.1 - 0.05), 0, 1);
-            if (!outward) head = length - head + 3 * carLength; // reversed: the locomotive leads from the other end
+            float travel = run * Mathf.Clamp((float)(p * 1.1 - 0.05), 0, 1);
+            bool moving = p * 1.1 - 0.05 > 0 && p * 1.1 - 0.05 < 1;
+            // The locomotive leads: its front at `nose`, the cars strung out behind it.
+            float nose = outward ? skip + total + travel : length - skip - total - travel;
+            float dir = outward ? 1 : -1;
+            float along = 0;
             for (int i = 0; i < cars.Length; i++)
             {
-                float s = outward ? head - i * carLength : head - 3 * carLength + i * carLength;
-                var at = Ground(from + d * (s / length), origin, deg, lift);
-                cars[i].Position = at + new Vector3(0, tile * 0.25f, 0);
+                float carLen = (float)cars[i].GetMeta("length").AsDouble() * unit;
+                float centre = nose - dir * (along + carLen / 2);
+                along += carLen + 0.15f * unit;
+                var at = Ground(from + d * (centre / length), origin, deg, lift);
+                cars[i].Position = at + new Vector3(0, tile * 0.15f, 0);
                 cars[i].Rotation = new Vector3(0, yaw + (outward ? 0 : Mathf.Pi), 0);
-                cars[i].Scale = Vector3.One * tile * 0.85f;
+                cars[i].Scale = Vector3.One * unit;
                 cars[i].Visible = true;
+                if (cars[i].FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() is AnimationPlayer player && player.HasAnimation("Run"))
+                {
+                    if (!player.IsPlaying()) { player.GetAnimation("Run").LoopMode = Animation.LoopModeEnum.Linear; player.Play("Run"); }
+                    player.SpeedScale = moving ? 1.6f : 0f;
+                }
             }
         }
         var mm = _track!.Multimesh;

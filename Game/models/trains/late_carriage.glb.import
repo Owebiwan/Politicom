@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dsxcudo1p25in"
-path="res://.godot/imported/train-carriage-wood.glb-91c6bdd03a7616372cdaf73eb370dadf.scn"
+uid="uid://y0s6fkcm4vpn"
+path="res://.godot/imported/late_carriage.glb-dfbaac9a8c18142f648cedcd9111174f.scn"
 
 [deps]
 
-source_file="res://models/rail/train-carriage-wood.glb"
-dest_files=["res://.godot/imported/train-carriage-wood.glb-91c6bdd03a7616372cdaf73eb370dadf.scn"]
+source_file="res://models/trains/late_carriage.glb"
+dest_files=["res://.godot/imported/late_carriage.glb-dfbaac9a8c18142f648cedcd9111174f.scn"]
 
 [params]
 
