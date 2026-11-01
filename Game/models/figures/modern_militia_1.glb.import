@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dji5ugrqx4var"
-path="res://.godot/imported/Barbarian.glb-4bb86da889bb52cf6c0ed43797773c79.scn"
+uid="uid://dtc34mlhp5knu"
+path="res://.godot/imported/modern_militia_1.glb-9ed12737d81133ed912cc390312725dd.scn"
 
 [deps]
 
-source_file="res://models/soldiers/Barbarian.glb"
-dest_files=["res://.godot/imported/Barbarian.glb-4bb86da889bb52cf6c0ed43797773c79.scn"]
+source_file="res://models/figures/modern_militia_1.glb"
+dest_files=["res://.godot/imported/modern_militia_1.glb-9ed12737d81133ed912cc390312725dd.scn"]
 
 [params]
 

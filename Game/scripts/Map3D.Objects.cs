@@ -200,7 +200,7 @@ public partial class Map3D
             }
             float scale = Mathf.Clamp(0.75f + Mathf.Sqrt(strength) * 0.35f, 0.75f, 2f) * Mathf.Sqrt(Map.Zoom);
             army.Node.Position = Ground(at, origin, deg, lift);
-            army.Node.Scale = Vector3.One * 21 * scale;
+            army.Node.Scale = Vector3.One * 28 * scale;
             army.Node.Visible = alpha > 0.3f;
             Face(army.Node, at, towards);
             Drill(army.Node, attacking ? "fight" : moving ? "march" : "stand", year);
@@ -222,7 +222,7 @@ public partial class Map3D
             }
             float scale = Mathf.Clamp(0.8f + Mathf.Sqrt(defense) * 0.25f, 0.8f, 1.6f) * Mathf.Sqrt(Map.Zoom);
             band.Node.Position = Ground(at, origin, deg, lift);
-            band.Node.Scale = Vector3.One * 21 * scale;
+            band.Node.Scale = Vector3.One * 28 * scale;
             band.Node.Visible = true;
             Face(band.Node, at, facing);
             Drill(band.Node, underAttack ? "guard" : "stand", year);
@@ -407,13 +407,13 @@ public partial class Map3D
     private void Drill(Node3D company, string doing, int year)
     {
         if (!_drill.TryGetValue(company, out var drill) || drill.Doing == doing) return;
-        bool firearms = year >= 1700;
+        // The figures' own clips (tools/models/build_soldiers.py): firing or thrusting, aiming or shield up.
         string anim = doing switch
         {
-            "march" => "Walking_A",
-            "fight" => firearms ? "2H_Ranged_Shooting" : "1H_Melee_Attack_Chop",
-            "guard" => firearms ? "2H_Ranged_Aiming" : "Blocking",
-            _ => firearms ? "2H_Melee_Idle" : "Idle",
+            "march" => "March",
+            "fight" => "Attack",
+            "guard" => "Guard",
+            _ => "Idle",
         };
         var rng = new Random(company.GetInstanceId().GetHashCode());
         foreach (var player in drill.Players)
@@ -448,69 +448,44 @@ public partial class Map3D
         return _shadowDisc = new PlaneMesh { Size = Vector2.One, Material = material };
     }
 
-    private static readonly string[] Weapons =
-    {
-        "1H_Sword_Offhand", "Badge_Shield", "Rectangle_Shield", "Round_Shield", "Spike_Shield", "1H_Sword", "2H_Sword",
-        "1H_Axe_Offhand", "Barbarian_Round_Shield", "1H_Axe", "2H_Axe", "Mug",
-        "Knife_Offhand", "1H_Crossbow", "2H_Crossbow", "Knife", "Throwable",
-    };
+    /// <summary>The figures' era: the clothes, headgear and arms they wear.</summary>
+    private static string FigureEra(int year) =>
+        year < 500 ? "ancient" : year < 1450 ? "medieval" : year < 1789 ? "earlymodern" : year < 1914 ? "industrial" : "modern";
 
     /// <summary>
-    /// One soldier (KayKit Adventurers, CC0, Game/models/soldiers), one unit tall. Armies before
-    /// 1700 are knights with sword and round shield; after, riflemen. Militia are hooded rogues and
-    /// barbarians in their own clothes, with axes early and rifles later. An army's uniform is its colour.
+    /// One figure (Game/models/figures, built by tools/models/build_soldiers.py), one unit tall, of its
+    /// era: a soldier whose "Uniform" is the army's colour ("UniformDark" a darker shade for helmets and
+    /// rolls), or a militia fighter in one of three sets of civilian clothes.
     /// </summary>
-    private Node3D? Soldier(Node3D parent, string model, Vector3 at, bool firearms, Color? uniform, Random rng, List<AnimationPlayer> players)
+    private Node3D? Soldier(Node3D parent, string model, Vector3 at, Color? uniform, Random rng, List<AnimationPlayer> players)
     {
-        if (Scene($"soldiers/{model}")?.Instantiate() is not Node3D node) return null;
-        node.Scale = Vector3.One / 2.2f;
+        if (Scene($"figures/{model}")?.Instantiate() is not Node3D node) return null;
         node.Position = at;
-        node.RotationDegrees = new Vector3(0, (float)(rng.NextDouble() - 0.5) * 16, 0);
-        var keep = firearms ? Array.Empty<string>()
-            : model == "Knight" ? new[] { "1H_Sword", "Round_Shield" }
-            : model == "Barbarian" ? new[] { "1H_Axe" }
-            : new[] { "Knife" };
-        MeshInstance3D? crossbow = null;
-        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
-        {
-            if (child is not MeshInstance3D mesh) continue;
-            string name = mesh.Name;
-            if (name is "2H_Crossbow" or "1H_Sword" && crossbow?.Name != "2H_Crossbow") crossbow = mesh;
-            if (Weapons.Contains(name)) mesh.Visible = keep.Contains(name);
-            if (name is "Knight_Cape" or "Barbarian_Cape" or "Rogue_Cape") mesh.Visible = !firearms && model == "Knight";
-            if (name == "Knight_Helmet")
-            {
-                // Before 1700 a knight's helm; after, a steel helmet (a darker shade of the uniform).
-                if (firearms && uniform is { } hu && mesh.Mesh.SurfaceGetMaterial(0) is BaseMaterial3D hm && hm.Duplicate() is BaseMaterial3D helmet)
-                {
-                    helmet.AlbedoColor = hu.Darkened(0.45f);
-                    mesh.SetSurfaceOverrideMaterial(0, helmet);
-                }
-            }
-            if (uniform is { } u && (name.Contains("Body") || name.Contains("Arm") || name.Contains("Leg") || name.Contains("Cape") || name.Contains("Hat")))
-                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
-                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m && m.Duplicate() is BaseMaterial3D copy)
-                    {
-                        copy.AlbedoColor = u;
-                        mesh.SetSurfaceOverrideMaterial(i, copy);
-                    }
-        }
-        // A rifle in place of the two-handed crossbow, held the same way.
-        if (firearms && crossbow?.GetParent() is Node3D hand)
-        {
-            var wood = new StandardMaterial3D { AlbedoColor = new Color(0.36f, 0.24f, 0.14f) };
-            var steel = new StandardMaterial3D { AlbedoColor = new Color(0.25f, 0.26f, 0.28f), Metallic = 0.6f, Roughness = 0.4f };
-            // The crossbow is held for aiming already; a sword points up the blade, so turn the rifle level.
-            var rifle = new Node3D { Transform = crossbow.Name == "2H_Crossbow" ? crossbow.Transform : crossbow.Transform * new Transform3D(new Basis(Vector3.Right, -Mathf.Pi / 2), Vector3.Zero) };
-            rifle.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.14f, 0.2f, 0.9f), Material = wood }, Position = new Vector3(0, 0, 0.1f) });
-            rifle.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.07f, 0.07f, 0.9f), Material = steel }, Position = new Vector3(0, 0.08f, 0.85f) });
-            hand.AddChild(rifle);
-        }
+        node.RotationDegrees = new Vector3(0, (float)(rng.NextDouble() - 0.5) * 14, 0);
+        if (uniform is { } u)
+            foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+                if (child is MeshInstance3D mesh)
+                    for (int i = 0; i < mesh.Mesh.GetSurfaceCount(); i++)
+                        if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m && m.ResourceName is "Uniform" or "UniformDark")
+                        {
+                            // The army's map colour, muted toward field drab so a uniform reads as cloth, not paint.
+                            var cloth = u.Lerp(new Color(0.42f, 0.40f, 0.33f), 0.45f);
+                            mesh.SetSurfaceOverrideMaterial(i, UniformMaterial(m.ResourceName == "Uniform" ? cloth : cloth.Darkened(0.35f)));
+                        }
         parent.AddChild(node);
-        // A soft shadow on the ground under each soldier.
-        parent.AddChild(new MeshInstance3D { Mesh = ShadowDisc(), Position = at + new Vector3(0.04f, 0.01f, 0.04f), Scale = new Vector3(0.42f, 1, 0.32f) });
+        // A soft shadow on the ground under each figure.
+        parent.AddChild(new MeshInstance3D { Mesh = ShadowDisc(), Position = at + new Vector3(0.04f, 0.01f, 0.04f), Scale = new Vector3(0.36f, 1, 0.28f) });
         if (node.FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() is AnimationPlayer player) players.Add(player);
         return node;
+    }
+
+    private static readonly Dictionary<Color, StandardMaterial3D> Uniforms = new();
+
+    private static StandardMaterial3D UniformMaterial(Color color)
+    {
+        if (!Uniforms.TryGetValue(color, out var m))
+            Uniforms[color] = m = new StandardMaterial3D { AlbedoColor = color, Roughness = 0.85f };
+        return m;
     }
 
     /// <summary>
@@ -521,16 +496,15 @@ public partial class Map3D
     {
         var root = new Node3D();
         _objects.AddChild(root);
-        bool firearms = year >= 1700;
         var rng = new Random(count * 97 + (militia ? 1 : 0) + year);
         var players = new List<AnimationPlayer>();
-        string[] militiaModels = firearms ? new[] { "Rogue_Hooded", "Rogue", "Barbarian" } : new[] { "Barbarian", "Rogue_Hooded", "Rogue" };
+        string era = FigureEra(year);
         for (int i = 0; i < count; i++)
         {
             int rank = i % 2, file = i / 2;
             var at = new Vector3((file - (count - 1) / 4f) * 0.5f + rank * 0.22f, 0, -rank * 0.45f);
-            string model = militia ? militiaModels[i % militiaModels.Length] : "Knight";
-            Soldier(root, model, at, firearms, uniform, rng, players);
+            string model = militia ? $"{era}_militia_{(i + count) % 3}" : $"{era}_soldier";
+            Soldier(root, model, at, militia ? null : uniform, rng, players);
         }
         _drill[root] = (players, "");
         // The standard.

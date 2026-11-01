@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bad2f12sdkeri"
-path="res://.godot/imported/Rogue.glb-d7aa5b0ae69d2ae91d35df0926240e1b.scn"
+uid="uid://b536gu6j4isna"
+path="res://.godot/imported/medieval_militia_1.glb-1dad8dc466f5327ea1b49b35cc149cce.scn"
 
 [deps]
 
-source_file="res://models/soldiers/Rogue.glb"
-dest_files=["res://.godot/imported/Rogue.glb-d7aa5b0ae69d2ae91d35df0926240e1b.scn"]
+source_file="res://models/figures/medieval_militia_1.glb"
+dest_files=["res://.godot/imported/medieval_militia_1.glb-1dad8dc466f5327ea1b49b35cc149cce.scn"]
 
 [params]
 

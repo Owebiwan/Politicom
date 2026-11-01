@@ -265,13 +265,16 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   or slate later), a temple, a church tower or a domed tower; factories with brick chimneys
   trailing smoke once industry comes; blocks of flats in the twentieth century; broken walls
   where a town is occupied.
-- **Armies** are companies of animated soldiers (KayKit Adventurers, CC0, `Game/models/soldiers/`)
-  in the enemy's colour, more of them the stronger the army, under a standard rippling in the
-  wind: knights with sword, round shield and helm before 1700; after, riflemen in steel helmets.
-  They stand at ease, march while the army moves, and fire (or swing their swords) when it
-  attacks. The **militia** are a mix of hooded and bareheaded fighters in their own clothes, with
-  axes and knives early and rifles later, under the black-and-red flag, taking aim when a front
-  is under attack. Each company faces its enemy, and its soldiers move out of step.
+- **Armies** are companies of soldiers of their era, made for Politicom in Blender by
+  `tools/models/build_soldiers.py` (`Game/models/figures/`): a legionary with crested helmet,
+  scutum and pilum; a medieval soldier in kettle helmet and tabard with kite shield and spear; an
+  18th-century fusilier in tricorn, long coat and crossbelts; a 19th-century soldier in kepi and
+  red trousers; a 20th-century one in steel helmet, greatcoat and puttees. Their uniform takes
+  the army's colour (muted toward field drab). The **militia** wear their own clothes, three
+  variants per era (tunic and round shield; hood and bill; slouch hat; cap and smock; blue
+  overalls with a red-and-black scarf). Every figure stands at ease, marches, fights (fires and
+  reloads, or thrusts with the spear) and stands guard (aiming, or shield raised); companies
+  face their enemy and move out of step. Run the script in Blender to rebuild or change them.
 - **Forests:** trees stand on the land wherever Natural Earth's land cover marks woodland
   (not where the summer satellite picture is merely green, so steppe and cropland stay open),
   in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees
