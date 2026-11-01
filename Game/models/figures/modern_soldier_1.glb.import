@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://g5qfadkroxnf"
-path="res://.godot/imported/earlymodern_soldier.glb-1f764e8a5d528e3a9142cc0d5a66bff8.scn"
+uid="uid://col5jwphp7bd5"
+path="res://.godot/imported/modern_soldier_1.glb-b4e645494d178d023293eca02b5085e5.scn"
 
 [deps]
 
-source_file="res://models/figures/earlymodern_soldier.glb"
-dest_files=["res://.godot/imported/earlymodern_soldier.glb-1f764e8a5d528e3a9142cc0d5a66bff8.scn"]
+source_file="res://models/figures/modern_soldier_1.glb"
+dest_files=["res://.godot/imported/modern_soldier_1.glb-b4e645494d178d023293eca02b5085e5.scn"]
 
 [params]
 

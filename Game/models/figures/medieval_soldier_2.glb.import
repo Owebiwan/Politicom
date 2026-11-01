@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cjel64u8gkumo"
-path="res://.godot/imported/medieval_soldier.glb-fd2bf95942b5d8561fe7782138730d83.scn"
+uid="uid://dky1qjveaxtcx"
+path="res://.godot/imported/medieval_soldier_2.glb-cb05b21bad701217a4a88c3853790ec4.scn"
 
 [deps]
 
-source_file="res://models/figures/medieval_soldier.glb"
-dest_files=["res://.godot/imported/medieval_soldier.glb-fd2bf95942b5d8561fe7782138730d83.scn"]
+source_file="res://models/figures/medieval_soldier_2.glb"
+dest_files=["res://.godot/imported/medieval_soldier_2.glb-cb05b21bad701217a4a88c3853790ec4.scn"]
 
 [params]
 

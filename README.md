@@ -274,7 +274,13 @@ City (industrial, commercial) and Mini Characters kits, CC0):
   variants per era (tunic and round shield; hood and bill; slouch hat; cap and smock; blue
   overalls with a red-and-black scarf). Every figure stands at ease, marches, fights (fires and
   reloads, or thrusts with the spear) and stands guard (aiming, or shield raised); companies
-  face their enemy and move out of step. Run the script in Blender to rebuild or change them.
+  face their enemy and move out of step. Each figure is one smooth skinned body on a skeleton
+  (no gaps at the joints), with a face (eyes, brows, nose, ears; beards and moustaches on
+  some), closed hands, the kit of its era (packs and bedrolls, canteens, pouches, cartridge
+  boxes, scabbards, bandoliers, gaiters and puttees), detailed weapons (musket locks, barrel
+  bands, ramrods, slings, rifle bolts, spear sockets, shield rims and bosses) and ambient
+  occlusion baked into its vertex colours; three builds and faces of each, 3,200 to 4,700
+  triangles. Run the script in Blender to rebuild or change them.
 - **Forests:** trees stand on the land wherever Natural Earth's land cover marks woodland
   (not where the summer satellite picture is merely green, so steppe and cropland stay open),
   in clumps: pines in the north and on high ground, palms in the tropics, broadleaf trees

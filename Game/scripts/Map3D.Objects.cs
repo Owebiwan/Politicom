@@ -484,7 +484,7 @@ public partial class Map3D
     private static StandardMaterial3D UniformMaterial(Color color)
     {
         if (!Uniforms.TryGetValue(color, out var m))
-            Uniforms[color] = m = new StandardMaterial3D { AlbedoColor = color, Roughness = 0.85f };
+            Uniforms[color] = m = new StandardMaterial3D { AlbedoColor = color, Roughness = 0.85f, VertexColorUseAsAlbedo = true }; // keeps the baked shading
         return m;
     }
 
@@ -503,7 +503,7 @@ public partial class Map3D
         {
             int rank = i % 2, file = i / 2;
             var at = new Vector3((file - (count - 1) / 4f) * 0.5f + rank * 0.22f, 0, -rank * 0.45f);
-            string model = militia ? $"{era}_militia_{(i + count) % 3}" : $"{era}_soldier";
+            string model = $"{era}_{(militia ? "militia" : "soldier")}_{(i * 2 + count) % 3}"; // three builds and faces each
             Soldier(root, model, at, militia ? null : uniform, rng, players);
         }
         _drill[root] = (players, "");

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dnpp285us8vus"
-path="res://.godot/imported/industrial_soldier.glb-fce887121e902e1b6d657f68826363e7.scn"
+uid="uid://dqmjxlb0vonhl"
+path="res://.godot/imported/ancient_soldier_0.glb-796d463ed12b7dd8f729693217f84eea.scn"
 
 [deps]
 
-source_file="res://models/figures/industrial_soldier.glb"
-dest_files=["res://.godot/imported/industrial_soldier.glb-fce887121e902e1b6d657f68826363e7.scn"]
+source_file="res://models/figures/ancient_soldier_0.glb"
+dest_files=["res://.godot/imported/ancient_soldier_0.glb-796d463ed12b7dd8f729693217f84eea.scn"]
 
 [params]
 
