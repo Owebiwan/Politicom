@@ -196,27 +196,37 @@ public partial class Map3D
             if (!shown.Contains(id)) port.Visible = false;
     }
 
-    /// <summary>A jetty and its ships, in town units (1 = the town's size), the land behind -Z, the water ahead +Z.</summary>
+    /// <summary>
+    /// A quay and its ships, in town units (1 = the town's size), the land behind -Z, the water ahead
+    /// +Z. Ships of the age, built by tools/models/build_ships.py: galleys and fishing boats in
+    /// antiquity, cogs, galleons until the steamers, cargo ships, and a liner off the larger ports;
+    /// a wooden pier with a treadwheel crane, later a stone quay with an iron crane.
+    /// </summary>
     private Node3D BuildPort(Politicom.Sim.Commune c, int year)
     {
         var root = new Node3D();
         _objects.AddChild(root);
-        Model(root, "sail/structure-platform-dock-small", new Vector3(0, 0, 0.05f), Vector3.One * 0.11f);
-        (string Model, float Length)[] ships = year < 1450 ? new[] { ("harbour/boat-sail-a", 3.8f), ("harbour/boat-fishing-small", 3.9f) }
-            : year < 1840 ? new[] { ("sail/ship-medium", 10.6f), ("harbour/boat-fishing-small", 3.9f) }
-            : year < 1914 ? new[] { ("harbour/ship-cargo-a", 10.5f), ("sail/ship-small", 9f) }
-            : c.Population >= 30 ? new[] { ("harbour/ship-cargo-a", 10.5f), ("harbour/ship-ocean-liner-small", 15.2f) }
-            : new[] { ("harbour/ship-cargo-a", 10.5f), ("harbour/boat-fishing-small", 3.9f) };
+        if (Model(root, year < 1840 ? "ships/quay_wood" : "ships/quay_stone", new Vector3(0, 0, -0.05f), Vector3.One * 0.32f) is { } quay)
+            Baked(quay);
+        (string Model, float Length)[] ships = year < 500 ? new[] { ("galley", 4.4f), ("boat", 1.7f) }
+            : year < 1450 ? new[] { ("cog", 3.1f), ("boat", 1.7f) }
+            : year < 1840 ? new[] { ("galleon", 5.0f), ("boat", 1.7f) }
+            : year < 1914 ? new[] { ("steamer", 4.7f), ("galleon", 5.0f) }
+            : c.Population >= 30 ? new[] { ("cargo", 5.1f), ("liner", 7.0f) }
+            : new[] { ("cargo", 5.1f), ("trawler", 1.9f) };
         var rng = new Random(c.Id * 17 + 3);
         for (int i = 0; i < ships.Length; i++)
         {
             var (model, length) = ships[i];
-            float size = (i == 0 ? 0.95f : 0.6f) / length; // the main ship about as long as the town is wide
-            var holder = new Node3D { Position = new Vector3(i == 0 ? 0.35f : -0.4f, 0, i == 0 ? 0.75f : 1.0f), Rotation = new Vector3(0, Mathf.Pi / 2 + (float)(rng.NextDouble() - 0.5) * 0.6f, 0) };
+            float size = (i == 0 ? 0.95f : model == "liner" ? 1.3f : 0.6f) / length; // the main ship about as long as the town is wide
+            var holder = new Node3D { Position = new Vector3(i == 0 ? 0.35f : -0.4f, 0, i == 0 ? 0.75f : 1.05f), Rotation = new Vector3(0, Mathf.Pi / 2 + (float)(rng.NextDouble() - 0.5) * 0.6f, 0) };
             holder.SetMeta("ship", rng.NextDouble() * 6);
             root.AddChild(holder);
-            // The kit's toy colours, recoloured: steel grey for steamers, dark timber for sailing ships.
-            Model(holder, model, Vector3.Zero, Vector3.One * size, tone: model.StartsWith("harbour/ship") ? new Color("6d7178") : new Color("8a6a4a"));
+            if (Model(holder, $"ships/{model}", Vector3.Zero, Vector3.One * size) is not { } ship) continue;
+            Baked(ship);
+            foreach (var funnel in ship.FindChildren("Funnel*", "", true, false))
+                if (funnel is Node3D top)
+                    Smoke(top, Vector3.Zero, 0.8f);
         }
         return root;
     }

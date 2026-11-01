@@ -34,52 +34,15 @@ public partial class Map3D
         return _scenes[path] = ResourceLoader.Exists(res) ? GD.Load<PackedScene>(res) : null;
     }
 
-    /// <summary>A model, placed (in its parent's units) and scaled; tinted if asked.</summary>
-    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0, Color? paint = null, Color? tone = null)
+    /// <summary>A model, placed (in its parent's units) and scaled.</summary>
+    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0)
     {
         if (Scene(path)?.Instantiate() is not Node3D node) return null;
         node.Position = at;
         node.Scale = scale;
         node.RotationDegrees = new Vector3(0, turn, 0);
-        if (paint is { } p) Paint(node, p);
-        if (tone is { } t2) Recolor(node, t2);
         parent.AddChild(node);
         return node;
-    }
-
-    private static readonly Dictionary<Color, StandardMaterial3D> Paints = new();
-    private static readonly Dictionary<(Texture2D, Color), ShaderMaterial> Recolors = new();
-    private static Shader? _recolor;
-
-    /// <summary>Recolours a model to one tone, keeping its texture's detail as light and shade (shaders/recolor.gdshader).</summary>
-    private static void Recolor(Node node, Color tone)
-    {
-        _recolor ??= GD.Load<Shader>("res://shaders/recolor.gdshader");
-        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
-            if (child is MeshInstance3D mesh)
-                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
-                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D { AlbedoTexture: { } tex })
-                    {
-                        if (!Recolors.TryGetValue((tex, tone), out var material))
-                        {
-                            material = new ShaderMaterial { Shader = _recolor };
-                            material.SetShaderParameter("tex", tex);
-                            material.SetShaderParameter("tone", tone);
-                            Recolors[(tex, tone)] = material;
-                        }
-                        mesh.SetSurfaceOverrideMaterial(i, material);
-                    }
-    }
-
-    /// <summary>Paints a model one colour (the kits' own palettes are too bright for a period map).</summary>
-    private static void Paint(Node node, Color color)
-    {
-        if (!Paints.TryGetValue(color, out var material))
-            Paints[color] = material = new StandardMaterial3D { AlbedoColor = color, Roughness = 0.9f };
-        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
-            if (child is MeshInstance3D mesh)
-                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
-                    mesh.SetSurfaceOverrideMaterial(i, material);
     }
 
     private static readonly Color[] WallPaint = { new("dccaa4"), new("d6c19a"), new("cdb894") };
@@ -158,10 +121,11 @@ public partial class Map3D
         {
             var c = w.Communes[id];
             int level = c.Occupied ? 0 : (int)Math.Ceiling(c.Fortification * 4); // 0..4
-            if (!_forts.TryGetValue(id, out var fort) || fort.Level != level)
+            int code = level * 10 + (int)Age(year); // rebuilt when the works go up or the age turns
+            if (!_forts.TryGetValue(id, out var fort) || fort.Level != code)
             {
                 fort.Node?.QueueFree();
-                fort = (level == 0 ? new Node3D() : BuildWalls(level), level);
+                fort = (level == 0 ? new Node3D() : BuildWalls(level, Age(year)), code);
                 if (level == 0) _objects.AddChild(fort.Node);
                 _forts[id] = fort;
             }
@@ -220,23 +184,36 @@ public partial class Map3D
 
     private readonly Dictionary<int, (Node3D Node, int Level)> _forts = new();
 
-    /// <summary>A ring of earth-coloured wall segments round a town (town units), higher with each level of works.</summary>
-    private Node3D BuildWalls(int level)
+    /// <summary>
+    /// A ring of works round a town (town units), higher with each level: a palisade on an earth
+    /// bank, a battlemented stone wall, an earthen rampart, a barricade of paving stones, or a
+    /// sandbagged trench, by age; at the gate and, as the works grow, round the ring, a strongpoint
+    /// of the age (a gate tower, a round tower, a cannon, a field gun, a machine-gun nest). Built by
+    /// tools/models/build_works.py.
+    /// </summary>
+    private Node3D BuildWalls(int level, AgeKind age)
     {
         var root = new Node3D();
         _objects.AddChild(root);
+        string era = AgeName(age);
         const int segments = 12;
         const float radius = 0.62f;
         float length = Mathf.Tau * radius / segments * 1.05f;
         float height = 0.04f + 0.035f * level;
-        for (int i = 0; i < segments; i++)
+        Vector3 Ring(float a) => new(Mathf.Cos(a) * radius, 0, Mathf.Sin(a) * radius / 0.62f * 0.75f);
+        for (int i = 0; i < segments - 1; i++) // the last is the gate
         {
-            if (i == segments - 1) continue; // a gate
             float a = i * Mathf.Tau / segments;
-            var at = new Vector3(Mathf.Cos(a) * radius, 0, Mathf.Sin(a) * radius / 0.62f * 0.75f);
-            // The wall model runs along X; turn each piece to the ring's tangent.
-            Model(root, "castle/wall", at, new Vector3(length, height, 0.06f), -Mathf.RadToDeg(a) - 90, paint: new Color("8a7356"));
+            // The wall runs along its X with the outside at +Z: turned to the ring's tangent, facing out.
+            if (Building(root, $"works/wall_{era}", Ring(a), 1, 90 - Mathf.RadToDeg(a), Colors.White, Colors.White) is { } wall)
+                wall.Scale = new Vector3(length, height * 1.2f, length * 0.45f);
         }
+        // Strongpoints: either side of the gate, then round the ring as the works go up.
+        var posts = new List<float> { (segments - 1.5f) * Mathf.Tau / segments, (segments - 0.5f) * Mathf.Tau / segments };
+        if (level >= 3) posts.AddRange(new[] { 2.5f, 5.5f }.Select(k => k * Mathf.Tau / segments));
+        if (level >= 4) posts.AddRange(new[] { 8.5f }.Select(k => k * Mathf.Tau / segments));
+        foreach (float a in posts)
+            Building(root, $"works/post_{era}", Ring(a) * 1.04f, 0.1f + 0.015f * level, 90 - Mathf.RadToDeg(a), Colors.White, Colors.White);
         return root;
     }
 
@@ -316,7 +293,7 @@ public partial class Map3D
     /// <summary>One of the buildings, its walls and roof in the town's colours.</summary>
     private Node3D? Building(Node3D parent, string name, Vector3 at, float scale, float turn, Color wall, Color roof)
     {
-        if (Scene($"buildings/{name}")?.Instantiate() is not Node3D node) return null;
+        if (Scene(name.Contains('/') ? name : $"buildings/{name}")?.Instantiate() is not Node3D node) return null;
         node.Position = at;
         node.Scale = Vector3.One * scale;
         node.RotationDegrees = new Vector3(0, turn, 0);

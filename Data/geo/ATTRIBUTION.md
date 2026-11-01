@@ -53,8 +53,9 @@
 
 ## 3D models
 
-- Wall, tree, track, harbour and ship models in `Game/models/`: **Kenney** (kenney.nl), Castle Kit,
-  Nature Kit, Train Kit, Pirate Kit and Watercraft Pack, CC0.
+- Tree and track models in `Game/models/`: **Kenney** (kenney.nl), Nature Kit and Train Kit, CC0.
+- Ships and quays in `Game/models/ships/` and fortifications in `Game/models/works/`: made for this
+  project by `tools/models/build_ships.py` and `tools/models/build_works.py` (Blender).
 - Town buildings in `Game/models/buildings/`: made for this project by
   `tools/models/build_buildings.py` (Blender).
 - Soldiers and militia in `Game/models/figures/`: made for this project by

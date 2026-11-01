@@ -307,9 +307,15 @@ Close in, towns, armies and militia are 3D models standing on the raised ground
   lined in red with smoke deflectors and a closed cab, a bogie tender, maroon bogie carriages,
   oxide-red vans and steel coal wagons. Industrial towns run goods trains, others passenger
   trains. The wheels turn, the coupling rods go round, smoke rises from the chimney, and
-  everything stops while the train waits at the station. At each coastal town a jetty and a ship
-  of its age riding the swell (Kenney Pirate Kit and Watercraft Pack, CC0): sailing boats before
-  1450, square-riggers until the steamers, then cargo steamers, and a liner off the larger ports.
+  everything stops while the train waits at the station. At each coastal town a quay and ships
+  of its age riding the swell, made in Blender by `tools/models/build_ships.py`
+  (`Game/models/ships/`): a galley with banks of oars, a bronze ram and a striped sail, and a
+  fishing boat under a lateen sail in antiquity; a cog with castles fore and aft in the middle
+  ages; a three-masted galleon with gun ports until 1840; then an iron screw steamer with a tall
+  funnel; in the twentieth century a cargo ship with derricks and, off the larger ports, an
+  ocean liner with three funnels and lifeboats (a motor trawler off the smaller ones). Funnels
+  smoke. The quay is a wooden pier with a treadwheel crane before 1840, a stone quay with an iron
+  crane and a warehouse after.
 - Zoomed out, the flat map's emblems take over again.
 
 ## Towns, armies and seasons on the map
@@ -484,7 +490,12 @@ Two actions for a front commune (Commune tab):
 - **Fortify** (8 influence, and goods from the commune's own store): earthworks and
   barricades go up over three turns, to about 60% after one round (up to 100%), adding up to
   +25% defence. The works wear down by 3% a turn while the front gives way. The map shows them
-  as a ring of walls round the town (a palisade on the flat map).
+  as a ring of works round the town, higher as they go up (a palisade on the flat map). In 3D
+  they are of the age (`tools/models/build_works.py`): a palisade of stakes on an earth bank
+  with a timber gate tower; a battlemented stone wall with round towers; an earthen rampart
+  faced with stone, with gabions and cannon; barricades of paving stones, barrels and carts
+  under a red flag, with field guns; sandbagged trenches behind barbed wire, with machine-gun
+  nests. Strongpoints stand either side of the gate and, as the works rise, round the ring.
 - **Raid** (6 influence, once every four turns): a strike on the enemy. The chance (15–85%,
   shown on the button) is better the more firmly the commune holds its line. Success tires
   the enemy (+0.04 exhaustion), brings back captured arms and lifts enthusiasm; failure costs
