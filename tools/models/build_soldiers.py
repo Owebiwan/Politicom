@@ -45,6 +45,7 @@ DEFAULT = {
     "Dark": (0.10, 0.09, 0.09), "Hair": (0.20, 0.14, 0.10),
 }
 M = {name: i for i, name in enumerate(MATS)}
+TINTED = ["Uniform", "UniformDark"]
 
 SHOULDER_Z, ELBOW_Z, WRIST_Z = 0.775, 0.615, 0.47
 HIP_Z, KNEE_Z, ANKLE_Z = 0.50, 0.275, 0.045
@@ -565,16 +566,46 @@ def assemble(B, scale):
         if len(e.link_faces) == 2 and e.calc_face_angle(0) > math.radians(50):
             e.smooth = False
     bake_occlusion(bm)
-    mesh = bpy.data.meshes.new("Body")
-    bm.to_mesh(mesh)
-    bm.free()
-    for m in MATS:
-        mesh.materials.append(bpy.data.materials[m])
-    body = bpy.data.objects.new("Body", mesh)
+    # The colours of everything but the uniform (which the game tints) are baked with the occlusion
+    # into corner colours under one "Detail" material, and the body is split by material: Blender's
+    # glTF exporter writes vertex colours only for a mesh's first material.
+    ao = bm.verts.layers.float_color["Col"]
+    col = bm.loops.layers.float_color.new("Color")
+    parts = TINTED + ["Detail"]
+    for f in bm.faces:
+        name = MATS[f.material_index]
+        tint = (1, 1, 1) if name in TINTED else bpy.data.materials[name].diffuse_color[:3]
+        for loop in f.loops:
+            a = loop.vert[ao][0]
+            loop[col] = (tint[0] * a, tint[1] * a, tint[2] * a, 1)
+        f.material_index = parts.index(name) if name in TINTED else len(TINTED)
+    bm.verts.layers.float_color.remove(ao)
+    detail = bpy.data.materials.new("Detail")
+    detail.use_nodes = True
+    detail.node_tree.nodes.get("Principled BSDF").inputs["Base Color"].default_value = (1, 1, 1, 1)
+    detail.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.8
     scene = bpy.context.scene
-    scene.collection.objects.link(body)
-    for g in GROUPS:
-        body.vertex_groups.new(name=g)
+    bodies = []
+    for index, name in enumerate(parts):
+        part = bm.copy()
+        bmesh.ops.delete(part, geom=[f for f in part.faces if f.material_index != index], context="FACES")
+        if not part.faces:
+            part.free()
+            continue
+        for f in part.faces:
+            f.material_index = 0
+        mesh = bpy.data.meshes.new(f"Body_{name}")
+        part.to_mesh(mesh)
+        part.free()
+        mesh.materials.append(bpy.data.materials[name])
+        mesh.color_attributes.active_color = mesh.color_attributes["Color"]
+        mesh.color_attributes.render_color_index = mesh.color_attributes.active_color_index
+        body = bpy.data.objects.new(f"Body_{name}", mesh)
+        scene.collection.objects.link(body)
+        for g in GROUPS:
+            body.vertex_groups.new(name=g)
+        bodies.append(body)
+    bm.free()
 
     arm_data = bpy.data.armatures.new("Skeleton")
     arm = bpy.data.objects.new("Figure", arm_data)
@@ -590,11 +621,12 @@ def assemble(B, scale):
     bpy.ops.object.mode_set(mode="OBJECT")
     for pb in arm.pose.bones:
         pb.rotation_mode = "QUATERNION"
-    body.parent = arm
-    mod = body.modifiers.new("Armature", "ARMATURE")
-    mod.object = arm
+    for body in bodies:
+        body.parent = arm
+        mod = body.modifiers.new("Armature", "ARMATURE")
+        mod.object = arm
     arm.scale = (scale, scale, scale)
-    return arm, body
+    return arm, bodies
 
 
 # ── Animation (rotations given in the parent's frame at rest, converted into each bone's own frame) ──
@@ -721,12 +753,12 @@ def build(era, side, n, path):
         colors["Uniform" if era == "modern" else "Cloth"] = MILITIA[era][n]
     materials(colors)
     B, scale = figure(era, side, n)
-    arm, body = assemble(B, scale)
+    arm, bodies = assemble(B, scale)
     clips = animate(arm, era)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", export_animation_mode="NLA_TRACKS",
                               export_vertex_color="ACTIVE", export_yup=True, export_skins=True)
-    tris = sum(len(p.vertices) - 2 for p in body.data.polygons)
+    tris = sum(len(p.vertices) - 2 for body in bodies for p in body.data.polygons)
     if PREVIEW and n == 0:
         render_clips(arm, clips, os.path.join(PREVIEW, os.path.basename(path)[:-4]))
     return tris
@@ -740,7 +772,7 @@ def shade_with_occlusion():
         if bsdf is None:
             continue
         attr = nt.nodes.new("ShaderNodeVertexColor")
-        attr.layer_name = "Col"
+        attr.layer_name = "Color"
         mixn = nt.nodes.new("ShaderNodeMix")
         mixn.data_type = "RGBA"
         mixn.blend_type = "MULTIPLY"

@@ -77,6 +77,7 @@ public partial class Map3D
                 for (int i = 0; i < cars.Length; i++)
                 {
                     cars[i].SetMeta("length", CarLength[$"{era}_{make[i]}"]);
+                    Baked(cars[i]);
                     if (make[i] == "locomotive" && cars[i].FindChild("Chimney", true, false) is Node3D chimney)
                         Smoke(chimney, Vector3.Zero, 2.2f);
                 }

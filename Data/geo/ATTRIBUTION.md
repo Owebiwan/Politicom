@@ -53,8 +53,10 @@
 
 ## 3D models
 
-- Town, castle, city and character models in `Game/models/`: **Kenney** (kenney.nl), Fantasy
-  Town Kit, Castle Kit, City Kit (Industrial, Commercial, Suburban), Nature Kit, Train Kit, Pirate Kit, Watercraft Pack and Mini Characters, CC0.
+- Wall, tree, track, harbour and ship models in `Game/models/`: **Kenney** (kenney.nl), Castle Kit,
+  Nature Kit, Train Kit, Pirate Kit and Watercraft Pack, CC0.
+- Town buildings in `Game/models/buildings/`: made for this project by
+  `tools/models/build_buildings.py` (Blender).
 - Soldiers and militia in `Game/models/figures/`: made for this project by
   `tools/models/build_soldiers.py` (Blender).
 - Locomotives, carriages and wagons in `Game/models/trains/`: made for this project by

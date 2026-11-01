@@ -11,7 +11,7 @@ Builds Politicom's trains (Game/models/trains/<era>_<car>.glb) in Blender, from 
 Each car runs along -Y in Blender (+Z in Godot), wheels on the ground at z = 0, about 1.4 units
 wide (the locomotive and tender together about 3.6 long). Wheels turn and coupling rods go round
 in a looping "Run" animation; an empty named "Chimney" marks where the game puffs smoke. Shading
-(ambient occlusion) is baked into vertex colours.
+(ambient occlusion) is baked with the colours into vertex colours.
 
 Usage:
   blender --background --factory-startup --python tools/models/build_trains.py -- OUTPUT_DIR [--preview DIR]
@@ -92,11 +92,23 @@ class Part:
             if len(e.link_faces) == 2 and e.calc_face_angle(0) > math.radians(40):
                 e.smooth = False
         occlusion(bm)
+        # Colours are baked with the occlusion into corner colours under one "Detail" material:
+        # Blender's glTF exporter writes vertex colours only for a mesh's first material.
+        ao = bm.verts.layers.float_color["Col"]
+        col = bm.loops.layers.float_color.new("Color")
+        for f in bm.faces:
+            tint = COLORS[MATS[f.material_index]]
+            for loop in f.loops:
+                a = loop.vert[ao][0]
+                loop[col] = (tint[0] * a, tint[1] * a, tint[2] * a, 1)
+            f.material_index = 0
+        bm.verts.layers.float_color.remove(ao)
         mesh = bpy.data.meshes.new(self.name)
         bm.to_mesh(mesh)
         bm.free()
-        for m in MATS:
-            mesh.materials.append(bpy.data.materials[m])
+        mesh.materials.append(bpy.data.materials["Detail"])
+        mesh.color_attributes.active_color = mesh.color_attributes["Color"]
+        mesh.color_attributes.render_color_index = mesh.color_attributes.active_color_index
         obj = bpy.data.objects.new(self.name, mesh)
         bpy.context.scene.collection.objects.link(obj)
         if parent:
@@ -133,6 +145,11 @@ def materials():
         bsdf.inputs["Metallic"].default_value = 0.7 if metal else 0.0
         bsdf.inputs["Roughness"].default_value = 0.35 if metal else (0.2 if name == "Glass" else 0.7)
         mat.diffuse_color = (*c, 1)
+    detail = bpy.data.materials.new("Detail")
+    detail.use_nodes = True
+    bsdf = detail.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Base Color"].default_value = (1, 1, 1, 1)
+    bsdf.inputs["Roughness"].default_value = 0.6
 
 
 # ── Running gear (animated) ──
@@ -457,7 +474,7 @@ def preview(root, png):
         nt = mat.node_tree
         bsdf = nt.nodes.get("Principled BSDF")
         attr = nt.nodes.new("ShaderNodeVertexColor")
-        attr.layer_name = "Col"
+        attr.layer_name = "Color"
         mixn = nt.nodes.new("ShaderNodeMix")
         mixn.data_type = "RGBA"
         mixn.blend_type = "MULTIPLY"

@@ -249,22 +249,34 @@ The map is three-dimensional, as Victoria 3's is (`Game/scripts/Map3D.cs`,
 ### Models on the 3D map
 
 Close in, towns, armies and militia are 3D models standing on the raised ground
-(`Game/scripts/Map3D.Objects.cs`, models in `Game/models/` from Kenney's Fantasy Town, Castle,
-City (industrial, commercial) and Mini Characters kits, CC0):
-- **Towns** are built from the flat map's plan for each commune. Each house has a facade on
-  every side (windows with shutters, small windows, a door; timber fronts on some medieval
-  houses), a tiled roof, a dormer on some and a chimney from the middle ages on; the kit's
-  textures are recoloured to the age's plaster and tiles by `Game/shaders/recolor.gdshader`, so
-  every window and frame still shows. Sunlight from the north-west casts real shadows from buildings, figures, trees and ships onto
-  each other and onto the terrain (the ground is lit only to receive them, so its colours in
-  sunlight are exactly the flat map's). In
-  3D, towns keep growing as you zoom in (up to 2.4 times), so their buildings can be read close
-  up, and their names are drawn on plates on the overlay below each town, never covered by the
-  buildings. Towns are painted for their age: houses
-  with tiled gable roofs (whitewashed under Roman tiles in antiquity, sandstone and terracotta
-  or slate later), a temple, a church tower or a domed tower; factories with brick chimneys
-  trailing smoke once industry comes; blocks of flats in the twentieth century; broken walls
-  where a town is occupied.
+(`Game/scripts/Map3D.Objects.cs`, models in `Game/models/`):
+- **Towns** are built from the flat map's plan for each commune, out of buildings made for
+  Politicom in Blender by `tools/models/build_buildings.py` (`Game/models/buildings/`), four
+  houses for each age, two smaller and two taller:
+  - **antiquity:** Roman houses with low hipped tile roofs, a portico or a pergola of vines;
+    insulae over shops with wooden balconies; a temple on a podium ringed with columns.
+  - **middle ages:** thatched cottages; timber-framed houses with jettied upper floors and steep
+    gables; stone houses with crow-stepped gables; a church with aisles, buttresses, lancets, an
+    apse and a spired west tower.
+  - **early modern:** plastered houses with quoins, string courses and dormers; brick houses with
+    curved gables to the street; tall houses with iron balconies; a domed baroque church
+    between bell towers.
+  - **industrial age:** brick terraces with chimney pots; workers' cottages; Haussmann
+    apartments with mansard roofs and wrought-iron balconies; tenements over shops with
+    awnings; a town hall with a clock tower; brick works with saw-tooth roof lights, a water
+    tower and a tall chimney trailing smoke.
+  - **twentieth century:** suburban houses with bay windows; white flat-roofed villas with
+    ribbon windows; blocks of flats with concrete balconies; brick blocks over shops; office
+    and department-store blocks; a people's house with a clock tower; concrete works with a
+    silo.
+  - **occupied towns** are ruins: broken walls, fallen beams and rubble, in stone or brick.
+  Walls and roofs take the town's colours; everything else keeps its own, baked into the vertex
+  colours with ambient occlusion, so a building draws in three calls. Sunlight from the
+  north-west casts real shadows from buildings, figures, trees and ships onto each other and
+  onto the terrain (the ground is lit only to receive them, so its colours in sunlight are
+  exactly the flat map's). In 3D, towns keep growing as you zoom in (up to 2.4 times), so their
+  buildings can be read close up, and their names are drawn on plates on the overlay below
+  each town, never covered by the buildings.
 - **Armies** are companies of soldiers of their era, made for Politicom in Blender by
   `tools/models/build_soldiers.py` (`Game/models/figures/`): a legionary with crested helmet,
   scutum and pilum; a medieval soldier in kettle helmet and tabard with kite shield and spear; an

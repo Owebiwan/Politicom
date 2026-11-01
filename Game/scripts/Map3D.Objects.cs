@@ -7,13 +7,13 @@ using Politicom.Sim;
 namespace Politicom.Game;
 
 /// <summary>
-/// Models on the 3D map, as Victoria 3 stands cities and armies on its terrain (Kenney's CC0
-/// kits in Game/models): each town built in the style of its age from the same plan the flat map
-/// uses (houses with gabled roofs; a temple, a church tower or a domed tower; factories with
-/// smoking chimneys; blocks and suburban houses in the twentieth century; broken walls once
-/// occupied), and armies as companies of small figures in the enemy's colour under a standard,
-/// facing the militia under the black-and-red flag. They stand on the raised ground and follow
-/// the map as it pans and zooms; zoomed out, the flat map's emblems take over.
+/// Models on the 3D map, as Victoria 3 stands cities and armies on its terrain: each town built
+/// in the style of its age from the same plan the flat map uses, out of Politicom's own buildings
+/// (tools/models/build_buildings.py): houses, a landmark, factories with smoking chimneys, blocks
+/// in the twentieth century, ruins once occupied; and armies as companies of figures of their era
+/// (tools/models/build_soldiers.py) in the enemy's colour under a standard, facing the militia
+/// under the black-and-red flag. They stand on the raised ground and follow the map as it pans
+/// and zooms; zoomed out, the flat map's emblems take over.
 /// </summary>
 public partial class Map3D
 {
@@ -35,13 +35,12 @@ public partial class Map3D
     }
 
     /// <summary>A model, placed (in its parent's units) and scaled; tinted if asked.</summary>
-    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0, Color? tint = null, Color? paint = null, Color? tone = null)
+    private Node3D? Model(Node3D parent, string path, Vector3 at, Vector3 scale, float turn = 0, Color? paint = null, Color? tone = null)
     {
         if (Scene(path)?.Instantiate() is not Node3D node) return null;
         node.Position = at;
         node.Scale = scale;
         node.RotationDegrees = new Vector3(0, turn, 0);
-        if (tint is { } t) Tint(node, t);
         if (paint is { } p) Paint(node, p);
         if (tone is { } t2) Recolor(node, t2);
         parent.AddChild(node);
@@ -91,18 +90,6 @@ public partial class Map3D
         AgeKind.Industrial => new[] { new Color("94503c"), new Color("555b66"), new Color("85473a") }[tone],
         _ => new[] { new Color("8a4d3a"), new Color("6f7177"), new Color("9a5a40") }[tone],
     };
-
-    private static void Tint(Node node, Color color)
-    {
-        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
-            if (child is MeshInstance3D mesh)
-                for (int i = 0; i < mesh.GetSurfaceOverrideMaterialCount(); i++)
-                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m && m.Duplicate() is BaseMaterial3D copy)
-                    {
-                        copy.AlbedoColor = color;
-                        mesh.SetSurfaceOverrideMaterial(i, copy);
-                    }
-    }
 
     private void SetUpObjects()
     {
@@ -258,12 +245,27 @@ public partial class Map3D
     private static AgeKind Age(int year) =>
         year < 500 ? AgeKind.Ancient : year < 1450 ? AgeKind.Medieval : year < 1789 ? AgeKind.EarlyModern : year < 1914 ? AgeKind.Industrial : AgeKind.Modern;
 
-    /// <summary>A town of models from the flat map's plan, in town units (1 = the town's size on the map).</summary>
+    private static string AgeName(AgeKind age) => age switch
+    {
+        AgeKind.Ancient => "ancient",
+        AgeKind.Medieval => "medieval",
+        AgeKind.EarlyModern => "early",
+        AgeKind.Industrial => "industrial",
+        _ => "modern",
+    };
+
+    /// <summary>
+    /// A town of buildings from the flat map's plan, in town units (1 = the town's size on the map).
+    /// The buildings are Politicom's own, made in Blender for each age (tools/models/build_buildings.py):
+    /// houses, a landmark (temple, church, domed church, town hall, people's house), factories, blocks,
+    /// and ruins once the town is occupied.
+    /// </summary>
     private Node3D BuildTown(Commune c, int year)
     {
         var root = new Node3D();
         _objects.AddChild(root);
         var age = Age(year);
+        string era = AgeName(age);
         var rng = new Random(c.Id * 131 + 7);
         foreach (var (offset, width, depth, height, kind, tone) in Map.TownPlan(c))
         {
@@ -273,101 +275,73 @@ public partial class Map3D
             float turn = rng.Next(4) * 90 + (float)(rng.NextDouble() - 0.5) * 20;
             if (c.Occupied)
             {
-                Model(root, "town/wall-broken", at, new Vector3(u, u * 0.8f, u), turn, new Color(0.45f, 0.4f, 0.36f));
+                Building(root, age >= AgeKind.Industrial ? "ruin_brick" : "ruin_stone", at, u * 0.9f, turn, WallPaint[tone], RoofPaint(age, tone));
                 continue;
             }
+            var wall = age == AgeKind.Ancient ? new Color("efe6d4") : WallPaint[tone];
             switch (kind)
             {
-                case 1: Landmark(root, at, age); break;
-                case 2: Factory(root, at, u, turn, age); break;
-                case 3:
-                    Model(root, $"commercial/low-detail-building-{(char)('a' + rng.Next(8))}", at, new Vector3(u * 1.3f, u * 0.9f, u * 1.3f), turn, tint: new Color("e6d6bc"));
+                case 1:
+                    Building(root, $"landmark_{era}", at, 0.24f, rng.Next(2) * 180 + 90 + (float)(rng.NextDouble() - 0.5) * 16, new Color("e2d6bc"), RoofPaint(age, 1));
                     break;
-                default: House(root, at, u, height, turn, age, tone, rng); break;
+                case 2 when age >= AgeKind.Industrial:
+                    if (Building(root, $"factory_{era}", at, u * 0.75f, turn, wall, RoofPaint(age, 1)) is { } works
+                        && works.FindChild("Chimney", true, false) is Node3D chimney)
+                        Smoke(chimney, Vector3.Zero, 1.3f);
+                    break;
+                case 3 when age == AgeKind.Modern:
+                    Building(root, $"block_modern_{rng.Next(2)}", at, u * 0.85f, turn, wall, RoofPaint(age, tone));
+                    break;
+                default:
+                    // Two smaller houses and two taller ones for each age; the plan says which. Half the
+                    // houses are still those of the age before: towns are built up over centuries.
+                    int variant = (height > 0.11f ? 2 : 0) + rng.Next(2);
+                    var built = age > AgeKind.Ancient && rng.Next(2) == 0 ? age - 1 : age;
+                    Building(root, $"house_{AgeName(built)}_{variant}", at, u * 0.85f, turn, wall, RoofPaint(built, tone).Lightened(0.1f));
+                    break;
             }
         }
         return root;
     }
 
-    /// <summary>
-    /// A house of the age: a core with a facade on each side (windows with shutters, small
-    /// windows, a door; timber-framed fronts on some medieval houses), a tiled gable roof, a dormer
-    /// on some, a chimney from the middle ages on. The pieces keep the kit's windows and frames and
-    /// take the town's colours over them.
-    /// </summary>
-    private void House(Node3D root, Vector3 at, float u, float height, float turn, AgeKind age, int tone, Random rng)
+    /// <summary>Draws a model's baked vertex colours (trains: tools/models/build_trains.py).</summary>
+    private static void Baked(Node node)
     {
-        var house = new Node3D { Position = at, RotationDegrees = new Vector3(0, turn, 0), Scale = Vector3.One * u };
-        root.AddChild(house);
-        float storeys = height > 0.11f ? 1.35f : 1f;
-        if (age == AgeKind.Modern) storeys += 0.35f;
-        float h = storeys * 0.8f;
-        var wall = age == AgeKind.Ancient ? new Color("efe6d4") : WallPaint[tone];
-        bool timber = age is AgeKind.Medieval or AgeKind.EarlyModern && rng.Next(3) == 0;
-        // The core, inside the facades.
-        Model(house, "town/wall-block", Vector3.Zero, new Vector3(0.82f, h, 0.82f), paint: wall.Darkened(0.08f));
-        // Facades: the panels sit on the +X face of their cell; turned, they make the four sides.
-        string window = age == AgeKind.Ancient ? "town/wall-window-small" : timber ? "town/wall-wood-window-shutters" : "town/wall-window-shutters";
-        string door = timber ? "town/wall-wood-door" : "town/wall-door";
-        for (int side = 0; side < 4; side++)
-        {
-            string piece = side == 0 ? door : side == 2 && rng.Next(2) == 0 ? "town/wall-window-small" : window;
-            Model(house, piece, Vector3.Zero, new Vector3(1, h, 1), side * 90, tone: wall);
-        }
-        var top = new Vector3(0, h, 0);
-        var roof = RoofPaint(age, tone);
-        float pitch = age == AgeKind.Ancient ? 0.55f : 0.9f;
-        bool dormer = age >= AgeKind.EarlyModern && rng.Next(3) == 0;
-        Model(house, dormer ? "town/roof-window" : "town/roof-gable", top, new Vector3(1, pitch, 1), tone: roof.Lightened(0.1f));
-        if (age >= AgeKind.Medieval && rng.Next(3) > 0)
-            Model(house, "town/chimney-top", top + new Vector3(-0.05f, pitch * 0.25f, 0.18f), new Vector3(0.8f, 0.9f, 0.8f), paint: new Color("8c6a58"));
+        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+            if (child is MeshInstance3D mesh)
+                for (int i = 0; i < mesh.Mesh.GetSurfaceCount(); i++)
+                    mesh.SetSurfaceOverrideMaterial(i, BuildingMaterial(Colors.White));
     }
 
-    private void Landmark(Node3D root, Vector3 at, AgeKind age)
+    /// <summary>One of the buildings, its walls and roof in the town's colours.</summary>
+    private Node3D? Building(Node3D parent, string name, Vector3 at, float scale, float turn, Color wall, Color roof)
     {
-        var lm = new Node3D { Position = at, Scale = Vector3.One * 1.7f };
-        root.AddChild(lm);
-        root = lm;
-        at = Vector3.Zero;
-        var stone = new Color("e2d6bc");
-        switch (age)
-        {
-            case AgeKind.Ancient:
-                // A temple: a ring of columns under a flat roof, on a stone base.
-                Model(root, "town/wall-block-half", at, new Vector3(0.32f, 0.06f, 0.2f), paint: stone);
-                for (int i = 0; i < 6; i++)
-                {
-                    float x = -0.13f + (i % 3) * 0.13f, z = i < 3 ? -0.08f : 0.08f;
-                    Model(root, "town/pillar-stone", at + new Vector3(x, 0.03f, z), new Vector3(0.05f, 0.14f, 0.05f), paint: stone);
-                }
-                Model(root, "town/roof-flat", at + new Vector3(0, 0.17f, 0), new Vector3(0.36f, 0.12f, 0.24f), paint: RoofPaint(age, 2));
-                break;
-            case AgeKind.Medieval:
-                // A church: a square tower with a high roof beside its nave.
-                Model(root, "town/wall-block", at + new Vector3(0.07f, 0, 0), new Vector3(0.2f, 0.13f, 0.12f), paint: stone);
-                Model(root, "town/roof-gable", at + new Vector3(0.07f, 0.13f, 0), new Vector3(0.2f, 0.12f, 0.12f), paint: RoofPaint(age, 1));
-                Model(root, "castle/tower-square", at + new Vector3(-0.07f, 0, 0), new Vector3(0.08f, 0.16f, 0.08f), paint: stone);
-                Model(root, "castle/tower-square-top-roof-high", at + new Vector3(-0.07f, 0.2f, 0), Vector3.One * 0.08f, paint: RoofPaint(age, 1));
-                break;
-            case AgeKind.EarlyModern:
-                // A domed church.
-                Model(root, "castle/tower-hexagon-base", at, new Vector3(0.18f, 0.12f, 0.18f), paint: stone);
-                Model(root, "castle/tower-hexagon-roof", at + new Vector3(0, 0.12f, 0), new Vector3(0.18f, 0.14f, 0.18f), paint: new Color("8f9aa0"));
-                break;
-            default:
-                // A town hall with a clock tower.
-                Model(root, "castle/tower-square-mid-windows", at, new Vector3(0.22f, 0.14f, 0.14f), tint: stone);
-                Model(root, "town/roof-high-point", at + new Vector3(0, 0.14f, 0), new Vector3(0.1f, 0.12f, 0.1f), paint: RoofPaint(age, 1));
-                break;
-        }
+        if (Scene($"buildings/{name}")?.Instantiate() is not Node3D node) return null;
+        node.Position = at;
+        node.Scale = Vector3.One * scale;
+        node.RotationDegrees = new Vector3(0, turn, 0);
+        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+            if (child is MeshInstance3D mesh)
+                for (int i = 0; i < mesh.Mesh.GetSurfaceCount(); i++)
+                    if (mesh.Mesh.SurfaceGetMaterial(i) is { } m)
+                        mesh.SetSurfaceOverrideMaterial(i, BuildingMaterial(m.ResourceName switch
+                        {
+                            "Wall" => wall,
+                            "Roof" => roof,
+                            _ => Colors.White, // "Detail": its colours are in the vertices
+                        }));
+        parent.AddChild(node);
+        return node;
     }
 
-    private void Factory(Node3D root, Vector3 at, float u, float turn, AgeKind age)
+    private static readonly Dictionary<Color, StandardMaterial3D> BuildingMaterials = new();
+
+    /// <summary>A shared material per colour; the vertex colours carry the detail's colours and the baked shading.</summary>
+    private static StandardMaterial3D BuildingMaterial(Color color)
     {
-        Model(root, $"industrial/building-{(char)('a' + Math.Abs((int)(at.X * 977 + at.Z * 131)) % 6)}", at, Vector3.One * u * 0.8f, turn, tint: new Color("d9b8a0"));
-        var chimney = at + new Vector3(u * 0.45f, 0, -u * 0.2f);
-        Model(root, "industrial/chimney-large", chimney, new Vector3(u * 0.35f, u * 1.4f, u * 0.35f), paint: new Color("8a4636"));
-        Smoke(root, chimney + new Vector3(0, u * 2.4f, 0), u);
+        if (!BuildingMaterials.TryGetValue(color, out var m))
+            BuildingMaterials[color] = m = new StandardMaterial3D { AlbedoColor = color, Roughness = 0.88f, VertexColorUseAsAlbedo = true };
+        return m;
     }
 
     /// <summary>Smoke rising from a chimney and drifting east, fading as it goes.</summary>
@@ -462,16 +436,21 @@ public partial class Map3D
         if (Scene($"figures/{model}")?.Instantiate() is not Node3D node) return null;
         node.Position = at;
         node.RotationDegrees = new Vector3(0, (float)(rng.NextDouble() - 0.5) * 14, 0);
-        if (uniform is { } u)
-            foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
-                if (child is MeshInstance3D mesh)
-                    for (int i = 0; i < mesh.Mesh.GetSurfaceCount(); i++)
-                        if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m && m.ResourceName is "Uniform" or "UniformDark")
+        foreach (var child in node.FindChildren("*", "MeshInstance3D", true, false))
+            if (child is MeshInstance3D mesh)
+                for (int i = 0; i < mesh.Mesh.GetSurfaceCount(); i++)
+                    if (mesh.Mesh.SurfaceGetMaterial(i) is BaseMaterial3D m)
+                    {
+                        // The army's map colour, muted toward field drab so a uniform reads as cloth, not paint;
+                        // the militia's clothes and all the rest keep the colours baked into the figure.
+                        var cloth = uniform is { } u ? u.Lerp(new Color(0.42f, 0.40f, 0.33f), 0.45f) : m.AlbedoColor;
+                        mesh.SetSurfaceOverrideMaterial(i, UniformMaterial(m.ResourceName switch
                         {
-                            // The army's map colour, muted toward field drab so a uniform reads as cloth, not paint.
-                            var cloth = u.Lerp(new Color(0.42f, 0.40f, 0.33f), 0.45f);
-                            mesh.SetSurfaceOverrideMaterial(i, UniformMaterial(m.ResourceName == "Uniform" ? cloth : cloth.Darkened(0.35f)));
-                        }
+                            "Uniform" => cloth,
+                            "UniformDark" => uniform is null ? m.AlbedoColor : cloth.Darkened(0.35f),
+                            _ => Colors.White,
+                        }));
+                    }
         parent.AddChild(node);
         // A soft shadow on the ground under each figure.
         parent.AddChild(new MeshInstance3D { Mesh = ShadowDisc(), Position = at + new Vector3(0.04f, 0.01f, 0.04f), Scale = new Vector3(0.36f, 1, 0.28f) });
