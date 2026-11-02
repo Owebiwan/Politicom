@@ -431,10 +431,9 @@ public partial class MapView
         DrawCircle(at, 4, Anarchist);
     }
 
-    /// <summary>Country names at world zoom: biggest first, skipped where they'd overlap or not fit.</summary>
     /// <summary>
-    /// Where a country's name runs, as on Victoria 3's map: along the shape's longest axis (from
-    /// the outline's spread, tilted no more than 35°) through its middle, as long as the shape is.
+    /// Where a country's name runs: along the longest straight line that stays inside the
+    /// country, near its main axis, level where there's room (see the scoring below).
     /// </summary>
     private static (Vector2 At, float Angle, float Length) NameLine(Vector2[] ring, Rect2 box)
     {
@@ -498,7 +497,7 @@ public partial class MapView
 
     /// <summary>
     /// Country names across their territory: spaced capitals in the title face, sized to the
-    /// country, along its main axis with a gentle bow, faint enough to read through.
+    /// country, along one straight line, faint enough to read through.
     /// </summary>
     private void DrawGlobeLabels(Font font, List<Rect2> taken)
     {
@@ -533,16 +532,13 @@ public partial class MapView
             var ink = new Color(1, 0.97f, 0.88f, 0.62f).Lerp(new Color(0.24f, 0.17f, 0.10f, 0.72f), paper);
             var shade = new Color(0, 0, 0, 0.45f).Lerp(new Color(1, 0.96f, 0.85f, 0.35f), paper);
             float x = -total / 2;
-            float bow = total * 0.06f; // a slight arch, highest in the middle
             foreach (char ch in text)
             {
                 string glyph = ch.ToString();
                 float w = face.GetStringSize(glyph, HorizontalAlignment.Left, -1, size).X;
                 float mid = x + w / 2;
-                float u = mid / (total / 2); // -1..1 along the name
-                var pos = centre + dir * mid - normal * bow * (1 - u * u);
-                float tilt = angle + Mathf.Atan(2 * bow * u / Mathf.Max(1, total / 2)) * 0.9f;
-                DrawSetTransform(pos, tilt, Vector2.One);
+                // Every letter on one straight line, all at the same angle.
+                DrawSetTransform(centre + dir * mid, angle, Vector2.One);
                 var origin = new Vector2(-w / 2, size * 0.35f);
                 DrawString(face, origin + new Vector2(0, 1.5f), glyph, HorizontalAlignment.Left, -1, size, shade);
                 DrawString(face, origin, glyph, HorizontalAlignment.Left, -1, size, ink);

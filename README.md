@@ -219,7 +219,7 @@ The map is modelled on Victoria 3's:
 - **The paper chart:** zoomed out toward the whole world, the sea turns to parchment with
   engraved lines following the coasts, and the countries become watercolour on paper.
 - **Inland maps:** Paris sits on land, not sea.
-- **Country names:** names run across their territory in spaced capitals with a slight bow,
+- **Country names:** names run across their territory in spaced capitals on a straight line,
   as on Victoria 3's map, along the longest line that stays inside the country (level where
   there's room, steeper for tall, thin countries such as Chile or Norway), sized to fit it;
   a name with no room is left out rather than spilling over the borders. They're cream over
