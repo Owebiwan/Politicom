@@ -990,12 +990,17 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            6%       94%     0% │    58    49      8    66    45 │    64
-educator          85%       15%     0% │    64    51     15    78    52 │    38
-centralizer        0%        0%   100% │    26    50      2    50    32 │   100
-balanced          94%        0%     6% │    87    51     13    71    56 │    50
-trader            87%        0%    13% │    85    52     13    65    54 │    64
+passive           12%       88%     0% │    57    49     10    63    45 │    66
+educator          87%       13%     0% │    62    52     18    76    52 │    37
+centralizer        0%        0%   100% │    25    50      2    51    32 │   100
+balanced          80%        0%    20% │    87    51     14    63    54 │    72
+trader            81%        0%    19% │    86    53     14    69    56 │    59
 ```
+
+The Nationalist Army starts at strength 1.7 (it was 1.4, when the balanced player survived
+97% of games and the war rarely felt dangerous). A stronger enemy is lost to less through the
+front than through drift: the war's emergencies are what turn a fifth of balanced games into a
+state.
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
 1937 and collapses in the Aragon (March 1938) and Catalonia (December 1938) offensives.
@@ -1020,12 +1025,15 @@ Paris (`--scenario paris_commune_1871`) is the tragic one:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    82    67      7    91    62 │    27
-educator           0%      100%     0% │    80    67      7    96    62 │     7
-centralizer        0%        0%   100% │    78    63      4    48    49 │   100
-balanced          31%       69%     0% │    96    68      7    92    65 │    18
-trader            48%       52%     0% │    96    68      7    90    65 │    23
+passive            0%      100%     0% │    82    66      7    91    61 │    26
+educator           0%      100%     0% │    80    66      7    96    62 │     7
+centralizer        0%        0%   100% │    76    62      4    49    48 │   100
+balanced          44%       56%     0% │    96    66      7    92    65 │    18
+trader            53%       47%     0% │    96    66      7    90    65 │    23
 ```
+
+Bloody Week's strength is 27 (from 29): Paris is still the tragic scenario, but a good
+defence now holds it in nearly half of games rather than a third.
 
 The front holds through April and early May, and Bloody Week (from 21 May) breaks it in
 days. A war committee at the right moment gives about a 30% chance of outlasting history. Winning

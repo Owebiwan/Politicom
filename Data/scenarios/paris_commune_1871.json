@@ -26,7 +26,7 @@
       "offensives": [
         { "name": "The fighting at Courbevoie and Neuilly", "tick": 15, "duration": 4, "strength": 0.6 },
         { "name": "The assault on Fort Issy", "tick": 46, "duration": 7, "strength": 0.8 },
-        { "name": "Bloody Week", "tick": 64, "duration": 8, "strength": 29 }
+        { "name": "Bloody Week", "tick": 64, "duration": 8, "strength": 27 }
       ]
     }
   ],
