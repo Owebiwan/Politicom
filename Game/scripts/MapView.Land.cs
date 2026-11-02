@@ -15,7 +15,7 @@ public partial class MapView
 {
     internal const string LandDir = "res://data/land/";
     /// <summary>How strongly countries' and communes' colours tint the ground.</summary>
-    private const float StateTint = 0.5f, CommuneTint = 0.62f;
+    private const float StateTint = 0.5f, CommuneTint = 0.5f;
 
     private sealed partial class LandLayer : Node2D
     {

@@ -446,16 +446,54 @@ public partial class MapView
             var d = p - c;
             sxx += d.X * d.X; syy += d.Y * d.Y; sxy += d.X * d.Y;
         }
-        float angle = 0.5f * Mathf.Atan2(2 * sxy, sxx - syy);
-        angle = Mathf.Clamp(Mathf.Wrap(angle, -Mathf.Pi / 2, Mathf.Pi / 2), -0.61f, 0.61f);
-        var dir = Vector2.Right.Rotated(angle);
-        float lo = float.MaxValue, hi = float.MinValue;
-        foreach (var p in ring)
+        float main = Mathf.Wrap(0.5f * Mathf.Atan2(2 * sxy, sxx - syy), -Mathf.Pi / 2, Mathf.Pi / 2);
+        // The name runs along the longest line that stays inside the country (not across a bay or
+        // out to a far cape): try the main axis and a little either side of it, through the middle
+        // and either side of the middle, and keep the longest stretch of land.
+        var best = (At: c, Angle: Mathf.Clamp(main, -1.2f, 1.2f), Length: 0f);
+        foreach (float turn in new[] { 0f, -0.25f, 0.25f, -0.5f, 0.5f, -main })
         {
-            float t = (p - c).Dot(dir);
-            lo = Mathf.Min(lo, t); hi = Mathf.Max(hi, t);
+            float angle = Mathf.Clamp(main + turn, -1.2f, 1.2f); // up to about 70°: steep names for tall, thin countries
+            var dir = Vector2.Right.Rotated(angle);
+            var normal = dir.Orthogonal();
+            float lo = float.MaxValue, hi = float.MinValue;
+            foreach (var p in ring)
+            {
+                float t = (p - c).Dot(normal);
+                lo = Mathf.Min(lo, t); hi = Mathf.Max(hi, t);
+            }
+            for (int k = -3; k <= 3; k++)
+            {
+                var o = c + normal * ((lo + hi) / 2 + (hi - lo) * k / 9f);
+                if (!Geometry2D.IsPointInPolygon(o, ring)) continue;
+                var (mid, length) = Chord(ring, o, dir);
+                // Prefer the middle, and level names when a level line is nearly as long: steep
+                // names are for countries with no other room.
+                float score = length * (1 - 0.04f * Mathf.Abs(k)) * (1 - 0.35f * Mathf.Abs(angle));
+                if (score > best.Length) best = (mid, angle, score);
+            }
         }
-        return (c + dir * (lo + hi) / 2, angle, hi - lo);
+        return best;
+    }
+
+    /// <summary>The stretch of the line through `at` along `dir` that lies inside the ring: its middle and length.</summary>
+    private static (Vector2 Mid, float Length) Chord(Vector2[] ring, Vector2 at, Vector2 dir)
+    {
+        float before = float.MinValue, after = float.MaxValue; // the nearest crossings behind and ahead
+        var normal = dir.Orthogonal();
+        for (int i = 0; i < ring.Length; i++)
+        {
+            var a = ring[i] - at;
+            var b = ring[(i + 1) % ring.Length] - at;
+            float da = a.Dot(normal), db = b.Dot(normal);
+            if ((da > 0) == (db > 0) || Mathf.IsEqualApprox(da, db)) continue;
+            float t = da / (da - db);
+            float along = a.Lerp(b, t).Dot(dir);
+            if (along < 0) before = Mathf.Max(before, along);
+            else after = Mathf.Min(after, along);
+        }
+        if (before == float.MinValue || after == float.MaxValue) return (at, 0);
+        return (at + dir * (before + after) / 2, after - before);
     }
 
     /// <summary>
@@ -471,17 +509,19 @@ public partial class MapView
         foreach (var state in Globe.States.OrderByDescending(st => g.Labels[st.Id].Area))
         {
             var (at, angle, length) = g.NameLines[state.Id];
-            float span = length * s * 0.72f; // leave the ends of the country clear
-            if (span < 60) continue;
+            float span = length * s * 0.8f; // leave the ends of the country clear
+            if (span < 50) continue;
             var text = StateText.Country(World?.States.FirstOrDefault(x => x.Id == state.Id)?.Name ?? state.Name).ToUpperInvariant();
             if (text.Length == 0) continue;
-            // Size from the room: wide countries get big, airy names.
+            // Size from the room: wide countries get big names, spaced but still read as one word.
             float probe = face.GetStringSize(text, HorizontalAlignment.Left, -1, 20).X;
-            int size = (int)Mathf.Clamp(span / (probe / 20 + 0.6f * (text.Length - 1) / 1) * 1.0f, 11, 34);
+            int size = (int)Mathf.Clamp(span / (probe / 20 + 0.3f * (text.Length - 1)), 10, 34);
             float plain = face.GetStringSize(text, HorizontalAlignment.Left, -1, size).X;
-            float tracking = Mathf.Clamp((span - plain) / Mathf.Max(1, text.Length - 1), size * 0.08f, size * 0.9f);
+            while (plain > span && size > 10)
+                plain = face.GetStringSize(text, HorizontalAlignment.Left, -1, --size).X;
+            if (plain > span) continue; // no room even small
+            float tracking = Mathf.Clamp((span - plain) / Mathf.Max(1, text.Length - 1), size * 0.04f, size * 0.45f);
             float total = plain + tracking * (text.Length - 1);
-            if (total > span * 1.15f && size == 11) continue; // no room even small
             var centre = ToScreen(at);
             var dir = Vector2.Right.Rotated(angle);
             var normal = dir.Orthogonal();
