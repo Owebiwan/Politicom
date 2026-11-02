@@ -154,11 +154,26 @@ internal static class WarSystem
         }
         if (!a.OfferPending && a.OfferInterval > 0 && w.Tick >= a.NextOfferTick)
         {
+            // Refused twice, the ally stops asking; each acceptance makes the next price higher.
+            if (a.Declined >= 2)
+            {
+                a.OfferInterval = 0;
+                w.Emit(Severity.Info, $"The {a.Name} stops offering arms. The militias will fight with what they have.");
+                return;
+            }
             a.OfferPending = true;
             a.OfferExpires = w.Tick + 4;
+            string opening = (a.Accepted, a.Declined) switch
+            {
+                (0, 0) => $"The {a.Name} offers arms for the front — if the militias accept militarization under its command.",
+                (0, _) => $"The {a.Name} asks again: arms for the front, if the militias accept its command. It will not ask a third time.",
+                _ => $"The {a.Name} offers more arms — and now wants the brigades' political delegates replaced by its own officers.",
+            };
             w.Emit(Severity.Decision,
-                $"The {a.Name} offers arms for the front — if the militias accept militarization under its command. " +
-                $"(+{w.Balance.MilitarizationDefense:P0} defense for {w.Turns(w.Balance.MilitarizationTicks)}, +{w.Balance.ArmsAcceptDrift:0} drift now and more while it lasts)");
+                $"{opening} (+{w.Balance.MilitarizationDefense:P0} defense for {w.Turns(w.Balance.MilitarizationTicks)}, +{AllyDrift(w):0} drift now and more while it lasts)");
         }
     }
+
+    /// <summary>Drift for accepting the ally's arms: higher each time they've been accepted before.</summary>
+    internal static double AllyDrift(World w) => w.Balance.ArmsAcceptDrift * (1 + 0.5 * w.Ally.Accepted);
 }

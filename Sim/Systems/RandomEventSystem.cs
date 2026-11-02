@@ -5,7 +5,9 @@ namespace Politicom.Sim.Systems;
 /// <summary>
 /// Now and then something happens that nobody planned: a harvest, a fire, a stranger with
 /// news, a quarrel over water. One fits the age, the regime and the communes; it arrives as a
-/// decision like the historical ones. At most one every few weeks, and each kind once a game.
+/// decision like the historical ones. At most one every few weeks, and each kind once a game,
+/// but never a long drought: after <see cref="Balance.DecisionDrought"/> weeks with nothing to
+/// decide, one comes for certain (a kind seen over a year ago may return, if all have been used).
 /// </summary>
 internal static class RandomEventSystem
 {
@@ -14,8 +16,10 @@ internal static class RandomEventSystem
         var pool = w.Scenario.RandomEvents;
         var b = w.Balance;
         if (pool.Count == 0 || w.Tick < 2 || (w.Tick - w.LastRandomEvent) * w.Weeks < b.RandomEventGap) return;
-        if (!w.Rng.Chance(b.RandomEventRate * w.Weeks)) return;
-        var eligible = pool.Where(t => Fits(w, t)).ToList();
+        bool drought = (w.Tick - w.LastDecision) * w.Weeks >= b.DecisionDrought && w.PendingEvents.Count == 0;
+        if (!drought && !w.Rng.Chance(b.RandomEventRate * w.Weeks)) return;
+        var eligible = pool.Where(t => Fits(w, t, again: false)).ToList();
+        if (eligible.Count == 0 && drought) eligible = pool.Where(t => Fits(w, t, again: true)).ToList();
         if (eligible.Count == 0) return;
         var template = w.Rng.PickWeighted(eligible, eligible.Select(t => t.Weight).ToList());
         var commune = PickOne(w, Candidates(w, template.Needs));
@@ -51,11 +55,13 @@ internal static class RandomEventSystem
 
     private static T PickOne<T>(World w, List<T> items) => items[w.Rng.Next(items.Count)];
 
-    private static bool Fits(World w, RandomEventTemplate t)
+    private static bool Fits(World w, RandomEventTemplate t, bool again)
     {
         if (w.Year < t.Eras[0] || w.Year > t.Eras[1]) return false;
         if (t.Regimes.Length > 0 && !t.Regimes.Contains(w.Scenario.HomeIdeology ?? "", StringComparer.OrdinalIgnoreCase)) return false;
-        if (w.FiredEvents.Any(id => id.StartsWith($"random_{t.Id}_")) || w.Scenario.Events.Any(e => e.Id.StartsWith($"random_{t.Id}_"))) return false;
+        // Each kind once a game; when the well runs dry, one not seen for a year may come round again.
+        var seen = w.Scenario.Events.Where(e => e.Id.StartsWith($"random_{t.Id}_")).Select(e => e.Tick).ToList();
+        if (seen.Count > 0 && (!again || (w.Tick - seen.Max()) * w.Weeks < 52)) return false;
         if (t.Needs == "world" && w.States.Count == 0) return false;
         return Candidates(w, t.Needs).Count > 0;
     }

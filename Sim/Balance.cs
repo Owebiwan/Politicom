@@ -316,6 +316,8 @@ public sealed class Balance
     public double RandomEventRate { get; set; } = 0.12;
     /// <summary>Weeks between random events at least.</summary>
     public double RandomEventGap { get; set; } = 6;
+    /// <summary>Weeks without a decision after which something is sure to happen: no long stretch of just waiting.</summary>
+    public double DecisionDrought { get; set; } = 8;
     /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
     public double RisingRate { get; set; } = 0.02;
     /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>

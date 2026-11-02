@@ -36,18 +36,31 @@ public static class RivalSystem
             Offer(w, rival);
     }
 
+    /// <summary>
+    /// A rival's offer of arms. Each time it comes back the terms are harder (more arms, but more
+    /// drift and a bigger party); the third is its last.
+    /// </summary>
     private static void Offer(World w, WorldState rival)
     {
         var b = w.Balance;
+        int before = w.Scenario.Events.Count(e => e.Id.StartsWith($"rival_offer_{rival.Id}_"));
+        if (before >= 3) return;
+        double harder = 1 + 0.5 * before;
         string country = StateText.Country(rival.Name);
+        string terms = w.Year >= 1914
+            ? $"Advisers from {country} offer tanks and aircraft for the front — if the militias accept their commissars and the party gets a free hand."
+            : $"Envoys from {country} offer arms and drillmasters for the front — if the militias accept their overseers and the elect get a free hand.";
         w.Scenario.Events.Add(new EventDefinition
         {
             Id = $"rival_offer_{rival.Id}_{w.Tick}",
             Tick = w.Tick + 1,
-            Title = $"{rival.Name} offers arms",
-            Text = w.Year >= 1914
-                ? $"Advisers from {country} offer tanks and aircraft for the front — if the militias accept their commissars and the party gets a free hand."
-                : $"Envoys from {country} offer arms and drillmasters for the front — if the militias accept their overseers and the elect get a free hand.",
+            Title = before switch { 0 => $"{rival.Name} offers arms", 1 => $"{rival.Name} offers arms again", _ => $"{rival.Name}'s last offer" },
+            Text = before switch
+            {
+                0 => terms,
+                1 => $"The envoys are back, with more to give and more to ask. {terms} This time they also want the federation's food committees answering to them.",
+                _ => $"A last offer, they say, and they mean it. {terms} They want the police, the press and the food committees. Refuse, and there will be no more offers.",
+            },
             DefaultOption = 1,
             Options =
             {
@@ -57,8 +70,9 @@ public static class RivalSystem
                     Description = w.Year >= 1914 ? "The front gets modern weapons. The party gets its commissars." : "The front gets arms. The elect get their overseers.",
                     Effects = new EventEffects
                     {
-                        GoodsToFront = b.RivalArms, MilitarizationTicks = 8, Drift = b.RivalAcceptDrift,
-                        PartyInfluence = 0.15, Stances = { [rival.Id] = 0.15 },
+                        GoodsToFront = Math.Round(b.RivalArms * (1 + 0.3 * before)), MilitarizationTicks = 8,
+                        Drift = Math.Round(b.RivalAcceptDrift * harder, 1),
+                        PartyInfluence = Math.Round(0.15 * harder, 2), Stances = { [rival.Id] = 0.15 },
                     },
                 },
                 new EventOption

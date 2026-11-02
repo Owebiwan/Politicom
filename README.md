@@ -423,7 +423,9 @@ Commons** where its article has one. Flags are skipped.
 ## Random events and pop-ups
 
 Besides each scenario's scripted dilemmas, **random events** happen: about one every couple of
-months of game time, each kind at most once a game. There are 37 of them, in
+months of game time, each kind at most once a game. There is never a long stretch of just
+waiting: after eight weeks with nothing to decide, one comes for certain (and if every kind
+has been used, one not seen for a year may come round again). There are 37 of them, in
 `Data/events/random_events.json`, written for different societies. Each fits by era, by the
 regime the movement rises against, and by the communes it needs:
 
@@ -725,8 +727,11 @@ the farms on the towns' goods, so the columns show where the federation depends 
     Political education wears them down, and *Expose party cells* breaks them up here and next
     door, at the cost of the rival's goodwill.
   - **Arms for commissars:** now and then the strongest rival offers arms if the militias take
-    its commissars: arms and militarization, plus drift and more party cells. This is separate
-    from the domestic ally's offers (the Republican Government, the Red Army command).
+    its commissars: arms and militarization, plus drift and more party cells. Each time it
+    comes back its terms are harder (more arms, but more drift and a bigger party), and the
+    third is its last. This is separate from the domestic ally's offers (the Republican
+    Government, the Red Army command), which also grow dearer each time they're accepted; refuse
+    the ally twice and it stops asking.
   - **Revolutions abroad:** a rival nearby makes a winning revolution likelier to end with a
     party in power, so revolutions become contests between you and them.
   - **Generated maps** get 3–5 neighbouring countries, and a neighbour on an enemy's side can

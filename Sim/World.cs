@@ -110,6 +110,8 @@ public sealed class World
 
     /// <summary>Turn of the last random event.</summary>
     public int LastRandomEvent { get; internal set; } = -999;
+    /// <summary>Turn the movement was last asked to decide something (an event, an offer, a proposal).</summary>
+    public int LastDecision { get; internal set; }
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
     /// <summary>Food a commune eats in a turn.</summary>
@@ -365,6 +367,7 @@ public sealed class World
         Breakthroughs = Breakthroughs,
         TechLevelStart = TechLevelStart,
         LastRandomEvent = LastRandomEvent,
+        LastDecision = LastDecision,
         LastProposal = LastProposal,
         FoodPrice = FoodPrice,
         GoodsPrice = GoodsPrice,
@@ -423,6 +426,7 @@ public sealed class World
             Breakthroughs = s.Breakthroughs,
             TechLevelStart = s.TechLevelStart,
             LastRandomEvent = s.LastRandomEvent,
+            LastDecision = s.LastDecision,
             LastProposal = s.LastProposal,
             FoodPrice = s.FoodPrice,
             GoodsPrice = s.GoodsPrice,
@@ -530,8 +534,11 @@ public sealed class World
         return list.Count == 0 ? 0 : list.Average(f);
     }
 
-    internal void Emit(Severity severity, string text, int? commune = null, bool pause = false, string title = "") =>
+    internal void Emit(Severity severity, string text, int? commune = null, bool pause = false, string title = "")
+    {
+        if (severity == Severity.Decision) LastDecision = Tick;
         _log.Add(new GameEvent(Tick, Date, severity, text, commune, pause, title));
+    }
 
     /// <summary>One-off drift from an event; applied in this tick's drift update.</summary>
     internal void BumpDrift(double amount) => PendingDriftBump += amount;

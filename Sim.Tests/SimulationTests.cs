@@ -118,6 +118,46 @@ public class SimulationTests
         Assert.True(w.States.Count(s => s.Does(Sim.Global.StateActions.Embargo)) > lines.Count);
     }
 
+    [Theory]
+    [InlineData(1UL)]
+    [InlineData(2UL)]
+    [InlineData(3UL)]
+    public void There_is_never_a_long_stretch_without_a_decision(ulong seed)
+    {
+        var w = Play(Sim.Ai.Policies.Get("balanced")!, seed);
+        var asked = w.Log.Where(e => e.Severity == Severity.Decision).Select(e => e.Tick).Distinct().ToList();
+        int longest = asked.Zip(asked.Skip(1), (a, b) => b - a).Max();
+        Assert.True(longest * w.Weeks <= w.Balance.DecisionDrought + 3, $"{longest * w.Weeks} weeks with nothing to decide");
+    }
+
+    [Fact]
+    public void The_ally_stops_offering_after_two_refusals()
+    {
+        var w = NewWorld();
+        for (int i = 0; i < 135 && w.Outcome == Outcome.Ongoing; i++)
+        {
+            if (w.Ally.OfferPending) w.Apply(new AnswerAllyOffer(false));
+            w.Step();
+        }
+        Assert.Equal(2, w.Ally.Declined);
+        Assert.Equal(0, w.Ally.OfferInterval);
+    }
+
+    [Fact]
+    public void Rival_offers_harden_and_end_after_three()
+    {
+        var w = NewWorld();
+        w.Run(135);
+        foreach (var offers in w.Scenario.Events.Where(e => e.Id.StartsWith("rival_offer_"))
+                     .GroupBy(e => e.Id.Split('_')[2]))
+        {
+            var list = offers.OrderBy(e => e.Tick).ToList();
+            Assert.True(list.Count <= 3);
+            for (int i = 1; i < list.Count; i++)
+                Assert.True(list[i].Options[0].Effects.Drift > list[i - 1].Options[0].Effects.Drift);
+        }
+    }
+
     [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {

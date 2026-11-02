@@ -437,11 +437,11 @@ internal static class ActionSystem
             w.Emit(Severity.Info, $"You turn down the {ally.Name}'s terms. The militias stay under their own control.");
             return ActionResult.Done("Offer declined.");
         }
+        w.BumpDrift(Systems.WarSystem.AllyDrift(w));
         ally.Accepted++;
         ally.MilitarizationTicks += b.MilitarizationTicks;
         var fronts = w.Federation.Where(c => c.Front).ToList();
         foreach (var c in fronts) c.Goods += ally.ArmsGoods / Math.Max(1, fronts.Count);
-        w.BumpDrift(b.ArmsAcceptDrift);
         w.Emit(Severity.Warning, $"Arms arrive from the {ally.Name}. The columns become regular brigades with officers.");
         return ActionResult.Done("Arms accepted; militias militarized.");
     }
