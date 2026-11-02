@@ -68,7 +68,12 @@ internal static class WarSystem
             c.Defense = Defense(w, c) + campaign;
             if (c.Pressure > c.Defense) c.Fortification = Math.Max(0, c.Fortification - b.FortWear);
             if (c.Pressure > c.Defense)
-                c.Control -= b.ControlLossRate * w.Scenario.WarPace * (c.Pressure - c.Defense) / c.Pressure;
+            {
+                // Ground lost with the margin: barely outmatched, slowly; overwhelmed, up to
+                // OverwhelmCap times faster (a cap of 1 would be the old (P - D) / P).
+                double over = (c.Pressure - c.Defense) / Math.Max(1e-6, c.Defense);
+                c.Control -= b.ControlLossRate * w.Scenario.WarPace * over / (1 + over / (w.Scenario.OverwhelmCap ?? b.OverwhelmCap));
+            }
             else
                 c.Control = Math.Min(1, c.Control + b.ControlRecovery * w.Scenario.WarPace);
             if (c.Control <= 0) fallen.Add(c);

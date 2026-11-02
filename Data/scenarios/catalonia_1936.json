@@ -13,6 +13,7 @@
   "stances": { "MEX": 0.55, "SUN": 0.3, "FRA": 0.0, "GBR": -0.25, "USA": -0.05, "DEU": -0.85, "ITA": -0.85, "PRT": -0.8 },
   "startDate": "1936-07-19",
   "endTick": 135,
+  "overwhelmCap": 3,
   "neighborCount": 3,
   "neighborRadiusKm": 25,
   // Republican Spain and foreign purchases supplied grain Catalonia could not grow itself.
@@ -26,7 +27,7 @@
     "offensives": [
       { "name": "The Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },
       { "name": "The Aragon Offensive", "tick": 86, "duration": 10, "strength": 28 },
-      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 44 }
+      { "name": "The Catalonia Offensive", "tick": 124, "duration": 12, "strength": 120 }
     ]
   } ],
 

@@ -24,6 +24,8 @@ public sealed class ScenarioDefinition
     public double FoodImports { get; set; }
     /// <summary>Multiplies how fast front communes lose and regain control — higher for street fighting.</summary>
     public double WarPace { get; set; } = 1;
+    /// <summary>How much faster an overwhelming offensive takes ground than one barely stronger; null for the balance default.</summary>
+    public double? OverwhelmCap { get; set; }
     public double GoodsImports { get; set; }
     public int NeighborCount { get; set; } = 3;
     public double NeighborRadiusKm { get; set; } = 25;

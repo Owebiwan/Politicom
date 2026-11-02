@@ -1001,17 +1001,20 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            3%       97%     0% │    52    49      9    65    44 │    64
-educator          92%        9%     0% │    61    52     19    75    52 │    37
+passive            0%      100%     0% │    44    48      8    70    43 │    54
+educator           1%      100%     0% │    50    51     16    80    49 │    30
 centralizer        0%        0%   100% │    25    50      2    51    32 │   100
-balanced          79%        0%    21% │    85    52     14    64    54 │    68
-trader            66%        0%    34% │    85    52     14    62    53 │    72
+balanced          80%       15%     6% │    77    51     16    67    53 │    57
+trader            67%       16%    18% │    78    52     15    62    52 │    68
 ```
 
-The Nationalist Army starts at strength 1.9 (it was 1.4, when the balanced player survived
-97% of games and the war rarely felt dangerous). A stronger enemy is lost to less through the
-front than through drift: the war's emergencies are what turn a fifth of balanced games into a
-state.
+Catalonia can be lost both ways: to the Nationalists, or to the federation's own hardening
+into a state. The Nationalist Army starts at strength 1.9 (from 1.4), and the Catalonia
+Offensive is a crushing 120 (from 44). In Catalonia an overwhelming offensive takes ground up
+to three times faster than one that barely outmatches the defence (`overwhelmCap` in the
+scenario; elsewhere offensives keep the old pace), so the last offensive can break a weak
+federation in its final weeks. Education alone no longer saves it: a movement that never
+organizes its defence is crushed, and one that centralizes to survive becomes a state.
 
 The war follows the historical shape: with nobody playing, the front mostly holds through
 1937 and collapses in the Aragon (March 1938) and Catalonia (December 1938) offensives.

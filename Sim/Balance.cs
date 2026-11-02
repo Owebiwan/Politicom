@@ -259,6 +259,8 @@ public sealed class Balance
     public double ForceStayTrustLoss { get; set; } = 0.15;
     /// <summary>Destroyed when fewer than this share of communes remain free and federated.</summary>
     public double CollapseFraction { get; set; } = 0.3;
+    /// <summary>How much faster than the base rate an overwhelming offensive takes ground (1 = never faster).</summary>
+    public double OverwhelmCap { get; set; } = 1;
 
     // ── Militia, gold and enthusiasm ───────────────────────────────────────
     /// <summary>Share of a commune's people in its militia, as things stand (more at the front).</summary>
