@@ -50,6 +50,7 @@ public partial class Map3D : Control
         public Map3D Owner = null!;
         public override void _Draw()
         {
+            Owner.Map.DrawCountryLabels(this, Owner.OnScreen);
             Owner.Map.DrawTownLabels(this, Owner.OnScreen);
             Owner.Map.DrawUi(this, Owner._mouse);
         }

@@ -541,11 +541,12 @@ public partial class MapView : Control
         {
             DrawWars();
             DrawRegionMarker();
-            DrawGlobeLabels(font, new List<Rect2>());
+            DrawGlobeLabels(this, new List<Rect2>());
             if (!ExternalUi) DrawHud(font);
             return;
         }
-        if (globe && _zoom < 0.6f) DrawGlobeLabels(font, new List<Rect2>());
+        // On the 3D map these go on the screen overlay instead (Map3D's Hud), straight above the relief.
+        if (globe && _zoom < 0.6f && !ExternalUi) DrawGlobeLabels(this, new List<Rect2>());
 
         // Militia columns marching to the front for each defensive campaign.
         foreach (var project in w.ActiveProjects.Where(p => p.Kind == ProjectKind.DefensiveCampaign))

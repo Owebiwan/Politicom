@@ -497,18 +497,35 @@ public partial class MapView
 
     /// <summary>
     /// Country names across their territory: spaced capitals in the title face, sized to the
-    /// country, along one straight line, faint enough to read through.
+    /// country, along one straight line, faint enough to read through. On the 3D map they're
+    /// drawn on the screen overlay (`place` takes a point of the flat map to the screen), so
+    /// they stay straight instead of being draped over the relief.
     /// </summary>
-    private void DrawGlobeLabels(Font font, List<Rect2> taken)
+    private void DrawGlobeLabels(CanvasItem target, List<Rect2> taken, Func<Vector2, Vector2?>? place = null)
     {
         if (Globe_Layout() is not { } g || Globe is null) return;
         var face = UiTheme.Display;
         float s = _fitScale * _zoom;
-        var view = ViewRect;
+        var view = place is null ? ViewRect : new Rect2(Vector2.Zero, target is Control c ? c.Size : Size);
         foreach (var state in Globe.States.OrderByDescending(st => g.Labels[st.Id].Area))
         {
             var (at, angle, length) = g.NameLines[state.Id];
             float span = length * s * 0.8f; // leave the ends of the country clear
+            var centre = ToScreen(at);
+            var dir = Vector2.Right.Rotated(angle);
+            if (place != null)
+            {
+                // Where the line lies on screen once the ground is tilted in 3D: its middle, its
+                // direction and how much it is shortened by the distance.
+                if (place(centre) is not { } c0 || place(centre + dir * span / 2) is not { } c1) continue;
+                var d = c1 - c0;
+                if (d.LengthSquared() < 1) continue;
+                span = d.Length() * 2;
+                centre = c0;
+                dir = d.Normalized();
+                if (dir.X < 0) dir = -dir; // read left to right
+                angle = dir.Angle();
+            }
             if (span < 50) continue;
             var text = StateText.Country(World?.States.FirstOrDefault(x => x.Id == state.Id)?.Name ?? state.Name).ToUpperInvariant();
             if (text.Length == 0) continue;
@@ -521,9 +538,6 @@ public partial class MapView
             if (plain > span) continue; // no room even small
             float tracking = Mathf.Clamp((span - plain) / Mathf.Max(1, text.Length - 1), size * 0.04f, size * 0.45f);
             float total = plain + tracking * (text.Length - 1);
-            var centre = ToScreen(at);
-            var dir = Vector2.Right.Rotated(angle);
-            var normal = dir.Orthogonal();
             var bounds = new Rect2(centre, Vector2.Zero).Grow(size).Expand(centre + dir * total / 2).Expand(centre - dir * total / 2);
             if (!view.Intersects(bounds) || taken.Any(t => t.Intersects(bounds))) continue;
             taken.Add(bounds);
@@ -538,14 +552,20 @@ public partial class MapView
                 float w = face.GetStringSize(glyph, HorizontalAlignment.Left, -1, size).X;
                 float mid = x + w / 2;
                 // Every letter on one straight line, all at the same angle.
-                DrawSetTransform(centre + dir * mid, angle, Vector2.One);
+                target.DrawSetTransform(centre + dir * mid, angle, Vector2.One);
                 var origin = new Vector2(-w / 2, size * 0.35f);
-                DrawString(face, origin + new Vector2(0, 1.5f), glyph, HorizontalAlignment.Left, -1, size, shade);
-                DrawString(face, origin, glyph, HorizontalAlignment.Left, -1, size, ink);
+                target.DrawString(face, origin + new Vector2(0, 1.5f), glyph, HorizontalAlignment.Left, -1, size, shade);
+                target.DrawString(face, origin, glyph, HorizontalAlignment.Left, -1, size, ink);
                 x += w + tracking;
             }
-            DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+            target.DrawSetTransform(Vector2.Zero, 0, Vector2.One);
         }
+    }
+
+    /// <summary>Country names for the 3D map's overlay, at the zooms where the flat map would show them.</summary>
+    public void DrawCountryLabels(CanvasItem target, Func<Vector2, Vector2?> place)
+    {
+        if (Globe != null && !AtWorldZoom && _zoom < 0.6f) DrawGlobeLabels(target, new List<Rect2>(), place);
     }
 
     private AtlasState? HitState(Vector2 at)
