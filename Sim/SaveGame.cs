@@ -53,6 +53,8 @@ public sealed class SaveGame
     public double TechLevelStart { get; set; }
     public int LastRandomEvent { get; set; } = -999;
     public int LastDecision { get; set; }
+    public List<Goal> Goals { get; set; } = new();
+    public int LastGoal { get; set; } = -999;
     public int LastProposal { get; set; } = -999;
     public double FoodPrice { get; set; } = 1;
     public double GoodsPrice { get; set; } = 1;

@@ -318,6 +318,13 @@ public sealed class Balance
     public double RandomEventGap { get; set; } = 6;
     /// <summary>Weeks without a decision after which something is sure to happen: no long stretch of just waiting.</summary>
     public double DecisionDrought { get; set; } = 8;
+    /// <summary>Goals (GoalSystem): the first offered after this many weeks, then one every this many.</summary>
+    public double GoalFirstWeek { get; set; } = 10;
+    public double GoalInterval { get; set; } = 22;
+    /// <summary>A goal met: enthusiasm and influence; missed: enthusiasm lost.</summary>
+    public double GoalEnthusiasm { get; set; } = 0.08;
+    public double GoalInfluence { get; set; } = 8;
+    public double GoalFailEnthusiasm { get; set; } = 0.04;
     /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
     public double RisingRate { get; set; } = 0.02;
     /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>

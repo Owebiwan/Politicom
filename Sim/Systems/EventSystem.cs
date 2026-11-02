@@ -102,6 +102,11 @@ internal static class EventSystem
             if (choice == FigureChoice.Empower) FigureSystem.Empower(w, figure);
             else FigureSystem.Rotate(w, figure);
         }
+        if (e.StartGoal.Length > 0 && w.Goals.FirstOrDefault(g => g.Id == e.StartGoal) is { } goal)
+        {
+            goal.Active = true;
+            w.Emit(Severity.Info, $"The movement takes on a goal: {goal.Title}, by {w.Format(w.DateAt(goal.Deadline), "d MMMM yyyy")}.");
+        }
         foreach (var (id, delta) in e.Stances)
             if (w.States.FirstOrDefault(s => s.Id == id) is { } state)
                 state.Stance = Math.Clamp(state.Stance + delta, -1, 1);

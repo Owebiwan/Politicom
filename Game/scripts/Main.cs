@@ -136,7 +136,7 @@ public partial class Main : Control
     private CheckButton _reliefToggle = null!;
     private TechCatalog _techs = null!;
     private RichTextLabel _resources = null!;
-    private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!;
+    private RichTextLabel _driftDetail = null!, _enemy = null!, _commune = null!, _log = null!, _goal = null!;
     private VBoxContainer _decisions = null!, _projects = null!;
     private CheckButton _warCommittee = null!, _trade = null!, _conscription = null!;
     private Button _seize = null!;
@@ -1272,6 +1272,7 @@ public partial class Main : Control
 
         var overview = Tab("Overview");
         _driftDetail = AddRich(overview);
+        _goal = AddRich(overview);
         Section(overview, "Resources");
         _resources = AddRich(overview);
         Section(overview, "Outside pressure");
@@ -1454,6 +1455,12 @@ public partial class Main : Control
         _driftDetail.Text = $"[i]{DriftEffects.Describe(w.Drift.Stage)}[/i]\n{Hint($"Last {w.Turn} {(d.Net >= 0 ? "+" : "")}{d.Net:0.00}", driftLines)}: " + string.Join(", ",
             d.Items().Where(i => Math.Abs(i.Value) > 0.005).OrderByDescending(i => Math.Abs(i.Value)).Take(5)
                 .Select(i => $"{Esc(i.Label)} [color={(i.Value > 0 ? "#f07060" : "#70d080")}]{(i.Value > 0 ? "+" : "")}{i.Value:0.00}[/color]"));
+
+        // A goal under way: what it is, how it stands, how long is left.
+        var goal = w.Goals.FirstOrDefault(g => g.Active);
+        _goal.Visible = goal != null;
+        if (goal != null)
+            _goal.Text = $"[color=#e8c66a]◆ Goal[/color] {Esc(Sim.Systems.GoalSystem.Describe(w, goal))}";
 
         var lines = w.Enemies.Select(e =>
         {

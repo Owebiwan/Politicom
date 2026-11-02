@@ -21,7 +21,7 @@
   "enemies": [ {
     "name": "Nationalist Army",
       "sponsors": ["DEU", "ITA", "PRT"],
-    "strength": 1.7,
+    "strength": 1.9,
     "growth": 0.03,
     "offensives": [
       { "name": "The Huesca counter-attack", "tick": 30, "duration": 6, "strength": 1 },

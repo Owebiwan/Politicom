@@ -78,6 +78,8 @@ public sealed class EventEffects
     public string Federate { get; set; } = "";
     /// <summary>Changes to outside states' stance toward the federation, by state id.</summary>
     public Dictionary<string, double> Stances { get; set; } = new();
+    /// <summary>A goal (by id) the movement takes on (GoalSystem).</summary>
+    public string StartGoal { get; set; } = "";
 
     /// <summary>Short human-readable summary, e.g. "+6 drift, +25 influence".</summary>
     public string Summary(string turn = "week")
@@ -109,6 +111,7 @@ public sealed class EventEffects
         foreach (var (state, delta) in Stances) parts.Add($"{state} {(delta > 0 ? "warmer" : "cooler")} toward you");
         if (Federate.Length > 0) parts.Add("its cities join your federation");
         if (PartyInfluence > 0) parts.Add($"party cells +{PartyInfluence * 100:0}%");
+        if (StartGoal.Length > 0) parts.Add("the goal is taken on");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);
     }
 }

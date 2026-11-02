@@ -112,6 +112,9 @@ public sealed class World
     public int LastRandomEvent { get; internal set; } = -999;
     /// <summary>Turn the movement was last asked to decide something (an event, an offer, a proposal).</summary>
     public int LastDecision { get; internal set; }
+    /// <summary>Goals offered or taken on (GoalSystem); turn the last was offered.</summary>
+    public List<Goal> Goals { get; } = new();
+    public int LastGoal { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
     /// <summary>Food a commune eats in a turn.</summary>
@@ -368,6 +371,8 @@ public sealed class World
         TechLevelStart = TechLevelStart,
         LastRandomEvent = LastRandomEvent,
         LastDecision = LastDecision,
+        Goals = Goals.ToList(),
+        LastGoal = LastGoal,
         LastProposal = LastProposal,
         FoodPrice = FoodPrice,
         GoodsPrice = GoodsPrice,
@@ -427,6 +432,7 @@ public sealed class World
             TechLevelStart = s.TechLevelStart,
             LastRandomEvent = s.LastRandomEvent,
             LastDecision = s.LastDecision,
+            LastGoal = s.LastGoal,
             LastProposal = s.LastProposal,
             FoodPrice = s.FoodPrice,
             GoodsPrice = s.GoodsPrice,
@@ -453,6 +459,7 @@ public sealed class World
         foreach (var (k, v) in s.IdeaNudges) w.IdeaNudges[k] = v;
         w.WidespreadTechs.UnionWith(s.WidespreadTechs);
         w.Risen.UnionWith(s.Risen);
+        w.Goals.AddRange(s.Goals);
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();
@@ -468,6 +475,7 @@ public sealed class World
         if (Outcome != Outcome.Ongoing) return;
         RefreshTechShares();
         EventSystem.Run(this);
+        GoalSystem.Run(this);
         RandomEventSystem.Run(this);
         ProposalSystem.Run(this);
         EconomySystem.Run(this);

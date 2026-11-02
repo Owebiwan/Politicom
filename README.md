@@ -425,6 +425,17 @@ Commons** where its article has one. Flags are skipped.
   polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
   the indigenous peoples of that region.
 
+## Goals
+
+Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits
+the moment (`Sim/Systems/GoalSystem.cs`): hold a threatened town at the front for twelve weeks;
+bring hierarchy drift down by six points; end a hunger within eight weeks; raise trust between
+communes, political education or the radicalization of the enemy's workers by a set amount.
+It comes as a decision. Taken on, it shows in the Overview with its progress and the weeks
+left; met, the assemblies take heart (+8% enthusiasm, +8 influence); missed, they lose a little
+(-4% enthusiasm). Not taken up, it lapses with no cost. The AI players take every goal on, and
+the balance tables above include them.
+
 ## Random events and pop-ups
 
 Besides each scenario's scripted dilemmas, **random events** happen: about one every couple of
@@ -990,14 +1001,14 @@ The current defaults produce the dilemma the doc asks for:
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive           12%       88%     0% │    57    49     10    63    45 │    66
-educator          87%       13%     0% │    62    52     18    76    52 │    37
+passive            3%       97%     0% │    52    49      9    65    44 │    64
+educator          92%        9%     0% │    61    52     19    75    52 │    37
 centralizer        0%        0%   100% │    25    50      2    51    32 │   100
-balanced          80%        0%    20% │    87    51     14    63    54 │    72
-trader            81%        0%    19% │    86    53     14    69    56 │    59
+balanced          79%        0%    21% │    85    52     14    64    54 │    68
+trader            66%        0%    34% │    85    52     14    62    53 │    72
 ```
 
-The Nationalist Army starts at strength 1.7 (it was 1.4, when the balanced player survived
+The Nationalist Army starts at strength 1.9 (it was 1.4, when the balanced player survived
 97% of games and the war rarely felt dangerous). A stronger enemy is lost to less through the
 front than through drift: the war's emergencies are what turn a fifth of balanced games into a
 state.
@@ -1011,15 +1022,16 @@ The Free Territory (`--scenario free_territory_1918`) is harsher and plays diffe
 
 ```
 policy       survived destroyed  state │  surv   QoL spread  free total │ drift
-passive            0%      100%     0% │    65    49     11    83    52 │    38
-educator           2%       98%     0% │    70    51     12    90    56 │    20
-centralizer        0%        0%   100% │    28    48      2    50    32 │   100
-balanced          80%        1%    19% │    87    50     12    68    54 │    72
-trader            31%        1%    68% │    80    49     11    60    50 │    87
+passive            8%       93%     0% │    70    50     13    79    53 │    44
+educator          31%       69%     0% │    77    52     16    87    58 │    22
+centralizer        0%        0%   100% │    27    48      2    50    32 │   100
+balanced          79%        0%    21% │    87    51     15    71    56 │    61
+trader            47%        0%    54% │    83    51     14    60    52 │    85
 ```
 
-There, refusing to centralize at all means being crushed by the final Red offensive, but
-with the highest freedom. The educator's total score nearly ties the balanced player's.
+There, refusing to centralize at all usually means being crushed by the final Red offensive,
+but with the highest freedom; goals met along the way (see below) now carry the educator
+through about a third of games.
 
 Paris (`--scenario paris_commune_1871`) is the tragic one:
 
@@ -1028,8 +1040,8 @@ policy       survived destroyed  state │  surv   QoL spread  free total │ dr
 passive            0%      100%     0% │    82    66      7    91    61 │    26
 educator           0%      100%     0% │    80    66      7    96    62 │     7
 centralizer        0%        0%   100% │    76    62      4    49    48 │   100
-balanced          44%       56%     0% │    96    66      7    92    65 │    18
-trader            53%       47%     0% │    96    66      7    90    65 │    23
+balanced          45%       56%     0% │    96    66      7    92    65 │    17
+trader            56%       45%     0% │    96    66      7    90    65 │    23
 ```
 
 Bloody Week's strength is 27 (from 29): Paris is still the tragic scenario, but a good

@@ -159,6 +159,45 @@ public class SimulationTests
     }
 
     [Fact]
+    public void A_goal_is_offered_in_the_middle_of_a_game_and_taking_it_on_sets_it_going()
+    {
+        var w = NewWorld();
+        for (int i = 0; i < 60 && !w.PendingEvents.Any(p => p.Id.StartsWith("goal_")); i++) w.Step();
+        var offer = w.PendingEvents.First(p => p.Id.StartsWith("goal_"));
+        Assert.True(w.Apply(new ChooseEventOption(offer.Id, 0)).Ok);
+        Assert.Contains(w.Goals, g => g.Active && g.Id == offer.Id);
+    }
+
+    [Fact]
+    public void A_goal_met_lifts_enthusiasm_and_a_goal_missed_costs_some()
+    {
+        var w = NewWorld();
+        w.Step();
+        double enthusiasm = w.Enthusiasm, influence = w.Influence;
+        w.Goals.Add(new Goal { Id = "goal_test_met", Kind = GoalKind.LowerDrift, Title = "test", Target = 99, Offered = w.Tick, Deadline = w.Tick + 10, Active = true });
+        w.Step();
+        Assert.Empty(w.Goals.Where(g => g.Id == "goal_test_met"));
+        Assert.Contains(w.Log, e => e.Text.StartsWith("Goal met"));
+        Assert.True(w.Influence > influence - 5);
+
+        w.Goals.Add(new Goal { Id = "goal_test_missed", Kind = GoalKind.Trust, Title = "test", Target = 2, Offered = w.Tick, Deadline = w.Tick + 1, Active = true });
+        w.Step();
+        w.Step();
+        Assert.Contains(w.Log, e => e.Text.StartsWith("Goal missed"));
+    }
+
+    [Fact]
+    public void Goals_survive_saving_and_loading()
+    {
+        var w = NewWorld();
+        w.Step();
+        w.Goals.Add(new Goal { Id = "goal_saved", Kind = GoalKind.Trust, Title = "test", Target = 0.99, Offered = w.Tick, Deadline = w.Tick + 20, Active = true });
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        var g = Assert.Single(loaded.Goals);
+        Assert.Equal(("goal_saved", 0.99, true), (g.Id, g.Target, g.Active));
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();
