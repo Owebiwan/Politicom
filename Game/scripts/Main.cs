@@ -334,6 +334,8 @@ public partial class Main : Control
         Refresh();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        // --sound: the soundscape's layers for the view being saved.
+        if (Array.IndexOf(args, "--sound") >= 0) GD.Print($"sound: {_map3d.SoundReport()}");
         GetViewport().GetTexture().GetImage().SavePng(path);
         GetTree().Quit();
     }
@@ -347,6 +349,7 @@ public partial class Main : Control
 
     public override void _Process(double delta)
     {
+        if (_map3d != null) _map3d.Ducked = _overlay != null; // a window over the map: its sounds step back
         UpdateTutorial();
         if (_uiStale && (_speed < 3 || Time.GetTicksMsec() - _lastRefresh >= 200)) Refresh();
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
@@ -612,6 +615,7 @@ public partial class Main : Control
         }
         var music = Slider("Music", audio.MusicVolume);
         var sound = Slider("Sounds", audio.SoundVolume);
+        var ambience = Slider("Surroundings", audio.AmbienceVolume);
         var mute = new CheckBox { Text = "Mute everything", ButtonPressed = audio.Muted };
         var tilt = new CheckBox { Text = "Tilt the map as you zoom in (3D)", ButtonPressed = _map3d.Tilt };
         tilt.Toggled += on =>
@@ -619,7 +623,8 @@ public partial class Main : Control
             _map3d.Tilt = on;
             SaveTiltSetting(on);
         };
-        void Apply() => audio.SetVolumes((float)music.Value / 100, (float)sound.Value / 100, mute.ButtonPressed);
+        void Apply() => audio.SetVolumes((float)music.Value / 100, (float)sound.Value / 100, mute.ButtonPressed, (float)ambience.Value / 100);
+        ambience.ValueChanged += _ => Apply();
         music.ValueChanged += _ => Apply();
         sound.ValueChanged += _ => { Apply(); audio.Play("click"); };
         mute.Toggled += _ => Apply();

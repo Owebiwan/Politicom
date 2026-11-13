@@ -369,6 +369,20 @@ glow under the pointer. All of it takes about a fifth of a second (`Game/scripts
   minutes and encodes it to `Game/audio/music/`, with credits in `Data/audio/music.json`.
   Interface sounds are from Kenney's RPG Audio, UI Audio and Interface Sounds packs (CC0),
   plus a bell and a drum synthesised by the tool.
+- **The map's surroundings** (`Game/scripts/Map3D.Sound.cs`): a soundscape that follows the
+  view. Zoomed out, a faint wind and sea; closing in, the place itself: waves over the sea,
+  wind on high ground, birdsong in spring and summer, cicadas in a Mediterranean summer,
+  winter wind and snow in the cold, rain on rainy weeks (more in autumn and winter); the town
+  nearest the middle of the view (a crowd in old towns, workshops in industrial ones, a street
+  in the twentieth century); and near a front fought over last turn, the battle a few miles
+  off, in its age's sounds: rifles, machine guns and artillery; muskets in volleys and cannon;
+  or iron on iron, shouting and horses. Now and then church bells, a rooster, gulls, a steam
+  whistle or a ship's horn. Layers fade smoothly; windows over the map hush them, and a battle
+  scene plays its battle close. A **Surroundings** slider in Settings sets the level.
+  `tools/audio/build_ambience.py` fetches the field recordings from Wikimedia Commons (licences
+  checked per file), loops them seamlessly and evens their loudness; it mixes the battles from
+  single recordings of shots, explosions, artillery, clanking iron, a crowd and horses, filtered
+  and echoed as if heard across the fields. Credits are in `Data/audio/ambience.json`.
 
 ## Relief
 

@@ -33,6 +33,10 @@ public partial class Audio : Node
     /// <summary>0..1 each; Muted silences both.</summary>
     public float MusicVolume { get; private set; } = 0.55f;
     public float SoundVolume { get; private set; } = 0.7f;
+    /// <summary>The map's soundscape (Map3D.Sound.cs).</summary>
+    public float AmbienceVolume { get; private set; } = 0.6f;
+    /// <summary>The soundscape's linear gain: 0 when muted.</summary>
+    public float AmbienceGain => Muted ? 0 : AmbienceVolume * AmbienceVolume;
     public bool Muted { get; private set; }
 
     /// <summary>Raised when a piece starts: its title and credit.</summary>
@@ -133,10 +137,11 @@ public partial class Audio : Node
         player.Play();
     }
 
-    public void SetVolumes(float music, float sound, bool muted)
+    public void SetVolumes(float music, float sound, bool muted, float? ambience = null)
     {
         MusicVolume = Mathf.Clamp(music, 0, 1);
         SoundVolume = Mathf.Clamp(sound, 0, 1);
+        if (ambience is { } amb) AmbienceVolume = Mathf.Clamp(amb, 0, 1);
         Muted = muted;
         _tween?.Kill();
         _music[_current].VolumeDb = MusicDb;
@@ -150,6 +155,7 @@ public partial class Audio : Node
         if (config.Load(SettingsPath) != Error.Ok) return;
         MusicVolume = (float)config.GetValue("audio", "music", MusicVolume).AsDouble();
         SoundVolume = (float)config.GetValue("audio", "sound", SoundVolume).AsDouble();
+        AmbienceVolume = (float)config.GetValue("audio", "ambience", AmbienceVolume).AsDouble();
         Muted = config.GetValue("audio", "muted", false).AsBool();
     }
 
@@ -159,6 +165,7 @@ public partial class Audio : Node
         config.Load(SettingsPath);
         config.SetValue("audio", "music", MusicVolume);
         config.SetValue("audio", "sound", SoundVolume);
+        config.SetValue("audio", "ambience", AmbienceVolume);
         config.SetValue("audio", "muted", Muted);
         config.Save(SettingsPath);
     }

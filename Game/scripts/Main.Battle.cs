@@ -139,6 +139,17 @@ public partial class Main
                 },
             });
             Place(0);
+            // The battle's sound, close: the soundscape's battle loop for its age.
+            string kind = w.Year < 1450 ? "battle_ancient" : w.Year < 1820 ? "battle_musket" : "battle_modern";
+            if (ResourceLoader.Exists($"res://audio/ambience/{kind}.ogg") && Audio.Instance is { AmbienceGain: > 0.001f } audio)
+            {
+                var stream = GD.Load<AudioStream>($"res://audio/ambience/{kind}.ogg");
+                if (stream is AudioStreamOggVorbis ogg) ogg.Loop = true;
+                float fierce = r.Result is BattleResult.Repulsed ? 0.6f : r.Result is BattleResult.Fell ? 0.5f : 1f;
+                var player = new AudioStreamPlayer { Stream = stream, VolumeDb = Mathf.LinearToDb(audio.AmbienceGain * fierce * 1.6f) };
+                AddChild(player);
+                player.Play();
+            }
         }
 
         public override void _Process(double delta)

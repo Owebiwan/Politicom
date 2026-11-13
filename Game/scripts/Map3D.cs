@@ -96,6 +96,7 @@ public partial class Map3D : Control
         SetUpObjects();
         SetUpTrees();
         SetUpTransport();
+        SetUpSound();
 
         // The screen's colour grade, vignette and snowfall, then the flat legend and tooltips.
         AddChild(new BackBufferCopy { CopyMode = BackBufferCopy.CopyModeEnum.Viewport });
@@ -175,6 +176,7 @@ public partial class Map3D : Control
 
     public override void _Process(double delta)
     {
+        SyncSound(delta);
         if (_extent == Vector2.Zero) return;
         // Straight down over the world; tilting toward the horizon as the view closes in.
         float target = Tilt && !Map.AtWorldZoom ? Mathf.DegToRad(MaxTilt) * Mathf.SmoothStep(0.3f, 1.0f, Map.Zoom) : 0;

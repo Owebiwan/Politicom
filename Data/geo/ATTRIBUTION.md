@@ -50,6 +50,12 @@
   licences; each piece's performer, licence and source page are in `Data/audio/music.json`
   and shown in the game as it plays. CC BY-SA pieces stay under CC BY-SA.
 - Interface sounds: **Kenney** (kenney.nl), RPG Audio, UI Audio and Interface Sounds, CC0.
+- Ambient sound (sea, wind, birds, cicadas, rain, crowds, workshops, a street, bells, a rooster,
+  gulls, a steam whistle, a ship's horn) and the raw material for the distant battles: field
+  recordings from **Wikimedia Commons** under public domain, CC0, CC BY or CC BY-SA licences;
+  each recording's author, licence and source page are in `Data/audio/ambience.json`. The
+  battle loops are mixes made for this project from those recordings (CC BY-SA ones keep their
+  licence).
 
 ## 3D models
 

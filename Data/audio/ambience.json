@@ -1,0 +1,128 @@
+[
+ {
+  "file": "sea.ogg",
+  "kind": "loop",
+  "seconds": 70,
+  "credit": "Jarrod stanley, CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Ocean_Waves_on_a_Tropical_Beach.ogg"
+ },
+ {
+  "file": "wind.ogg",
+  "kind": "loop",
+  "seconds": 58,
+  "credit": "W.carter, CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Wind_in_Swedish_pine_forest_at_25_mps.ogg"
+ },
+ {
+  "file": "mountain.ogg",
+  "kind": "loop",
+  "seconds": 75,
+  "credit": "Robert EA Harvey, CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Wind_sounds_2020-05-10_1625.mp3"
+ },
+ {
+  "file": "winter.ogg",
+  "kind": "loop",
+  "seconds": 42,
+  "credit": "Fabricio Cardenas, CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:20221229_-_Abisko_Turiststation_at_night_-_Wind_and_snow.wav"
+ },
+ {
+  "file": "birds.ogg",
+  "kind": "loop",
+  "seconds": 95,
+  "credit": "Robert EA Harvey, CC BY-SA 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Bourne_woods_Birdsong_2020-06-30_0811.mp3"
+ },
+ {
+  "file": "cicadas.ogg",
+  "kind": "loop",
+  "seconds": 27,
+  "credit": "Channel R, Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Cicadas_in_Greece.ogg"
+ },
+ {
+  "file": "rain.ogg",
+  "kind": "loop",
+  "seconds": 75,
+  "credit": "cori, Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg"
+ },
+ {
+  "file": "crowd.ogg",
+  "kind": "loop",
+  "seconds": 100,
+  "credit": "SoundSnap, CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:442697-SBssa-Crowd_Talking_003.wav"
+ },
+ {
+  "file": "workshop.ogg",
+  "kind": "loop",
+  "seconds": 90,
+  "credit": "Work With Sounds / Konrad Gutkowski, CC BY 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:WWS_Eccentricpress.ogg"
+ },
+ {
+  "file": "street.ogg",
+  "kind": "loop",
+  "seconds": 90,
+  "credit": "Extemporalist, CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Urban_Street_on_a_Rainy_Afternoon.flac"
+ },
+ {
+  "file": "bells.ogg",
+  "kind": "shot",
+  "seconds": 30,
+  "credit": "natalie, Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Church_bells_-_Leverkusen,_2007.oga"
+ },
+ {
+  "file": "rooster.ogg",
+  "kind": "shot",
+  "seconds": 8,
+  "credit": "alys, Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Medium_rooster_crowing.ogg"
+ },
+ {
+  "file": "gulls.ogg",
+  "kind": "shot",
+  "seconds": 12,
+  "credit": "avphillips, Public domain · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Gull_1.ogg"
+ },
+ {
+  "file": "whistle.ogg",
+  "kind": "shot",
+  "seconds": 9,
+  "credit": "Work With Sounds / Konrad Gutkowski, CC BY 4.0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:WWS_SteamWhistle.ogg"
+ },
+ {
+  "file": "horn.ogg",
+  "kind": "shot",
+  "seconds": 12,
+  "credit": "Tvabutzku1234, CC0 · Wikimedia Commons",
+  "source": "https://commons.wikimedia.org/wiki/File:Cruise_ship_Albatros_ship_horn.ogg"
+ },
+ {
+  "file": "battle_modern.ogg",
+  "kind": "loop",
+  "seconds": 60,
+  "credit": "Mixed for Politicom from: aradlaw, Public domain · Wikimedia Commons; tcpp, Public domain · Wikimedia Commons; LouiseBrown1981, CC BY-SA 3.0 · Wikimedia Commons; wind as above",
+  "source": "https://commons.wikimedia.org/wiki/File:Gunshots_8.ogg https://commons.wikimedia.org/wiki/File:Explosion_10.ogg https://commons.wikimedia.org/wiki/File:Sexton_artillery_firing.oga"
+ },
+ {
+  "file": "battle_musket.ogg",
+  "kind": "loop",
+  "seconds": 60,
+  "credit": "Mixed for Politicom from: aradlaw, Public domain · Wikimedia Commons; tcpp, Public domain · Wikimedia Commons; LouiseBrown1981, CC BY-SA 3.0 · Wikimedia Commons; wind as above",
+  "source": "https://commons.wikimedia.org/wiki/File:Gunshots_8.ogg https://commons.wikimedia.org/wiki/File:Explosion_10.ogg https://commons.wikimedia.org/wiki/File:Sexton_artillery_firing.oga"
+ },
+ {
+  "file": "battle_ancient.ogg",
+  "kind": "loop",
+  "seconds": 60,
+  "credit": "Mixed for Politicom from: Musahfm, CC0 · Wikimedia Commons; eguobyte, CC0 · Wikimedia Commons; Freesound Community https://pixabay.com/users/freesound_community-46691455/ Bruno Auzet ht, CC0 · Wikimedia Commons; wind as above",
+  "source": "https://commons.wikimedia.org/wiki/File:Dag-Zali(Blacksmith_tool).ogg https://commons.wikimedia.org/wiki/File:360703_eguobyte_large-crowd-medium-distance-stereo.wav https://commons.wikimedia.org/wiki/File:Six_Horses_Galloping_By.ogg"
+ }
+]
