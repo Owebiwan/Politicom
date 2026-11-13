@@ -54,6 +54,7 @@ public sealed class SaveGame
     public int LastRandomEvent { get; set; } = -999;
     public int LastDecision { get; set; }
     public List<Goal> Goals { get; set; } = new();
+    public List<BattleReport> Battles { get; set; } = new();
     public int LastGoal { get; set; } = -999;
     public int LastProposal { get; set; } = -999;
     public double FoodPrice { get; set; } = 1;

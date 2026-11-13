@@ -114,6 +114,8 @@ public sealed class World
     public int LastDecision { get; internal set; }
     /// <summary>Goals offered or taken on (GoalSystem); turn the last was offered.</summary>
     public List<Goal> Goals { get; } = new();
+    /// <summary>The last few months' battles at the fronts (WarSystem), newest last.</summary>
+    public List<BattleReport> Battles { get; } = new();
     public int LastGoal { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
@@ -372,6 +374,7 @@ public sealed class World
         LastRandomEvent = LastRandomEvent,
         LastDecision = LastDecision,
         Goals = Goals.ToList(),
+        Battles = Battles.ToList(),
         LastGoal = LastGoal,
         LastProposal = LastProposal,
         FoodPrice = FoodPrice,
@@ -460,6 +463,7 @@ public sealed class World
         w.WidespreadTechs.UnionWith(s.WidespreadTechs);
         w.Risen.UnionWith(s.Risen);
         w.Goals.AddRange(s.Goals);
+        w.Battles.AddRange(s.Battles);
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();

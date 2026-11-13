@@ -263,6 +263,14 @@ public partial class Main : Control
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
+        // --battle [COMMUNE]: open a battle (by default the most eventful of last turn's).
+        int battleAt = Array.IndexOf(args, "--battle");
+        if (battleAt >= 0)
+        {
+            if (battleAt + 1 < args.Length && int.TryParse(args[battleAt + 1], out int fought)) ShowBattle(fought);
+            else if (_world.Battles.Where(x => x.Tick == _world.Tick - 1).OrderByDescending(x => (int)x.Result).ThenByDescending(x => x.Attack / x.Defense).FirstOrDefault() is { } worst)
+                ShowBattle(worst.Commune);
+        }
         if (Array.IndexOf(args, "--save") >= 0) QuickSave();
         if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
         if (Array.IndexOf(args, "--load") >= 0) ShowLoadDialog();
@@ -1141,6 +1149,7 @@ public partial class Main : Control
 
         _map = new MapView { World = _world, SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsStretchRatio = 3 };
         _map.CommuneClicked += OnCommuneClicked;
+        _map.BattleClicked += commune => ShowBattle(commune);
         _map.StateClicked += SelectState;
         _map.CityClicked += ShowMission;
         _map3d = new Map3D(_map) { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsStretchRatio = 3, Tilt = LoadTiltSetting() };

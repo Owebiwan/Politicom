@@ -425,6 +425,30 @@ Commons** where its article has one. Flags are skipped.
   polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
   the indigenous peoples of that region.
 
+## Battles
+
+Every turn each front commune under attack fights a battle, and the map shows it: where a
+commune was fought over last turn, crossed swords stand between its militia and the army
+attacking it, ringed green if the attack was repulsed, amber if the line held, red if ground
+was lost or the town fell. Click them to open the battle (`Game/scripts/Main.Battle.cs`):
+
+- **A 3D scene** of that turn's fighting, built from the map's own models
+  (`Game/scripts/Map3D.Battle.cs`), the camera sweeping slowly over the field from the flank.
+  The town and its works stand behind the militia's line, the enemy's companies come from the
+  west, and how they stand tells how it went. Repulsed, the attackers fall back and leave their
+  dead before the line; held, the lines trade volleys; ground lost, the attackers are at the
+  works, shells burst among the militia and houses burn; fallen, the enemy's flag stands in the
+  burning ruins. Muskets and rifles flash and smoke from 1450, guns shell the line from 1820;
+  earlier, spears and shields only. Companies, figures and kit are of the age.
+- **A report:** attack against defence as two bars, the ground held before and after, the works,
+  the people under arms, a defensive campaign's help, and every part of the defence and the
+  attack (the same breakdown the simulation computes with).
+- **Earlier battles there**, a strip of dates coloured by how each went: click one to see it.
+
+The simulation records each battle (`BattleReport`, kept for about six months and saved with
+the game). There are no casualty figures: the simulation doesn't count the dead, so the report
+doesn't invent them.
+
 ## Goals
 
 Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits

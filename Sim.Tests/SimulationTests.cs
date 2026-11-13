@@ -176,7 +176,7 @@ public class SimulationTests
         double enthusiasm = w.Enthusiasm, influence = w.Influence;
         w.Goals.Add(new Goal { Id = "goal_test_met", Kind = GoalKind.LowerDrift, Title = "test", Target = 99, Offered = w.Tick, Deadline = w.Tick + 10, Active = true });
         w.Step();
-        Assert.Empty(w.Goals.Where(g => g.Id == "goal_test_met"));
+        Assert.DoesNotContain(w.Goals, g => g.Id == "goal_test_met");
         Assert.Contains(w.Log, e => e.Text.StartsWith("Goal met"));
         Assert.True(w.Influence > influence - 5);
 
@@ -195,6 +195,25 @@ public class SimulationTests
         var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
         var g = Assert.Single(loaded.Goals);
         Assert.Equal(("goal_saved", 0.99, true), (g.Id, g.Target, g.Active));
+    }
+
+    [Fact]
+    public void Each_turns_battles_are_recorded_and_survive_saving()
+    {
+        var w = NewWorld();
+        w.Run(30);
+        Assert.NotEmpty(w.Battles);
+        foreach (var r in w.Battles)
+        {
+            Assert.True(r.Attack > 0 && r.Defense > 0);
+            Assert.Equal(r.Attack > r.Defense, r.Result is BattleResult.LostGround or BattleResult.Fell);
+            Assert.True(r.ControlAfter <= r.ControlBefore || r.Attack <= r.Defense);
+            Assert.NotEmpty(r.DefenseAdded);
+        }
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.Equal(w.Battles.Count, loaded.Battles.Count);
+        var (a, b) = (w.Battles[^1], loaded.Battles[^1]);
+        Assert.Equal((a.Commune, a.Attack, a.Result, a.DefenseAdded[0]), (b.Commune, b.Attack, b.Result, b.DefenseAdded[0]));
     }
 
     [Fact]

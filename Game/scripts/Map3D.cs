@@ -52,6 +52,7 @@ public partial class Map3D : Control
         {
             Owner.Map.DrawCountryLabels(this, Owner.OnScreen);
             Owner.Map.DrawTownLabels(this, Owner.OnScreen);
+            Owner.Map.DrawBattleMarkers(this, Owner.OnScreen);
             Owner.Map.DrawUi(this, Owner._mouse);
         }
     }

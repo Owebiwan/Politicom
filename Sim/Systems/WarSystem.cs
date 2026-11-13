@@ -56,8 +56,10 @@ internal static class WarSystem
         if (allFronts.Count == 0) return;
         double campaign = w.ActiveProjects.Where(p => p.Kind == ProjectKind.DefensiveCampaign).Sum(p => p.LastOutput) * 0.5 / allFronts.Count;
         var fallen = new List<Commune>();
+        var reports = new Dictionary<int, BattleReport>();
         foreach (var c in allFronts)
         {
+            double controlBefore = c.Control, fortBefore = c.Fortification;
             // Works go up a little each turn; they're worn down while the front gives way.
             if (c.Fortifying > 0)
             {
@@ -77,6 +79,7 @@ internal static class WarSystem
             else
                 c.Control = Math.Min(1, c.Control + b.ControlRecovery * w.Scenario.WarPace);
             if (c.Control <= 0) fallen.Add(c);
+            if (c.Pressure > 0) reports[c.Id] = Report(w, c, pressureBy, controlBefore, fortBefore, campaign);
         }
 
         // Shared struggle: neighbouring communes under attack together come to trust each other.
@@ -90,11 +93,36 @@ internal static class WarSystem
             // The enemy pressing hardest takes it.
             int occupier = c.Fronts.OrderByDescending(k => pressureBy.GetValueOrDefault((c.Id, k))).ThenBy(k => k).First();
             Occupy(w, c, occupier);
+            if (reports.TryGetValue(c.Id, out var r)) r.Result = BattleResult.Fell;
         }
+        w.Battles.AddRange(reports.Values);
+        // A few months of battles are enough to show how each front has gone.
+        int keep = w.Tick - (int)Math.Ceiling(26 / w.Weeks);
+        w.Battles.RemoveAll(r => r.Tick < keep);
 
         foreach (var c in w.Communes)
             if (c.OccupiedBy is int k && c.Techs.Contains("militia_doctrine"))
                 w.Enemies[k].Exhaustion = Math.Min(1, w.Enemies[k].Exhaustion + b.GuerrillaExhaustion);
+    }
+
+    /// <summary>This turn's battle at a front commune, from the numbers WarSystem just used.</summary>
+    private static BattleReport Report(World w, Commune c, Dictionary<(int Commune, int Enemy), double> pressureBy,
+                                       double controlBefore, double fortBefore, double campaign)
+    {
+        int enemy = c.Fronts.OrderByDescending(k => pressureBy.GetValueOrDefault((c.Id, k))).ThenBy(k => k).First();
+        var e = w.Enemies[enemy];
+        var (defAdded, defFactors) = Explain.Defense(w, c);
+        var (attAdded, attFactors) = Explain.Enemy(w, e, e.CurrentOffensive);
+        if (campaign > 0) defAdded.Add(new Part("Defensive campaign's columns", campaign));
+        return new BattleReport
+        {
+            Tick = w.Tick, Commune = c.Id, Enemy = enemy, EnemyName = e.Name, Offensive = e.CurrentOffensive?.Name ?? "",
+            Attack = c.Pressure, Defense = c.Defense, ControlBefore = controlBefore, ControlAfter = Math.Max(0, c.Control),
+            FortBefore = fortBefore, FortAfter = c.Fortification, Militia = c.Population * c.Mobilization, Campaign = campaign,
+            Result = c.Pressure > c.Defense ? BattleResult.LostGround
+                : c.Pressure > c.Defense * 0.7 ? BattleResult.Held : BattleResult.Repulsed,
+            DefenseAdded = defAdded, DefenseFactors = defFactors, AttackAdded = attAdded, AttackFactors = attFactors,
+        };
     }
 
     /// <summary>Militia and neighbours' support, times every factor (see <see cref="Explain.Defense"/>, which it is computed from).</summary>

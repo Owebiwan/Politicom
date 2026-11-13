@@ -372,7 +372,8 @@ public partial class MapView : Control
                     _dragging = false;
                     if (wasClick)
                     {
-                        if (!AtWorldZoom && Hit(button.Position) is int id) CommuneClicked?.Invoke(id, button.ShiftPressed);
+                        if (HitBattle(button.Position) is int fought) BattleClicked?.Invoke(fought);
+                        else if (!AtWorldZoom && Hit(button.Position) is int id) CommuneClicked?.Invoke(id, button.ShiftPressed);
                         else if (HitCity(button.Position) is { } city) CityClicked?.Invoke(city.State.Id, city.City.Name);
                         else if (HitState(button.Position) is { } st) StateClicked?.Invoke(st.Id);
                     }
@@ -872,7 +873,7 @@ public partial class MapView : Control
         Ui.DrawRect(new Rect2(0, Size.Y - LegendHeight, Size.X, LegendHeight), new Color(Background, 0.88f));
         Ui.DrawString(font, new Vector2(14, Size.Y - 34), text, HorizontalAlignment.Left, -1, 13, Muted);
         Ui.DrawString(font, new Vector2(14, Size.Y - 14),
-"Drag to move · scroll or pinch to zoom · click to select. Soldiers: enemy armies. Flag-bearers: your militia. Ruins: occupied. Rails: railways. T: trust links.",
+"Drag to move · scroll or pinch to zoom · click to select. Soldiers: enemy armies. Flag-bearers: your militia. Crossed swords: last turn's battles (click one). Ruins: occupied. Rails: railways. T: trust links.",
             HorizontalAlignment.Left, -1, 13, Muted);
     }
 
