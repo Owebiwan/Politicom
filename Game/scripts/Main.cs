@@ -370,6 +370,7 @@ public partial class Main : Control
         var date = w.Date.AddDays(_dayInTurn);
         _header.Text = $"{w.Scenario.Name} · {w.Format(date, "d MMM yyyy")} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}"
                        + (SandboxGenerator.TryParseId(ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId, out var mapSeed, out _) ? $"  · seed {mapSeed}" : "");
+        if (_miniHeader != null) _miniHeader.Text = $"{w.Format(date, "d MMM yyyy")} · {w.Turn} {w.Tick}/{w.Scenario.EndTick}";
     }
 
     public override void _UnhandledInput(InputEvent e)
@@ -388,6 +389,7 @@ public partial class Main : Control
         switch (key.Keycode)
         {
             case Key.C: ToggleCommuneList(); break;
+            case Key.P: SetPanel(!_sidePanel.Visible); break;
             case Key.K: ShowTechTree(); break;
             case Key.L: ShowLedger(); break;
             case Key.F5: QuickSave(); break;
@@ -1180,6 +1182,8 @@ public partial class Main : Control
         var panel = new PanelContainer { CustomMinimumSize = new Vector2(360, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(14)); // clear of the corner ornaments
         root.AddChild(panel);
+        _sidePanel = panel;
+        BuildPanelToggle();
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         foreach (var edge in new[] { "left", "right", "top", "bottom" }) margin.AddThemeConstantOverride($"margin_{edge}", 12);
         panel.AddChild(margin);
@@ -1874,6 +1878,7 @@ public partial class Main : Control
     private void OnCommuneClicked(int id, bool shift)
     {
         Audio.Instance?.Play("tick", -4);
+        if (!_sidePanel.Visible) SetPanel(true); // a commune chosen: its details are on the dashboard
         // The tab stays as it is: the Commune tab follows the selection when it's open.
         if (shift && _map.Selected is int sel && sel != id) _map.Secondary = id;
         else
@@ -1914,6 +1919,7 @@ public partial class Main : Control
         _speed = speed;
         _accumulator = 0;
         for (int i = 0; i < _speedButtons.Count; i++) _speedButtons[i].SetPressedNoSignal(i == Math.Min(speed, 3));
+        for (int i = 0; i < _miniSpeed.Count; i++) _miniSpeed[i].SetPressedNoSignal(i == Math.Min(speed, 3));
     }
 
     private void Say(string text)

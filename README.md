@@ -425,6 +425,12 @@ Commons** where its article has one. Flags are skipped.
   polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
   the indigenous peoples of that region.
 
+## Folding the dashboard
+
+The dashboard on the right folds away: press the tab on the map's right edge (or **P**) and the
+map takes the whole window, with a small clock at the top (date, turn, pause and speeds). The
+tab, P, or clicking a commune brings it back. The game remembers whether it was folded.
+
 ## Battles
 
 Every turn each front commune under attack fights a battle, and the map shows it: where a
