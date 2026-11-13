@@ -239,6 +239,26 @@ public class SimulationTests
     }
 
     [Fact]
+    public void The_codex_links_only_to_entries_and_events_that_exist()
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(DataDir, "codex.json")));
+        var entries = doc.RootElement.GetProperty("entries").EnumerateArray().ToList();
+        var categories = doc.RootElement.GetProperty("categories").EnumerateArray().Select(c => c.GetString()).ToHashSet();
+        var ids = entries.Select(e => e.GetProperty("id").GetString()).ToHashSet();
+        Assert.Equal(entries.Count, ids.Count);
+        var events = new[] { "catalonia_1936", "free_territory_1918", "paris_commune_1871" }
+            .SelectMany(s => World.Load(DataDir, s).Scenario.Events.Select(e => e.Id)).ToHashSet();
+        foreach (var e in entries)
+        {
+            Assert.Contains(e.GetProperty("category").GetString(), categories);
+            if (e.TryGetProperty("related", out var related))
+                foreach (var r in related.EnumerateArray()) Assert.Contains(r.GetString(), ids);
+            if (e.TryGetProperty("events", out var linked))
+                foreach (var x in linked.EnumerateArray()) Assert.Contains(x.GetString(), events);
+        }
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();

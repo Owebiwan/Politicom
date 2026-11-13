@@ -425,6 +425,30 @@ Commons** where its article has one. Flags are skipped.
   polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
   the indigenous peoples of that region.
 
+## Codex
+
+The **Codex** (button in the dashboard, or **J**) explains where the game's ideas come from, in
+35 entries (`Data/codex.json`) under five headings:
+
+- **Ideas:** anarchism, the many anarchisms (syndicalist, communist, individualist, pacifist,
+  platformist and synthesist, anarcha-feminist), mutual aid, federation, the critique of the
+  state, means and ends, anarcho-syndicalism, libertarian communism.
+- **Practices:** the assembly, the imperative mandate and recall, rotation, ateneos and
+  rationalist schools, collectivization, militias, trust between communes.
+- **Dangers:** hierarchy drift (Bakunin, Michels's iron law of oligarchy), the expert trap,
+  double-edged technology, war or revolution, parties and commissars, leaders in a leaderless
+  movement.
+- **Histories:** the Paris Commune, the Free Territory, Revolutionary Catalonia, and
+  experiments elsewhere.
+- **People:** Proudhon, Bakunin, Kropotkin, Malatesta, Goldman, Louise Michel, Makhno,
+  Durruti, Montseny, Lucía Sánchez Saornil and Mujeres Libres.
+
+Each entry says what it was, how it appears in the game, and what to read next, and links to
+related entries. The scenarios' historical events link to their history from their pop-up
+("The history behind this"), and clicking the drift line opens the entry on drift. The game
+models one tradition, the federated communes of Spain, Ukraine and France; the entry on the
+many anarchisms says so.
+
 ## Needs attention
 
 At the top of the Overview tab, **Needs attention** lists up to six communes that most need the

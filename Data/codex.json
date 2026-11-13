@@ -1,0 +1,316 @@
+{
+  "categories": ["Ideas", "Practices", "Dangers", "Histories", "People"],
+  "entries": [
+    {
+      "id": "anarchism",
+      "category": "Ideas",
+      "title": "Anarchism",
+      "text": "Anarchism is the idea that people can organize their lives without rulers: without a state, bosses or any authority that can't justify itself to the people it affects. Pierre-Joseph Proudhon was the first to call himself an anarchist, in What Is Property? (1840). Anarchists don't mean disorder. They mean order from below, made by free association, mutual aid and federation instead of command. Most anarchists of the nineteenth and twentieth centuries were also socialists: they wanted the land and the workshops held in common, and saw the state and capital as two halves of one system of domination.",
+      "game": "You play the movement, not a government. The communes run themselves; you can only persuade, propose and back. The game's central danger, hierarchy drift, is the anarchist fear that a revolution can rebuild the power it overthrew.",
+      "reading": ["Colin Ward, Anarchy in Action (1973)", "Peter Marshall, Demanding the Impossible (1992)", "Errico Malatesta, Anarchy (1891)"],
+      "related": ["schools_of_anarchism", "mutual_aid", "federalism", "state", "drift"]
+    },
+    {
+      "id": "schools_of_anarchism",
+      "category": "Ideas",
+      "title": "The many anarchisms",
+      "text": "Anarchists have never agreed on everything. Anarcho-syndicalists (the CNT in Spain) put their hope in revolutionary unions; anarchist communists (Kropotkin, Malatesta) in communes sharing according to need; individualists (Max Stirner, Benjamin Tucker) in the sovereign individual and voluntary exchange; Christian and pacifist anarchists (Tolstoy) in refusing all violence. In the 1920s, exiles from the Russian Revolution split over the Organizational Platform (1926), which called for a disciplined anarchist organization with a common program, against the 'synthesis' of Voline and Sébastien Faure, which wanted a loose union of all tendencies. Anarcha-feminists, from Emma Goldman to the Spanish Mujeres Libres, insisted that domination at home and in the family was as real as domination by the state.",
+      "game": "This game models one tradition: the anarcho-syndicalist and anarchist-communist movements of Spain, Ukraine and France, organized in federated communes. Other anarchisms would make a different game.",
+      "reading": ["Peter Marshall, Demanding the Impossible (1992)", "Robert Graham (ed.), Anarchism: A Documentary History of Libertarian Ideas (2005–2012)"],
+      "related": ["anarchism", "syndicalism", "libertarian_communism", "mujeres_libres"]
+    },
+    {
+      "id": "mutual_aid",
+      "category": "Ideas",
+      "title": "Mutual aid",
+      "text": "Peter Kropotkin's Mutual Aid: A Factor of Evolution (1902) answered the Social Darwinists who read nature as a war of all against all. In animals and in human history, from village communes to medieval guilds and workers' societies, he found cooperation as important to survival as competition. Anarchists took from it the conviction that people can sustain a society by sharing and helping one another, without being made to.",
+      "game": "Communes share food and goods with neighbours they trust, and send militia to help them at the front. Trust is the federation's real strength: it carries help, ideas and support, and it is what keeps communes from leaving.",
+      "reading": ["Peter Kropotkin, Mutual Aid: A Factor of Evolution (1902)"],
+      "related": ["federalism", "trust", "kropotkin"]
+    },
+    {
+      "id": "federalism",
+      "category": "Ideas",
+      "title": "Federation and free association",
+      "text": "Anarchists proposed to replace the state with federations: communes and unions joined from below, each free to govern itself, linked by agreements they can leave. Proudhon set the idea out in The Principle of Federation (1863), and Bakunin built his programs on it. Coordination flows up through delegates who carry their community's decisions and can be recalled, never down by command. Its critics asked whether a federation could act fast enough in war or plan an economy; its defenders answered that centralization was the danger, not the cure.",
+      "game": "The federation is the communes that choose to belong. A discontented commune can vote to leave; holding it by force is possible, but it breaks trust and adds drift. Projects are joined by invitation, and coordinating many communes costs effort.",
+      "reading": ["Pierre-Joseph Proudhon, The Principle of Federation (1863)", "Mikhail Bakunin, Statism and Anarchy (1873)"],
+      "related": ["mandate", "assembly", "mutual_aid", "proudhon"]
+    },
+    {
+      "id": "state",
+      "category": "Ideas",
+      "title": "Against the state",
+      "text": "For anarchists the state is not a neutral tool that can be captured and used for good: it is a minority holding the means of force over a majority, and whoever takes it over becomes that minority. This was the heart of the split with Marx in the First International (1872). In Statism and Anarchy (1873) Bakunin predicted that a 'people's state' would be ruled by a new class of educated administrators, governing in the people's name. Many anarchists read the Russian Revolution as proof.",
+      "game": "If drift reaches its last stage, a state crystallizes out of the councils and commissars: the game ends with the revolution lost, even if the war was won.",
+      "reading": ["Mikhail Bakunin, Statism and Anarchy (1873)", "Emma Goldman, My Disillusionment in Russia (1923)"],
+      "related": ["drift", "bakunin", "means_and_ends"]
+    },
+    {
+      "id": "means_and_ends",
+      "category": "Ideas",
+      "title": "Means and ends",
+      "text": "Anarchists insist that the way a revolution is made shapes what it becomes: you cannot reach freedom through dictatorship, or equality through a disciplined hierarchy. Malatesta argued it for fifty years; Emma Goldman concluded from Russia that 'no revolution can ever succeed as a factor of liberation unless the means used to further it be identical in spirit and tendency with the purposes to be achieved'. Today this is often called prefigurative politics: organizing now in the form of the society you want.",
+      "game": "Almost every shortcut in the game — the war committee, government arms, foreign advisers, conscription, the statistics bureau — works, and costs drift. The game asks the anarchists' question: how much can you borrow from the methods of the state before you become one?",
+      "reading": ["Emma Goldman, My Disillusionment in Russia (1923), Afterword", "Errico Malatesta, writings collected in The Method of Freedom (2014)"],
+      "related": ["drift", "war_and_revolution", "goldman", "malatesta"]
+    },
+    {
+      "id": "syndicalism",
+      "category": "Ideas",
+      "title": "Anarcho-syndicalism",
+      "text": "Anarcho-syndicalists made the union the seed of the new society: workers organized by trade and industry would fight the bosses through direct action and the general strike, and one day take over production themselves. The French CGT's Charter of Amiens (1906) and Spain's CNT (founded 1910) were its great organizations; by 1936 the CNT had well over a million members. Rudolf Rocker's Anarcho-Syndicalism (1938) is its classic statement.",
+      "game": "The Catalan scenario's industrial communes are syndicates (Sants textile workers, Poblenou metalworkers), and the general strike can come as an event that stalls the enemy's supply.",
+      "reading": ["Rudolf Rocker, Anarcho-Syndicalism: Theory and Practice (1938)"],
+      "related": ["collectivization", "catalonia", "schools_of_anarchism"]
+    },
+    {
+      "id": "libertarian_communism",
+      "category": "Ideas",
+      "title": "Libertarian communism",
+      "text": "Kropotkin's The Conquest of Bread (1892) argued that once the land and the workshops were taken back, a free society could provide for everyone from common stores: 'from each according to ability, to each according to need', without money or wages. In May 1936 the CNT's Zaragoza congress adopted a program of libertarian communism built on free communes; within weeks, parts of Aragon and Catalonia were trying to live it.",
+      "game": "Communes produce food and goods and share them through trust; prices only rise as scarcity bites, and trade abroad for currency brings accounts and markets back in, which counts as drift.",
+      "reading": ["Peter Kropotkin, The Conquest of Bread (1892)", "Isaac Puente, Libertarian Communism (1932)"],
+      "related": ["collectivization", "mutual_aid", "kropotkin"]
+    },
+    {
+      "id": "assembly",
+      "category": "Practices",
+      "title": "The assembly",
+      "text": "In anarchist practice decisions are made by those they affect, in open assemblies of a village, a workplace or a neighbourhood, not by representatives ruling in their name. The assembly decides; anyone it chooses to carry its decisions elsewhere is a delegate, not a leader. Assemblies are slow and demanding, and anarchists have argued ever since about how to make them work at scale.",
+      "game": "The technology 'Open assemblies' makes decisions bind only those who make them, and slows federal decisions. Many communes' own proposals reach you as their assembly's request.",
+      "reading": ["Murray Bookchin, The Next Revolution (2015)", "Colin Ward, Anarchy in Action (1973)"],
+      "related": ["mandate", "federalism", "rotation"]
+    },
+    {
+      "id": "mandate",
+      "category": "Practices",
+      "title": "The imperative mandate and recall",
+      "text": "A delegate in an anarchist federation carries a mandate: instructions from the assembly that sent them, which they may not exceed. If they betray it they can be recalled at once. The Paris Commune of 1871 made its members 'revocable at any moment', which Marx too praised; the CNT's congresses voted by delegates mandated by their unions. The point is that power stays with the base, and nobody becomes indispensable.",
+      "game": "Recall delegates breaks up informal power: drift falls, but experience is lost and defence suffers briefly. Mandates, recall and rotation brake drift every turn.",
+      "reading": ["Karl Marx, The Civil War in France (1871)", "José Peirats, The CNT in the Spanish Revolution (1951–53)"],
+      "related": ["rotation", "assembly", "drift", "paris_commune"]
+    },
+    {
+      "id": "rotation",
+      "category": "Practices",
+      "title": "Rotation",
+      "text": "Rotating tasks and posts keeps any one person from accumulating the knowledge, contacts and habits of command that turn a delegate into a boss. It costs: newcomers know less, and things are done less well for a while. Anarchists have generally thought the price worth paying.",
+      "game": "Figures who have gathered a following can be rotated back to the ranks: their followers grumble, and the power they were gathering is broken up. Delegates are recalled and replaced by rotation when drift nears a threshold.",
+      "reading": ["Robert Michels, Political Parties (1911) — the problem rotation answers"],
+      "related": ["mandate", "figures", "drift"]
+    },
+    {
+      "id": "education",
+      "category": "Practices",
+      "title": "Ateneos and rationalist schools",
+      "text": "Spanish anarchists built a culture of their own: ateneos libertarios (workers' athenaeums with libraries, literacy classes and debates), newspapers, theatre, hiking clubs. Francisco Ferrer's Escuela Moderna (1901) taught children without church or state; Ferrer was executed in 1909, and his schools inspired others across Europe and the Americas. The idea was that people who can read, argue and decide together don't need rulers, and won't put up with them.",
+      "game": "Political education is your main brake on drift. Political schools, pamphlets, ateneo networks and cultural works raise it; practical schooling raises production, but if it runs ahead of political education experts start to take charge.",
+      "reading": ["Francisco Ferrer, The Origin and Ideals of the Modern School (1913)", "Paul Avrich, The Modern School Movement (1980)"],
+      "related": ["expert_trap", "drift", "mujeres_libres"]
+    },
+    {
+      "id": "collectivization",
+      "category": "Practices",
+      "title": "Collectivization",
+      "text": "After July 1936, workers in Catalonia took over factories, trams, railways and public services, and peasants in Aragon, the Levante and Andalusia formed collectives: perhaps several hundred in Aragon alone. Some abolished money and shared by need; others kept a family wage. They varied greatly, and historians still debate how voluntary and how productive they were. In August 1937 the Republic's own troops broke up many of the Aragon collectives.",
+      "game": "Collectivizing the works is a project the communes propose once the war allows it: one plan for every collective, with the efficiency and the risk that a plan brings planners.",
+      "reading": ["Gaston Leval, Collectives in the Spanish Revolution (1975)", "Sam Dolgoff (ed.), The Anarchist Collectives (1974)"],
+      "related": ["catalonia", "libertarian_communism", "syndicalism"]
+    },
+    {
+      "id": "militias",
+      "category": "Practices",
+      "title": "Militias",
+      "text": "In July 1936 the CNT's workers defeated the military rising in Barcelona and formed columns of volunteers, such as Durruti's, which elected their delegates, held assemblies and had no saluting or ranks. Their supporters saw a new kind of army; their critics, an undisciplined one. From late 1936 the Republic 'militarized' the militias into a regular army with officers, and the anarchists argued bitterly over whether to accept it. In Ukraine, Makhno's insurgent army kept elected commanders throughout.",
+      "game": "Each commune's militia is its people under arms, their militancy and spirit; neighbours send help by trust. Elected officers and militia doctrine are techniques; government arms come with militarization.",
+      "reading": ["George Orwell, Homage to Catalonia (1938)", "Abel Paz, Durruti in the Spanish Revolution (1996)"],
+      "related": ["war_and_revolution", "durruti", "makhno", "catalonia"]
+    },
+    {
+      "id": "drift",
+      "category": "Dangers",
+      "title": "Hierarchy drift",
+      "text": "Why do organizations founded to free people so often end up ruled by a few? Bakunin warned of a 'red bureaucracy'. The sociologist Robert Michels, studying Germany's socialist party, called it the 'iron law of oligarchy' (1911): whoever organizes needs leaders, experts and officials, and these acquire knowledge, control of resources and interests of their own. Anarchists have answered with recall, rotation, education and the refusal of permanent office, while admitting that the pull never goes away.",
+      "game": "Drift is the game's measure of that pull. War, big projects, experts, popular figures, trade and emergency powers push it up; political education, recall, rotation and some techniques push it down. At 25 permanent councils form, at 50 commissars, at 75 a party; at the end, a state.",
+      "reading": ["Robert Michels, Political Parties (1911)", "Mikhail Bakunin, Statism and Anarchy (1873)"],
+      "related": ["state", "means_and_ends", "mandate", "expert_trap", "figures"]
+    },
+    {
+      "id": "expert_trap",
+      "category": "Dangers",
+      "title": "The expert trap",
+      "text": "Bakunin did not reject expertise: 'In the matter of boots, I refer to the authority of the bootmaker.' What he rejected was letting expertise become command: the engineer, the planner or the scientist deciding for everyone else. Anarchists thought the answer was to spread knowledge widely and keep experts answerable to those they serve.",
+      "game": "When a commune's practical education runs far ahead of its political education, experts start to take charge, and drift rises. The Needs attention list warns you; a political school helps.",
+      "reading": ["Mikhail Bakunin, God and the State (1882)"],
+      "related": ["education", "drift", "technology"]
+    },
+    {
+      "id": "technology",
+      "category": "Dangers",
+      "title": "Double-edged technology",
+      "text": "Some tools spread power; others concentrate it. The historian Lewis Mumford distinguished 'authoritarian' from 'democratic' technics (1964): a power grid or a telegraph network needs a centre and someone to run it, a workshop tool does not. Anarchists have long asked which technologies a free society can live with, and on what terms.",
+      "game": "Most technologies in the game carry a risk: the telegraph favours hub towns, newspapers make editors powerful, a grid needs a board. Each is useful and adds a little drift; free paths exist for some.",
+      "reading": ["Lewis Mumford, 'Authoritarian and Democratic Technics' (1964)", "Murray Bookchin, Post-Scarcity Anarchism (1971)"],
+      "related": ["expert_trap", "drift"]
+    },
+    {
+      "id": "war_and_revolution",
+      "category": "Dangers",
+      "title": "War or revolution?",
+      "text": "The Spanish anarchists faced a dilemma they never solved. To defeat Franco they needed arms, which the Republic and the Soviet Union would give only to a disciplined army under a central command. Accepting meant ministers, militarization and the slow end of the revolution; refusing meant losing the war. In September and November 1936 the CNT joined the Catalan and Spanish governments. Critics inside the movement, such as the Friends of Durruti, called it the abandonment of the revolution; its leaders called it the price of survival. Franco won anyway.",
+      "game": "Every arms offer, war committee and emergency measure is this dilemma in small. You can lose by being crushed, or by becoming a state.",
+      "reading": ["Vernon Richards, Lessons of the Spanish Revolution (1953)", "Burnett Bolloten, The Spanish Civil War (1991)"],
+      "related": ["catalonia", "means_and_ends", "militias", "montseny"],
+      "events": ["cnt_joins_government"]
+    },
+    {
+      "id": "vanguard",
+      "category": "Dangers",
+      "title": "Parties and commissars",
+      "text": "Anarchists and Bolsheviks fought side by side against the old order in Russia and Spain, and then against each other. The Bolsheviks believed a disciplined party had to lead the revolution; anarchists that a party in power becomes a new ruling class. In 1921 the Red Army crushed the Kronstadt sailors who demanded free soviets, and the Cheka had already turned on Russia's anarchists. In Spain the Soviet advisers and the Communist party gained influence with every shipment of arms.",
+      "game": "Rival parties grow cells where political education is thin and life is hard. They offer arms for commissars, harder each time. Exposing their cells costs their patrons' goodwill.",
+      "reading": ["Voline, The Unknown Revolution (1947)", "Paul Avrich, Kronstadt 1921 (1970)"],
+      "related": ["free_territory", "catalonia", "state"],
+      "events": ["sim_police", "may_days"]
+    },
+    {
+      "id": "figures",
+      "category": "Dangers",
+      "title": "Leaders in a leaderless movement",
+      "text": "Anarchist movements rejected leaders, and produced famous ones anyway: Durruti, Makhno, Louise Michel, Federica Montseny. Their courage and skill mattered; so did the danger that a following becomes a power base. Anarchists tried to keep even their heroes answerable, with mixed success.",
+      "game": "Historical figures bring defence, influence or organization. Over time some gather a following and an appetite for office: you can let them take the power they ask for, or rotate them back to the ranks.",
+      "reading": ["Abel Paz, Durruti in the Spanish Revolution (1996)"],
+      "related": ["rotation", "drift", "durruti", "makhno"]
+    },
+    {
+      "id": "paris_commune",
+      "category": "Histories",
+      "title": "The Paris Commune, 1871",
+      "text": "After France's defeat by Prussia, Paris rose on 18 March 1871 when the government tried to take the National Guard's cannon. The city elected a Commune on 26 March: workers, artisans, journalists, Proudhonists, Blanquists and members of the International. In two months it separated church and state, ended night work in bakeries, handed abandoned workshops to cooperatives and made its members recallable. It never marched on Versailles while it could, and left the Bank of France untouched. On 1 May a majority voted a Committee of Public Safety over the minority's protest. From 21 to 28 May, Bloody Week, the Versailles army retook the city; many thousands were killed.",
+      "game": "The Paris scenario is the hardest: a short siege that ends in Bloody Week. Its decisions are the Commune's own debates.",
+      "reading": ["Prosper-Olivier Lissagaray, History of the Paris Commune of 1871 (1876)", "Louise Michel, The Red Virgin: Memoirs (1886)"],
+      "related": ["mandate", "louise_michel", "proudhon"],
+      "events": ["march_on_versailles", "elections", "bank_of_france", "union_des_femmes", "committee_of_public_safety", "bloody_week"]
+    },
+    {
+      "id": "free_territory",
+      "category": "Histories",
+      "title": "The Free Territory, 1918–1921",
+      "text": "In southern Ukraine, around Huliaipole, peasants and workers led by Nestor Makhno fought the Austro-German occupiers, the nationalists, the White armies and finally the Bolsheviks. Regional congresses of peasants, workers and insurgents governed the area; land was taken by those who worked it, and the insurgent army elected its commanders. In June 1919 Trotsky's Order No. 1824 banned the insurgents' congress. In September 1919 the insurgents broke Denikin's White army at Peregonovka; in October 1920 they allied with the Red Army against Wrangel, and in November, Wrangel beaten, the Red Army turned on them. Makhno escaped abroad in 1921 and died in Paris in 1934.",
+      "game": "The Free Territory scenario: harsher than Catalonia, its decisions drawn from the insurgents' congresses and the Bolshevik alliance and betrayal.",
+      "reading": ["Peter Arshinov, History of the Makhnovist Movement (1923)", "Alexandre Skirda, Nestor Makhno: Anarchy's Cossack (1982)"],
+      "related": ["makhno", "vanguard", "militias"],
+      "events": ["second_congress", "order_1824", "peregonovka", "typhus", "starobilsk", "betrayal"]
+    },
+    {
+      "id": "catalonia",
+      "category": "Histories",
+      "title": "Revolutionary Catalonia, 1936–1939",
+      "text": "When generals rose against the Spanish Republic on 17–19 July 1936, the CNT and other workers' organizations defeated them in Barcelona. For months power lay with the unions and a Central Committee of Antifascist Militias; factories and land were collectivized, and columns marched on Aragon. George Orwell found a city where 'the working class was in the saddle'. The CNT joined the Catalan and then the Spanish government; Durruti was killed at Madrid in November. In May 1937 street fighting in Barcelona (the May Days) broke the revolutionaries' power, and in August the Council of Aragon was dissolved by force. Barcelona fell to Franco in January 1939.",
+      "game": "The default scenario. You can be crushed by the Nationalists, or survive the war and become the state you fought.",
+      "reading": ["George Orwell, Homage to Catalonia (1938)", "Abel Paz, Durruti in the Spanish Revolution (1996)", "Chris Ealham, Anarchism and the City (2010)"],
+      "related": ["war_and_revolution", "collectivization", "militias", "durruti", "montseny"],
+      "events": ["durruti_death", "may_days", "aragon_council", "ebro"]
+    },
+    {
+      "id": "elsewhere",
+      "category": "Histories",
+      "title": "Elsewhere",
+      "text": "Anarchist and anarchist-influenced experiments reached far beyond the game's three scenarios: the Kronstadt sailors' free soviets (1921); the Korean anarchists' Shinmin autonomous region in Manchuria (1929–1931); the Spanish collectives of Aragon and the Levante; the Zapatista autonomous communities of Chiapas since 1994; and the democratic confederalism of north-east Syria, inspired by Murray Bookchin's municipalism. None is a pure model, and their histories are argued over; together they show the ideas being tried.",
+      "game": "The open world lets you raise the movement anywhere and in any age: alternate history, asking what these ideas might have done elsewhere.",
+      "reading": ["Murray Bookchin, The Next Revolution (2015)", "Alex Khasnabish, Zapatismo Beyond Borders (2008)"],
+      "related": ["anarchism", "schools_of_anarchism"]
+    },
+    {
+      "id": "proudhon",
+      "category": "People",
+      "title": "Pierre-Joseph Proudhon (1809–1865)",
+      "text": "A printer from Besançon, the first to call himself an anarchist. 'Property is theft!' he wrote in What Is Property? (1840), meaning property that lets its owner live from others' work. He proposed mutual credit, workers' associations and a federation of free communes in place of the state. His ideas shaped the French workers' movement and many Communards; his hostility to women's equality has been rightly condemned.",
+      "reading": ["Pierre-Joseph Proudhon, What Is Property? (1840)"],
+      "related": ["federalism", "paris_commune"]
+    },
+    {
+      "id": "bakunin",
+      "category": "People",
+      "title": "Mikhail Bakunin (1814–1876)",
+      "text": "A Russian revolutionary who fought on the barricades of 1848, spent years in Tsarist prisons and Siberian exile, and escaped to lead the anti-authoritarian wing of the First International against Marx. He predicted that a revolutionary state would breed a new ruling class, and gave anarchism its collectivist and federalist program.",
+      "reading": ["Mikhail Bakunin, Statism and Anarchy (1873)", "Mikhail Bakunin, God and the State (1882)"],
+      "related": ["state", "drift", "expert_trap"]
+    },
+    {
+      "id": "kropotkin",
+      "category": "People",
+      "title": "Peter Kropotkin (1842–1921)",
+      "text": "A Russian prince turned geographer and revolutionary, imprisoned in Russia and France, who spent most of his life in exile in England. He gave anarchist communism its theory in The Conquest of Bread (1892) and Mutual Aid (1902). He returned to Russia in 1917 and died there in 1921, critical of the Bolshevik dictatorship; tens of thousands followed his funeral, among the last anarchist demonstrations the Soviet authorities allowed.",
+      "reading": ["Peter Kropotkin, The Conquest of Bread (1892)", "Peter Kropotkin, Mutual Aid (1902)"],
+      "related": ["mutual_aid", "libertarian_communism"]
+    },
+    {
+      "id": "malatesta",
+      "category": "People",
+      "title": "Errico Malatesta (1853–1932)",
+      "text": "An Italian electrician and revolutionary, active for sixty years in Italy, Argentina, London and beyond. Less a system-builder than a practical thinker, he argued that anarchy is a method as much as a goal: freedom has to be practised now, and organization is necessary as long as it is voluntary. He died under house arrest in Fascist Rome.",
+      "reading": ["Errico Malatesta, Anarchy (1891)", "Vernon Richards (ed.), Errico Malatesta: His Life and Ideas (1965)"],
+      "related": ["means_and_ends", "anarchism"]
+    },
+    {
+      "id": "goldman",
+      "category": "People",
+      "title": "Emma Goldman (1869–1940)",
+      "text": "A Lithuanian-born anarchist in the United States, famous for her speeches and her journal Mother Earth, who campaigned for free speech, birth control and women's freedom and against conscription. Deported to Russia in 1919, she left it disillusioned in 1921 and wrote one of the first anarchist critiques of the Soviet state. She worked for the CNT during the Spanish Civil War, and died in Toronto in 1940.",
+      "reading": ["Emma Goldman, Living My Life (1931)", "Emma Goldman, My Disillusionment in Russia (1923)"],
+      "related": ["means_and_ends", "schools_of_anarchism", "vanguard"]
+    },
+    {
+      "id": "louise_michel",
+      "category": "People",
+      "title": "Louise Michel (1830–1905)",
+      "text": "A schoolteacher who fought with the National Guard in the Paris Commune and ran an ambulance during Bloody Week. Deported to New Caledonia, she befriended the Kanak people and supported their revolt of 1878. She returned to France an anarchist and spent the rest of her life speaking for the cause, often from prison.",
+      "reading": ["Louise Michel, The Red Virgin: Memoirs of Louise Michel (1886)"],
+      "related": ["paris_commune"]
+    },
+    {
+      "id": "makhno",
+      "category": "People",
+      "title": "Nestor Makhno (1888–1934)",
+      "text": "A peasant from Huliaipole, imprisoned by the Tsar for his anarchist activity, who led the Revolutionary Insurrectionary Army of Ukraine through the civil war. A brilliant guerrilla commander, he fought every side that tried to rule the region, and was finally driven out by the Red Army in 1921. He died poor in Paris, where he had helped write the Organizational Platform.",
+      "reading": ["Nestor Makhno, The Russian Revolution in Ukraine (memoirs, 1929–1937)", "Alexandre Skirda, Nestor Makhno: Anarchy's Cossack (1982)"],
+      "related": ["free_territory", "militias", "schools_of_anarchism"]
+    },
+    {
+      "id": "durruti",
+      "category": "People",
+      "title": "Buenaventura Durruti (1896–1936)",
+      "text": "A mechanic from León who became the CNT's best-known militant: a bank robber for the cause, an exile, a union organizer. In July 1936 he helped defeat the rising in Barcelona and led a column to the Aragon front. He was killed defending Madrid on 20 November 1936; hundreds of thousands followed his coffin through Barcelona. 'We carry a new world here, in our hearts,' a Canadian journalist quoted him as saying.",
+      "reading": ["Abel Paz, Durruti in the Spanish Revolution (1996)", "Hans Magnus Enzensberger, The Short Summer of Anarchy (1972)"],
+      "related": ["catalonia", "militias", "figures"],
+      "events": ["durruti_death"]
+    },
+    {
+      "id": "montseny",
+      "category": "People",
+      "title": "Federica Montseny (1905–1994)",
+      "text": "A writer and CNT militant, daughter of anarchist publishers, who in November 1936 became Spain's Minister of Health: the first woman minister in Spanish history, and an anarchist in a government. She pressed for reforms in public health, birth control and the care of the sick and of sex workers, and later regretted, in part, the decision to enter government. She lived in exile in France after the war.",
+      "reading": ["Federica Montseny, Mis primeros cuarenta años (1987)"],
+      "related": ["war_and_revolution", "catalonia"]
+    },
+    {
+      "id": "mujeres_libres",
+      "category": "People",
+      "title": "Lucía Sánchez Saornil and Mujeres Libres",
+      "text": "In 1936 the poet Lucía Sánchez Saornil, with Mercedes Comaposada and Amparo Poch y Gascón, founded Mujeres Libres ('Free Women'), an anarchist women's organization that grew to some twenty thousand members. It ran literacy and job training, child care and a journal, insisting that women's emancipation was not a side issue to be settled after the revolution. Many male comrades disagreed; the CNT never recognized it as an equal branch of the movement.",
+      "reading": ["Martha Ackelsberg, Free Women of Spain (1991)"],
+      "related": ["schools_of_anarchism", "education", "catalonia"]
+    },
+    {
+      "id": "trust",
+      "category": "Practices",
+      "title": "Trust between communes",
+      "text": "A federation without a centre holds together through relations between its members: shared work, help in bad times, delegates who know each other. Where those relations are weak, communes go their own way, or quarrel over water and land. Anarchists put great weight on this patient building of solidarity.",
+      "game": "Trust grows from sharing, shared struggle at the front and mediation, and shrinks with hunger, force and neglect. It carries food, militia and ideas between communes, and low trust leads to secession.",
+      "reading": ["Colin Ward, Anarchy in Action (1973)"],
+      "related": ["mutual_aid", "federalism"]
+    }
+  ]
+}

@@ -263,6 +263,8 @@ public partial class Main : Control
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
+        int codexAt = Array.IndexOf(args, "--codex");
+        if (codexAt >= 0) ShowCodex(codexAt + 1 < args.Length && !args[codexAt + 1].StartsWith("--") ? args[codexAt + 1] : null);
         // --battle [COMMUNE]: open a battle (by default the most eventful of last turn's).
         int battleAt = Array.IndexOf(args, "--battle");
         if (battleAt >= 0)
@@ -392,6 +394,7 @@ public partial class Main : Control
             case Key.P: SetPanel(!_sidePanel.Visible); break;
             case Key.K: ShowTechTree(); break;
             case Key.L: ShowLedger(); break;
+            case Key.J: ShowCodex(); break;
             case Key.F5: QuickSave(); break;
             case Key.F9: QuickLoad(); break;
             case Key.W: ToggleWorldView(); break;
@@ -1221,6 +1224,7 @@ public partial class Main : Control
         AddButton(view, "Communes", "Sortable list of every commune (C).", ToggleCommuneList);
         AddButton(view, "Technologies", "The tech tree: what has spread, what it costs, and what to circulate (K).", () => ShowTechTree());
         AddButton(view, "Ledger", "The federation's history: stores, prices, wellbeing, enthusiasm, militia, gold, science, culture, drift (L).", ShowLedger);
+        AddButton(view, "Codex", "The ideas, practices, dangers, histories and people behind the game, with further reading (J).", () => ShowCodex());
         _mapMode = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = "What the map colours show.", CustomMinimumSize = new Vector2(150, 0) };
         foreach (var mode in Enum.GetValues<MapMode>()) _mapMode.AddItem($"Map: {(mode == MapMode.Parties ? "Party cells" : mode.ToString())}", (int)mode);
         _mapMode.ItemSelected += index =>
@@ -1266,6 +1270,10 @@ public partial class Main : Control
             _status[key] = item;
         }
         _stage = AddLabel(side, 14);
+        _stage.MouseFilter = MouseFilterEnum.Stop;
+        _stage.MouseDefaultCursorShape = CursorShape.PointingHand;
+        _stage.TooltipText = "Hierarchy drift: click to read where the idea comes from (Codex).";
+        _stage.GuiInput += e => { if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) ShowCodex("drift"); };
         _stage.AddThemeFontOverride("font", UiTheme.Display);
         _driftMeter = new DriftMeter();
         side.AddChild(_driftMeter);
@@ -1729,6 +1737,14 @@ public partial class Main : Control
                 note.AddThemeFontSizeOverride("font_size", 12);
                 if (note.Text.Length > 0) options.AddChild(note);
             }
+        }
+        // A historical event: its history, in the Codex.
+        if (_popupDecision != null && CodexForEvent(_popupDecision) is { } entry)
+        {
+            var history = new LinkButton { Text = $"The history behind this: {entry.Title} ›", Underline = LinkButton.UnderlineMode.OnHover };
+            history.AddThemeColorOverride("font_color", UiTheme.GoldBright);
+            history.Pressed += () => ShowCodex(entry.Id);
+            v.AddChild(history);
         }
         if (_popups.Count > 0)
         {
