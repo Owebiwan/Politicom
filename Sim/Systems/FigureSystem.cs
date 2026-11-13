@@ -146,6 +146,7 @@ internal static class FigureSystem
             Id = $"figure_bid_{f.Id}_{w.Tick}",
             Tick = w.Tick + 1,
             Title = $"{f.Name} asks for power",
+            Figure = f.Name,
             Text = $"{f.Name}, the movement's {Figure.RoleName(f.Role)} in {c.Name}, {what}. Their prestige is high ({f.Prestige:P0}), " +
                    $"and many would follow them. It would make them far more effective, and it is exactly how a revolution grows a new state.",
             DefaultOption = 1,

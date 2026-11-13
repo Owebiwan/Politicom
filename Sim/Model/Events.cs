@@ -14,6 +14,8 @@ public sealed class EventDefinition
     public int ExpiresAfter { get; set; } = 4;
     /// <summary>Only fires if all of these communes are still free and federated.</summary>
     public string[] RequiresFederated { get; set; } = Array.Empty<string>();
+    /// <summary>The figure (by name) the event is about, shown with it.</summary>
+    public string Figure { get; set; } = "";
     public List<EventOption> Options { get; set; } = new();
 }
 
@@ -80,6 +82,18 @@ public sealed class EventEffects
     public Dictionary<string, double> Stances { get; set; } = new();
     /// <summary>A goal (by id) the movement takes on (GoalSystem).</summary>
     public string StartGoal { get; set; } = "";
+    /// <summary>Changes to <see cref="Figure"/>'s prestige and ambition, and the chance they are killed doing it.</summary>
+    public double FigurePrestige { get; set; }
+    public double FigureAmbition { get; set; }
+    public double FigureRisk { get; set; }
+    /// <summary>Another figure (by name) the choice goes against, and the change to their prestige and ambition.</summary>
+    public string Rival { get; set; } = "";
+    public double RivalPrestige { get; set; }
+    public double RivalAmbition { get; set; }
+    /// <summary>Added to the target communes' control of their ground (front communes only).</summary>
+    public double Control { get; set; }
+    /// <summary>Added to the enemy's exhaustion.</summary>
+    public double EnemyExhaustion { get; set; }
 
     /// <summary>Short human-readable summary, e.g. "+6 drift, +25 influence".</summary>
     public string Summary(string turn = "week")
@@ -112,6 +126,13 @@ public sealed class EventEffects
         if (Federate.Length > 0) parts.Add("its cities join your federation");
         if (PartyInfluence > 0) parts.Add($"party cells +{PartyInfluence * 100:0}%");
         if (StartGoal.Length > 0) parts.Add("the goal is taken on");
+        Add(Control * 100, "% ground held" + scope);
+        Add(EnemyExhaustion * 100, "% enemy exhaustion");
+        if (Figure.Length > 0) Add(FigurePrestige * 100, $"% {Figure}'s prestige");
+        if (Figure.Length > 0) Add(FigureAmbition * 100, $"% {Figure}'s ambition");
+        if (FigureRisk > 0) parts.Add($"{FigureRisk:P0} risk to {Figure}'s life");
+        if (Rival.Length > 0) Add(RivalPrestige * 100, $"% {Rival}'s prestige");
+        if (Rival.Length > 0) Add(RivalAmbition * 100, $"% {Rival}'s ambition");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);
     }
 }

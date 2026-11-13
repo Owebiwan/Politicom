@@ -1719,6 +1719,10 @@ public partial class Main : Control
         title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         titleRow.AddChild(title);
         v.AddChild(titleRow);
+        // The figure it's about: who they are, and how they stand now.
+        if (_popupDecision != null && _world.EventDefinition(_popupDecision).Figure is { Length: > 0 } who
+            && _world.Figures.FirstOrDefault(f => f.Name == who) is { } figure)
+            v.AddChild(FigureCard(figure));
         v.AddChild(new Ornament { CustomMinimumSize = new Vector2(0, 10) });
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(568, 0), Text = Esc(body) };
         text.AddThemeFontSizeOverride("normal_font_size", 15);

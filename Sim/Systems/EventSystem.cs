@@ -59,6 +59,7 @@ internal static class EventSystem
         {
             if (e.Food != 0) c.Food = Math.Max(0, c.Food + e.Food * c.Population);
             if (e.Population != 0) c.Population = Math.Max(1, c.Population * (1 + e.Population));
+            if (e.PartyInfluence < 0) c.PartyInfluence = Math.Max(0, c.PartyInfluence * (1 + e.PartyInfluence * 3));
             if (e.Culture != 0) c.Culture = Math.Clamp(c.Culture + e.Culture * (e.Culture > 0 ? 1 - c.Culture : 1), 0, 1);
             if (e.Tech.Length > 0 && w.Techs.Contains(e.Tech) && w.Reached(w.Techs[e.Tech])) c.Techs.Add(e.Tech);
             c.Wellbeing = Math.Clamp(c.Wellbeing + e.Wellbeing, 0, 1);
@@ -82,7 +83,7 @@ internal static class EventSystem
             w.Ally.OfferInterval = 0;
             w.Ally.OfferPending = false;
         }
-        if (e.PartyInfluence != 0)
+        if (e.PartyInfluence > 0)
             foreach (var c in w.Federation) c.PartyInfluence = Math.Clamp(c.PartyInfluence + e.PartyInfluence * (1 - c.PartyInfluence), 0, 1);
         if (e.StartProject is { } project)
         {
@@ -102,6 +103,20 @@ internal static class EventSystem
             if (choice == FigureChoice.Empower) FigureSystem.Empower(w, figure);
             else FigureSystem.Rotate(w, figure);
         }
+        foreach (var c in targets.Where(c => c.Front && e.Control != 0)) c.Control = Math.Clamp(c.Control + e.Control, 0.01, 1);
+        if (e.EnemyExhaustion != 0)
+            foreach (var enemy in w.Enemies.Where(x => e.Enemy.Length == 0 || x.Name == e.Enemy))
+                enemy.Exhaustion = Math.Clamp(enemy.Exhaustion + e.EnemyExhaustion, 0, 1);
+        void Change(string name, double prestige, double ambition)
+        {
+            if (name.Length == 0 || w.Figures.FirstOrDefault(f => f.Name == name) is not { Alive: true } f) return;
+            f.Prestige = Math.Clamp(f.Prestige + prestige, 0, 1);
+            f.Ambition = Math.Clamp(f.Ambition + ambition, 0, 1);
+        }
+        Change(e.Figure, e.FigurePrestige, e.FigureAmbition);
+        Change(e.Rival, e.RivalPrestige, e.RivalAmbition);
+        if (e.FigureRisk > 0 && w.Figures.FirstOrDefault(f => f.Name == e.Figure) is { Alive: true } atRisk && w.Rng.Chance(e.FigureRisk))
+            FigureSystem.Kill(w, atRisk, $"{atRisk.Name} did not come back. The movement mourns.");
         if (e.StartGoal.Length > 0 && w.Goals.FirstOrDefault(g => g.Id == e.StartGoal) is { } goal)
         {
             goal.Active = true;

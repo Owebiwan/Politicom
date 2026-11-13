@@ -29,6 +29,36 @@ public partial class Main
         movement.AddChild(_figures);
     }
 
+    private static string RoleEmblem(FigureRole role) => role switch
+    {
+        FigureRole.Commander => "t_sword",
+        FigureRole.Orator => "t_press",
+        FigureRole.Organizer => "t_gear",
+        _ => "t_book",
+    };
+
+    /// <summary>A figure's card for a pop-up: their emblem, name, role, where they work, prestige and ambition.</summary>
+    private Control FigureCard(Figure f)
+    {
+        var card = new PanelContainer();
+        card.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(10));
+        var row = new HBoxContainer();
+        row.AddThemeConstantOverride("separation", 12);
+        card.AddChild(row);
+        row.AddChild(UiTheme.Medallion(RoleEmblem(f.Role), 52));
+        var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(520, 0) };
+        text.AddThemeFontSizeOverride("normal_font_size", 14);
+        text.AddThemeFontSizeOverride("bold_font_size", 15);
+        string where = f.Commune is int id ? $"in {Esc(_world.Communes[id].Name)}" : "back in the ranks";
+        string hunger = f.Hunger < 0.15 ? "#70d080" : f.Hunger < 0.3 ? "#e0c060" : "#f07060";
+        text.Text = $"[b]{Esc(f.Name)}[/b] · [color=#c9a25b]{Figure.RoleName(f.Role)}[/color] {where}"
+                    + (f.Empowered ? " · [color=#f07060]holds power[/color]" : "")
+                    + $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color]"
+                    + (f.Description.Length > 0 ? $"\n[i][color=#a8a090]{Esc(f.Description)}[/color][/i]" : "");
+        row.AddChild(text);
+        return card;
+    }
+
     private static string AmbitionWord(double hunger) =>
         hunger < 0.15 ? "content" : hunger < 0.28 ? "restless" : hunger < 0.38 ? "ambitious" : "hungry for power";
 

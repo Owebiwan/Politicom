@@ -117,6 +117,8 @@ public sealed class World
     /// <summary>The last few months' battles at the fronts (WarSystem), newest last.</summary>
     public List<BattleReport> Battles { get; } = new();
     public int LastGoal { get; internal set; } = -999;
+    /// <summary>Turn a figure last did something the movement had to answer.</summary>
+    public int LastFigureMoment { get; internal set; } = -999;
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
     /// <summary>Food a commune eats in a turn.</summary>
@@ -376,6 +378,7 @@ public sealed class World
         Goals = Goals.ToList(),
         Battles = Battles.ToList(),
         LastGoal = LastGoal,
+        LastFigureMoment = LastFigureMoment,
         LastProposal = LastProposal,
         FoodPrice = FoodPrice,
         GoodsPrice = GoodsPrice,
@@ -436,6 +439,7 @@ public sealed class World
             LastRandomEvent = s.LastRandomEvent,
             LastDecision = s.LastDecision,
             LastGoal = s.LastGoal,
+            LastFigureMoment = s.LastFigureMoment,
             LastProposal = s.LastProposal,
             FoodPrice = s.FoodPrice,
             GoodsPrice = s.GoodsPrice,
@@ -495,6 +499,7 @@ public sealed class World
         RisingSystem.Run(this);
         MilitiaSystem.Run(this);
         FigureSystem.Run(this);
+        FigureMoments.Run(this);
         PeaceSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);

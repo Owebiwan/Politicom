@@ -623,6 +623,20 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
   or **rotate them back to the ranks** (prestige and ambition fall, a short rest, their
   followers grumble, drift eases).
 - **Commanders** at a losing front may fall, which costs enthusiasm.
+- **They act in character** (`Sim/Systems/FigureMoments.cs`): every couple of months one of
+  them does something the movement must answer, shown with their card (role, town, prestige,
+  ambition, who they were):
+  - a **commander** wants to strike back from a front that holds (a blow to the enemy, a risk
+    to their life), or refuses to fall back from one giving way (ground held, at a cost);
+  - an **orator** offers to speak to a discontented town, or to denounce the party's cells;
+  - an **organizer** proposes requisitions for a hungry commune (fast, but drift) or double
+    shifts for the front (goods, at the workers' cost);
+  - an **educator** wants to found a newspaper, or writes a pamphlet against an ambitious
+    comrade (their standing and drift fall, their followers are bitter);
+  - two prestigious figures **fall out**: side with one, or put it to the congress.
+  Backing a figure feeds their prestige and their ambition, so the people who serve the
+  revolution best are also the ones who may come to ask for power. The same thing never comes
+  back within a year.
 - **Where to see them:** the Figures section of the Movement tab (send the selected commune a
   figure, or rotate one), a ★ after the town's name on the map, and the commune's tooltip.
 - **Balance** (balanced AI, 200 games): Catalonia 96%, Free Territory 72% (from about 79%:

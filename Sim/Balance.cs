@@ -327,6 +327,9 @@ public sealed class Balance
     public double GoalEnthusiasm { get; set; } = 0.08;
     public double GoalInfluence { get; set; } = 8;
     public double GoalFailEnthusiasm { get; set; } = 0.04;
+    /// <summary>Figures' moments (FigureMoments): at least this many weeks apart, and this likely a week after that.</summary>
+    public double FigureMomentGap { get; set; } = 8;
+    public double FigureMomentRate { get; set; } = 0.2;
     /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
     public double RisingRate { get; set; } = 0.02;
     /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>

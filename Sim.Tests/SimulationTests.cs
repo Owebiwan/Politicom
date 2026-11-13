@@ -259,6 +259,25 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Figures_act_in_character_and_backing_them_raises_their_prestige()
+    {
+        var w = NewWorld();
+        PendingEvent? moment = null;
+        for (int i = 0; i < 80 && moment is null; i++)
+        {
+            w.Step();
+            moment = w.PendingEvents.FirstOrDefault(p => p.Id.StartsWith("figure_moment_"));
+        }
+        Assert.NotNull(moment);
+        var def = w.EventDefinition(moment!.Id);
+        var figure = w.Figures.Single(f => f.Name == def.Figure);
+        var backed = def.Options.Select((o, i) => (o, i)).First(x => x.o.Effects.FigurePrestige > 0);
+        double before = figure.Prestige;
+        Assert.True(w.Apply(new ChooseEventOption(moment.Id, backed.i)).Ok);
+        Assert.True(!figure.Alive || figure.Prestige > before);
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();
@@ -1283,8 +1302,8 @@ public class SimulationTests
     {
         var w = NewWorld();
         w.Run(11);
-        // Random events and communes' proposals may be waiting too; this is about the scripted one.
-        var pending = Assert.Single(w.PendingEvents, p => !p.Id.StartsWith("random_") && !p.Id.StartsWith("proposal_"));
+        // Random events, proposals, goals and figures' moments may be waiting too; this is about the scripted one.
+        var pending = Assert.Single(w.PendingEvents, p => !p.Id.StartsWith("random_") && !p.Id.StartsWith("proposal_") && !p.Id.StartsWith("figure_") && !p.Id.StartsWith("goal_"));
         Assert.Equal("cnt_joins_government", pending.Id);
         double influence = w.Influence;
         var result = w.Apply(new ChooseEventOption(pending.Id, 1)); // stay outside
