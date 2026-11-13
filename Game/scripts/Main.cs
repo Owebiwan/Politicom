@@ -1285,6 +1285,7 @@ public partial class Main : Control
 
         var overview = Tab("Overview");
         _driftDetail = AddRich(overview);
+        BuildAttention(overview);
         _goal = AddRich(overview);
         Section(overview, "Resources");
         _resources = AddRich(overview);
@@ -1429,6 +1430,7 @@ public partial class Main : Control
         _uiStale = false;
         var w = _world;
         UpdateHeader();
+        RefreshAttention();
         _stepButton.Text = $"+1 {w.Turn}";
         _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#9a9283](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
         _status["commune"].Text = $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" +

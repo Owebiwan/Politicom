@@ -216,6 +216,28 @@ public class SimulationTests
         Assert.Equal((a.Commune, a.Attack, a.Result, a.DefenseAdded[0]), (b.Commune, b.Attack, b.Result, b.DefenseAdded[0]));
     }
 
+    [Theory]
+    [InlineData("catalonia_1936")]
+    [InlineData("free_territory_1918")]
+    [InlineData("open:1200:FRANCE")]
+    public void What_needs_attention_is_listed_and_every_remedy_works(string scenario)
+    {
+        var w = World.Load(DataDir, scenario);
+        int listed = 0;
+        for (int week = 0; week < 40 && w.Outcome == Outcome.Ongoing; week++)
+        {
+            var list = Attention.List(w);
+            Assert.True(list.Count <= 6);
+            Assert.Equal(list.Count, list.Select(x => x.Commune).Distinct().Count());
+            listed += list.Count;
+            // The most urgent with a remedy we can afford: it must go through.
+            if (list.FirstOrDefault(x => x.Action != null && x.Cost <= w.Influence) is { } act)
+                Assert.True(w.Apply(act.Action!).Ok, $"{w.Communes[act.Commune].Name}: {act.Remedy}");
+            w.Step();
+        }
+        Assert.True(listed > 0);
+    }
+
     [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {

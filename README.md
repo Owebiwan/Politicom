@@ -425,6 +425,26 @@ Commons** where its article has one. Flags are skipped.
   polity, culture or period. Descriptive names ("Amazon hunter-gatherers") are matched to
   the indigenous peoples of that region.
 
+## Needs attention
+
+At the top of the Overview tab, **Needs attention** lists up to six communes that most need the
+movement this turn (`Sim/Attention.cs`), most urgent first, each with what's wrong and one
+button for what would help, at its influence cost:
+
+| Problem | Button |
+|---|---|
+| Voting to leave the federation | Mediate with its least-trusted neighbour (or hold it by force, if it has none) |
+| Losing ground at the front | Fortify; or back a commune's proposed defensive campaign; or propose one |
+| Going hungry | Propose famine relief |
+| Discontented (above 0.5) | Mediate with its least-trusted neighbour |
+| Party cells in over 40% of its committees | Expose the cells |
+| Experts taking charge (the expert trap) | Fund a political school |
+| Thin political education | Fund a political school |
+
+A defensive campaign helps the whole front, so it is offered once, on the worst town. A
+commune's name selects it and brings it into view. In a large federation it saves searching
+the map town by town; the decisions are still yours.
+
 ## Folding the dashboard
 
 The dashboard on the right folds away: press the tab on the map's right edge (or **P**) and the
