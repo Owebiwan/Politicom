@@ -1212,6 +1212,7 @@ public partial class Main : Control
                 Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed; 4 is fastest, for campaigns",
                 CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
             };
+            UiTheme.Round(b, 40);
             b.Pressed += () => SetSpeed(speed);
             clock.AddChild(b);
             _speedButtons.Add(b);

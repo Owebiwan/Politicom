@@ -201,19 +201,28 @@ def plate(path, w, h, top, bottom, rim_bright=1.0, radius=5, rim=2, inset=False,
     finish(out, w, h).save(path)
 
 
-def side_tab(path, top, bottom, rim_bright, w=36, h=96, radius=10):
-    """A tab on a panel's edge: the left side rounded, the right flat (it meets the panel)."""
-    W, H = w * SS, h * SS
-    x = np.linspace(0, 1, W)[None, :]
-    body = np.zeros((H, W, 4), np.float32)
+def round_button(path, top, bottom, rim_bright=1.0, inset=False, size=72):
+    """A round button: an enamel disc with a sheen, in a brass bezel ringed with beads and a fine
+    inner rule, like a medallion; pressed in, the sheen becomes a shadow."""
+    S = size * SS
+    yy, xx = np.mgrid[0:S, 0:S]
+    r = np.hypot(xx - S / 2, yy - S / 2) / (S / 2)
+    y = yy / S
+    out = np.zeros((S, S, 4), np.float32)
     for c in range(3):
-        body[..., c] = (top[c] + (bottom[c] - top[c]) * x) * np.ones((H, 1))
-    shape = mask_from(lambda d: d.rounded_rectangle([0, 0, W + radius * SS * 2, H - 1], radius=radius * SS, fill=255), W, H)
-    body[..., 3] = shape * 255
-    r = 2 * SS
-    ring = mask_from(lambda d: d.rounded_rectangle([r // 2, r // 2, W + radius * SS * 2, H - 1 - r // 2], radius=radius * SS, outline=255, width=r), W, H) * shape
-    out = over(body, gold_fill(ring, bright=rim_bright))
-    finish(out, w, h).save(path)
+        out[..., c] = top[c] + (bottom[c] - top[c]) * y
+    sheen = np.clip(1 - y / 0.55, 0, 1) * (-30 if inset else 26) * (r < 0.8)
+    out[..., :3] = np.clip(out[..., :3] + sheen[..., None] - 30 * np.clip((r - 0.55) / 0.3, 0, 1)[..., None], 0, 255)
+    out[..., 3] = (r < 0.96) * 255
+    bezel = mask_from(lambda d: d.ellipse([S * 0.03, S * 0.03, S * 0.97, S * 0.97], outline=255, width=int(S * 0.1)), S, S)
+    out = over(out, gold_fill(bezel, bright=rim_bright))
+    beads = mask_from(lambda d: [d.ellipse([S / 2 + S * 0.435 * math.cos(t) - S * 0.02, S / 2 + S * 0.435 * math.sin(t) - S * 0.02,
+                                            S / 2 + S * 0.435 * math.cos(t) + S * 0.02, S / 2 + S * 0.435 * math.sin(t) + S * 0.02], fill=255)
+                                 for t in np.linspace(0, 2 * math.pi, 20, endpoint=False)], S, S)
+    out = over(out, gold_fill(beads, top=(250, 236, 186), bright=rim_bright * 1.1))
+    inner = mask_from(lambda d: d.ellipse([S * 0.16, S * 0.16, S * 0.84, S * 0.84], outline=255, width=max(1, SS)), S, S)
+    out = over(out, np.dstack([np.zeros((S, S, 3)), inner * 170]))
+    finish(out, size, size).save(path)
 
 
 def section_bar(path, w=240, h=30):
@@ -287,9 +296,11 @@ def main():
     plate(p("orn_tab_selected.png"), 64, 30, (70, 86, 112), (36, 45, 60), rim_bright=1.1, radius=5, open_bottom=True)
     # A title plate with scroll terminals.
     plate(p("orn_title.png"), 240, 44, (46, 58, 78), (24, 30, 42), rim_bright=1.0, radius=6, cap=True)
-    # Side tabs that fold a panel away: rounded on the outer side, flat against the panel's edge.
-    side_tab(p("orn_side_tab.png"), (58, 70, 88), (30, 37, 49), 0.85)
-    side_tab(p("orn_side_tab_hover.png"), (78, 94, 118), (40, 49, 64), 1.1)
+    # Round buttons for the clock and the fold control: slate enamel, lit on hover, steel-blue when on.
+    round_button(p("orn_round.png"), (64, 77, 97), (28, 35, 47), rim_bright=0.85)
+    round_button(p("orn_round_hover.png"), (86, 103, 128), (38, 47, 62), rim_bright=1.1)
+    round_button(p("orn_round_pressed.png"), (82, 124, 176), (32, 56, 90), rim_bright=1.15, inset=True)
+    round_button(p("orn_round_disabled.png"), (48, 51, 56), (30, 32, 36), rim_bright=0.45)
     section_bar(p("orn_section.png"))
     divider(p("orn_divider.png"))
     medallion(p("orn_medallion.png"))

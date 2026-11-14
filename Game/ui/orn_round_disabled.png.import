@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cabnv15covpoc"
-path="res://.godot/imported/orn_side_tab.png-f7080f185620d6cd07a47749af186775.ctex"
+uid="uid://c5gw048d3rjw6"
+path="res://.godot/imported/orn_round_disabled.png-a875d8e67211f62c3fe09174e22db54a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/orn_side_tab.png"
-dest_files=["res://.godot/imported/orn_side_tab.png-f7080f185620d6cd07a47749af186775.ctex"]
+source_file="res://ui/orn_round_disabled.png"
+dest_files=["res://.godot/imported/orn_round_disabled.png-a875d8e67211f62c3fe09174e22db54a.ctex"]
 
 [params]
 

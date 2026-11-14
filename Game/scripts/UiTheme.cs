@@ -132,8 +132,32 @@ internal static class UiTheme
     /// <summary>Windows (pop-ups, the scenario picker, the tech tree) and the dashboard: engraved frame, flourished corners.</summary>
     public static StyleBoxTexture FrameStrong(int content = 28) => Ornament("orn_window.png", 44, content, content, tile: true);
     /// <summary>A plate behind a window title.</summary>
-    /// <summary>A tab on a panel's edge that folds the panel away: rounded outside, flat against the panel.</summary>
-    public static StyleBoxTexture SideTab(bool hover = false) => Ornament(hover ? "orn_side_tab_hover.png" : "orn_side_tab.png", 12, 6, 6);
+    /// <summary>
+    /// Makes an icon button round and ornamental: an enamel disc in a beaded brass bezel (lit on
+    /// hover, steel-blue when on), `size` across, the icon in its middle.
+    /// </summary>
+    public static void Round(Button b, int size = 40)
+    {
+        StyleBoxTexture Disc(string file)
+        {
+            int pad = (int)(size * 0.27f);
+            return new StyleBoxTexture
+            {
+                Texture = Tex(file), ContentMarginLeft = pad, ContentMarginRight = pad, ContentMarginTop = pad, ContentMarginBottom = pad,
+            };
+        }
+        b.AddThemeStyleboxOverride("normal", Disc("orn_round.png"));
+        b.AddThemeStyleboxOverride("hover", Disc("orn_round_hover.png"));
+        b.AddThemeStyleboxOverride("pressed", Disc("orn_round_pressed.png"));
+        b.AddThemeStyleboxOverride("hover_pressed", Disc("orn_round_pressed.png"));
+        b.AddThemeStyleboxOverride("disabled", Disc("orn_round_disabled.png"));
+        b.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
+        b.CustomMinimumSize = new Vector2(size, size);
+        b.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        b.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+        b.IconAlignment = HorizontalAlignment.Center;
+        b.ExpandIcon = true;
+    }
 
     public static StyleBoxTexture TitlePlateStyle() => Ornament("orn_title.png", 40, 44, 6, marginV: 16);
     private static StyleBoxTexture SectionBar() => Ornament("orn_section.png", 0, 10, 4, marginV: 8) is var sb ? Fade(sb) : null!;

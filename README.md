@@ -696,9 +696,10 @@ Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution
 - **Titles:** window titles sit on a metal-rimmed plate with scroll terminals.
 - **Section headings:** each sits on a shaded bar with fine gold rules.
 - **Controls:** buttons are embossed slate-blue enamel plates with brass rims (lit on hover,
-  steel-blue when on). Tabs are plates with the open one lit, and switches are gilt. The
-  dashboard folds away behind a side tab, rounded toward the map with a brass chevron; while
-  it's folded, the small clock on the map uses the same buttons as the dashboard.
+  steel-blue when on). Tabs are plates with the open one lit, and switches are gilt. Icon
+  buttons are round: an enamel disc in a beaded brass bezel, like the medallions; the clock's
+  pause, play and speeds, and the round button on the map's edge that folds the dashboard away
+  (the small clock shown while it's folded uses the same).
 - **Map colours:** countries tint the terrain strongly enough to tell neighbours apart (and
   the paper chart, zoomed out, nearly at full colour); a cool, clear grade with a faint
   vignette lies over the map.

@@ -18,20 +18,16 @@ public partial class Main
 
     private void BuildPanelToggle()
     {
-        // A side tab, as Victoria 3 folds its panels: rounded toward the map, flat against the panel,
-        // a brass chevron pointing the way the panel will go.
+        // A round brass button on the map's edge, a chevron pointing the way the panel will go.
         _panelToggle = new Button
         {
             AnchorLeft = 1, AnchorRight = 1, AnchorTop = 0.5f, AnchorBottom = 0.5f,
-            OffsetLeft = -30, OffsetRight = 0, OffsetTop = -48, OffsetBottom = 48,
+            OffsetLeft = -50, OffsetRight = -6, OffsetTop = -22, OffsetBottom = 22,
             FocusMode = FocusModeEnum.None,
         };
-        _panelToggle.AddThemeStyleboxOverride("normal", UiTheme.SideTab());
-        _panelToggle.AddThemeStyleboxOverride("pressed", UiTheme.SideTab(true));
-        _panelToggle.AddThemeStyleboxOverride("hover", UiTheme.SideTab(true));
-        _panelToggle.AddThemeStyleboxOverride("hover_pressed", UiTheme.SideTab(true));
+        UiTheme.Round(_panelToggle, 44);
         _panelToggle.AddThemeFontOverride("font", UiTheme.DisplayBold);
-        _panelToggle.AddThemeFontSizeOverride("font_size", 26);
+        _panelToggle.AddThemeFontSizeOverride("font_size", 24);
         _panelToggle.AddThemeColorOverride("font_color", UiTheme.GoldBright);
         _panelToggle.AddThemeColorOverride("font_hover_color", new Color("fff6e0"));
         _panelToggle.Pressed += () => SetPanel(!_sidePanel.Visible);
@@ -40,7 +36,7 @@ public partial class Main
         // The clock while the dashboard is folded: the date, and pause, play, fast, fastest.
         _miniClock = new PanelContainer
         {
-            AnchorLeft = 0.5f, AnchorRight = 0.5f, OffsetLeft = -230, OffsetRight = 230, OffsetTop = 12, OffsetBottom = 60,
+            AnchorLeft = 0.5f, AnchorRight = 0.5f, OffsetLeft = -230, OffsetRight = 230, OffsetTop = 10, OffsetBottom = 66,
             Visible = false,
         };
         _miniClock.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(8));
@@ -56,8 +52,8 @@ public partial class Main
             var b = new Button
             {
                 Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, FocusMode = FocusModeEnum.None,
-                CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
             };
+            UiTheme.Round(b, 40);
             b.Pressed += () => SetSpeed(speed);
             row.AddChild(b);
             _miniSpeed.Add(b);
