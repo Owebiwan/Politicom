@@ -18,8 +18,9 @@ from PIL import Image, ImageDraw, ImageFilter
 
 SS = 4  # supersampling
 
-GOLD_TOP, GOLD_MID, GOLD_LOW = (246, 218, 140), (201, 162, 91), (122, 92, 46)
-LACQUER = (24, 22, 24)
+# Brass over slate-blue lacquer, as Victoria 3 dresses its windows.
+GOLD_TOP, GOLD_MID, GOLD_LOW = (236, 214, 160), (186, 156, 104), (104, 84, 54)
+LACQUER = (22, 28, 38)
 
 
 def hexc(h):
@@ -163,7 +164,7 @@ def window_frame(path, size=160, margin=44, period=72, bg=LACQUER, ornate=True):
 def small_frame(path, size=48, period=24):
     """Tooltips, menus and cards: lacquer with a single fine gold rim."""
     S = size * SS
-    out = grain(S, (20, 19, 21), amount=3, period=period * SS)
+    out = grain(S, (19, 24, 33), amount=3, period=period * SS)
     out = np.roll(np.roll(out, (10 * SS) % (period * SS), 0), (10 * SS) % (period * SS), 1)
     rim = mask_from(lambda d: d.rounded_rectangle([SS, SS, S - SS, S - SS], radius=4 * SS, outline=255, width=2 * SS), S, S)
     out = over(out, gold_fill(rim, bright=0.85))
@@ -200,6 +201,21 @@ def plate(path, w, h, top, bottom, rim_bright=1.0, radius=5, rim=2, inset=False,
     finish(out, w, h).save(path)
 
 
+def side_tab(path, top, bottom, rim_bright, w=36, h=96, radius=10):
+    """A tab on a panel's edge: the left side rounded, the right flat (it meets the panel)."""
+    W, H = w * SS, h * SS
+    x = np.linspace(0, 1, W)[None, :]
+    body = np.zeros((H, W, 4), np.float32)
+    for c in range(3):
+        body[..., c] = (top[c] + (bottom[c] - top[c]) * x) * np.ones((H, 1))
+    shape = mask_from(lambda d: d.rounded_rectangle([0, 0, W + radius * SS * 2, H - 1], radius=radius * SS, fill=255), W, H)
+    body[..., 3] = shape * 255
+    r = 2 * SS
+    ring = mask_from(lambda d: d.rounded_rectangle([r // 2, r // 2, W + radius * SS * 2, H - 1 - r // 2], radius=radius * SS, outline=255, width=r), W, H) * shape
+    out = over(body, gold_fill(ring, bright=rim_bright))
+    finish(out, w, h).save(path)
+
+
 def section_bar(path, w=240, h=30):
     """Behind a section heading: a shaded band with fine gold rules, fading out to the right."""
     W, H = w * SS, h * SS
@@ -207,7 +223,7 @@ def section_bar(path, w=240, h=30):
     fade = np.clip((1 - x) / 0.55, 0, 1) ** 1.3
     out = np.zeros((H, W, 4), np.float32)
     y = np.linspace(0, 1, H)[:, None]
-    for c, (a, b) in enumerate(zip((46, 38, 30), (26, 22, 20))):
+    for c, (a, b) in enumerate(zip((40, 50, 66), (22, 28, 38))):
         out[..., c] = a + (b - a) * y
     out[..., 3] = 225 * fade
     rules = mask_from(lambda d: (d.line([(0, SS), (W, SS)], fill=255, width=SS), d.line([(0, H - 2 * SS), (W, H - 2 * SS)], fill=255, width=SS)), W, H)
@@ -240,7 +256,7 @@ def medallion(path, size=96):
     out = np.zeros((S, S, 4), np.float32)
     disc = r < 0.84
     shade = np.clip(1 - r, 0, 1)
-    for c, v in enumerate((34, 30, 30)):
+    for c, v in enumerate((28, 34, 46)):
         out[..., c] = v + 26 * shade ** 0.7
     out[..., 3] = disc * 255
     ring = mask_from(lambda d: d.ellipse([S * 0.04, S * 0.04, S * 0.96, S * 0.96], outline=255, width=int(S * 0.09)), S, S)
@@ -260,17 +276,20 @@ def main():
     p = lambda name: os.path.join(out, name)
     window_frame(p("orn_window.png"))
     small_frame(p("orn_small.png"))
-    # Buttons: bronze lacquer, brighter on hover, red lacquer when pressed or on, grey when disabled.
-    plate(p("orn_button.png"), 64, 32, (66, 56, 44), (34, 29, 24), rim_bright=0.75, radius=4)
-    plate(p("orn_button_hover.png"), 64, 32, (88, 74, 56), (44, 37, 30), rim_bright=1.05, radius=4)
-    plate(p("orn_button_pressed.png"), 64, 32, (120, 40, 32), (70, 22, 18), rim_bright=1.1, radius=4, inset=True)
-    plate(p("orn_button_disabled.png"), 64, 32, (44, 42, 42), (30, 29, 29), rim_bright=0.45, radius=4)
+    # Buttons: slate-blue enamel, brighter on hover, lit steel-blue when pressed or on, grey when disabled.
+    plate(p("orn_button.png"), 64, 32, (58, 70, 88), (30, 37, 49), rim_bright=0.75, radius=4)
+    plate(p("orn_button_hover.png"), 64, 32, (78, 94, 118), (40, 49, 64), rim_bright=1.05, radius=4)
+    plate(p("orn_button_pressed.png"), 64, 32, (70, 110, 158), (34, 58, 92), rim_bright=1.1, radius=4, inset=True)
+    plate(p("orn_button_disabled.png"), 64, 32, (44, 47, 52), (30, 32, 36), rim_bright=0.45, radius=4)
     # Tabs: the open one lit, the others dim; open at the bottom so they sit on the panel.
-    plate(p("orn_tab.png"), 64, 30, (40, 35, 30), (26, 23, 21), rim_bright=0.55, radius=5, open_bottom=True)
-    plate(p("orn_tab_hover.png"), 64, 30, (58, 50, 40), (32, 28, 24), rim_bright=0.8, radius=5, open_bottom=True)
-    plate(p("orn_tab_selected.png"), 64, 30, (84, 70, 50), (40, 34, 28), rim_bright=1.1, radius=5, open_bottom=True)
+    plate(p("orn_tab.png"), 64, 30, (36, 44, 58), (24, 30, 40), rim_bright=0.55, radius=5, open_bottom=True)
+    plate(p("orn_tab_hover.png"), 64, 30, (52, 63, 82), (30, 37, 49), rim_bright=0.8, radius=5, open_bottom=True)
+    plate(p("orn_tab_selected.png"), 64, 30, (70, 86, 112), (36, 45, 60), rim_bright=1.1, radius=5, open_bottom=True)
     # A title plate with scroll terminals.
-    plate(p("orn_title.png"), 240, 44, (52, 40, 30), (26, 21, 18), rim_bright=1.0, radius=6, cap=True)
+    plate(p("orn_title.png"), 240, 44, (46, 58, 78), (24, 30, 42), rim_bright=1.0, radius=6, cap=True)
+    # Side tabs that fold a panel away: rounded on the outer side, flat against the panel's edge.
+    side_tab(p("orn_side_tab.png"), (58, 70, 88), (30, 37, 49), 0.85)
+    side_tab(p("orn_side_tab_hover.png"), (78, 94, 118), (40, 49, 64), 1.1)
     section_bar(p("orn_section.png"))
     divider(p("orn_divider.png"))
     medallion(p("orn_medallion.png"))

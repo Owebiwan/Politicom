@@ -91,7 +91,7 @@ public partial class Main
         var text = new List<string>
         {
             $"[font_size=26][color=#{UiTheme.GoldBright.ToHtml(false)}]{Esc(current.Title)}[/color][/font_size]",
-            $"[color=#9a9283]{Esc(current.Category)}[/color]",
+            $"[color=#929aa6]{Esc(current.Category)}[/color]",
             "",
             Esc(current.Text),
         };

@@ -51,7 +51,7 @@ public partial class Main
         text.AddThemeFontSizeOverride("bold_font_size", 15);
         string where = f.Commune is int id ? $"in {Esc(_world.Communes[id].Name)}" : "back in the ranks";
         string hunger = f.Hunger < 0.15 ? "#70d080" : f.Hunger < 0.3 ? "#e0c060" : "#f07060";
-        text.Text = $"[b]{Esc(f.Name)}[/b] · [color=#c9a25b]{Figure.RoleName(f.Role)}[/color] {where}"
+        text.Text = $"[b]{Esc(f.Name)}[/b] · [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] {where}"
                     + (f.Empowered ? " · [color=#f07060]holds power[/color]" : "")
                     + $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color]"
                     + (f.Description.Length > 0 ? $"\n[i][color=#a8a090]{Esc(f.Description)}[/color][/i]" : "");
@@ -83,7 +83,7 @@ public partial class Main
                 : f.Resting > 0 ? $"[color=#9aa0a8]in the ranks, {w.Turns(f.Resting)} more[/color]"
                 : f.Commune is int id ? $"in {Esc(w.Communes[id].Name)}" : "[color=#9aa0a8]between postings[/color]";
             string hunger = f.Hunger >= 0.38 ? "#f07060" : f.Hunger >= 0.28 ? "#e0a040" : "#9aa0a8";
-            text.Text = $"[b]{Esc(f.Name)}[/b] [color=#c9a25b]{Figure.RoleName(f.Role)}[/color] · {where}" +
+            text.Text = $"[b]{Esc(f.Name)}[/b] [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] · {where}" +
                         (f.Empowered ? " · [color=#f07060]holds power[/color]" : "") +
                         (f.Alive ? $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color] · {Figure.Does(f.Role)}" : "");
             text.TooltipText = f.Description;

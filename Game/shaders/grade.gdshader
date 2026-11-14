@@ -1,4 +1,5 @@
-// Over the whole map: a light colour grade (warmer, a touch more contrast), a soft vignette,
+// Over the whole map: a light colour grade (a touch cooler and clearer, a little more colour and
+// contrast, as Victoria 3's map is), a faint vignette,
 // and, as the view widens, drifting clouds with their shadows, anchored to the world so they
 // stay put as the map pans. They clear again when the map turns into the paper chart.
 shader_type canvas_item;
@@ -33,12 +34,12 @@ void fragment() {
     vec2 px = UV * size;
     if (grade > 0.0) {
         float lum = dot(col, vec3(0.299, 0.587, 0.114));
-        vec3 g = mix(vec3(lum), col, 1.06);                 // a touch more colour
-        g = g + (g - 0.5) * 0.06;                           // and contrast
-        g *= vec3(1.03, 1.0, 0.95);                         // warmer
+        vec3 g = mix(vec3(lum), col, 1.1);                  // a touch more colour
+        g = g + (g - 0.5) * 0.07;                           // and contrast
+        g *= vec3(0.985, 1.0, 1.03);                        // cooler and cleaner
         col = mix(col, clamp(g, 0.0, 1.0), grade);
         vec2 v = UV - 0.5;
-        col *= 1.0 - grade * 0.28 * smoothstep(0.35, 0.85, length(v * vec2(1.0, 1.25)));
+        col *= 1.0 - grade * 0.16 * smoothstep(0.4, 0.9, length(v * vec2(1.0, 1.25)));
     }
     if (clouds > 0.0) {
         vec2 ll = origin + px * deg_per_px;

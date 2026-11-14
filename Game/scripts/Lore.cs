@@ -69,7 +69,7 @@ internal static class Lore
         }
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(width, 0) };
         string Esc(string t) => t.Replace("[", "[lb]");
-        text.Text = $"{UiTheme.DisplayText(Esc(s.Name), 18)}\n[color=#c9a25b]{Esc(EraLine(atlas, s))}[/color]" +
+        text.Text = $"{UiTheme.DisplayText(Esc(s.Name), 18)}\n[color=#c8aa72]{Esc(EraLine(atlas, s))}[/color]" +
                     (entry != null ? $"\n\n{Esc(entry.Extract)}" : "");
         box.AddChild(text);
         if (entry != null)

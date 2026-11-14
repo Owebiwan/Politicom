@@ -4,8 +4,8 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// One theme for the whole interface, in the manner of Victoria 3: windows of dark grained
-/// lacquer in engraved gold frames with flourished corners, title plates and section bars,
+/// One theme for the whole interface, in the manner of Victoria 3: windows of slate-blue grained
+/// lacquer in engraved brass frames with flourished corners, title plates and section bars,
 /// embossed bronze buttons and tabs, medallions behind emblems, and a book serif (Crimson Pro)
 /// throughout — semibold gilt titles, regular cream body text, bold figures. The ornaments are
 /// textures from tools/ui/build_ornaments.py; painted art of the same size can replace any.
@@ -13,17 +13,17 @@ namespace Politicom.Game;
 /// </summary>
 internal static class UiTheme
 {
-    public static readonly Color Background = new("121317");
-    public static readonly Color Panel = new("18191e");
-    public static readonly Color PanelRaised = new("22232a");
-    public static readonly Color Border = new("3a3326");
-    public static readonly Color Text = new("e4dccb");
-    public static readonly Color Muted = new("9a9283");
+    public static readonly Color Background = new("10151d");
+    public static readonly Color Panel = new("161c26");
+    public static readonly Color PanelRaised = new("212a38");
+    public static readonly Color Border = new("3a3f45");
+    public static readonly Color Text = new("e6e0d2");
+    public static readonly Color Muted = new("929aa6");
     /// <summary>Headings: old gold.</summary>
-    public static readonly Color Heading = new("c9a25b");
-    public static readonly Color Gold = new("c9a25b");
-    public static readonly Color GoldBright = new("e3bd6b");
-    public static readonly Color GoldDim = new("6b5530");
+    public static readonly Color Heading = new("c8aa72");
+    public static readonly Color Gold = new("c8aa72");
+    public static readonly Color GoldBright = new("e6cd94");
+    public static readonly Color GoldDim = new("6a5a3e");
     public static readonly Color Accent = new("b8382e");
     public static readonly Color AccentSoft = new("b8382e55");
 
@@ -42,7 +42,7 @@ internal static class UiTheme
 
     /// <summary>Rich-text markup for a name in the title face, gilt.</summary>
     public static string DisplayText(string text, int size = 18) =>
-        $"[font=res://fonts/CrimsonPro.ttf][b][font_size={size}][color=#e3bd6b]{text}[/color][/font_size][/b][/font]";
+        $"[font=res://fonts/CrimsonPro.ttf][b][font_size={size}][color=#e6cd94]{text}[/color][/font_size][/b][/font]";
 
     /// <summary>Crimson Pro at a weight (it's a variable font: 200 light to 900 black).</summary>
     private static Font Weight(FontFile face, int weight) => new FontVariation
@@ -132,6 +132,9 @@ internal static class UiTheme
     /// <summary>Windows (pop-ups, the scenario picker, the tech tree) and the dashboard: engraved frame, flourished corners.</summary>
     public static StyleBoxTexture FrameStrong(int content = 28) => Ornament("orn_window.png", 44, content, content, tile: true);
     /// <summary>A plate behind a window title.</summary>
+    /// <summary>A tab on a panel's edge that folds the panel away: rounded outside, flat against the panel.</summary>
+    public static StyleBoxTexture SideTab(bool hover = false) => Ornament(hover ? "orn_side_tab_hover.png" : "orn_side_tab.png", 12, 6, 6);
+
     public static StyleBoxTexture TitlePlateStyle() => Ornament("orn_title.png", 40, 44, 6, marginV: 16);
     private static StyleBoxTexture SectionBar() => Ornament("orn_section.png", 0, 10, 4, marginV: 8) is var sb ? Fade(sb) : null!;
 
@@ -175,8 +178,8 @@ internal static class UiTheme
             t.SetStylebox("hover_pressed", type, Ornament("orn_button_pressed.png", 8, 11, 5));
             t.SetStylebox("disabled", type, Ornament("orn_button_disabled.png", 8, 11, 5));
             t.SetStylebox("focus", type, Box(new Color(0, 0, 0, 0), border: new Color(GoldBright, 0.4f), radius: 4, margin: 11, vmargin: 5));
-            t.SetColor("font_color", type, new Color("eadfc8"));
-            t.SetColor("font_hover_color", type, new Color("fff4dc"));
+            t.SetColor("font_color", type, new Color("ece6d8"));
+            t.SetColor("font_hover_color", type, new Color("fffaf0"));
             t.SetColor("font_pressed_color", type, Colors.White);
             t.SetColor("font_disabled_color", type, new Color(Muted, 0.6f));
             t.SetColor("font_outline_color", type, new Color(0, 0, 0, 0.6f));
@@ -203,8 +206,8 @@ internal static class UiTheme
         t.SetColor("font_hover_pressed_color", "CheckButton", GoldBright);
 
         // Inputs and menus
-        t.SetStylebox("normal", "LineEdit", Box(new Color("0f1013"), border: GoldDim, radius: 3, margin: 8, vmargin: 4));
-        t.SetStylebox("focus", "LineEdit", Box(new Color("0f1013"), border: Gold, radius: 3, margin: 8, vmargin: 4));
+        t.SetStylebox("normal", "LineEdit", Box(new Color("0e131b"), border: GoldDim, radius: 3, margin: 8, vmargin: 4));
+        t.SetStylebox("focus", "LineEdit", Box(new Color("0e131b"), border: Gold, radius: 3, margin: 8, vmargin: 4));
         t.SetStylebox("panel", "PopupMenu", FramePanel(10));
         t.SetStylebox("hover", "PopupMenu", Box(AccentSoft, radius: 2));
         t.SetFont("font", "PopupMenu", Body);
@@ -223,26 +226,26 @@ internal static class UiTheme
         t.SetConstant("icon_separation", "TabContainer", 4);
 
         // Bars, separators, scrolling
-        t.SetStylebox("background", "ProgressBar", Box(new Color("0f1013"), border: GoldDim, radius: 2));
+        t.SetStylebox("background", "ProgressBar", Box(new Color("0e131b"), border: GoldDim, radius: 2));
         t.SetStylebox("fill", "ProgressBar", Box(new Color("5a8fd0"), radius: 2));
         t.SetStylebox("separator", "HSeparator", Line(new Color(GoldDim, 0.7f)));
         t.SetConstant("separation", "HSeparator", 14);
         t.SetStylebox("scroll", "VScrollBar", Box(new Color(0, 0, 0, 0), radius: 4));
-        t.SetStylebox("grabber", "VScrollBar", Box(new Color("4a4234"), radius: 4));
+        t.SetStylebox("grabber", "VScrollBar", Box(new Color("3e4a5c"), radius: 4));
         t.SetStylebox("grabber_highlight", "VScrollBar", Box(GoldDim, radius: 4));
         t.SetStylebox("grabber_pressed", "VScrollBar", Box(Gold, radius: 4));
         t.SetStylebox("scroll", "HScrollBar", Box(new Color(0, 0, 0, 0), radius: 4));
-        t.SetStylebox("grabber", "HScrollBar", Box(new Color("4a4234"), radius: 4));
+        t.SetStylebox("grabber", "HScrollBar", Box(new Color("3e4a5c"), radius: 4));
         t.SetStylebox("grabber_highlight", "HScrollBar", Box(GoldDim, radius: 4));
 
         // Commune table
-        t.SetStylebox("panel", "Tree", Box(new Color("0f1013"), border: GoldDim, radius: 2, margin: 2));
+        t.SetStylebox("panel", "Tree", Box(new Color("0e131b"), border: GoldDim, radius: 2, margin: 2));
         t.SetStylebox("selected", "Tree", Box(AccentSoft, radius: 2));
         t.SetStylebox("selected_focus", "Tree", Box(AccentSoft, radius: 2));
         t.SetFont("title_button_font", "Tree", Display);
         t.SetFontSize("title_button_font_size", "Tree", 14);
         t.SetStylebox("title_button_normal", "Tree", Box(PanelRaised, radius: 0, margin: 6, vmargin: 4, underline: GoldDim));
-        t.SetStylebox("title_button_hover", "Tree", Box(new Color("2b2b31"), radius: 0, margin: 6, vmargin: 4, underline: Gold));
+        t.SetStylebox("title_button_hover", "Tree", Box(new Color("2a3444"), radius: 0, margin: 6, vmargin: 4, underline: Gold));
         t.SetStylebox("title_button_pressed", "Tree", Box(Accent, radius: 0, margin: 6, vmargin: 4));
         t.SetColor("title_button_color", "Tree", Heading);
         t.SetColor("guide_color", "Tree", new Color("ffffff10"));

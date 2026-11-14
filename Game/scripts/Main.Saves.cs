@@ -265,7 +265,7 @@ public partial class Main
                 if (head)
                 {
                     l.AddThemeFontOverride("font", UiTheme.Display);
-                    l.AddThemeColorOverride("font_color", new Color("c9a25b"));
+                    l.AddThemeColorOverride("font_color", new Color("c8aa72"));
                 }
                 else if (color is { } c) l.AddThemeColorOverride("font_color", c);
                 grid.AddChild(l);
@@ -274,7 +274,7 @@ public partial class Main
             for (int i = 0; i < rows.Count; i++)
             {
                 var e = rows[i];
-                var medal = i switch { 0 => new Color("e3bd6b"), 1 => new Color("c8ccd2"), 2 => new Color("c58a52"), _ => new Color(0.85f, 0.86f, 0.88f) };
+                var medal = i switch { 0 => new Color("e6cd94"), 1 => new Color("c8ccd2"), 2 => new Color("c58a52"), _ => new Color(0.85f, 0.86f, 0.88f) };
                 Cell($"{i + 1}", color: medal, right: true);
                 Cell($"{e.Total:0.0}", color: medal, right: true);
                 Cell(e.Scenario.Length > 34 ? e.Scenario[..33] + "…" : e.Scenario);

@@ -18,13 +18,22 @@ public partial class Main
 
     private void BuildPanelToggle()
     {
+        // A side tab, as Victoria 3 folds its panels: rounded toward the map, flat against the panel,
+        // a brass chevron pointing the way the panel will go.
         _panelToggle = new Button
         {
             AnchorLeft = 1, AnchorRight = 1, AnchorTop = 0.5f, AnchorBottom = 0.5f,
-            OffsetLeft = -26, OffsetRight = 0, OffsetTop = -44, OffsetBottom = 44,
+            OffsetLeft = -30, OffsetRight = 0, OffsetTop = -48, OffsetBottom = 48,
             FocusMode = FocusModeEnum.None,
         };
-        _panelToggle.AddThemeFontSizeOverride("font_size", 20);
+        _panelToggle.AddThemeStyleboxOverride("normal", UiTheme.SideTab());
+        _panelToggle.AddThemeStyleboxOverride("pressed", UiTheme.SideTab(true));
+        _panelToggle.AddThemeStyleboxOverride("hover", UiTheme.SideTab(true));
+        _panelToggle.AddThemeStyleboxOverride("hover_pressed", UiTheme.SideTab(true));
+        _panelToggle.AddThemeFontOverride("font", UiTheme.DisplayBold);
+        _panelToggle.AddThemeFontSizeOverride("font_size", 26);
+        _panelToggle.AddThemeColorOverride("font_color", UiTheme.GoldBright);
+        _panelToggle.AddThemeColorOverride("font_hover_color", new Color("fff6e0"));
         _panelToggle.Pressed += () => SetPanel(!_sidePanel.Visible);
         _map3d.AddChild(_panelToggle);
 
@@ -47,7 +56,7 @@ public partial class Main
             var b = new Button
             {
                 Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, FocusMode = FocusModeEnum.None,
-                CustomMinimumSize = new Vector2(40, 28), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
+                CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
             };
             b.Pressed += () => SetSpeed(speed);
             row.AddChild(b);

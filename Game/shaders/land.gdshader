@@ -121,7 +121,7 @@ void fragment() {
         vec3 tinted = c.rgb * (0.42 + 1.15 * lum) + (ground - lum) * 0.45;
         vec3 col = mix(ground, tinted, c.a);
         // The paper chart: flat colours (bare land in parchment) with a trace of the relief.
-        vec3 chart = mix(parchment, c.rgb, c.a > 0.01 ? 0.78 : 0.0) * (0.88 + 0.24 * lum);
+        vec3 chart = mix(parchment, c.rgb, c.a > 0.01 ? 0.88 : 0.0) * (0.88 + 0.24 * lum);
         COLOR = vec4(mix(col, chart, paper), 1.0);
     }
 }

@@ -679,7 +679,7 @@ public partial class Main : Control
         var title = new Label { Text = "POLITICOM", HorizontalAlignment = HorizontalAlignment.Center };
         title.AddThemeFontOverride("font", new FontVariation { BaseFont = UiTheme.DisplayBold, SpacingGlyph = 10 });
         title.AddThemeFontSizeOverride("font_size", 64);
-        title.AddThemeColorOverride("font_color", new Color("e3bd6b"));
+        title.AddThemeColorOverride("font_color", new Color("e6cd94"));
         title.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.8f));
         title.AddThemeConstantOverride("shadow_offset_y", 3);
         column.AddChild(title);
@@ -1017,7 +1017,7 @@ public partial class Main : Control
         var text = new RichTextLabel
         {
             BbcodeEnabled = true, FitContent = true, ScrollActive = false,
-            Text = $"{UiTheme.DisplayText(Esc(city), 20)}\n[color=#c9a25b]{Esc(state.Name)} · {Politicom.Sim.Global.StateText.Name(state.Ideology)}[/color]\n\n" +
+            Text = $"{UiTheme.DisplayText(Esc(city), 20)}\n[color=#c8aa72]{Esc(state.Name)} · {Politicom.Sim.Global.StateText.Name(state.Ideology)}[/color]\n\n" +
                    $"{Politicom.Sim.Global.StateText.Stance(state.Stance)} toward you ([b]{state.Stance:+0.00;-0.00}[/b]) — {Politicom.Sim.Global.StateText.Actions(state.Actions)}\n" +
                    $"Workers radicalized: [b]{state.Radicalization:P0}[/b]" + (state.Repression > 0.05 ? $" · repression {state.Repression:P0}" : "") + "\n" +
                    (state.Uprising > 0 ? $"[color=#f2c94c][b]Revolution under way[/b], decided in {w.Turns(state.Uprising)}.[/color]\n" : "") +
@@ -1076,12 +1076,12 @@ public partial class Main : Control
         _map.Banner = title;
         Audio.Instance?.Play(w.Outcome == Outcome.Survived ? "good" : "drum");
         int? rank = RecordOutcome(title);
-        string ranked = rank is int r ? $"\n\n[color=#e3bd6b]{(r == 1 ? "A new best" : $"Number {r}")} on the leaderboard for {Esc(w.Scenario.Name)}.[/color]" : "";
+        string ranked = rank is int r ? $"\n\n[color=#e6cd94]{(r == 1 ? "A new best" : $"Number {r}")} on the leaderboard for {Esc(w.Scenario.Name)}.[/color]" : "";
         var chart = new HistoryChart { World = w, FontSize = 13, CustomMinimumSize = new Vector2(0, 220) };
         ShowOverlay(title, $"""
             {verdict}
 
-            [color=#c9a25b]{epilogue}[/color]
+            [color=#c8aa72]{epilogue}[/color]
 
             [b]Survival[/b] {s.Survival:0}    [b]Quality of life[/b] {s.QualityOfLife:0}    [b]Spread[/b] {s.Spread:0}    [b]Freedom[/b] {s.Freedom:0}    —    [b]Total {s.Total:0}[/b]
 
@@ -1445,9 +1445,9 @@ public partial class Main : Control
         UpdateHeader();
         RefreshAttention();
         _stepButton.Text = $"+1 {w.Turn}";
-        _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#9a9283](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
+        _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#929aa6](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
         _status["commune"].Text = $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" +
-            (w.Communes.Count > w.InitialCommuneCount ? $" [color=#9a9283](began {w.InitialCommuneCount})[/color]" : $"/{w.InitialCommuneCount}");
+            (w.Communes.Count > w.InitialCommuneCount ? $" [color=#929aa6](began {w.InitialCommuneCount})[/color]" : $"/{w.InitialCommuneCount}");
         _status["enthusiasm"].Text = $"{UiTheme.Img("enthusiasm")} {w.Enthusiasm:P0}";
         _status["militia"].Text = $"{UiTheme.Img("militia")} {w.Fighters:0.0}k";
         _status["gold"].Text = $"{UiTheme.Img("gold")} {w.Gold:0}";
@@ -1592,7 +1592,7 @@ public partial class Main : Control
                    $"{(foodNeed > 0 ? food / foodNeed : 0):0} {turn}s in reserve\n" +
                    $"{UiTheme.Img("goods")} [b]Goods[/b] {goods:0} in store, {goodsMade:0} made against {goodsNeed:0} used a {turn} ({Rate(goodsMade, goodsNeed)})";
         string Dear(double p) => p > 1.3 ? "#f07060" : p < 0.8 ? "#70d080" : "#e4dccb";
-        text += $"\n{UiTheme.Img("treasury")} [b]Prices[/b] {Hint($"food [color={Dear(w.FoodPrice)}]{w.FoodPrice:0.00}[/color] · goods [color={Dear(w.GoodsPrice)}]{w.GoodsPrice:0.00}[/color]", PriceLines(w))} [color=#9a9283](1 = four weeks in store; scarcity raises them)[/color]";
+        text += $"\n{UiTheme.Img("treasury")} [b]Prices[/b] {Hint($"food [color={Dear(w.FoodPrice)}]{w.FoodPrice:0.00}[/color] · goods [color={Dear(w.GoodsPrice)}]{w.GoodsPrice:0.00}[/color]", PriceLines(w))} [color=#929aa6](1 = four weeks in store; scarcity raises them)[/color]";
         var from = new List<string>();
         if (w.LastArms > 0.05) from.Add($"arms {w.LastArms:0.0}");
         if (w.ForeignTrade && w.LastImports > 0.05) from.Add($"goods {w.LastImports:0.0} for {w.LastExports:0.0} food");
