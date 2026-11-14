@@ -690,17 +690,22 @@ Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution
 ## What the player sees
 
 **The look.** The interface is modelled on Victoria 3:
-- **Windows:** pop-ups, the scenario picker, the tech tree and the dashboard are dark grained
-  lacquer in engraved gold frames with flourished corners: a bracket with curling ends and a
-  palmette.
+- **Windows:** pop-ups, the scenario picker, the tech tree and the dashboard are slate-blue
+  grained lacquer in engraved brass frames with flourished corners: a bracket with curling ends
+  and a palmette.
 - **Titles:** window titles sit on a metal-rimmed plate with scroll terminals.
 - **Section headings:** each sits on a shaded bar with fine gold rules.
-- **Controls:** buttons are embossed bronze plates (lit on hover, red lacquer when on).
-  Tabs are plates with the open one lit, and switches are gilt.
+- **Controls:** buttons are embossed slate-blue enamel plates with brass rims (lit on hover,
+  steel-blue when on). Tabs are plates with the open one lit, and switches are gilt. The
+  dashboard folds away behind a side tab, rounded toward the map with a brass chevron; while
+  it's folded, the small clock on the map uses the same buttons as the dashboard.
+- **Map colours:** countries tint the terrain strongly enough to tell neighbours apart (and
+  the paper chart, zoomed out, nearly at full colour); a cool, clear grade with a faint
+  vignette lies over the map.
 - **Medallions:** pop-up and decision emblems sit in beaded gold medallions. Dividers are
   tapered gold rules.
 - **Text:** a book serif, **Crimson Pro**, throughout. Titles and headings are semibold, in
-  title case and gold; body text is regular, cream, at about 16 px; figures are bold.
+  title case and brass; body text is regular, cream, at about 16 px; figures are bold.
 - **Replacing the art:** every ornament is a PNG drawn by `tools/ui/build_ornaments.py`
   (Pillow and numpy). Painted art of the same size and margins can replace any of them
   without code changes; the margins are in `Game/scripts/UiTheme.cs`.
