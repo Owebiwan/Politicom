@@ -95,8 +95,11 @@ public partial class Map3D
                 foreach (var car in cars) car.Visible = false;
                 continue;
             }
-            // Out and back, pausing a moment at each end; each line on its own schedule.
-            double period = 2 * (run / (18 * zoom) + 2);
+            // Out and back, pausing a moment at each end; each line on its own schedule. Timed by the
+            // real distance between the towns, not the line's length on screen, so zooming doesn't
+            // jolt the train along its line.
+            double km = Politicom.Sim.Global.WorldSetup.DistanceKm(w.Communes[a].Longitude, w.Communes[a].Latitude, w.Communes[b].Longitude, w.Communes[b].Latitude);
+            double period = 2 * (Math.Clamp(km, 8, 400) / 3.0 + 2); // about 3 km a second, and 2 seconds at each station
             double phase = ((time + (a * 7 + b * 13) % 11) % period) / period;
             bool outward = phase < 0.5;
             double p = outward ? phase * 2 : (1 - phase) * 2;
