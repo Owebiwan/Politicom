@@ -330,6 +330,13 @@ public sealed class Balance
     /// <summary>Figures' moments (FigureMoments): at least this many weeks apart, and this likely a week after that.</summary>
     public double FigureMomentGap { get; set; } = 8;
     public double FigureMomentRate { get; set; } = 0.2;
+    /// <summary>Factions: strength gained a week per point of power above the threshold; drift a week at full strength;
+    /// addressing one costs influence and takes this much strength away.</summary>
+    public double FactionGrowth { get; set; } = 0.12;
+    public double FactionThreshold { get; set; } = 0.15;
+    public double FactionDrift { get; set; } = 0.06;
+    public double CostAddressFaction { get; set; } = 10;
+    public double AddressFactionRelief { get; set; } = 0.35;
     /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
     public double RisingRate { get; set; } = 0.02;
     /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>

@@ -20,6 +20,7 @@ internal static class DriftSystem
             Conscription = w.Conscription ? b.ConscriptionDrift * w.Weeks : 0,
             Treasury = b.GoldHoldingDrift * w.Gold * w.Weeks,
             Figures = FigureSystem.Drift(w),
+            Factions = FactionSystem.Drift(w),
             LargeProjects = Level(w, w.ActiveProjects.Sum(p => b.LargeProjectDrift * Math.Max(0, p.Participants.Count - b.LargeProjectThreshold)), b.ProjectDriftCeiling),
             Events = w.PendingDriftBump,
             PoliticalEducationBrake = b.PoliticalBrake * w.Mean(c => c.PoliticalEducation),

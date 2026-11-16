@@ -14,6 +14,7 @@ public sealed record Concern(int Commune, int Urgency, string Problem, string Re
         ProposeProject { Kind: ProjectKind.FamineRelief } => "Famine relief",
         ExposeCells => "Expose cells",
         FundSchool => "Political school",
+        AddressFaction => "Address them",
         _ => Remedy,
     };
 }
@@ -74,6 +75,15 @@ public static class Attention
             else if (c.PoliticalEducation < 0.15 && c.PoliticalSchooling < b.MaxSchooling)
                 found.Add(new(c.Id, 30, $"political education is thin ({c.PoliticalEducation:P0})",
                     "Fund a political school", new FundSchool(c.Id, EducationTrack.Political), b.CostSchool));
+        }
+
+        // A faction close to making its demand: shown on the commune at its heart.
+        foreach (var f in w.Factions.Where(f => f.Strength >= 0.6 && f.Members.Count > 0))
+        {
+            int heart = f.Leader is int l && w.Figures[l].Commune is int lc ? lc : f.Members.OrderByDescending(id => w.Communes[id].Population).First();
+            found.RemoveAll(x => x.Commune == heart);
+            found.Add(new(heart, 70 + (int)(20 * f.Strength), $"{Faction.Name(f.Kind).ToLowerInvariant()} ({f.Members.Count} communes, strength {f.Strength:P0}) will soon demand {Faction.Demand(f.Kind)}",
+                $"Address {Faction.Name(f.Kind).ToLowerInvariant()}", new AddressFaction(f.Kind), b.CostAddressFaction));
         }
 
         found = found.OrderByDescending(x => x.Urgency).ThenBy(x => w.Communes[x.Commune].Name).Take(max).ToList();

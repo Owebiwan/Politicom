@@ -15,6 +15,32 @@ public enum FigureRole
     Educator,
 }
 
+/// <summary>
+/// A figure's character, as Crusader Kings gives its people traits. Each shapes how they work,
+/// what they do when they act on their own, and how fast fame turns into appetite.
+/// </summary>
+public enum FigureTrait
+{
+    /// <summary>Leads from the front: a commander's line holds better, and they risk their life more.</summary>
+    Brave,
+    /// <summary>Spares lives: less risk, a little less fight; prefers holding to striking.</summary>
+    Cautious,
+    /// <summary>Wants more: ambition grows half again as fast.</summary>
+    Ambitious,
+    /// <summary>Wants little: ambition grows at half the rate.</summary>
+    Humble,
+    /// <summary>Plays straight: the power they gather adds less drift.</summary>
+    Honest,
+    /// <summary>Loves the crowd: prestige comes faster, and a slight cuts deeper.</summary>
+    Vain,
+    /// <summary>A true believer: fights the party, and takes compromises badly.</summary>
+    Zealous,
+    /// <summary>Takes what works: forgives compromises, and leans toward the centralists.</summary>
+    Pragmatic,
+    /// <summary>A gift for words: speeches and papers reach further.</summary>
+    Eloquent,
+}
+
 /// <summary>A notable figure as a scenario names them (historical people), or as one is generated.</summary>
 public sealed class FigureDefinition
 {
@@ -26,7 +52,11 @@ public sealed class FigureDefinition
     public double Ambition { get; set; } = 0.3;
     public double Prestige { get; set; } = 0.3;
     public string Description { get; set; } = "";
+    public List<FigureTrait> Traits { get; set; } = new();
 }
+
+/// <summary>Something a figure remembers the movement doing, for or against them.</summary>
+public sealed record FigureMemory(int Tick, string Text, double Regard);
 
 /// <summary>
 /// A notable figure of the movement. Wherever they are, they make things better: a commander's
@@ -53,6 +83,44 @@ public sealed class Figure
     public bool Empowered { get; set; }
     /// <summary>A request for power is waiting for the movement's answer.</summary>
     public bool Asking { get; set; }
+    public List<FigureTrait> Traits { get; set; } = new();
+    /// <summary>How they feel about the movement's leadership (-1 bitter .. 1 devoted): what it has done to them.</summary>
+    public double Regard { get; set; }
+    /// <summary>How they feel about each other figure (by id): above 0.4 friends, below -0.4 rivals.</summary>
+    public Dictionary<int, double> Opinions { get; set; } = new();
+    /// <summary>What they remember the movement doing, newest last (a few at most).</summary>
+    public List<FigureMemory> Memories { get; set; } = new();
+
+    public bool Has(FigureTrait t) => Traits.Contains(t);
+    public double OpinionOf(int other) => Opinions.GetValueOrDefault(other);
+    public bool FriendOf(int other) => OpinionOf(other) >= 0.4;
+    public bool RivalOf(int other) => OpinionOf(other) <= -0.4;
+
+    /// <summary>How readily ambition grows: ambitious faster, humble slower, a grudge feeds it.</summary>
+    [JsonIgnore] public double AmbitionPace => (Has(FigureTrait.Ambitious) ? 1.5 : 1) * (Has(FigureTrait.Humble) ? 0.5 : 1) * (Regard < -0.3 ? 1.4 : 1);
+
+    /// <summary>How well they work: devoted figures give more, bitter ones less.</summary>
+    [JsonIgnore] public double Zeal => 1 + 0.25 * Math.Clamp(Regard, -1, 1);
+
+    public static string TraitName(FigureTrait t) => t.ToString().ToLowerInvariant();
+
+    public static string RegardWord(double regard) =>
+        regard >= 0.5 ? "devoted" : regard >= 0.2 ? "loyal" : regard > -0.2 ? "steady" : regard > -0.5 ? "resentful" : "bitter";
+
+    /// <summary>Remembers something, and feels it.</summary>
+    public void Remember(int tick, string text, double regard)
+    {
+        Regard = Math.Clamp(Regard + regard, -1, 1);
+        Memories.Add(new FigureMemory(tick, text, regard));
+        if (Memories.Count > 5) Memories.RemoveAt(0);
+    }
+
+    /// <summary>Changes how they feel about another figure (and that one about them, half as much).</summary>
+    public static void Feel(Figure a, Figure b, double change)
+    {
+        a.Opinions[b.Id] = Math.Clamp(a.OpinionOf(b.Id) + change, -1, 1);
+        b.Opinions[a.Id] = Math.Clamp(b.OpinionOf(a.Id) + change * 0.5, -1, 1);
+    }
 
     /// <summary>How close they are to asking for power (0..1); they ask at about 0.45.</summary>
     [JsonIgnore] public double Hunger => Prestige * Ambition;

@@ -151,13 +151,13 @@
   // kind: Agrarian | Industrial | Mixed. Values run -1..1 (collectivist, militant, federalist).
   // Population in thousands, abstracted — Barcelona's syndicates stand in for the city.
   "figures": [
-    { "name": "Buenaventura Durruti", "role": "Commander", "commune": "Bujaraloz", "ambition": 0.12, "prestige": 0.55,
+    { "name": "Buenaventura Durruti", "role": "Commander", "traits": ["Brave", "Humble"], "commune": "Bujaraloz", "ambition": 0.12, "prestige": 0.55,
       "description": "Metalworker, bank robber, the best-loved militant of the CNT. His column of 3,000 marched on Zaragoza and holds the line at Bujaraloz." },
-    { "name": "Juan García Oliver", "role": "Organizer", "commune": "Barcelona transport collective", "ambition": 0.6, "prestige": 0.45,
+    { "name": "Juan García Oliver", "role": "Organizer", "traits": ["Ambitious", "Pragmatic"], "commune": "Barcelona transport collective", "ambition": 0.6, "prestige": 0.45,
       "description": "Waiter and insurrectionist, the strategist of the July fighting. He organizes the militias' supply; in November he will become Minister of Justice." },
-    { "name": "Federica Montseny", "role": "Orator", "commune": "Sants textile syndicate", "ambition": 0.5, "prestige": 0.45,
+    { "name": "Federica Montseny", "role": "Orator", "traits": ["Eloquent", "Pragmatic"], "commune": "Sants textile syndicate", "ambition": 0.5, "prestige": 0.45,
       "description": "Writer and the movement's finest speaker. Her rallies fill the bullrings; in November she will be the first woman minister in Spain." },
-    { "name": "Lucía Sánchez Saornil", "role": "Educator", "commune": "Poblenou metalworkers", "ambition": 0.08, "prestige": 0.35,
+    { "name": "Lucía Sánchez Saornil", "role": "Educator", "traits": ["Zealous", "Honest"], "commune": "Poblenou metalworkers", "ambition": 0.08, "prestige": 0.35,
       "description": "Poet and founder of Mujeres Libres: literacy classes, schools and training for thousands of working women." }
   ],
   "communes": [

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Politicom.Sim;
@@ -54,9 +55,29 @@ public partial class Main
         text.Text = $"[b]{Esc(f.Name)}[/b] · [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] {where}"
                     + (f.Empowered ? " · [color=#f07060]holds power[/color]" : "")
                     + $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color]"
+                    + $"\n{Character(f, memory: true)}"
                     + (f.Description.Length > 0 ? $"\n[i][color=#a8a090]{Esc(f.Description)}[/color][/i]" : "");
         row.AddChild(text);
         return card;
+    }
+
+    /// <summary>Their traits, how they feel about the movement, their friends and rivals, and what they last remember.</summary>
+    private string Character(Figure f, bool memory)
+    {
+        var w = _world;
+        string traits = f.Traits.Count == 0 ? "" : string.Join(", ", f.Traits.Select(Figure.TraitName));
+        string regardColor = f.Regard >= 0.2 ? "#70d080" : f.Regard > -0.2 ? "#b8b0a0" : "#f07060";
+        var friends = w.Figures.Where(o => o.Alive && o != f && f.FriendOf(o.Id)).Select(o => Esc(o.Name)).ToList();
+        var rivals = w.Figures.Where(o => o.Alive && o != f && f.RivalOf(o.Id)).Select(o => Esc(o.Name)).ToList();
+        var parts = new List<string>();
+        if (traits.Length > 0) parts.Add($"[i]{traits}[/i]");
+        parts.Add($"[color={regardColor}]{Figure.RegardWord(f.Regard)}[/color] toward the movement");
+        if (friends.Count > 0) parts.Add($"[color=#70d080]friend of[/color] {string.Join(", ", friends)}");
+        if (rivals.Count > 0) parts.Add($"[color=#f07060]rival of[/color] {string.Join(", ", rivals)}");
+        string line = string.Join(" · ", parts);
+        if (memory && f.Memories.LastOrDefault() is { } m)
+            line += $"\n[color=#a8a090]Remembers: {Esc(f.Name.Split(' ')[0])} {Esc(m.Text)} ({w.Format(w.DateAt(m.Tick), "MMM yyyy")})[/color]";
+        return line;
     }
 
     private static string AmbitionWord(double hunger) =>
@@ -66,7 +87,7 @@ public partial class Main
     {
         var w = _world;
         // Rebuilt only when something shown changes.
-        string key = string.Join("|", w.Figures.Select(f => $"{f.Alive}{f.Commune}{f.Resting}{f.Empowered}{(int)(f.Prestige * 20)}{(int)(f.Hunger * 20)}")) + $"/{_map.Selected}/{(int)w.Influence}";
+        string key = string.Join("|", w.Figures.Select(f => $"{f.Alive}{f.Commune}{f.Resting}{f.Empowered}{(int)(f.Prestige * 20)}{(int)(f.Hunger * 20)}{(int)(f.Regard * 10)}{f.Memories.Count}{string.Join(",", f.Opinions.Select(o => (int)(o.Value * 3)))}")) + $"/{_map.Selected}/{(int)w.Influence}";
         if (key == _figuresShown) return;
         _figuresShown = key;
         foreach (var child in _figures.GetChildren()) child.QueueFree();
@@ -85,8 +106,9 @@ public partial class Main
             string hunger = f.Hunger >= 0.38 ? "#f07060" : f.Hunger >= 0.28 ? "#e0a040" : "#9aa0a8";
             text.Text = $"[b]{Esc(f.Name)}[/b] [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] · {where}" +
                         (f.Empowered ? " · [color=#f07060]holds power[/color]" : "") +
-                        (f.Alive ? $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color] · {Figure.Does(f.Role)}" : "");
-            text.TooltipText = f.Description;
+                        (f.Alive ? $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color] · {Figure.Does(f.Role)}\n{Character(f, memory: false)}" : "");
+            text.TooltipText = f.Description + (f.Memories.Count > 0 ? "\n\nRemembers:\n" + string.Join("\n", f.Memories.Select(m => $"· {m.Text} ({w.Format(w.DateAt(m.Tick), "MMM yyyy")})")) : "")
+                               + (f.Traits.Count > 0 ? "\n\nTraits: " + string.Join(", ", f.Traits.Select(Figure.TraitName)) : "");
             text.MouseFilter = MouseFilterEnum.Pass;
             box.AddChild(text);
             if (f.Alive)

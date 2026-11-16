@@ -82,6 +82,8 @@ public sealed record BuyAbroad(Purchase What) : PlayerAction;
 
 /// <summary>Answer a scripted historical event. Option is zero-based.</summary>
 public sealed record ChooseEventOption(string EventId, int Option) : PlayerAction;
+/// <summary>Meet a faction's communes and answer their grievance: much of its strength fades.</summary>
+public sealed record AddressFaction(FactionKind Kind) : PlayerAction;
 
 public sealed record ActionResult(bool Ok, string Message)
 {
@@ -123,6 +125,7 @@ internal static class ActionSystem
             SeizeTreasuries => Seize(w),
             BuyAbroad a => Buy(w, a),
             FoundCulturalWork a => CulturalWork(w, a),
+            AddressFaction a => Systems.FactionSystem.Address(w, a.Kind),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
     }

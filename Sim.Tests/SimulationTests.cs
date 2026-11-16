@@ -243,18 +243,18 @@ public class SimulationTests
     {
         using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(DataDir, "codex.json")));
         var entries = doc.RootElement.GetProperty("entries").EnumerateArray().ToList();
-        var categories = doc.RootElement.GetProperty("categories").EnumerateArray().Select(c => c.GetString()).ToHashSet();
-        var ids = entries.Select(e => e.GetProperty("id").GetString()).ToHashSet();
+        var categories = doc.RootElement.GetProperty("categories").EnumerateArray().Select(c => c.GetString()!).ToHashSet();
+        var ids = entries.Select(e => e.GetProperty("id").GetString()!).ToHashSet();
         Assert.Equal(entries.Count, ids.Count);
         var events = new[] { "catalonia_1936", "free_territory_1918", "paris_commune_1871" }
             .SelectMany(s => World.Load(DataDir, s).Scenario.Events.Select(e => e.Id)).ToHashSet();
         foreach (var e in entries)
         {
-            Assert.Contains(e.GetProperty("category").GetString(), categories);
+            Assert.Contains(e.GetProperty("category").GetString()!, categories);
             if (e.TryGetProperty("related", out var related))
-                foreach (var r in related.EnumerateArray()) Assert.Contains(r.GetString(), ids);
+                foreach (var r in related.EnumerateArray()) Assert.Contains(r.GetString()!, ids);
             if (e.TryGetProperty("events", out var linked))
-                foreach (var x in linked.EnumerateArray()) Assert.Contains(x.GetString(), events);
+                foreach (var x in linked.EnumerateArray()) Assert.Contains(x.GetString()!, events);
         }
     }
 
@@ -275,6 +275,65 @@ public class SimulationTests
         double before = figure.Prestige;
         Assert.True(w.Apply(new ChooseEventOption(moment.Id, backed.i)).Ok);
         Assert.True(!figure.Alive || figure.Prestige > before);
+    }
+
+    [Fact]
+    public void Historical_figures_have_their_traits_and_generated_ones_get_two()
+    {
+        var w = NewWorld();
+        var durruti = w.Figures.Single(f => f.Name == "Buenaventura Durruti");
+        Assert.Contains(FigureTrait.Brave, durruti.Traits);
+        var open = World.Create(Sim.Open.OpenStartGenerator.Generate(Sim.Global.Atlas.Load(DataDir, "1200"), Sandbox.Value, "FRANCE", 1, calibrate: false), NewWorld().Techs);
+        Assert.All(open.Figures, f => Assert.Equal(2, f.Traits.Distinct().Count()));
+    }
+
+    [Fact]
+    public void Rotating_a_figure_is_remembered_and_their_friends_notice()
+    {
+        var w = NewWorld();
+        w.Step();
+        var (a, b) = (w.Figures[0], w.Figures[1]);
+        Figure.Feel(b, a, 0.8);
+        Assert.True(b.FriendOf(a.Id));
+        Assert.True(w.Apply(new RotateFigure(a.Id)).Ok);
+        Assert.True(a.Regard < 0);
+        Assert.Contains(a.Memories, m => m.Text.Contains("rotated"));
+        Assert.True(b.Regard < 0);
+    }
+
+    [Fact]
+    public void Factions_form_can_be_addressed_and_make_their_demand_at_full_strength()
+    {
+        var w = NewWorld();
+        w.Run(40);
+        Assert.Equal(4, w.Factions.Count);
+        var centralists = w.Factions.Single(f => f.Kind == FactionKind.Centralists);
+        Assert.True(centralists.Members.Count >= 3, "front communes should lean centralist in wartime");
+
+        centralists.Strength = 0.8;
+        w.Influence = 50;
+        Assert.True(w.Apply(new AddressFaction(FactionKind.Centralists)).Ok);
+        Assert.True(centralists.Strength < 0.5);
+
+        centralists.Strength = 1;
+        w.Step();
+        Assert.Contains(w.Scenario.Events, e => e.Id.StartsWith("faction_Centralists_"));
+        w.Step();
+        Assert.Contains(w.PendingEvents, p => p.Id.StartsWith("faction_Centralists_"));
+    }
+
+    [Fact]
+    public void Factions_and_figures_feelings_survive_saving()
+    {
+        var w = NewWorld();
+        w.Run(30);
+        Figure.Feel(w.Figures[0], w.Figures[2], -0.7);
+        w.Figures[1].Remember(w.Tick, "was tested", -0.3);
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.True(loaded.Figures[0].RivalOf(2));
+        Assert.Equal(w.Figures[1].Regard, loaded.Figures[1].Regard, 6);
+        Assert.Equal(w.Figures[0].Traits, loaded.Figures[0].Traits);
+        Assert.Equal(w.Factions.Select(f => (f.Kind, f.Strength, f.Members.Count)), loaded.Factions.Select(f => (f.Kind, f.Strength, f.Members.Count)));
     }
 
     [Fact]

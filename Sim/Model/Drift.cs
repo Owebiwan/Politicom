@@ -54,6 +54,8 @@ public sealed class DriftBreakdown
     public double LargeProjects { get; set; }
     /// <summary>Notable figures' gathered power.</summary>
     public double Figures { get; set; }
+    /// <summary>Factions pressing their demands.</summary>
+    public double Factions { get; set; }
     public double Events { get; set; }
     public double PoliticalEducationBrake { get; set; }
     public double TechnologyBrake { get; set; }
@@ -61,7 +63,7 @@ public sealed class DriftBreakdown
     /// <summary>Campaigns at peace: the militias go home and the assemblies take back what the war gave away.</summary>
     public double PeaceBrake { get; set; }
 
-    [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects + Conscription + Treasury + Figures;
+    [JsonIgnore] public double Pressure => Baseline + Technology + ExpertTrap + WarCommittee + WarStress + ForeignTrade + PartyCells + Militarization + LargeProjects + Conscription + Treasury + Figures + Factions;
     [JsonIgnore] public double Brakes => PoliticalEducationBrake + TechnologyBrake + CultureBrake + PeaceBrake;
     [JsonIgnore] public double Net => Pressure - Brakes + Events;
 
@@ -79,6 +81,7 @@ public sealed class DriftBreakdown
         yield return ("The treasury committee", Treasury);
         yield return ("Large federal projects", LargeProjects);
         yield return ("Figures gathering power", Figures);
+        yield return ("Factions pressing demands", Factions);
         yield return ("One-off events", Events);
         yield return ("Political education", -PoliticalEducationBrake);
         yield return ("Mandates, recall, rotation", -TechnologyBrake);

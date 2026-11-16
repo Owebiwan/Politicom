@@ -130,6 +130,9 @@ public sealed class Balanced : IPolicy
         if (margin < 5 && w.Influence >= b.CostRecall * DriftEffects.RecallCost(w.Drift.Stage)) w.Apply(new RecallDelegates());
 
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
+        // Factions nearing half strength: meet them before they make their demand.
+        foreach (var f in w.Factions.Where(f => f.Strength > 0.45).OrderByDescending(f => f.Strength))
+            if (w.Influence >= b.CostAddressFaction + 8) w.Apply(new AddressFaction(f.Kind));
         Helpers.Diplomacy(w, crisis, reserve: 20);
         Helpers.ReliefForStarving(w);
         if (w.Tick % 20 == 5 && w.TechShare("militia_doctrine") < 0.5) w.Apply(new CirculateIdea("militia_doctrine"));

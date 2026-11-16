@@ -90,6 +90,16 @@ public sealed class EventEffects
     public string Rival { get; set; } = "";
     public double RivalPrestige { get; set; }
     public double RivalAmbition { get; set; }
+    /// <summary>How the choice makes the figure and the rival feel about the movement, and what each remembers of it.</summary>
+    public double FigureRegard { get; set; }
+    public string Memory { get; set; } = "";
+    public double RivalRegard { get; set; }
+    public string RivalMemory { get; set; } = "";
+    /// <summary>Change in how the figure and the rival feel about each other.</summary>
+    public double Relation { get; set; }
+    /// <summary>A faction (by kind) whose strength changes.</summary>
+    public string Faction { get; set; } = "";
+    public double FactionStrength { get; set; }
     /// <summary>Added to the target communes' control of their ground (front communes only).</summary>
     public double Control { get; set; }
     /// <summary>Added to the enemy's exhaustion.</summary>
@@ -133,6 +143,10 @@ public sealed class EventEffects
         if (FigureRisk > 0) parts.Add($"{FigureRisk:P0} risk to {Figure}'s life");
         if (Rival.Length > 0) Add(RivalPrestige * 100, $"% {Rival}'s prestige");
         if (Rival.Length > 0) Add(RivalAmbition * 100, $"% {Rival}'s ambition");
+        if (Figure.Length > 0 && FigureRegard != 0) parts.Add($"{Figure} {(FigureRegard > 0 ? "warmer" : "cooler")} toward you");
+        if (Rival.Length > 0 && RivalRegard != 0) parts.Add($"{Rival} {(RivalRegard > 0 ? "warmer" : "cooler")} toward you");
+        if (Rival.Length > 0 && Relation < 0) parts.Add($"{Figure} and {Rival} grow apart");
+        if (Rival.Length > 0 && Relation > 0) parts.Add($"{Figure} and {Rival} grow closer");
         return parts.Count == 0 ? "no direct effect" : string.Join(", ", parts);
     }
 }

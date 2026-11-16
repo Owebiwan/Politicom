@@ -116,6 +116,8 @@ public sealed class World
     public List<Goal> Goals { get; } = new();
     /// <summary>The last few months' battles at the fronts (WarSystem), newest last.</summary>
     public List<BattleReport> Battles { get; } = new();
+    /// <summary>Factions of communes pressing a demand (FactionSystem).</summary>
+    public List<Faction> Factions { get; } = new();
     public int LastGoal { get; internal set; } = -999;
     /// <summary>Turn a figure last did something the movement had to answer.</summary>
     public int LastFigureMoment { get; internal set; } = -999;
@@ -377,6 +379,7 @@ public sealed class World
         LastDecision = LastDecision,
         Goals = Goals.ToList(),
         Battles = Battles.ToList(),
+        Factions = Factions.ToList(),
         LastGoal = LastGoal,
         LastFigureMoment = LastFigureMoment,
         LastProposal = LastProposal,
@@ -468,6 +471,7 @@ public sealed class World
         w.Risen.UnionWith(s.Risen);
         w.Goals.AddRange(s.Goals);
         w.Battles.AddRange(s.Battles);
+        w.Factions.AddRange(s.Factions);
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();
@@ -504,6 +508,7 @@ public sealed class World
         WarSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
+        FactionSystem.Run(this);
         DriftSystem.Run(this);
         InfluenceSystem.Run(this);
         ScoreSystem.Run(this);

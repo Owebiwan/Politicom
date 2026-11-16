@@ -55,6 +55,7 @@ public sealed class SaveGame
     public int LastDecision { get; set; }
     public List<Goal> Goals { get; set; } = new();
     public List<BattleReport> Battles { get; set; } = new();
+    public List<Faction> Factions { get; set; } = new();
     public int LastGoal { get; set; } = -999;
     public int LastFigureMoment { get; set; } = -999;
     public int LastProposal { get; set; } = -999;

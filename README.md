@@ -513,6 +513,29 @@ The simulation records each battle (`BattleReport`, kept for about six months an
 the game). There are no casualty figures: the simulation doesn't count the dead, so the report
 doesn't invent them.
 
+## Factions
+
+Drift with a face (`Sim/Systems/FactionSystem.cs`), as Crusader Kings' discontented vassals band
+together. Each turn every commune leans toward the factions whose grievance it shares, and joins
+those it leans far toward:
+
+| Faction | Who | Demand | Conceded | Refused |
+|---|---|---|---|---|
+| The centralists | front communes under pressure, little political education | a permanent war committee | stronger fronts, +6 drift | front communes feel abandoned |
+| The party's friends | communes where party cells are strong | commissars in every column | arms, party cells, +4 drift | the party cries splitting |
+| The planners | communes where expertise outruns political education | a planning bureau of engineers | output, +5 drift | the engineers grumble |
+| The localists | discontented communes with little trust | autonomy | the federation loosens | the most aggrieved leave |
+
+A faction's power is its share of the federation's people and communes, times how strongly
+they feel, and more with a figure of fitting character at its head (a pragmatic or ambitious
+figure leads the centralists, a bitter one the localists). Its strength grows while that power
+is real (it needs at least three communes) and fades when it isn't; it adds drift with the
+square of its strength, little while weak and much as it nears its demand. At full strength
+it puts its demand to the congress. **Address** a faction (10 influence) and delegates answer
+its communes point by point: it loses a third of its strength. Factions show in the Overview
+tab, and in Needs attention when they near their demand; the drift breakdown lists them.
+Balance (balanced AI, 200 games): Catalonia 81%, Free Territory 72%, Paris 45%.
+
 ## Goals
 
 Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits
@@ -651,6 +674,23 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
   Backing a figure feeds their prestige and their ambition, so the people who serve the
   revolution best are also the ones who may come to ask for power. The same thing never comes
   back within a year.
+- **Traits** (as in Crusader Kings): each figure has two, which shape how they work and what
+  they do. Brave (a commander's line holds harder; more risk to their life), cautious, ambitious
+  (ambition grows half again as fast), humble (half as fast), honest (their power adds less
+  drift), vain (prestige comes faster, slights cut deeper), zealous (fights the party; takes
+  compromises badly), pragmatic (forgives them; leans toward the centralists), eloquent
+  (speeches and papers reach further). Historical figures have fitting ones (Durruti brave and
+  humble, García Oliver ambitious and pragmatic, Courbet vain and eloquent); generated figures
+  get two that don't contradict. Traits make some moments likelier: a brave commander strikes
+  back, a zealous orator denounces the party.
+- **How they feel, and what they remember:** each figure has a regard for the movement (from
+  devoted to bitter) and remembers what it did to them: backed, held back, rotated, given
+  power, attacked in print. Devoted figures work up to a quarter better, bitter ones a quarter
+  worse; a grudge feeds ambition and makes them ask for power sooner, and a bitter figure may
+  threaten to break with the movement (make amends, rotate them, or let them speak). Figures
+  feel about each other too: working side by side makes friends (who take a friend's
+  rotation personally), a zealot and a pragmatist grate, quarrels and pamphlets make rivals,
+  and rivals' quarrels come back.
 - **Where to see them:** the Figures section of the Movement tab (send the selected commune a
   figure, or rotate one), a ★ after the town's name on the map, and the commune's tooltip.
 - **Balance** (balanced AI, 200 games): Catalonia 96%, Free Territory 72% (from about 79%:
