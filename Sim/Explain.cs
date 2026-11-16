@@ -79,6 +79,7 @@ public static class Explain
         F("Foreign volunteers", 1 + w.VolunteerDefense);
         F("Commanders", 1 + Systems.FigureSystem.Defense(w, c));
         F($"Fortifications ({c.Fortification:P0})", 1 + b.FortDefense * c.Fortification);
+        if (w.Struggle is { } st) F($"{st.Name} ({Struggle.PhaseName(st.Phase).ToLowerInvariant()})", Systems.StruggleSystem.DefenseFactor(w));
         return (added, factors);
     }
 

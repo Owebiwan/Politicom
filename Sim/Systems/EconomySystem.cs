@@ -105,7 +105,7 @@ internal static class EconomySystem
         if (population <= 0) return;
         foreach (var c in members)
         {
-            c.Food += s.FoodImports * c.Population / population;
+            c.Food += s.FoodImports * (StruggleSystem.Hostile(w) ? 0.7 : 1) * c.Population / population; // hostile allies cut supplies
             c.Goods += s.GoodsImports * c.Population / population;
         }
     }

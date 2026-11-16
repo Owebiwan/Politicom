@@ -36,13 +36,14 @@ internal static class EventSystem
     {
         w.PendingEvents.RemoveAll(p => p.Id == def.Id);
         var chosen = def.Options[option];
-        Apply(w, chosen.Effects);
+        Apply(w, chosen.Effects, $"{def.Title}: {chosen.Label}");
         w.Emit(Severity.Info, (answered ? $"{def.Title}: {chosen.Label}." : $"{def.Title}: with no answer from the movement, events take their course — {chosen.Label}.")
                               + (chosen.Description.Length > 0 ? $" {chosen.Description}" : ""));
     }
 
-    internal static void Apply(World w, EventEffects e)
+    internal static void Apply(World w, EventEffects e, string reason = "A decision")
     {
+        if (e.Tension != 0) StruggleSystem.Catalyst(w, e.Tension, reason);
         var b = w.Balance;
         var targets = e.Communes.Length == 0
             ? w.Federation.ToList()

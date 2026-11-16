@@ -49,9 +49,9 @@
       "defaultOption": 0,
       "options": [
         { "label": "Join the government", "description": "Ministers get access to the gold reserves and arms purchases. The committees now answer to them.",
-          "effects": { "drift": 6, "influence": 25, "goodsToFront": 30 } },
+          "effects": { "tension": -12, "drift": 6, "influence": 25, "goodsToFront": 30 } },
         { "label": "Stay outside", "description": "The committees keep their power. The government will remember the snub.",
-          "effects": { "drift": -1, "influence": -5, "trust": 0.03 } }
+          "effects": { "tension": 8, "drift": -1, "influence": -5, "trust": 0.03 } }
       ]
     },
     {
@@ -76,11 +76,11 @@
       "requiresFederated": [ "Sants textile syndicate" ],
       "options": [
         { "label": "Call for a ceasefire", "description": "Unity holds. The revolution's control of Barcelona ends quietly, and many militants feel betrayed.",
-          "effects": { "drift": 6, "influence": -10,
+          "effects": { "tension": -15, "drift": 6, "influence": -10,
             "communes": [ "Sants textile syndicate", "Poblenou metalworkers", "Barcelona transport collective", "Badalona", "L'Hospitalet" ],
             "trust": -0.08, "wellbeing": -0.05 } },
         { "label": "Hold the barricades", "description": "The revolution is defended in the streets. Civil war within the civil war weakens the front, and the government will send no more arms.",
-          "effects": { "drift": -4, "enemyStrength": 1.0, "endAllyOffers": true,
+          "effects": { "tension": 15, "drift": -4, "enemyStrength": 1.0, "endAllyOffers": true,
             "communes": [ "Sants textile syndicate", "Poblenou metalworkers", "Barcelona transport collective", "Badalona", "L'Hospitalet" ],
             "trust": 0.05, "wellbeing": -0.12 } }
       ]
@@ -94,7 +94,7 @@
       "requiresFederated": [ "Caspe" ],
       "options": [
         { "label": "Accept the dissolution", "description": "Collectives are broken up and their leaders arrested. Aragon's villages lose faith in the federation.",
-          "effects": { "drift": 4,
+          "effects": { "tension": -10, "drift": 4,
             "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
             "wellbeing": -0.2, "trust": -0.05 } },
         { "label": "Negotiate", "description": "Give up the Council to save the collectives. It costs most of the movement's standing.",
@@ -102,7 +102,7 @@
             "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
             "wellbeing": -0.05 } },
         { "label": "Defend the collectives", "description": "Militias face Republican troops. The collectives survive; the front pays for it, and the government cuts off arms.",
-          "effects": { "drift": -2, "enemyStrength": 1.5, "endAllyOffers": true,
+          "effects": { "tension": 18, "drift": -2, "enemyStrength": 1.5, "endAllyOffers": true,
             "communes": [ "Caspe", "Alcañiz", "Calanda", "Mas de las Matas", "Alcorisa", "Fraga", "Binéfar", "Monzón", "Barbastro", "Graus", "Sariñena", "Bujaraloz", "Pina de Ebro" ],
             "wellbeing": -0.08, "trust": 0.05 } }
       ]
@@ -115,9 +115,9 @@
       "defaultOption": 1,
       "options": [
         { "label": "Cooperate with the SIM", "description": "Saboteurs are caught. So are a good number of anarchists.",
-          "effects": { "drift": 8, "enemyStrength": -0.8, "trust": -0.05 } },
+          "effects": { "tension": -8, "drift": 8, "enemyStrength": -0.8, "trust": -0.05 } },
         { "label": "Refuse", "description": "The collectives police themselves, as they always have.",
-          "effects": { "influence": -5 } }
+          "effects": { "tension": 6, "influence": -5 } }
       ]
     },
     {

@@ -437,10 +437,12 @@ internal static class ActionSystem
         if (!a.Accept)
         {
             ally.Declined++;
+            Systems.StruggleSystem.Catalyst(w, 4, $"Refused the {ally.Name}'s arms");
             w.Emit(Severity.Info, $"You turn down the {ally.Name}'s terms. The militias stay under their own control.");
             return ActionResult.Done("Offer declined.");
         }
         w.BumpDrift(Systems.WarSystem.AllyDrift(w));
+        Systems.StruggleSystem.Catalyst(w, -6, $"Took the {ally.Name}'s arms");
         ally.Accepted++;
         ally.MilitarizationTicks += b.MilitarizationTicks;
         var fronts = w.Federation.Where(c => c.Front).ToList();
@@ -559,6 +561,7 @@ internal static class ActionSystem
         var b = w.Balance;
         if (!Spend(w, b.CostExpose)) return Broke(w, b.CostExpose);
         c.PartyInfluence *= 0.4;
+        Systems.StruggleSystem.Catalyst(w, 6, $"Exposed the party's cells in {c.Name}");
         foreach (var n in w.Trust.Neighbors(c.Id)) w.Communes[n].PartyInfluence *= 0.75;
         foreach (var r in Global.RivalSystem.Rivals(w).ToList()) r.Stance = Math.Clamp(r.Stance - 0.05, -1, 1);
         w.Emit(Severity.Info, $"Assemblies in and around {c.Name} debate the party's methods in the open. Its cells lose ground; its patrons abroad are displeased.", c.Id);

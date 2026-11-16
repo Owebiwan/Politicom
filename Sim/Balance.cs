@@ -337,6 +337,8 @@ public sealed class Balance
     public double FactionDrift { get; set; } = 0.06;
     public double CostAddressFaction { get; set; } = 10;
     public double AddressFactionRelief { get; set; } = 0.35;
+    /// <summary>How fast the struggle between allies' tension drifts (catalysts are unaffected).</summary>
+    public double StrugglePace { get; set; } = 1;
     /// <summary>Chance per week that a city of a regional rising's country rises, next door and with the movement's ideas at full strength.</summary>
     public double RisingRate { get; set; } = 0.02;
     /// <summary>Distance (km) over which a city's chance of rising falls by e.</summary>

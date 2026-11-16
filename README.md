@@ -536,6 +536,34 @@ its communes point by point: it loses a third of its strength. Factions show in 
 tab, and in Needs attention when they near their demand; the drift breakdown lists them.
 Balance (balanced AI, 200 games): Catalonia 81%, Free Territory 72%, Paris 45%.
 
+## The struggle between allies
+
+As Crusader Kings tracks a struggle no one side can win outright (`Sim/Systems/StruggleSystem.cs`):
+where the movement has allies of convenience (the Republic and the party in Catalonia, "the
+antifascist front"; the Bolsheviks in Ukraine; elsewhere the government ally or the strongest
+rival party), a **tension** from 0 to 100 moves it through three phases:
+
+| Phase | Tension | Effect |
+|---|---|---|
+| Cooperation | under 35 | a united front: +5% defence |
+| Tension | 35–65 | none yet |
+| Hostility | over 65 | the allies hold back: −5% defence, no arms offered, party cells grow faster, imports cut by 30% |
+
+Phases change only when tension passes the line by a margin, so they don't flicker. Tension
+drifts each turn with the party's growth, blame for a war going badly and collectivization,
+falls while the militias serve under the allies' command, and cools slowly toward 30. Choices
+move it in jumps: taking the ally's or a rival's arms (−6, −8) or refusing them (+4, +5),
+exposing cells (+6), letting a figure denounce the party (+6) or keeping unity (−3), conceding
+the party's demands (−10) or refusing them (+8), and the historical choices (joining the
+government −12 or staying out +8, the May Days ceasefire −15 or the barricades +15, defending the
+Council of Aragon +18; in Ukraine the Starobilsk agreement −20, holding the banned congress +15).
+At **90** it breaks into the open: barricades in the largest commune, resist (bloodshed, the
+front stripped, no more arms, the party weakened) or accept the ceasefire (drift, their police
+and officers). Kept under 20 for half a year, the allies **recognize the collectives**: more
+supplies, enthusiasm, less drift. The Overview tab shows the phase and tension; its tooltip
+lists what moved it. Balance (balanced AI, 200 games): Catalonia 75%, Free Territory 75%,
+Paris 45%.
+
 ## Goals
 
 Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits

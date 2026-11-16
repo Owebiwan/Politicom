@@ -77,12 +77,12 @@ internal static class FactionSystem
         switch (f.Kind)
         {
             case FactionKind.Centralists:
-                concede.Drift = 6; concede.MilitarizationTicks = 12;
+                concede.Drift = 6; concede.MilitarizationTicks = 12; concede.Tension = -4;
                 grant = "A committee takes the militias in hand: stronger fronts, and a new power in the federation.";
                 deny = "The assemblies keep the militias. The front communes feel abandoned.";
                 break;
             case FactionKind.Party:
-                concede.Drift = 4; concede.PartyInfluence = 0.15; concede.GoodsToFront = 40;
+                concede.Drift = 4; concede.PartyInfluence = 0.15; concede.GoodsToFront = 40; concede.Tension = -10; refuse.Tension = 8;
                 grant = "Commissars join the columns, and the party's arms with them.";
                 deny = "No commissars. The party's friends say the movement is splitting the antifascist front.";
                 break;

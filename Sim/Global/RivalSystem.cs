@@ -23,7 +23,7 @@ public static class RivalSystem
         // Party cells grow where political education is thin and life is hard; education wears them down.
         foreach (var c in w.Federation)
         {
-            double grow = b.PartyGrowth * pressure * (1 - c.PoliticalEducation) * (c.Starving || c.Front ? 1.5 : 1)
+            double grow = b.PartyGrowth * pressure * (1 - c.PoliticalEducation) * (c.Starving || c.Front ? 1.5 : 1) * (Systems.StruggleSystem.Hostile(w) ? 1.3 : 1)
                           * (1 - b.CultureResistsParty * c.Culture);
             double fade = b.PartyFade * c.PoliticalEducation;
             c.PartyInfluence = Math.Clamp(c.PartyInfluence + grow * (1 - c.PartyInfluence) - fade * c.PartyInfluence, 0, 1);
@@ -70,7 +70,7 @@ public static class RivalSystem
                     Description = w.Year >= 1914 ? "The front gets modern weapons. The party gets its commissars." : "The front gets arms. The elect get their overseers.",
                     Effects = new EventEffects
                     {
-                        GoodsToFront = Math.Round(b.RivalArms * (1 + 0.3 * before)), MilitarizationTicks = 8,
+                        GoodsToFront = Math.Round(b.RivalArms * (1 + 0.3 * before)), MilitarizationTicks = 8, Tension = -8,
                         Drift = Math.Round(b.RivalAcceptDrift * harder, 1),
                         PartyInfluence = Math.Round(0.15 * harder, 2), Stances = { [rival.Id] = 0.15 },
                     },
@@ -79,7 +79,7 @@ public static class RivalSystem
                 {
                     Label = "Refuse",
                     Description = "No commissars. No tanks either.",
-                    Effects = new EventEffects { Stances = { [rival.Id] = -0.1 } },
+                    Effects = new EventEffects { Stances = { [rival.Id] = -0.1 }, Tension = 5 },
                 },
             },
         });

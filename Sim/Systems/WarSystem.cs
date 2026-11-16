@@ -185,7 +185,7 @@ internal static class WarSystem
             a.NextOfferTick = w.Tick + a.OfferInterval;
             w.Emit(Severity.Info, $"The {a.Name}'s offer lapses unanswered.");
         }
-        if (!a.OfferPending && a.OfferInterval > 0 && w.Tick >= a.NextOfferTick)
+        if (!a.OfferPending && a.OfferInterval > 0 && w.Tick >= a.NextOfferTick && !StruggleSystem.Hostile(w))
         {
             // Refused twice, the ally stops asking; each acceptance makes the next price higher.
             if (a.Declined >= 2)

@@ -118,6 +118,8 @@ public sealed class World
     public List<BattleReport> Battles { get; } = new();
     /// <summary>Factions of communes pressing a demand (FactionSystem).</summary>
     public List<Faction> Factions { get; } = new();
+    /// <summary>The struggle with the movement's allies of convenience, if it has any.</summary>
+    public Struggle? Struggle { get; internal set; }
     public int LastGoal { get; internal set; } = -999;
     /// <summary>Turn a figure last did something the movement had to answer.</summary>
     public int LastFigureMoment { get; internal set; } = -999;
@@ -382,6 +384,7 @@ public sealed class World
         Goals = Goals.ToList(),
         Battles = Battles.ToList(),
         Factions = Factions.ToList(),
+        Struggle = Struggle,
         LastGoal = LastGoal,
         LastFigureMoment = LastFigureMoment,
         FigureYear = FigureYear,
@@ -476,6 +479,7 @@ public sealed class World
         w.Goals.AddRange(s.Goals);
         w.Battles.AddRange(s.Battles);
         w.Factions.AddRange(s.Factions);
+        w.Struggle = s.Struggle;
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();
@@ -503,6 +507,7 @@ public sealed class World
         Global.RevolutionSystem.Run(this);
         Global.InterstateSystem.Run(this);
         Global.RivalSystem.Run(this);
+        StruggleSystem.Run(this);
         Global.TechLevelSystem.Run(this);
         RisingSystem.Run(this);
         MilitiaSystem.Run(this);

@@ -86,9 +86,9 @@ internal static class FigureMoments
                         yield return (Moment($"denounce_{f.Id}", f, $"{f.Name} denounces the party",
                             $"{f.Name} wants to speak out against the party's cells: their commissars, their lists, their meetings behind closed doors. Others plead for unity while the war lasts.",
                             ("Let them speak", "The cells lose ground everywhere; the party and its patrons are furious.",
-                                new EventEffects { PartyInfluence = -0.15, FigurePrestige = 0.1, FigureAmbition = 0.03, Enthusiasm = -0.02, FigureRegard = 0.12, Memory = "was let speak against the party" }),
+                                new EventEffects { PartyInfluence = -0.15, FigurePrestige = 0.1, FigureAmbition = 0.03, Enthusiasm = -0.02, FigureRegard = 0.12, Memory = "was let speak against the party", Tension = 6 }),
                             ("Keep the unity", "No public quarrel. The cells go on growing quietly.",
-                                new EventEffects { PartyInfluence = 0.04, Enthusiasm = 0.02, FigureRegard = Sting(f, -0.1), Memory = "was silenced for unity's sake" })),
+                                new EventEffects { PartyInfluence = 0.04, Enthusiasm = 0.02, FigureRegard = Sting(f, -0.1), Memory = "was silenced for unity's sake", Tension = -3 })),
                             f.Has(FigureTrait.Zealous) ? 3 : f.Has(FigureTrait.Pragmatic) ? 0.3 : 1);
                     break;
                 case FigureRole.Organizer:

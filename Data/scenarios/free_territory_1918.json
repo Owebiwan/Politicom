@@ -83,9 +83,9 @@
       "requiresFederated": [ "Huliaipole" ],
       "options": [
         { "label": "Hold the congress anyway", "description": "The soviets meet as free soviets. The Bolsheviks take it as a declaration of war.",
-          "effects": { "drift": -3, "enemy": "Red Army", "enemyStrength": 1, "politicalEducation": 0.05 } },
+          "effects": { "tension": 15, "drift": -3, "enemy": "Red Army", "enemyStrength": 1, "politicalEducation": 0.05 } },
         { "label": "Cancel it to keep the alliance", "description": "A few more weeks of Red support, bought with the villages' right to meet.",
-          "effects": { "drift": 4, "enemy": "Red Army", "enemyStrength": -1, "trust": -0.05 } }
+          "effects": { "tension": -10, "drift": 4, "enemy": "Red Army", "enemyStrength": -1, "trust": -0.05 } }
       ]
     },
     {
@@ -122,9 +122,9 @@
       "defaultOption": 0,
       "options": [
         { "label": "Sign it", "description": "The Insurgent Army marches on Crimea alongside the Red Army.",
-          "effects": { "drift": 3, "militarizationTicks": 8, "enemy": "Red Army", "enemyStrength": -2 } },
+          "effects": { "tension": -20, "drift": 3, "militarizationTicks": 8, "enemy": "Red Army", "enemyStrength": -2 } },
         { "label": "Refuse", "description": "No more agreements with those who broke the last one.",
-          "effects": { "drift": -1, "enemy": "Red Army", "enemyStrength": 1 } }
+          "effects": { "tension": 8, "drift": -1, "enemy": "Red Army", "enemyStrength": 1 } }
       ]
     },
     {
@@ -135,9 +135,9 @@
       "defaultOption": 0,
       "options": [
         { "label": "Fight on from the villages", "description": "Guerrilla war across the steppe, for as long as the villages will hide the army.",
-          "effects": { "drift": 1, "wellbeing": -0.05 } },
+          "effects": { "tension": 10, "drift": 1, "wellbeing": -0.05 } },
         { "label": "Form a single field command", "description": "Concentrate everything under one staff to break out of the encirclement.",
-          "effects": { "drift": 6, "enemy": "Red Army", "enemyStrength": -2 } }
+          "effects": { "tension": -5, "drift": 6, "enemy": "Red Army", "enemyStrength": -2 } }
       ]
     }
   ],

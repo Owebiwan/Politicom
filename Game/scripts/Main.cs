@@ -1301,6 +1301,7 @@ public partial class Main : Control
         _driftDetail = AddRich(overview);
         BuildAttention(overview);
         BuildFactions(overview);
+        BuildStruggle(overview);
         _goal = AddRich(overview);
         Section(overview, "Resources");
         _resources = AddRich(overview);
@@ -1447,6 +1448,7 @@ public partial class Main : Control
         UpdateHeader();
         RefreshAttention();
         RefreshFactions();
+        RefreshStruggle();
         _stepButton.Text = $"+1 {w.Turn}";
         _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#929aa6](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
         _status["commune"].Text = $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" +

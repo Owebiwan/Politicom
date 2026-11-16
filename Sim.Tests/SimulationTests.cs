@@ -354,6 +354,46 @@ public class SimulationTests
     }
 
     [Fact]
+    public void The_struggle_with_the_allies_moves_with_choices_breaks_at_ninety_and_survives_saving()
+    {
+        var w = NewWorld();
+        w.Step();
+        var s = Assert.IsType<Struggle>(w.Struggle);
+        Assert.Equal("The antifascist front", s.Name);
+
+        double t = s.Tension;
+        Systems.StruggleSystem.Catalyst(w, 10, "test");
+        Assert.Equal(t + 10, s.Tension, 6);
+        Assert.Contains(s.Catalysts, c => c.Why == "test");
+
+        s.Tension = 95;
+        w.Step();
+        Assert.Contains(w.Scenario.Events, e => e.Id.StartsWith("struggle_rupture_"));
+        w.Step();
+        var rupture = w.PendingEvents.First(p => p.Id.StartsWith("struggle_rupture_"));
+        double before = s.Tension;
+        Assert.True(w.Apply(new ChooseEventOption(rupture.Id, 0)).Ok); // resist
+        Assert.True(s.Tension < before);
+
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.Equal((s.Name, s.Tension, s.Phase), (loaded.Struggle!.Name, loaded.Struggle.Tension, loaded.Struggle.Phase));
+    }
+
+    [Fact]
+    public void Half_a_year_of_calm_brings_recognition()
+    {
+        var w = NewWorld();
+        w.Step();
+        for (int i = 0; i < 30; i++)
+        {
+            w.Struggle!.Tension = 5;
+            w.Step();
+        }
+        Assert.True(w.Struggle!.Recognized);
+        Assert.Contains(w.Log, e => e.Title == "Recognition");
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();
