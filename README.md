@@ -691,6 +691,14 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
   feel about each other too: working side by side makes friends (who take a friend's
   rotation personally), a zealot and a pragmatist grate, quarrels and pamphlets make rivals,
   and rivals' quarrels come back.
+- **Generations** (`Sim/Systems/GenerationSystem.cs`): figures age (historical ones from their
+  real birth years). Once a year, past sixty they may die of age and past sixty-five retire,
+  with a line on their legacy. New militants rise from the communes with the strongest
+  political life, more often when few figures are at work: a commander from the front, an
+  organizer from the works, an educator where people read, with traits that lean toward their
+  town's character (militant towns breed the brave and the zealous, well-read ones the honest
+  and the humble). They start loyal, and close to the figure working nearby they learned from.
+  In a 50-year campaign the founders give way to the generation the revolution raised.
 - **Where to see them:** the Figures section of the Movement tab (send the selected commune a
   figure, or rotate one), a ★ after the town's name on the map, and the commune's tooltip.
 - **Balance** (balanced AI, 200 games): Catalonia 96%, Free Territory 72% (from about 79%:

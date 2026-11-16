@@ -7,7 +7,7 @@ namespace Politicom.Sim.Systems;
 internal static class FigureSystem
 {
     // Trades for generated figures, by role: era-neutral enough for any start.
-    private static readonly Dictionary<FigureRole, string[]> Trades = new()
+    internal static readonly Dictionary<FigureRole, string[]> Trades = new()
     {
         [FigureRole.Commander] = new[] { "smith", "carter", "miner", "shepherd", "boatman" },
         [FigureRole.Orator] = new[] { "weaver", "baker", "tanner", "washerwoman", "cobbler" },
@@ -45,12 +45,13 @@ internal static class FigureSystem
             {
                 Id = w.Figures.Count, Name = d.Name, Role = d.Role, Description = d.Description,
                 Commune = home.Id, Prestige = d.Prestige, Ambition = d.Ambition, Traits = d.Traits.ToList(),
+                Born = d.Born != 0 ? d.Born : w.Year - 25 - rng.Next(20),
             });
         }
     }
 
     /// <summary>Two traits that don't contradict each other.</summary>
-    private static List<FigureTrait> RandomTraits(Rng rng)
+    internal static List<FigureTrait> RandomTraits(Rng rng)
     {
         var opposites = new[] { (FigureTrait.Brave, FigureTrait.Cautious), (FigureTrait.Ambitious, FigureTrait.Humble), (FigureTrait.Zealous, FigureTrait.Pragmatic), (FigureTrait.Honest, FigureTrait.Vain) };
         var all = Enum.GetValues<FigureTrait>();
@@ -64,7 +65,7 @@ internal static class FigureSystem
     private static IEnumerable<(Figure Figure, Commune Commune)> AtWork(World w)
     {
         foreach (var f in w.Figures)
-            if (f.Alive && f.Commune is int id && w.Communes[id].InFederation)
+            if (f.Alive && !f.Retired && f.Commune is int id && w.Communes[id].InFederation)
                 yield return (f, w.Communes[id]);
     }
 

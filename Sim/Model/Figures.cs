@@ -53,6 +53,8 @@ public sealed class FigureDefinition
     public double Prestige { get; set; } = 0.3;
     public string Description { get; set; } = "";
     public List<FigureTrait> Traits { get; set; } = new();
+    /// <summary>Year of birth (0: unknown, they don't age).</summary>
+    public int Born { get; set; }
 }
 
 /// <summary>Something a figure remembers the movement doing, for or against them.</summary>
@@ -84,6 +86,9 @@ public sealed class Figure
     /// <summary>A request for power is waiting for the movement's answer.</summary>
     public bool Asking { get; set; }
     public List<FigureTrait> Traits { get; set; } = new();
+    /// <summary>Year of birth (0: unknown, they don't age); retired from the work in old age.</summary>
+    public int Born { get; set; }
+    public bool Retired { get; set; }
     /// <summary>How they feel about the movement's leadership (-1 bitter .. 1 devoted): what it has done to them.</summary>
     public double Regard { get; set; }
     /// <summary>How they feel about each other figure (by id): above 0.4 friends, below -0.4 rivals.</summary>

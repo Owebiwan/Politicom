@@ -508,6 +508,7 @@ internal static class ActionSystem
     {
         if (w.Figures.FirstOrDefault(f => f.Id == a.Figure) is not { Alive: true } f) return ActionResult.Fail("No such figure, or they are dead.");
         if (f.Resting > 0) return ActionResult.Fail($"{f.Name} is back in the ranks for {w.Turns(f.Resting)} more.");
+        if (f.Retired) return ActionResult.Fail($"{f.Name} has retired.");
         if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
         if (f.Commune == c.Id) return ActionResult.Fail($"{f.Name} is already in {c.Name}.");
         var b = w.Balance;

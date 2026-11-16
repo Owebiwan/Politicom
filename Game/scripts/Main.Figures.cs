@@ -50,7 +50,7 @@ public partial class Main
         var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(520, 0) };
         text.AddThemeFontSizeOverride("normal_font_size", 14);
         text.AddThemeFontSizeOverride("bold_font_size", 15);
-        string where = f.Commune is int id ? $"in {Esc(_world.Communes[id].Name)}" : "back in the ranks";
+        string where = (f.Born != 0 ? $"aged {_world.Year - f.Born}, " : "") + (f.Commune is int id ? $"in {Esc(_world.Communes[id].Name)}" : f.Retired ? "retired" : "back in the ranks");
         string hunger = f.Hunger < 0.15 ? "#70d080" : f.Hunger < 0.3 ? "#e0c060" : "#f07060";
         text.Text = $"[b]{Esc(f.Name)}[/b] · [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] {where}"
                     + (f.Empowered ? " · [color=#f07060]holds power[/color]" : "")
@@ -87,11 +87,11 @@ public partial class Main
     {
         var w = _world;
         // Rebuilt only when something shown changes.
-        string key = string.Join("|", w.Figures.Select(f => $"{f.Alive}{f.Commune}{f.Resting}{f.Empowered}{(int)(f.Prestige * 20)}{(int)(f.Hunger * 20)}{(int)(f.Regard * 10)}{f.Memories.Count}{string.Join(",", f.Opinions.Select(o => (int)(o.Value * 3)))}")) + $"/{_map.Selected}/{(int)w.Influence}";
+        string key = string.Join("|", w.Figures.Select(f => $"{f.Alive}{f.Retired}{f.Commune}{f.Resting}{f.Empowered}{(int)(f.Prestige * 20)}{(int)(f.Hunger * 20)}{(int)(f.Regard * 10)}{f.Memories.Count}{string.Join(",", f.Opinions.Select(o => (int)(o.Value * 3)))}")) + $"/{_map.Selected}/{(int)w.Influence}";
         if (key == _figuresShown) return;
         _figuresShown = key;
         foreach (var child in _figures.GetChildren()) child.QueueFree();
-        foreach (var f in w.Figures.OrderByDescending(f => f.Alive))
+        foreach (var f in w.Figures.OrderByDescending(f => f.Alive && !f.Retired).ThenByDescending(f => f.Alive))
         {
             var card = new PanelContainer();
             card.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(8));
@@ -100,18 +100,20 @@ public partial class Main
             var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false };
             text.AddThemeFontSizeOverride("normal_font_size", 13);
             text.AddThemeFontSizeOverride("bold_font_size", 14);
+            string age = f.Born != 0 ? $", {w.Year - f.Born}" : "";
             string where = !f.Alive ? "[color=#9aa0a8]dead[/color]"
+                : f.Retired ? $"[color=#9aa0a8]retired{age}[/color]"
                 : f.Resting > 0 ? $"[color=#9aa0a8]in the ranks, {w.Turns(f.Resting)} more[/color]"
                 : f.Commune is int id ? $"in {Esc(w.Communes[id].Name)}" : "[color=#9aa0a8]between postings[/color]";
             string hunger = f.Hunger >= 0.38 ? "#f07060" : f.Hunger >= 0.28 ? "#e0a040" : "#9aa0a8";
-            text.Text = $"[b]{Esc(f.Name)}[/b] [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] · {where}" +
+            text.Text = $"[b]{Esc(f.Name)}[/b]{(f.Alive && !f.Retired ? $"[color=#929aa6]{age}[/color]" : "")} [color=#c8aa72]{Figure.RoleName(f.Role)}[/color] · {where}" +
                         (f.Empowered ? " · [color=#f07060]holds power[/color]" : "") +
                         (f.Alive ? $"\nPrestige {f.Prestige:P0} · [color={hunger}]{AmbitionWord(f.Hunger)}[/color] · {Figure.Does(f.Role)}\n{Character(f, memory: false)}" : "");
             text.TooltipText = f.Description + (f.Memories.Count > 0 ? "\n\nRemembers:\n" + string.Join("\n", f.Memories.Select(m => $"· {m.Text} ({w.Format(w.DateAt(m.Tick), "MMM yyyy")})")) : "")
                                + (f.Traits.Count > 0 ? "\n\nTraits: " + string.Join(", ", f.Traits.Select(Figure.TraitName)) : "");
             text.MouseFilter = MouseFilterEnum.Pass;
             box.AddChild(text);
-            if (f.Alive)
+            if (f.Alive && !f.Retired)
             {
                 var row = new HBoxContainer();
                 row.AddThemeConstantOverride("separation", 6);

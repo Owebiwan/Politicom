@@ -337,6 +337,23 @@ public class SimulationTests
     }
 
     [Fact]
+    public void Over_a_campaign_figures_age_and_new_ones_rise()
+    {
+        var w = World.Load(DataDir, "catalonia_1936@2600", seed: 1);
+        Assert.Equal(1896, w.Figures.Single(f => f.Name == "Buenaventura Durruti").Born);
+        int start = w.Figures.Count;
+        // Old figures, so that age tells within a few years even if the war ends the game early.
+        foreach (var f in w.Figures) f.Born -= 40;
+        for (int y = 0; y < 30; y++)
+        {
+            w.Run(52);
+            if (w.Outcome != Outcome.Ongoing) break;
+        }
+        Assert.True(w.Figures.Count > start || w.Figures.Any(f => !f.Alive || f.Retired));
+        Assert.Contains(w.Figures, f => !f.Alive || f.Retired);
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();
@@ -1245,6 +1262,8 @@ public class SimulationTests
     public void Scripted_wars_start_wear_states_down_and_end()
     {
         var w = World.Load(DataDir, "catalonia_1936@500", seed: 2);
+        // This is about other states' wars: keep the federation's own war from ending the game first.
+        foreach (var e in w.Enemies) { e.Strength = 0.1; e.Growth = 0; e.Offensives.Clear(); }
         w.Run(52);
         var war = Assert.Single(w.Wars, x => x.Name == "The Second Sino-Japanese War");
         var china = w.States.Single(s => s.Id == "CHN");

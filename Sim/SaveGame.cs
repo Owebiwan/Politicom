@@ -58,6 +58,7 @@ public sealed class SaveGame
     public List<Faction> Factions { get; set; } = new();
     public int LastGoal { get; set; } = -999;
     public int LastFigureMoment { get; set; } = -999;
+    public int FigureYear { get; set; }
     public int LastProposal { get; set; } = -999;
     public double FoodPrice { get; set; } = 1;
     public double GoodsPrice { get; set; } = 1;

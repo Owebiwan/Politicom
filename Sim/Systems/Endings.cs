@@ -40,6 +40,7 @@ public static class Endings
         {
             string role = Figure.RoleName(f.Role);
             yield return !f.Alive ? $"{f.Name}, {role}, did not live to see the end."
+                : f.Retired ? $"{f.Name}, {role}, had long since retired, and lived to see it."
                 : f.Empowered ? $"{f.Name}, {role}, took the power they asked for, and kept it."
                 : f.Hunger >= 0.3 ? $"{f.Name}, {role}, ended the war with a following and an appetite for office."
                 : f.Prestige >= 0.6 ? $"{f.Name}, {role}, is honoured across the federation, and still answers to the assemblies."

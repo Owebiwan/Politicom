@@ -121,6 +121,8 @@ public sealed class World
     public int LastGoal { get; internal set; } = -999;
     /// <summary>Turn a figure last did something the movement had to answer.</summary>
     public int LastFigureMoment { get; internal set; } = -999;
+    /// <summary>The year figures last aged (GenerationSystem).</summary>
+    public int FigureYear { get; internal set; }
     /// <summary>Cities of a regional rising's country that have risen and joined.</summary>
     public HashSet<string> Risen { get; } = new();
     /// <summary>Food a commune eats in a turn.</summary>
@@ -382,6 +384,7 @@ public sealed class World
         Factions = Factions.ToList(),
         LastGoal = LastGoal,
         LastFigureMoment = LastFigureMoment,
+        FigureYear = FigureYear,
         LastProposal = LastProposal,
         FoodPrice = FoodPrice,
         GoodsPrice = GoodsPrice,
@@ -443,6 +446,7 @@ public sealed class World
             LastDecision = s.LastDecision,
             LastGoal = s.LastGoal,
             LastFigureMoment = s.LastFigureMoment,
+            FigureYear = s.FigureYear,
             LastProposal = s.LastProposal,
             FoodPrice = s.FoodPrice,
             GoodsPrice = s.GoodsPrice,
@@ -504,6 +508,7 @@ public sealed class World
         MilitiaSystem.Run(this);
         FigureSystem.Run(this);
         FigureMoments.Run(this);
+        GenerationSystem.Run(this);
         PeaceSystem.Run(this);
         WarSystem.Run(this);
         TrustSystem.Run(this);
