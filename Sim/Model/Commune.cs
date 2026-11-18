@@ -40,6 +40,10 @@ public sealed class Commune
 
     /// <summary>Thousands of people.</summary>
     public double Population { get; set; }
+    /// <summary>Refugees sheltering here (thousands, counted in Population), settling in over months.</summary>
+    public double Refugees { get; set; }
+    /// <summary>Its people killed in the fighting, since the start (thousands).</summary>
+    public double WarDead { get; set; }
     public double Food { get; set; }
     public double Goods { get; set; }
     public CommuneValues Values { get; set; }
@@ -88,6 +92,10 @@ public sealed class Commune
 
     // Derived each tick; kept for UI and AI.
     [JsonInclude] public double FoodProduced { get; internal set; }
+    /// <summary>Last turn's change in population, by cause (thousands): births over deaths, famine, the war, refugees, people moving.</summary>
+    [JsonInclude] public List<Part> PopulationChange { get; internal set; } = new();
+    /// <summary>Deaths from hunger this turn, set by the economy for PopulationSystem's account.</summary>
+    [JsonIgnore] internal double FamineDead { get; set; }
     [JsonInclude] public double GoodsProduced { get; internal set; }
     [JsonInclude] public bool Starving { get; internal set; }
     [JsonInclude] public bool GoodsShort { get; internal set; }

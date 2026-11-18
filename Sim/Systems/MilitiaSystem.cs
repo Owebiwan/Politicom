@@ -16,12 +16,7 @@ internal static class MilitiaSystem
         {
             double volunteers = w.BaselineMobilization(c) * (1 - b.VolunteerMilitancy / 2 + b.VolunteerMilitancy * CommuneValues.To01(c.Values.Militancy)) * (0.5 + 0.625 * w.Enthusiasm);
             double target = Math.Min(b.MaxMobilization, w.Conscription ? Math.Max(volunteers, b.ConscriptionFloor) : volunteers);
-            c.Mobilization += (target - c.Mobilization) * Math.Min(1, b.MobilizationPull * w.Weeks);
-            if (c.Front && c.Pressure > c.Defense && c.Defense > 0)
-            {
-                double lost = c.Population * c.Mobilization * b.CombatLoss * Math.Min(1, c.Pressure / c.Defense - 1) * w.Weeks;
-                c.Population = Math.Max(1, c.Population - lost);
-            }
+            c.Mobilization += (target - c.Mobilization) * Math.Min(1, b.MobilizationPull * w.Weeks); // the fallen are counted by PopulationSystem
         }
 
         var members = w.Federation.ToList();

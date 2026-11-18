@@ -10,6 +10,9 @@ public readonly record struct Part(string Label, double Value);
 /// </summary>
 public static class Explain
 {
+    /// <summary>A commune's weekly births over deaths at its wellbeing and food (PopulationSystem).</summary>
+    public static double NaturalGrowth(World w, Commune c) => Systems.PopulationSystem.Growth(w, c);
+
     /// <summary>What wellbeing moves toward (it closes 15% of the gap each turn), part by part.</summary>
     public static List<Part> Wellbeing(World w, Commune c)
     {

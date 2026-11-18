@@ -528,6 +528,7 @@ public sealed class World
         GenerationSystem.Run(this);
         PeaceSystem.Run(this);
         WarSystem.Run(this);
+        PopulationSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
         FactionSystem.Run(this);

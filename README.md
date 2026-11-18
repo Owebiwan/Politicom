@@ -510,8 +510,30 @@ was lost or the town fell. Click them to open the battle (`Game/scripts/Main.Bat
 - **Earlier battles there**, a strip of dates coloured by how each went: click one to see it.
 
 The simulation records each battle (`BattleReport`, kept for about six months and saved with
-the game). There are no casualty figures: the simulation doesn't count the dead, so the report
-doesn't invent them.
+the game), with its dead and those who fled (see Population, below).
+
+## Population
+
+Each commune's people change, turn by turn, for reasons the game shows
+(`Sim/Systems/PopulationSystem.cs`). Hover a commune's people in the Commune tab to see last
+turn's change by cause.
+- **Births over deaths.** A commune that lives well and has food in store grows slowly (up to
+  about 1% a year). Growth stops in hard times and turns negative in misery. Hunger kills on its
+  own account (the economy's famine).
+- **The war dead.** Every battle costs the militia a few lives, and many when they are
+  outmatched. When ground is lost, townspeople die too. The battle window gives the toll, and
+  each commune counts its war dead.
+- **Refugees.** When a town loses ground, or falls, its townspeople flee; its fighters stay.
+  They go to the free communes next to it, more to those they trust and fewer to other fronts.
+  Refugees eat from the day they arrive but join the militia only once they've settled, over
+  some months. A large flight is announced.
+- **Moving.** People drift, slowly, toward neighbouring communes that are better off: better
+  wellbeing, food in store, away from the front and from free riders.
+
+Population drives production, need, the militia and each commune's weight in the federation,
+so all of this feeds back: a well-fed, trusted federation grows and draws people in, and a war
+going badly empties the front and crowds the rear. To keep the scenarios on target with it,
+Catalonia's 1938 Aragon Offensive was strengthened (28 to 44).
 
 ## Factions
 

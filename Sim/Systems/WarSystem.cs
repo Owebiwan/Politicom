@@ -132,9 +132,9 @@ internal static class WarSystem
         return Explain.Sum(added) * Explain.Product(factors);
     }
 
-    /// <summary>A commune's militia: its people under arms (relative to what it would field anyway), their militancy and spirit.</summary>
+    /// <summary>A commune's militia: its people under arms (refugees join once they've settled) (relative to what it would field anyway), their militancy and spirit.</summary>
     internal static double Militia(World w, Commune c) =>
-        c.Population * w.Balance.MilitiaPerPop * (c.Mobilization / w.BaselineMobilization(c))
+        (c.Population - c.Refugees) * w.Balance.MilitiaPerPop * (c.Mobilization / w.BaselineMobilization(c))
         * (0.6 + 0.4 * CommuneValues.To01(c.Values.Militancy)) * w.EnthusiasmFactor;
 
     private static void Occupy(World w, Commune c, int enemy)

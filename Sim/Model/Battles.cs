@@ -25,6 +25,10 @@ public sealed class BattleReport
     public double FortAfter { get; set; }
     /// <summary>People under arms in the commune (thousands).</summary>
     public double Militia { get; set; }
+    /// <summary>The militia's dead and the townspeople killed (thousands), and those who fled (PopulationSystem).</summary>
+    public double Dead { get; set; }
+    public double CiviliansDead { get; set; }
+    public double Fled { get; set; }
     /// <summary>Help from a defensive campaign's columns.</summary>
     public double Campaign { get; set; }
     public BattleResult Result { get; set; }

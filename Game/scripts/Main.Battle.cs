@@ -66,6 +66,15 @@ public partial class Main
         ShowOverlay($"The battle for {c.Name}", "", content, 1180, ("Close", () => CloseOverlay()));
     }
 
+    private static string Losses(BattleReport r, Commune c)
+    {
+        static string N(double thousands) => thousands >= 1 ? $"{thousands:0.0} thousand" : $"{thousands * 1000:0}";
+        string s = $"Killed: [color=#f07060]{N(r.Dead)}[/color] of the militia";
+        if (r.CiviliansDead > 0.0005) s += $" and [color=#f07060]{N(r.CiviliansDead)}[/color] townspeople";
+        if (r.Fled > 0.0005) s += $"; [color=#e0b050]{N(r.Fled)}[/color] fled {Esc(c.Name)}";
+        return s + ".";
+    }
+
     private static string Headline(BattleReport r, Commune c) => r.Result switch
     {
         BattleResult.Repulsed => "Repulsed: the attack broke against the militia's line",
@@ -86,6 +95,7 @@ public partial class Main
             + (r.FortBefore > 0 || r.FortAfter > 0 ? $" · works {r.FortBefore:P0} → {r.FortAfter:P0}" : ""),
             $"{r.Militia:0.0} thousand under arms in {Esc(c.Name)}"
             + (r.Campaign > 0 ? $"; a defensive campaign's columns added {r.Campaign:0.00}." : "."),
+            Losses(r, c),
             "",
             "[b]The defence[/b]",
         };

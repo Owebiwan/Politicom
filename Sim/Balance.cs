@@ -32,6 +32,21 @@ public sealed class Balance
     /// <summary>Transport loss on pooled goods; railways reduce it.</summary>
     public double PoolLoss { get; set; } = 0.2;
     public double FamineMortality { get; set; } = 0.01;
+
+    // ── Population ─────────────────────────────────────────────────────────
+    /// <summary>Weekly natural growth at full wellbeing with food in store (0.0002 ≈ 1% a year); it falls with wellbeing, below zero in misery.</summary>
+    public double PopulationGrowth { get; set; } = 0.0002;
+    /// <summary>Weekly share of the militia killed in any battle at even odds or worse (CombatLoss adds more when outmatched).</summary>
+    public double BattleDeathRate { get; set; } = 0.002;
+    /// <summary>Share of the townspeople killed for all the ground lost (scaled by the ground lost this turn).</summary>
+    public double CivilianDeaths { get; set; } = 0.03;
+    /// <summary>Share of the people who flee for all the ground lost; and when the town falls.</summary>
+    public double FleeOnLoss { get; set; } = 0.25;
+    public double FleeOnFall { get; set; } = 0.2;
+    /// <summary>Weekly share of refugees who settle and stop being counted as refugees.</summary>
+    public double RefugeesSettle { get; set; } = 0.03;
+    /// <summary>Weekly share of the people who move to a neighbour that is better off, per unit of difference.</summary>
+    public double MigrationRate { get; set; } = 0.002;
     public double ProjectLabor { get; set; } = 0.05;
 
     // ── Trust ──────────────────────────────────────────────────────────────

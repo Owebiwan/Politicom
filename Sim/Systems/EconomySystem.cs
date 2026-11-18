@@ -192,7 +192,8 @@ internal static class EconomySystem
             if (c.Starving)
             {
                 double severity = Math.Min(1, -c.Food / (c.Population * b.FoodNeed));
-                c.Population *= 1 - b.FamineMortality * severity;
+                c.FamineDead = c.Population * b.FamineMortality * severity;
+                c.Population -= c.FamineDead;
                 c.Wellbeing -= 0.05 * severity;
                 // Neighbours who sat on full granaries while this commune starved lose its trust.
                 foreach (var n in w.Trust.Neighbors(c.Id))

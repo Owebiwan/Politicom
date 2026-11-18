@@ -1807,6 +1807,7 @@ public partial class Main : Control
         _commune.Text =
             $"[b]{Esc(c.Name)}[/b] — {c.Kind}, {c.Population:0}k, {status}\n" +
             (c.Description.Length > 0 ? $"[i]{Esc(c.Description)}[/i]\n" : "") +
+            PopulationLine(w, c) + "\n" +
             $"Values: collectivism {c.Values.Collectivism:+0.0;-0.0}, militancy {c.Values.Militancy:+0.0;-0.0}, federalism {c.Values.Federalism:+0.0;-0.0}\n" +
             $"Education: practical {c.PracticalEducation:0.00} (schooling {c.PracticalSchooling:P0}), political {c.PoliticalEducation:0.00} (schooling {c.PoliticalSchooling:P0})" +
             (c.ExpertGap > 0.1 ? " [color=#f0a040]expert trap[/color]" : "") + "\n" +
@@ -1865,6 +1866,23 @@ public partial class Main : Control
         yield return $"   -{eaten:0.0}  eaten ({c.Population:0}k people)";
         if (c.AidReceived > 0.05 || c.AidGiven > 0.05) yield return $"   aid lately: received {c.AidReceived:0.0}, given {c.AidGiven:0.0}";
         if (c.Starving) yield return "Starving: wellbeing and trust suffer, and it may leave.";
+    }
+
+    /// <summary>Its people: how many, last turn's change by cause, refugees sheltering and its war dead.</summary>
+    private static string PopulationLine(World w, Commune c)
+    {
+        double net = c.PopulationChange.Sum(p => p.Value);
+        double year = Explain.NaturalGrowth(w, c) * 52;
+        var lines = new List<string> { $"People: {c.Population:0.0} thousand; {net * 1000:+0;-0;0} last {w.Turn}" };
+        foreach (var p in c.PopulationChange.OrderByDescending(p => Math.Abs(p.Value)))
+            lines.Add($"   {p.Value * 1000:+0;-0}  {p.Label}");
+        lines.Add($"Births over deaths at this wellbeing and with this food: {year:+0.0%;-0.0%} a year (they grow when fed and well, shrink in misery).");
+        lines.Add("Refugees eat at once but join the militia only once they've settled; people drift toward better-off neighbours.");
+        string color = net > 0.0005 ? "#70d080" : net < -0.0005 ? "#f07060" : "#b8b0a0";
+        string text = $"People {c.Population:0.0}k [color={color}]{net * 1000:+0;-0;±0}[/color] a {w.Turn}";
+        return Hint(text, lines)
+               + (c.Refugees > 0.05 ? $" · [color=#e0b050]{c.Refugees:0.0}k refugees[/color]" : "")
+               + (c.WarDead > 0.05 ? $" · {c.WarDead:0.0}k killed in the war" : "");
     }
 
     private static string DefenseLine(World w, Commune c)

@@ -1658,4 +1658,38 @@ public class SimulationTests
         Assert.Contains(w.Enemies, e => !e.AtPeace);
         Assert.Contains(w.Communes, c => c.Front && front.Contains(c.Id));
     }
+
+    [Fact]
+    public void Communes_grow_when_fed_and_well_and_shrink_in_misery()
+    {
+        var w = NewWorld();
+        w.Step();
+        var c = w.Active.First(x => !x.Starving);
+        c.Food = c.Population * 10;
+        c.Wellbeing = 0.9;
+        Assert.True(Explain.NaturalGrowth(w, c) > 0);
+        c.Wellbeing = 0.1;
+        Assert.True(Explain.NaturalGrowth(w, c) < 0);
+    }
+
+    [Fact]
+    public void The_war_kills_and_drives_refugees_to_the_neighbours()
+    {
+        var w = NewWorld();
+        double dead = 0, fled = 0;
+        for (int i = 0; i < 60 && fled == 0; i++)
+        {
+            w.Step();
+            dead += w.Battles.Where(r => r.Tick == w.Tick - 1).Sum(r => r.Dead);
+            fled += w.Battles.Where(r => r.Tick == w.Tick - 1).Sum(r => r.Fled);
+        }
+        Assert.True(dead > 0);
+        Assert.True(fled > 0);
+        Assert.Contains(w.Communes, c => c.Refugees > 0);
+        Assert.Contains(w.Communes, c => c.WarDead > 0);
+        Assert.Contains(w.Communes, c => c.PopulationChange.Any(p => p.Label.StartsWith("Refugees from")));
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.Equal(w.Communes.Sum(c => c.Refugees), loaded.Communes.Sum(c => c.Refugees), 9);
+        Assert.Equal(w.Communes.Sum(c => c.WarDead), loaded.Communes.Sum(c => c.WarDead), 9);
+    }
 }
