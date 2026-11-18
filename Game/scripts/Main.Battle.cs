@@ -168,7 +168,11 @@ public partial class Main
             Place(_clock);
         }
 
-        public override void _ExitTree() => _dispose();
+        public override void _ExitTree()
+        {
+            _dispose();
+            ReleaseNative(GetTree());
+        }
 
         /// <summary>The camera, swaying slowly to and fro over the field from the defenders' side.</summary>
         private void Place(double t)

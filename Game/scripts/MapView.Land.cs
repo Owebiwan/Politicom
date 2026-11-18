@@ -54,6 +54,14 @@ public partial class MapView
         return image.LoadWebpFromBuffer(FileAccess.GetFileAsBytes(path)) == Error.Ok ? image : null;
     }
 
+    /// <summary>The map's large textures and their sizes, for the --memory report.</summary>
+    public string TextureReport()
+    {
+        static string Of(string name, Texture2D? t) => t is null ? "" : $"{name} {t.GetWidth()}×{t.GetHeight()} ";
+        return Of("overview", _overview) + Of("detail", _detail) + Of("terrain", _terrain) + Of("mask", _landMask) + Of("relief", _reliefWorld)
+               + $"relief tiles {ReliefTiles.Count(kv => kv.Value != null)}" + (ReliefTiles.Values.FirstOrDefault(t => t != null) is { } tile ? $" of {tile.GetWidth()}×{tile.GetHeight()}" : "");
+    }
+
     internal static ImageTexture? Overview()
     {
         if (_overviewTried) return _overview;

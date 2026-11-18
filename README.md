@@ -65,6 +65,17 @@ Controls:
 If your Godot version differs from 4.7.2, Godot will offer to update the `Godot.NET.Sdk`
 version in `Game/Politicom.Game.csproj`. Accept it.
 
+**Checking memory** (a dev switch, with `--screenshot`):
+- `--memory N` opens and closes the battle and festival scenes N times and reports memory,
+  objects, nodes and video memory before and after.
+- With `--clock SECONDS`, `--memory` reports instead at the start and end of real-time play,
+  and breaks the 3D map's objects down by kind.
+
+Closed 3D scenes give their meshes, materials and render targets back at once. Armies,
+militia and trains whose front or line is gone are freed, not just hidden. An answered event
+keeps only a small stub. Over a 25-year campaign the save holds near 2 MB, and the game's
+footprint stays level through play.
+
 ## Sandbox
 
 Sandbox games are no longer offered in the game (old sandbox saves still load). The generator

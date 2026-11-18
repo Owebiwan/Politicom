@@ -10,6 +10,19 @@ namespace Politicom.Game;
 /// </summary>
 public partial class Main
 {
+    /// <summary>
+    /// A closed 3D stage's meshes, materials, world and render target are Godot resources held by
+    /// C# wrappers, freed only when .NET collects them; with a small managed heap that can be a long
+    /// while, and each stage holds tens of megabytes of video memory meanwhile. Once the stage's
+    /// nodes are gone (a moment later), a collection lets them go at once.
+    /// </summary>
+    private static void ReleaseNative(SceneTree tree) =>
+        tree.CreateTimer(0.25, processAlways: true).Timeout += () =>
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        };
+
     private static bool IsCelebration(string? id) => id != null && (id.StartsWith("anniversary_") || id == "liberation");
 
     private Control CelebrationFrame(float width)
@@ -83,7 +96,11 @@ public partial class Main
             Place(_clock);
         }
 
-        public override void _ExitTree() => _dispose();
+        public override void _ExitTree()
+        {
+            _dispose();
+            ReleaseNative(GetTree());
+        }
 
         /// <summary>The camera, circling slowly over the fairground with the town behind.</summary>
         private void Place(double t)

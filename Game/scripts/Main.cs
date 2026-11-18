@@ -249,6 +249,8 @@ public partial class Main : Control
             SetSpeed(speedAt >= 0 && speedAt + 1 < args.Length ? int.Parse(args[speedAt + 1]) : 1);
             int startTick = _world.Tick;
             ulong startMs = Time.GetTicksMsec();
+            bool measure = Array.IndexOf(args, "--memory") >= 0;
+            if (measure) GD.Print($"memory at clock start: {MemoryReport()}");
             double seconds = double.Parse(args[clockAt + 1], System.Globalization.CultureInfo.InvariantCulture);
             int wanted = _speed;
             // With --policy, the AI answers the decisions that pause the clock, and the clock runs on.
@@ -263,6 +265,32 @@ public partial class Main : Control
             }
             SetSpeed(0);
             GD.Print($"clock: {_world.Tick - startTick} turns in {(Time.GetTicksMsec() - startMs) / 1000.0:0.0} s, {Engine.GetFramesPerSecond()} fps");
+            if (measure)
+            {
+                GD.Print($"memory at clock end: {MemoryReport()}");
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                for (int i = 0; i < 10; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                GD.Print($"memory at clock end, collected: {MemoryReport()} · log {_world.Log.Count}");
+                // Where the nodes are: the subtrees with the most descendants.
+                var counts = new List<(string Path, int Count)>();
+                int Walk(Node n, string where, int depth)
+                {
+                    int total = 1;
+                    foreach (var k in n.GetChildren()) total += Walk(k, $"{where}/{k.GetType().Name}", depth + 1);
+                    if (depth <= 7 && total > 150) counts.Add((where, total));
+                    return total;
+                }
+                Walk(GetTree().Root, "", 0);
+                foreach (var (subtree, count) in counts.OrderBy(c => c.Path)) GD.Print($"nodes {count,5} {subtree}");
+                int Count(Node n) => 1 + n.GetChildren().Sum(Count);
+                var world3d = _map3d.FindChildren("*", "Node3D", true, false).Where(n => n.GetParent() is SubViewport).OrderByDescending(Count).First();
+                string Kind(Node n) => n.GetType().Name + ":" + (n.GetChildCount() > 0 ? n.GetChild(0).Name.ToString().Split('@')[0].TrimEnd('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_') : "-");
+                foreach (var group in world3d.GetChildren().GroupBy(Kind).OrderByDescending(g => g.Sum(Count)).Take(12))
+                    GD.Print($"layer {group.Count(),4} items, {group.Sum(Count),5} nodes · {group.Key}");
+                GD.Print($"layer: armies on the map {_map.ArmySpots.Count}, militia {_map.MilitiaSpots.Count}, fronts {_world.Active.Count(c => c.Front)}, occupied {_world.Communes.Count(c => c.Occupied)}");
+            }
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
         if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
@@ -342,6 +370,30 @@ public partial class Main : Control
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         // --sound: the soundscape's layers for the view being saved.
         if (Array.IndexOf(args, "--sound") >= 0) GD.Print($"sound: {_map3d.SoundReport()}");
+        // --memory N: open and close the battle and festival scenes N times, reporting memory and objects before and after.
+        int memoryAt = Array.IndexOf(args, "--memory");
+        if (memoryAt >= 0 && Array.IndexOf(args, "--clock") < 0)
+        {
+
+            int rounds = memoryAt + 1 < args.Length && int.TryParse(args[memoryAt + 1], out int n) ? n : 10;
+            GD.Print($"memory before: {MemoryReport()}");
+            for (int round = 0; round < rounds; round++)
+            {
+                if (_world.Battles.LastOrDefault() is { } battle) ShowBattle(battle.Commune);
+                for (int i = 0; i < 20; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                CloseOverlay();
+                ShowOverlay("The festival", "", CelebrationFrame(1100), 1180, ("Close", () => CloseOverlay()));
+                for (int i = 0; i < 20; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                CloseOverlay();
+                for (int i = 0; i < 30; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                if (round == 0 || round == rounds - 1) GD.Print($"memory after round {round + 1}: {MemoryReport()}");
+            }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            for (int i = 0; i < 10; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            GD.Print($"memory after a full collection: {MemoryReport()}");
+        }
         GetViewport().GetTexture().GetImage().SavePng(path);
         GetTree().Quit();
     }
@@ -585,6 +637,14 @@ public partial class Main : Control
         SetSpeed(0);
         Refresh();
     }
+
+    /// <summary>Memory, objects and the map's render targets and textures, for --memory.</summary>
+    private string MemoryReport() =>
+        $"static {Performance.GetMonitor(Performance.Monitor.MemoryStatic) / 1048576:0.0} MB · objects {Performance.GetMonitor(Performance.Monitor.ObjectCount):0}"
+        + $" · nodes {Performance.GetMonitor(Performance.Monitor.ObjectNodeCount):0} · orphans {Performance.GetMonitor(Performance.Monitor.ObjectOrphanNodeCount):0}"
+        + $" · resources {Performance.GetMonitor(Performance.Monitor.ObjectResourceCount):0} · video {Performance.GetMonitor(Performance.Monitor.RenderVideoMemUsed) / 1048576:0} MB"
+        + $" (textures {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TextureMemUsed) / 1048576:0}, buffers {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.BufferMemUsed) / 1048576:0})"
+        + $" · map {_map3d.MemoryReport()} · {_map.TextureReport()}";
 
     private void NewGame()
     {

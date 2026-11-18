@@ -28,8 +28,9 @@ internal static class EventSystem
         if (pending is null) return ActionResult.Fail($"No pending event '{eventId}'.");
         var def = w.EventDefinition(eventId);
         if (option < 0 || option >= def.Options.Count) return ActionResult.Fail($"'{def.Title}' has options 1–{def.Options.Count}.");
-        Resolve(w, def, option, answered: true);
-        return ActionResult.Done($"{def.Title}: {def.Options[option].Label}.");
+        string label = def.Options[option].Label;
+        Resolve(w, def, option, answered: true); // compacts the event: read what's needed first
+        return ActionResult.Done($"{def.Title}: {label}.");
     }
 
     private static void Resolve(World w, EventDefinition def, int option, bool answered)
@@ -39,6 +40,11 @@ internal static class EventSystem
         Apply(w, chosen.Effects, $"{def.Title}: {chosen.Label}");
         w.Emit(Severity.Info, (answered ? $"{def.Title}: {chosen.Label}." : $"{def.Title}: with no answer from the movement, events take their course — {chosen.Label}.")
                               + (chosen.Description.Length > 0 ? $" {chosen.Description}" : ""));
+        // Answered, an event is kept only as a stub (its id, title and turn, which later systems count
+        // and space by): its text and options would otherwise pile up in memory and saves, the
+        // hundreds a long campaign generates.
+        def.Text = "";
+        def.Options.Clear();
     }
 
     internal static void Apply(World w, EventEffects e, string reason = "A decision")

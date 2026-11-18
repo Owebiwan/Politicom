@@ -119,7 +119,9 @@ public partial class Map3D
                 cars[i].Rotation = new Vector3(0, yaw + (outward ? 0 : Mathf.Pi), 0);
                 cars[i].Scale = Vector3.One * unit;
                 cars[i].Visible = true;
-                if (cars[i].FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() is AnimationPlayer player && player.HasAnimation("Run"))
+                if (!_carPlayers.TryGetValue(cars[i], out var player)) // found once, not every frame
+                    _carPlayers[cars[i]] = player = cars[i].FindChildren("*", "AnimationPlayer", true, false).FirstOrDefault() as AnimationPlayer;
+                if (player != null && player.HasAnimation("Run"))
                 {
                     if (!player.IsPlaying()) { player.GetAnimation("Run").LoopMode = Animation.LoopModeEnum.Linear; player.Play("Run"); }
                     player.SpeedScale = moving ? 1.6f : 0f;
@@ -129,12 +131,21 @@ public partial class Map3D
         var mm = _track!.Multimesh;
         mm.InstanceCount = sleepers.Count;
         for (int i = 0; i < sleepers.Count; i++) mm.SetInstanceTransform(i, sleepers[i]);
-        foreach (var (key, cars) in _trains)
-            if (!lines.Contains(key))
-                foreach (var car in cars) car.Visible = false;
+        // A line cut by the war loses its train (rebuilt if the line is ever whole again).
+        foreach (var key in _trains.Keys.Where(k => !lines.Contains(k)).ToList())
+        {
+            foreach (var car in _trains[key])
+            {
+                _carPlayers.Remove(car);
+                car.QueueFree();
+            }
+            _trains.Remove(key);
+        }
 
         SyncPorts(w, origin, deg, lift, time);
     }
+
+    private readonly Dictionary<Node3D, AnimationPlayer?> _carPlayers = new();
 
     /// <summary>Which way the open water lies from a commune, from the elevation (sea is zero), or null inland.</summary>
     private Vector2? Seaward(Politicom.Sim.Commune c)

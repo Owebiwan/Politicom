@@ -149,6 +149,9 @@ public partial class Map3D : Control
     /// Sizes the canvas to what the most tilted camera sees, and places the flat map at its foot,
     /// centred: the camera keeps the map's bottom edge at the bottom of the screen.
     /// </summary>
+    /// <summary>The map's render targets, for the --memory report.</summary>
+    public string MemoryReport() => $"view {_view.Size} ×{_view.Msaa3D}, flat {_flat.Size}, resolution {_resolution}";
+
     private void Layout()
     {
         if (Size.X < 4 || Size.Y < 4) return;

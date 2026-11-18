@@ -109,6 +109,7 @@ public partial class Map3D
         _militia.Clear();
         _ports.Clear();
         _trains.Clear();
+        _carPlayers.Clear();
         _drill.Clear();
     }
 
@@ -184,8 +185,14 @@ public partial class Map3D
             Face(army.Node, at, towards);
             Drill(army.Node, attacking ? "fight" : moving ? "march" : "stand", year);
         }
-        foreach (var (key, army) in _armies)
-            if (!armies.Contains(key)) army.Node.Visible = false;
+        // An army whose front has closed is gone for good (a new front builds a new one): freed, not
+        // hidden, or a long war leaves dozens of skinned companies animating out of sight.
+        foreach (var key in _armies.Keys.Where(k => !armies.Contains(k)).ToList())
+        {
+            _drill.Remove(_armies[key].Node);
+            _armies[key].Node.QueueFree();
+            _armies.Remove(key);
+        }
 
         // Militia at the fronts
         var fronts = new HashSet<int>();
@@ -206,8 +213,12 @@ public partial class Map3D
             Face(band.Node, at, facing);
             Drill(band.Node, underAttack ? "guard" : "stand", year);
         }
-        foreach (var (key, band) in _militia)
-            if (!fronts.Contains(key)) band.Node.Visible = false;
+        foreach (var key in _militia.Keys.Where(k => !fronts.Contains(k)).ToList())
+        {
+            _drill.Remove(_militia[key].Node);
+            _militia[key].Node.QueueFree();
+            _militia.Remove(key);
+        }
     }
 
     private readonly Dictionary<int, (Node3D Node, int Level)> _forts = new();
