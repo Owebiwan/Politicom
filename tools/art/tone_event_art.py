@@ -32,10 +32,10 @@ AGES = {"ancient": "antiquity", "medieval": "the middle ages", "earlymodern": "t
 
 def print_look(img):
     """Flattened tones and an ink line along the edges, as a print rather than a render."""
-    img = img.convert("RGB").filter(ImageFilter.ModeFilter(5))
+    img = img.convert("RGB").filter(ImageFilter.ModeFilter(3))
     edges = ImageOps.invert(img.convert("L").filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(3)))
     ink = np.asarray(edges, np.float32) / 255
-    rgb = np.asarray(img, np.float32) * (0.55 + 0.45 * ink[..., None])
+    rgb = np.asarray(img, np.float32) * (0.7 + 0.3 * ink[..., None])
     return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8))
 
 
@@ -51,7 +51,7 @@ def main():
         img.save(os.path.join(out, name + ".jpg"), quality=88)
         credits[name] = {
             "caption": f"{CAPTIONS[theme]}, {AGES[age]}",
-            "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+            "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
             "source": "",
         }
         print("toned", name)

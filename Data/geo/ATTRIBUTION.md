@@ -70,4 +70,8 @@
   `tools/models/build_trains.py` (Blender).
 - Event pictures for the anniversary, mourning and the barricades (`Game/art/events/celebration_*`,
   `mourning_*`, `barricades_*`): rendered for this project by `tools/art/render_event_art.py`
-  (Blender) from the game's own models.
+  (Blender, Cycles). The towns are built by that script. Their textures (plaster, stucco, brick,
+  stone, roof tiles, slates, cobbles, wood), the props (barrels, crates, tables, chairs,
+  benches, baskets, bottles, jugs, lamps) and the skies (HDRIs) are from **Poly Haven**
+  (polyhaven.com), **CC0**, fetched by `tools/art/fetch_assets.py`. The people are the game's own
+  figures.

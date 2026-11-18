@@ -321,67 +321,67 @@
  },
  "barricades_earlymodern": {
   "caption": "On the barricades, the early modern age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "barricades_industrial": {
   "caption": "On the barricades, the industrial age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "barricades_modern": {
   "caption": "On the barricades, the twentieth century",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "celebration_ancient": {
   "caption": "The anniversary of the rising, in the square, antiquity",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "celebration_earlymodern": {
   "caption": "The anniversary of the rising, in the square, the early modern age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "celebration_industrial": {
   "caption": "The anniversary of the rising, in the square, the industrial age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "celebration_medieval": {
   "caption": "The anniversary of the rising, in the square, the middle ages",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "celebration_modern": {
   "caption": "The anniversary of the rising, in the square, the twentieth century",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "mourning_ancient": {
   "caption": "The funeral of a comrade, antiquity",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "mourning_earlymodern": {
   "caption": "The funeral of a comrade, the early modern age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "mourning_industrial": {
   "caption": "The funeral of a comrade, the industrial age",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "mourning_medieval": {
   "caption": "The funeral of a comrade, the middle ages",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  },
  "mourning_modern": {
   "caption": "The funeral of a comrade, the twentieth century",
-  "credit": "Rendered for Politicom in Blender from the game's own models (tools/art/render_event_art.py)",
+  "credit": "Rendered for Politicom in Blender with Poly Haven's CC0 textures, props and skies (tools/art/render_event_art.py)",
   "source": ""
  }
 }

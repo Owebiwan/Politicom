@@ -586,14 +586,31 @@ The movement marks what it has won (`Sim/Systems/CelebrationSystem.cs`):
 
 ### Event art rendered for the game
 
-Where no period picture fits, the game has its own (`tools/art/render_event_art.py`): scenes
-built in Blender from the game's own models (the age's buildings and figures), rendered, then
-given a light ink line and the same sepia duotone, grain and vignette as the period art
-(`tools/art/tone_event_art.py`). Thirteen so far: **the anniversary** in a town square dressed
-with flags, bunting, lanterns and long tables, and **mourning**, a funeral procession behind a
-coffin draped in the black-and-red flag, for every age; and **the barricades**, militia firing
-over paving stones, barrels and carts, from the age of muskets on. Events about anniversaries
-and liberation, deaths and funerals, and barricades show them.
+Where no period picture fits, the game has its own (`tools/art/render_event_art.py`), rendered in
+Blender with Cycles. The towns are built for the picture, not taken from the game:
+- **Houses of each age**, with plinths, string courses and cornices.
+- **Framed windows**, with sills, mullions, open shutters and pediments; iron balconies, doors,
+  shop fronts with awnings, and lit windows at dusk.
+- **Half-timbering** in the middle ages, and tiled or slated roofs with chimneys.
+- **Poly Haven's CC0 photographic textures**: plaster, stucco, brick, stone, roof tiles, slates,
+  cobbles and wood.
+- **Props** are Poly Haven CC0 models: barrels, crates, tables, chairs, benches, baskets, bottles,
+  jugs and lamps. The **skies** are its CC0 HDRIs.
+- **The people** are the game's figures, smoothed and posed: dancing, cheering, marching,
+  firing.
+
+`tools/art/fetch_assets.py` downloads the assets (not committed). Each render is then given a
+light ink line and the same sepia duotone, grain and vignette as the period art
+(`tools/art/tone_event_art.py`). There are thirteen pictures:
+- **The anniversary** for every age: a square at dusk, with a ring dance in the middle, people
+  cheering round it, long tables with wine and bread, flags, bunting and lanterns.
+- **Mourning** for every age: a funeral procession behind a coffin draped in the black-and-red
+  flag, between people lining the street.
+- **The barricades**, from the age of muskets on: militia firing over heaped paving stones,
+  barrels, crates and upturned chairs.
+
+Events about anniversaries and liberation, deaths and funerals, and barricades show them. The
+anniversary and liberation pop-ups show the live 3D festival instead.
 
 ## Goals
 
