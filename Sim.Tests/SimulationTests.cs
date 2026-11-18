@@ -1731,6 +1731,7 @@ public class SimulationTests
         w.Run(w.Scenario.EndTick);
         Assert.Equal(1, w.Legacy.Chapter);
         Assert.Null(w.Legacy.Crisis);
+        Assert.Contains(Endings.Epilogue(w), line => line.Contains("legac"));
     }
 
     [Fact]

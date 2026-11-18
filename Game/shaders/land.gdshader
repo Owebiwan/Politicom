@@ -1,4 +1,4 @@
-// The land under the map, in the manner of Victoria 3: the ground itself (NASA's Blue Marble,
+// The land under the map: the ground itself (NASA's Blue Marble,
 // graded and hill-shaded by tools/geo/build_land.py) with each country's colour laid over it
 // as a tint that keeps the terrain's light and shade. Vertex colour is the country's colour;
 // its alpha is how strongly it tints (0 = bare ground). Zoomed out to the world it turns into

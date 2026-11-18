@@ -4,8 +4,8 @@ namespace Politicom.Sim;
 public readonly record struct Part(string Label, double Value);
 
 /// <summary>
-/// Why a commune's numbers are what they are, part by part, as Victoria 3's tooltips break a
-/// value into its causes. The simulation computes these numbers through the same methods, so
+/// Why a commune's numbers are what they are, part by part: each value broken
+/// into its causes. The simulation computes these numbers through the same methods, so
 /// the explanation and the number can never disagree.
 /// </summary>
 public static class Explain

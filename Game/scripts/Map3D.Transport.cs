@@ -6,7 +6,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// Railways and harbours on the 3D map, as Victoria 3 lays its rails and moors its ships:
+/// Railways and harbours on the 3D map: rails laid and ships moored:
 /// track (Kenney Train Kit, CC0) laid tie by tie over the terrain between linked communes, with a
 /// steam train running back and forth on each line that isn't cut; and at every coastal town a
 /// jetty with a ship of its age riding at anchor beside it: sailing boats and galleys before 1450,

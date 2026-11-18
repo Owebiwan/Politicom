@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFilter
 
 SS = 4  # supersampling
 
-# Brass over slate-blue lacquer, as Victoria 3 dresses its windows.
+# Brass over slate-blue lacquer, for the windows.
 GOLD_TOP, GOLD_MID, GOLD_LOW = (236, 214, 160), (186, 156, 104), (104, 84, 54)
 LACQUER = (22, 28, 38)
 

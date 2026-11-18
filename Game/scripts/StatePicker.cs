@@ -113,7 +113,7 @@ public partial class StatePicker : Control
     private const float South = -60, North = 84;
 
     private float BaseScale => Mathf.Min(Size.X / 360f, Size.Y / (North - South));
-    private float Scale => BaseScale * _zoom;
+    private new float Scale => BaseScale * _zoom;
     private Vector2 Origin => Size / 2 + _pan + new Vector2(0, (North + South) / 2 * Scale);
 
     private Vector2 ToScreen(Vector2 lonLat) => Origin + new Vector2(lonLat.X, -lonLat.Y) * Scale;

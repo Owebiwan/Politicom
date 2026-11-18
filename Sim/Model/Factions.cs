@@ -3,7 +3,7 @@ namespace Politicom.Sim;
 public enum FactionKind { Centralists, Party, Planners, Localists }
 
 /// <summary>
-/// A faction, as Crusader Kings' discontented vassals band together: communes drawn to one demand,
+/// A faction: discontented communes banded together, drawn to one demand,
 /// growing in strength while they're many and their grievance lasts, pressing it on the congress
 /// when they are strong enough. Hierarchy drift with a face: while a faction presses, it adds drift.
 /// </summary>

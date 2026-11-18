@@ -1,7 +1,7 @@
 namespace Politicom.Sim.Systems;
 
 /// <summary>
-/// Generations, as Crusader Kings passes from one generation to the next: once a year figures
+/// Generations, one after the next: once a year figures
 /// grow older; past sixty they may die of age, and past sixty-five they may retire, ending
 /// their work with a few words on what they did. New militants rise from the communes with the
 /// strongest political life, more often when the movement has few figures at work; they take

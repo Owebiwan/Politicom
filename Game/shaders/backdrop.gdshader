@@ -1,4 +1,4 @@
-// Behind a window: the map blurred and darkened, as Victoria 3 does, rising with `amount`
+// Behind a window: the map blurred and darkened, rising with `amount`
 // (0 = clear, 1 = fully blurred) so a window can ease in.
 shader_type canvas_item;
 

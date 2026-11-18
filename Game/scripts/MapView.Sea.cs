@@ -3,7 +3,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// Water and land in the manner of Victoria 3: an animated sea (lit ripples, depth from the
+/// Water and land: an animated sea (lit ripples, depth from the
 /// coast, foam) drawn by a shader behind the map; land cover tinting the political colours; and,
 /// zoomed out to the world, a paper chart with engraved coastlines and a parchment wash over the
 /// land. Built from Natural Earth by tools/geo/build_sea.py.

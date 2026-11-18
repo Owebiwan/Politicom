@@ -1,6 +1,6 @@
 namespace Politicom.Sim;
 
-/// <summary>The four long paths a chapter can be remembered by (as Civilization VII's legacy paths).</summary>
+/// <summary>The four long paths a chapter can be remembered by.</summary>
 public enum LegacyPath { MutualAid, Culture, Defence, Knowledge }
 
 public enum CrisisKind { Plague, HungerYears, Offensive, CounterRevolution }

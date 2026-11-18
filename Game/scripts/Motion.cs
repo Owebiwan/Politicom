@@ -3,7 +3,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// The interface's motion, in the manner of Victoria 3: windows ease in over a blurred map and
+/// The interface's motion: windows ease in over a blurred map and
 /// fade away, notices slide in, buttons glow under the pointer, tabs fade their pages in.
 /// Everything is short (a fifth of a second or so), so it never slows play.
 /// </summary>

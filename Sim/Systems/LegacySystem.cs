@@ -1,7 +1,7 @@
 namespace Politicom.Sim.Systems;
 
 /// <summary>
-/// Chapters and their legacies (<see cref="LegacyState"/>), as Civilization VII's legacy paths:
+/// Chapters and their legacies (<see cref="LegacyState"/>):
 /// four long paths, three milestones on each per chapter. Each milestone reached brings a little
 /// influence and enthusiasm. At the chapter's end a path with two milestones becomes a legacy
 /// (level 1), with all three a lasting one (level 2), and legacies add up from chapter to

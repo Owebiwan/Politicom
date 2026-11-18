@@ -118,7 +118,7 @@ internal static class Play
                         for (int i = 0; i < weeks && w.Outcome == Outcome.Ongoing; i++)
                         {
                             w.Step();
-                            // Like a Paradox popup: stop fast-forwarding when a decision is needed.
+                            // Stop fast-forwarding when a decision is needed.
                             if (w.Log.Skip(shown).Any(e => e.StopsTheClock)) break;
                         }
                         PrintNewEvents(w, ref shown);

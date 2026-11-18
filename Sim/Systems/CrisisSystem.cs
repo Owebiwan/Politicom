@@ -1,7 +1,7 @@
 namespace Politicom.Sim.Systems;
 
 /// <summary>
-/// The crisis of the age (as Civilization VII's age crises): in campaigns and open starts, the
+/// The crisis of the age: in campaigns and open starts, the
 /// last quarter of each chapter brings one, chosen for the age and the moment: a plague (cholera,
 /// influenza), the hungry years, the enemy's great offensive, or the counter-revolution within.
 /// It breaks, rises to its height and comes to a head in three stages, each heavier than the last,

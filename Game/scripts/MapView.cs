@@ -732,7 +732,7 @@ public partial class MapView : Control
     }
 
     /// <summary>
-    /// Borders as in Victoria 3: between neighbouring communes a thin, soft line; around the
+    /// Borders: between neighbouring communes a thin, soft line; around the
     /// whole (the edge of the federation, or a commune on its own) a firmer one. An edge two
     /// territories share is inner; one only a single territory has is outer.
     /// </summary>
@@ -770,7 +770,7 @@ public partial class MapView : Control
     }
 
     /// <summary>
-    /// Borders as in Victoria 3: between neighbouring communes a thin, soft line; around the
+    /// Borders: between neighbouring communes a thin, soft line; around the
     /// whole (the edge of the federation, or a commune on its own) a firmer one.
     /// </summary>
     private void DrawCommuneBorders(World w, Vector2[][][] screen)
@@ -1330,7 +1330,7 @@ public partial class MapView : Control
 
     private float SpriteSize(Commune c) =>
         Mathf.Clamp(18 + Mathf.Sqrt((float)c.Population) * 2f, 22, 36) * Mathf.Clamp(Mathf.Sqrt(_zoom), 0.7f, 1.6f)
-        // 3D towns keep growing as you close in, as Victoria 3's cities do, so their buildings can be read.
+        // 3D towns keep growing as you close in, so their buildings can be read.
         * (Objects3D ? Mathf.Clamp(_zoom / 2.5f, 1, 2.4f) : 1);
 
     /// <summary>The commune whose territory contains the point.</summary>

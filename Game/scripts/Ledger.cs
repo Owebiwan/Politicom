@@ -7,7 +7,7 @@ using Politicom.Sim;
 namespace Politicom.Game;
 
 /// <summary>
-/// The ledger: the federation's history at a glance, in the manner of Victoria 3's — a grid of
+/// The ledger: the federation's history at a glance, as a grid of
 /// small charts (stores, scarcity prices, wellbeing, enthusiasm, militia, gold, science,
 /// culture, drift, communes, trust, influence, the enemy), each with its current value and range.
 /// </summary>

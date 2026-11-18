@@ -1,5 +1,5 @@
 // The 3D map's ground: a grid raised by the real elevation and draped with the flat map (drawn
-// off-screen by MapView). Mountains are lifted (exaggerated, as on Victoria 3's map) and lit a
+// off-screen by MapView). Mountains are lifted (exaggerated, to read at a glance) and lit a
 // little from the north-west so their slopes catch the light; the distance fades into haze.
 shader_type spatial;
 // Lit only to receive shadows: in sunlight the colour is exactly the flat map's (the sun adds the

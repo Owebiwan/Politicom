@@ -1,6 +1,6 @@
 namespace Politicom.Sim;
 
-/// <summary>What a commune puts its effort into (as Civilization VII's town specialisations).</summary>
+/// <summary>What a commune puts its effort into: its specialisation.</summary>
 public enum CommuneFocus { None, Granary, Workshop, Fortress, Schoolhouse, Junction }
 
 /// <summary>

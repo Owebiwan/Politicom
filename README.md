@@ -200,7 +200,7 @@ The sandbox (fresh maps) averages 70%.
 
 ## Water, terrain and the paper chart
 
-The map is modelled on Victoria 3's:
+The map:
 - **The sea:** an animated shader (`Game/shaders/sea.gdshader`) draws ripples that drift and
   catch the light, shallow teal near the coast deepening to navy offshore, and broken foam
   where it meets the land. The water is anchored to longitude and latitude, so it stays put
@@ -220,7 +220,7 @@ The map is modelled on Victoria 3's:
   engraved lines following the coasts, and the countries become watercolour on paper.
 - **Inland maps:** Paris sits on land, not sea.
 - **Country names:** names run across their territory in spaced capitals on a straight line,
-  as on Victoria 3's map, along the longest line that stays inside the country (level where
+  along the longest line that stays inside the country (level where
   there's room, steeper for tall, thin countries such as Chile or Norway), sized to fit it;
   a name with no room is left out rather than spilling over the borders. They're cream over
   the sea and brown ink on the paper chart.
@@ -233,7 +233,7 @@ The map is modelled on Victoria 3's:
 
 ## The 3D map
 
-The map is three-dimensional, as Victoria 3's is (`Game/scripts/Map3D.cs`,
+The map is three-dimensional (`Game/scripts/Map3D.cs`,
 `Game/shaders/terrain3d.gdshader`):
 - **Ground:** the flat map (`MapView`) is drawn off-screen and laid over a grid raised by the
   real elevation (NASA's GEBCO-derived elevation, `Data/land/height.land`), mountains
@@ -398,7 +398,7 @@ Real maps (the historical scenarios, open starts and the world view) are shaded 
 
 ## Communes' proposals, scarcity prices and the ledger
 
-Three features that bring the game closer to Victoria 3, keeping the anarchist premise:
+Three features that deepen the economy and the communes' own initiative, keeping the anarchist premise:
 
 - **Communes propose their own projects.** Every few weeks a commune puts a plan before the
   movement, and you can back it (influence; the project starts with that commune at its
@@ -420,7 +420,7 @@ Three features that bring the game closer to Victoria 3, keeping the anarchist p
   - **Wellbeing:** dear food weighs on industrial towns, which don't grow their own.
 
   Prices show in the Resources section.
-- **The ledger (L).** A Victoria-style grid of charts, from the first week to now: food and
+- **The ledger (L).** A grid of charts, from the first week to now: food and
   goods in store, both prices, wellbeing, enthusiasm, militia, gold, science, culture, drift,
   communes, trust, influence and enemy strength. Each chart shows its current value and its
   range.
@@ -537,7 +537,7 @@ Catalonia's 1938 Aragon Offensive was strengthened (28 to 44).
 
 ## Factions
 
-Drift with a face (`Sim/Systems/FactionSystem.cs`), as Crusader Kings' discontented vassals band
+Drift with a face (`Sim/Systems/FactionSystem.cs`): discontented communes band
 together. Each turn every commune leans toward the factions whose grievance it shares, and joins
 those it leans far toward:
 
@@ -560,7 +560,7 @@ Balance (balanced AI, 200 games): Catalonia 81%, Free Territory 72%, Paris 45%.
 
 ## The struggle between allies
 
-As Crusader Kings tracks a struggle no one side can win outright (`Sim/Systems/StruggleSystem.cs`):
+A struggle no one side can win outright (`Sim/Systems/StruggleSystem.cs`):
 where the movement has allies of convenience (the Republic and the party in Catalonia, "the
 antifascist front"; the Bolsheviks in Ukraine; elsewhere the government ally or the strongest
 rival party), a **tension** from 0 to 100 moves it through three phases:
@@ -636,7 +636,7 @@ anniversary and liberation pop-ups show the live 3D festival instead.
 
 ## Chapters, legacies and crises
 
-Taken from Civilization VII's legacy paths and age crises (`Sim/Systems/LegacySystem.cs`,
+Legacy paths and crises of the age (`Sim/Systems/LegacySystem.cs`,
 `CrisisSystem.cs`). A game is told in **chapters**: a short game is one chapter, and a campaign
 has a chapter about every five years. The Overview tab shows the chapter. Hover it for every
 milestone and its progress.
@@ -686,8 +686,8 @@ influence).
 
 ## Town focus
 
-Each commune's assembly can be asked to take up a focus, from Civilization VII's town
-specialisations: one lever per town that needs no managing afterwards (`Sim/Model/Focus.cs`).
+Each commune's assembly can be asked to take up a focus, a specialisation for the town:
+one lever per town that needs no managing afterwards (`Sim/Model/Focus.cs`).
 Buttons in the Commune tab set it. It costs nothing, since it is the assembly's choice, but a
 commune keeps a focus at least 13 weeks.
 
@@ -843,7 +843,7 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
   Backing a figure feeds their prestige and their ambition, so the people who serve the
   revolution best are also the ones who may come to ask for power. The same thing never comes
   back within a year.
-- **Traits** (as in Crusader Kings): each figure has two, which shape how they work and what
+- **Traits:** each figure has two, which shape how they work and what
   they do. Brave (a commander's line holds harder; more risk to their life), cautious, ambitious
   (ambition grows half again as fast), humble (half as fast), honest (their power adds less
   drift), vain (prestige comes faster, slights cut deeper), zealous (fights the party; takes
@@ -876,8 +876,8 @@ Each game has notable militants (`Sim/Model/Figures.cs`, `Sim/Systems/FigureSyst
 
 ## Why a number is what it is
 
-In the Commune tab, underlined numbers explain themselves on hover, part by part, as Victoria
-3's tooltips do (`Sim/Explain.cs`):
+In the Commune tab, underlined numbers explain themselves on hover, part by part
+(`Sim/Explain.cs`):
 - **Wellbeing:** what it is moving toward (it closes 15% of the gap each turn): food and goods
   in store, education, hierarchy, ground lost at the front, recalled delegates, dear food in a
   factory town.
@@ -906,7 +906,7 @@ Trust, Education, Values, Wellbeing, Culture, Ideology, Diplomacy and Revolution
 
 ## What the player sees
 
-**The look.** The interface is modelled on Victoria 3:
+**The look.** The interface:
 - **Windows:** pop-ups, the scenario picker, the tech tree and the dashboard are slate-blue
   grained lacquer in engraved brass frames with flourished corners: a bracket with curling ends
   and a palmette.

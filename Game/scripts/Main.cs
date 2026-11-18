@@ -444,7 +444,7 @@ public partial class Main : Control
         _world.Step();
         if (_world.Communes.Count(c => c.Occupied) > occupied) Audio.Instance?.Play("sword", -6);
         Audio.Instance?.PlayAge(Audio.AgeOf(_world.Year));
-        // Like a Paradox popup: pause when the movement has a decision to make.
+        // Pause when the movement has a decision to make.
         var fresh = _world.Log.Skip(_seenEvents).ToList();
         if (fresh.Any(e => e.StopsTheClock)) SetSpeed(0);
         foreach (var e in fresh.Where(e => e.Severity == Severity.Danger || e.StopsTheClock))

@@ -4,7 +4,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// The 3D map, in the manner of Victoria 3: the flat map (<see cref="MapView"/>, drawn off-screen)
+/// The 3D map: the flat map (<see cref="MapView"/>, drawn off-screen)
 /// laid over a grid raised by the real elevation and seen through a perspective camera that looks
 /// straight down at the whole world and tilts toward the horizon as you zoom in, the distance
 /// fading into haze.
@@ -49,7 +49,7 @@ public partial class Map3D : Control
 
     private sealed partial class Hud : Control
     {
-        public Map3D Owner = null!;
+        public new Map3D Owner = null!;
         public override void _Draw()
         {
             Owner.Map.DrawCountryLabels(this, Owner.OnScreen);

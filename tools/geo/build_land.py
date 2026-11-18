@@ -7,7 +7,7 @@ NASA Earth Observatory images, public domain.
 
 The satellite colours are graded toward a painted map (a little less saturated, warmer, with
 a gentle S-curve and a light smoothing that takes off the satellite grain), and lit from the
-north-west by hill shading from the elevation, so mountains stand out the way Victoria 3's do.
+north-west by hill shading from the elevation, so mountains stand out.
 Along the coasts the water's pixels take the colour of the nearest land: the game's own
 coastlines decide where land ends (the land is drawn inside the map's polygons), so there's no
 blue fringe; lakes inside the land keep their water.

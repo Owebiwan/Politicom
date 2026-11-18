@@ -7,7 +7,7 @@ namespace Politicom.Game;
 /// <summary>
 /// The land layer: the world's countries and the region's communes drawn over the real ground
 /// (Data/land, from tools/geo/build_land.py) by shaders/land.gdshader, each colour a tint
-/// that keeps the terrain's light and shade, as on Victoria 3's map. The layer sits behind the
+/// that keeps the terrain's light and shade. The layer sits behind the
 /// map (over the sea) and holds its shapes in layout space; panning and zooming only move and
 /// scale it, so its drawing is recorded again only when colours change.
 /// </summary>
@@ -146,7 +146,7 @@ public partial class MapView
         _landMaterial!.SetShaderParameter("terrain", terrain);
         _landMaterial.SetShaderParameter("paper", PaperBlend());
         if (!terrain) return;
-        _landMaterial.SetShaderParameter("overview", Overview());
+        _landMaterial.SetShaderParameter("overview", Overview()!); // terrain is shown only when there is an overview
         _landMaterial.SetShaderParameter("winter_north", Winter(north: true));
         _landMaterial.SetShaderParameter("winter_south", Winter(north: false));
         // Layout → lon/lat: the projection is affine.

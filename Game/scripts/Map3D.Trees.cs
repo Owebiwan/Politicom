@@ -5,7 +5,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// Forests on the 3D map, as Victoria 3 plants trees across its wooded land: wherever Natural
+/// Forests on the 3D map, trees across the wooded land: wherever Natural
 /// Earth's land cover marks forest, around the region and its neighbours, clumps of trees stand
 /// on the raised terrain, of the climate: spruce, pine and birch in the north and on high ground;
 /// oak, elm, birch and pine in temperate lands; oak, umbrella pine and cypress round the

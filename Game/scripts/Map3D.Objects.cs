@@ -7,7 +7,7 @@ using Politicom.Sim;
 namespace Politicom.Game;
 
 /// <summary>
-/// Models on the 3D map, as Victoria 3 stands cities and armies on its terrain: each town built
+/// Models standing on the 3D map's terrain, towns and armies alike: each town built
 /// in the style of its age from the same plan the flat map uses, out of Politicom's own buildings
 /// (tools/models/build_buildings.py): houses, a landmark, factories with smoking chimneys, blocks
 /// in the twentieth century, ruins once occupied; and armies as companies of figures of their era

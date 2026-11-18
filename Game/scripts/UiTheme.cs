@@ -4,7 +4,7 @@ using Godot;
 namespace Politicom.Game;
 
 /// <summary>
-/// One theme for the whole interface, in the manner of Victoria 3: windows of slate-blue grained
+/// One theme for the whole interface: windows of slate-blue grained
 /// lacquer in engraved brass frames with flourished corners, title plates and section bars,
 /// embossed bronze buttons and tabs, medallions behind emblems, and a book serif (Crimson Pro)
 /// throughout — semibold gilt titles, regular cream body text, bold figures. The ornaments are

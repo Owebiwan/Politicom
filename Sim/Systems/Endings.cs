@@ -54,5 +54,12 @@ public static class Endings
         if (culture > 0.3) yield return "Its schools, presses and songs outlived the war.";
         int sisters = w.States.Count(x => x.Sister);
         if (sisters > 0) yield return $"{sisters} sister {(sisters == 1 ? "federation" : "federations")} rose abroad.";
+        // Its legacies: the chapters already closed, and what this last one leaves (two milestones or more on a path).
+        foreach (var line in w.Legacy.History) yield return line + ".";
+        var last = Systems.LegacySystem.Paths.Where(p => w.Legacy.Count(p) >= 2)
+            .Select(p => $"{Systems.LegacySystem.LegacyName(p).ToLowerInvariant()} ({Systems.LegacySystem.Name(p).ToLowerInvariant()}{(w.Legacy.Count(p) == 3 ? ", all three milestones" : "")})").ToList();
+        yield return last.Count > 0
+            ? $"{(w.Legacy.History.Count > 0 ? "Its last chapter leaves" : "It leaves")} {(last.Count == 1 ? "a legacy" : "legacies")}: {string.Join("; ", last)}."
+            : "No path reached two milestones: it leaves no legacy of its own.";
     }
 }

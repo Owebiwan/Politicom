@@ -1,5 +1,5 @@
 // Over the whole map: a light colour grade (a touch cooler and clearer, a little more colour and
-// contrast, as Victoria 3's map is), a faint vignette,
+// contrast), a faint vignette,
 // and, as the view widens, drifting clouds with their shadows, anchored to the world so they
 // stay put as the map pans. They clear again when the map turns into the paper chart.
 shader_type canvas_item;

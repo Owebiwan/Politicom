@@ -350,7 +350,7 @@ public partial class MapView
             _globeLines.Clear();
             foreach (var (line, box) in g.Coasts)
                 if (box.Intersects(view)) Culled(line, WorldCoast, 1.2f, InRegion, true);
-            // Borders as on Victoria 3's map: a broad soft shadow under a firm line with a light edge.
+            // Borders: a broad soft shadow under a firm line with a light edge.
             bool far = _zoom < DetailZoom;
             foreach (var (line, box) in g.Borders)
                 if (box.Intersects(view))

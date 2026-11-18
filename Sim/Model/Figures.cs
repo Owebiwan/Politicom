@@ -16,7 +16,7 @@ public enum FigureRole
 }
 
 /// <summary>
-/// A figure's character, as Crusader Kings gives its people traits. Each shapes how they work,
+/// A figure's character: their traits. Each shapes how they work,
 /// what they do when they act on their own, and how fast fame turns into appetite.
 /// </summary>
 public enum FigureTrait

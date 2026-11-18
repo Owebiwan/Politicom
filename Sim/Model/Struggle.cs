@@ -5,7 +5,7 @@ public enum StrugglePhase { Cooperation, Tension, Hostility }
 public sealed record StruggleCatalyst(int Tick, string Why, double Amount);
 
 /// <summary>
-/// The struggle between allies, as Crusader Kings' struggles track a contest that no one side can
+/// The struggle between allies, a contest that no one side can
 /// win outright: the movement against its allies of convenience (the Republic and the party in
 /// Catalonia, the Bolsheviks in Ukraine). Tension (0..100) moves it through its phases:
 /// cooperation, tension, hostility. At the top it breaks into open conflict; kept low for half a

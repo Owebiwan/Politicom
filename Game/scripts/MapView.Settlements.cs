@@ -7,7 +7,7 @@ using Politicom.Sim;
 namespace Politicom.Game;
 
 /// <summary>
-/// Towns drawn as small settlements, the way Victoria 3 shows cities as clusters of buildings:
+/// Towns drawn as small settlements, clusters of buildings:
 /// houses in an oblique view lit from the north-west (as the terrain is), more of them the more
 /// people live there, in the style of the age (flat roofs and a temple in antiquity; steep roofs,
 /// a spire and walls in the middle ages; domes after; chimneys with drifting smoke once industry
