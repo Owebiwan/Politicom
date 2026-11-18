@@ -148,15 +148,22 @@ public class SimulationTests
     public void Rival_offers_harden_and_end_after_three()
     {
         var w = NewWorld();
-        w.Run(135);
-        foreach (var offers in w.Scenario.Events.Where(e => e.Id.StartsWith("rival_offer_"))
-                     .GroupBy(e => e.Id.Split('_')[2]))
+        // Each offer's terms as it arrives (once answered, an event keeps only a stub).
+        var terms = new Dictionary<string, (int Tick, double Drift)>();
+        for (int t = 0; t < 135 && w.Outcome == Outcome.Ongoing; t++)
         {
-            var list = offers.OrderBy(e => e.Tick).ToList();
+            w.Step();
+            foreach (var e in w.Scenario.Events.Where(e => e.Id.StartsWith("rival_offer_") && e.Options.Count > 0))
+                terms.TryAdd(e.Id, (e.Tick, e.Options[0].Effects.Drift));
+        }
+        foreach (var offers in terms.GroupBy(kv => kv.Key.Split('_')[2]))
+        {
+            var list = offers.OrderBy(kv => kv.Value.Tick).Select(kv => kv.Value.Drift).ToList();
             Assert.True(list.Count <= 3);
             for (int i = 1; i < list.Count; i++)
-                Assert.True(list[i].Options[0].Effects.Drift > list[i - 1].Options[0].Effects.Drift);
+                Assert.True(list[i] > list[i - 1]);
         }
+        Assert.All(w.Scenario.Events.Where(e => w.FiredEvents.Contains(e.Id) && w.PendingEvents.All(p => p.Id != e.Id)), e => Assert.Empty(e.Options));
     }
 
     [Fact]
