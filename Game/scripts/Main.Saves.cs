@@ -213,6 +213,7 @@ public partial class Main
     {
         var w = _world;
         if (ReferenceEquals(_recorded, w) || w.Outcome == Outcome.Ongoing) return null;
+        if (Array.IndexOf(OS.GetCmdlineUserArgs(), "--screenshot") >= 0) return null; // test runs don't go on the player's leaderboard
         _recorded = w;
         var s = w.Scores;
         var id = ScenarioDefinition.SplitLength(w.Scenario.Id).BaseId;
@@ -227,7 +228,10 @@ public partial class Main
             using var file = FileAccess.Open(LeaderboardPath, FileAccess.ModeFlags.Write);
             file?.StoreString(JsonSerializer.Serialize(board, MetaJson));
         }
-        return board.Where(e => e.ScenarioId == id).OrderByDescending(e => e.Total).ToList().FindIndex(e => e == entry) + 1;
+        // Its place among this scenario's games (a game already on the board is found by its result, not its time).
+        int index = board.Where(e => e.ScenarioId == id).OrderByDescending(e => e.Total).ToList()
+            .FindIndex(e => e.Turns == entry.Turns && e.Total == entry.Total && e.Outcome == entry.Outcome);
+        return index >= 0 ? index + 1 : null; // off the bottom of the board: no rank to tell
     }
 
     /// <summary>The leaderboard: finished games ranked by total score, for all scenarios or one.</summary>

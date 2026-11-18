@@ -22,6 +22,7 @@ public partial class Main
         {
             Text = "Notable militants. Where they work they make a difference; their prestige grows, and with it their ambition. Rotate them back to the ranks before they ask for power.",
             AutowrapMode = TextServer.AutowrapMode.WordSmart, Modulate = new Color(1, 1, 1, 0.6f),
+            CustomMinimumSize = new Vector2(300, 0), // wrapped text with no width wraps letter by letter, thousands of pixels tall
         };
         help.AddThemeFontSizeOverride("font_size", 12);
         movement.AddChild(help);
@@ -97,7 +98,7 @@ public partial class Main
             card.AddThemeStyleboxOverride("panel", UiTheme.FramePanel(8));
             var box = new VBoxContainer();
             card.AddChild(box);
-            var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false };
+            var text = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, CustomMinimumSize = new Vector2(300, 0) };
             text.AddThemeFontSizeOverride("normal_font_size", 13);
             text.AddThemeFontSizeOverride("bold_font_size", 14);
             string age = f.Born != 0 ? $", {w.Year - f.Born}" : "";

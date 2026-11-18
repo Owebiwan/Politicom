@@ -29,6 +29,8 @@ public partial class Map3D : Control
     private readonly TextureRect _container = new() { ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.Scale, MouseFilter = MouseFilterEnum.Ignore };
     /// <summary>The 3D view's pixels per layout unit: the screen's (Retina, 5K) but no more than this, to bound memory.</summary>
     private const float MaxResolution = 2f;
+    /// <summary>The largest render target made, well inside every GPU's limit.</summary>
+    private const float MaxTexture = 7680f;
     private float _resolution = 1;
     private readonly Camera3D _camera = new() { Fov = Fov, Near = 5, Far = 200000 };
     private readonly MeshInstance3D _ground = new();
@@ -159,9 +161,13 @@ public partial class Map3D : Control
         var window = GetWindow();
         float screen = window.Size.X / Mathf.Max(1f, GetViewport().GetVisibleRect().Size.X);
         _resolution = Mathf.Clamp(screen, 1, MaxResolution);
-        _view.Size = (Vector2I)(Size * _resolution).Ceil();
+        // Within texture limits, whatever the layout asks for in passing (a dashboard laid out too tall
+        // for a frame once stretched the map to 9000 pixels and failed to make its render target).
+        var view = (Size * _resolution).Ceil();
+        float fit = Mathf.Min(1, MaxTexture / Mathf.Max(view.X, view.Y));
+        _view.Size = (Vector2I)(view * fit).Ceil();
         // The flat map draped over the ground, as sharp as the view (the near ground is a little enlarged), within texture limits.
-        float scale = Mathf.Min(_resolution * 1.25f, 7680f / Mathf.Max(_extent.X, _extent.Y));
+        float scale = Mathf.Min(_resolution * 1.25f, MaxTexture / Mathf.Max(_extent.X, _extent.Y));
         _flat.Size = (Vector2I)(_extent * scale).Ceil();
         _flat.Size2DOverride = (Vector2I)_extent;
         Map.Position = _offset;

@@ -108,6 +108,8 @@ public partial class MapView : Control
 
     private readonly Dictionary<(int Enemy, int Commune), Army> _armies = new();
 
+    private Vector2 _armyLayout;
+
     private void UpdateArmies(float delta)
     {
         if (World is not { } w) return;
@@ -143,9 +145,15 @@ public partial class MapView : Control
             }
         }
 
+        // Positions are in the map's own coordinates: when the map is laid out afresh (resized, the
+        // dashboard folded), armies take their new places at once instead of sliding in from where the
+        // old layout had them (off the coast, as often as not).
+        bool relaid = _armyLayout != _layoutSize;
+        _armyLayout = _layoutSize;
         foreach (var key in _armies.Keys.ToList())
         {
             var a = _armies[key];
+            if (relaid) a.Position = a.Target;
             a.Position += (a.Target - a.Position) * Mathf.Min(1, delta * 2.5f);
             a.Alpha = Mathf.MoveToward(a.Alpha, a.Alive ? 1 : 0, delta * 2);
             if (!a.Alive && a.Alpha <= 0) _armies.Remove(key);
