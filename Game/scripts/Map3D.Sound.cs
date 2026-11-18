@@ -144,6 +144,7 @@ public partial class Map3D
             int year = w.Year;
             bool works = heard.Kind == CommuneKind.Industrial && year >= 1800;
             if (heard.Occupied) town *= 0.3f;
+            if (w.Celebrating && !heard.Occupied) town = Mathf.Min(1, town * 1.6f + 0.15f * close); // the squares are full
             if (year < 1900) t["crowd"] = town * 0.9f;
             else
             {
@@ -192,7 +193,7 @@ public partial class Map3D
         var choices = new List<(string Name, float Weight, float Level)>();
         if (_soundTown is { Occupied: false } town && _soundTownLevel > 0.25f)
         {
-            if (year is > 600 and < 1960) choices.Add(("bells", 1, _soundTownLevel * 0.7f));
+            if (year is > 600 and < 1960) choices.Add(("bells", w.Celebrating ? 3 : 1, _soundTownLevel * 0.7f));
             if (town.Kind == CommuneKind.Agrarian && year < 1960) choices.Add(("rooster", 1, _soundTownLevel * 0.6f));
         }
         if (_soundSea > 0.2f) choices.Add(("gulls", 1.2f, _soundSea * 0.6f));

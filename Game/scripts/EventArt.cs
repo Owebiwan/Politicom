@@ -10,12 +10,17 @@ namespace Politicom.Game;
 /// hunger, harvest, work, faith, plague, fire, flood, refugees, festival, trade, press, town)
 /// and to the game's age, and shown in a gilt frame at the top of its pop-up. Pictures are
 /// public-domain period art processed to one sepia style (tools/ui/process_event_art.py),
-/// credited under the frame.
+/// and scenes rendered for the game from its own models where no period art fits (the
+/// anniversary, mourning, the barricades: tools/art/render_event_art.py), credited under the frame.
 /// </summary>
 internal static class EventArt
 {
     private static readonly (string Theme, string[] Words)[] Themes =
     {
+        // Scenes rendered for Politicom (tools/art/render_event_art.py), before the period art's themes.
+        ("celebration", new[] { "of the revolution", "anniversary", "liberation", "festival of the free" }),
+        ("mourning", new[] { " is dead", "has died", "mourns", "funeral", "did not come back", "has fallen at" }),
+        ("barricades", new[] { "barricade" }),
         ("plague", new[] { "plague", "typhus", "epidemic", "pestilence", "disease" }),
         ("fire", new[] { "fire " , "fire in", "burn" }),
         ("flood", new[] { "flood", "river burst" }),

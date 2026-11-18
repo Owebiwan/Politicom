@@ -97,6 +97,8 @@ public sealed class EventEffects
     public string RivalMemory { get; set; } = "";
     /// <summary>Change in how the figure and the rival feel about each other.</summary>
     public double Relation { get; set; }
+    /// <summary>Weeks the towns are dressed for a celebration.</summary>
+    public int Celebrate { get; set; }
     /// <summary>A jump in the struggle between allies' tension.</summary>
     public double Tension { get; set; }
     /// <summary>A faction (by kind) whose strength changes.</summary>
@@ -141,6 +143,7 @@ public sealed class EventEffects
         Add(Control * 100, "% ground held" + scope);
         Add(EnemyExhaustion * 100, "% enemy exhaustion");
         Add(Tension, "tension with the allies");
+        if (Celebrate > 0) parts.Add("the towns are dressed for it");
         if (Figure.Length > 0) Add(FigurePrestige * 100, $"% {Figure}'s prestige");
         if (Figure.Length > 0) Add(FigureAmbition * 100, $"% {Figure}'s ambition");
         if (FigureRisk > 0) parts.Add($"{FigureRisk:P0} risk to {Figure}'s life");

@@ -231,8 +231,12 @@ public partial class Main : Control
         var policy = policyAt >= 0 && policyAt + 1 < args.Length ? Sim.Ai.Policies.Get(args[policyAt + 1]) : null;
         if (Array.IndexOf(args, "--fortify") >= 0)
             foreach (var c in _world.Federation.Where(c => c.Front).ToList()) _world.Apply(new Fortify(c.Id));
+        // --popups-from N: pop-ups only for what happens from week N (to look at one turn's events).
+        int popupsFromAt = Array.IndexOf(args, "--popups-from");
+        int popupsFrom = popupsFromAt >= 0 && popupsFromAt + 1 < args.Length ? int.Parse(args[popupsFromAt + 1]) : -1;
         for (int i = 0; i < weeks && _world.Outcome == Outcome.Ongoing; i++)
         {
+            if (popupsFrom >= 0) PopupsEnabled = i >= popupsFrom;
             policy?.Act(_world);
             StepTurn();
         }

@@ -127,11 +127,13 @@ public partial class Map3D
         {
             var c = w.Communes[id];
             seen.Add(id);
-            string key = $"{Age(year)}:{c.Occupied}:{c.Kind}:{Map.TownPlan(c).Count}";
+            bool festive = w.Celebrating && c.InFederation;
+            string key = $"{Age(year)}:{c.Occupied}:{c.Kind}:{Map.TownPlan(c).Count}:{festive}";
             if (!_towns.TryGetValue(id, out var town) || town.Key != key)
             {
                 town.Node?.QueueFree();
                 town = (BuildTown(c, year), key);
+                if (festive) Festoon(town.Node, c);
                 _towns[id] = town;
             }
             float s = size * 1.05f; // a little under the flat map's size: the near ground is enlarged
@@ -247,6 +249,55 @@ public partial class Map3D
 
     private static AgeKind Age(int year) =>
         year < 500 ? AgeKind.Ancient : year < 1450 ? AgeKind.Medieval : year < 1789 ? AgeKind.EarlyModern : year < 1914 ? AgeKind.Industrial : AgeKind.Modern;
+
+    /// <summary>
+    /// A town dressed for a celebration: black-and-red flags on poles round the square, and
+    /// strings of lanterns between them glowing warm.
+    /// </summary>
+    private void Festoon(Node3D town, Commune c)
+    {
+        var rng = new Random(c.Id * 7 + 11);
+        int poles = 5;
+        var tops = new List<Vector3>();
+        for (int i = 0; i < poles; i++)
+        {
+            float a = i * Mathf.Tau / poles + (float)rng.NextDouble() * 0.4f;
+            var foot = new Vector3(Mathf.Cos(a) * 0.42f, 0, Mathf.Sin(a) * 0.32f);
+            float h = 0.5f + (float)rng.NextDouble() * 0.1f;
+            town.AddChild(new MeshInstance3D
+            {
+                Mesh = new CylinderMesh { TopRadius = 0.006f, BottomRadius = 0.007f, Height = h, Material = new StandardMaterial3D { AlbedoColor = new Color(0.3f, 0.22f, 0.14f) } },
+                Position = foot + new Vector3(0, h / 2, 0),
+            });
+            var flag = new ShaderMaterial { Shader = _flagShader };
+            flag.SetShaderParameter("upper", new Color(0.08f, 0.08f, 0.08f));
+            flag.SetShaderParameter("lower", new Color(0.75f, 0.12f, 0.1f));
+            flag.SetShaderParameter("split", true);
+            town.AddChild(new MeshInstance3D
+            {
+                Mesh = new PlaneMesh { Size = new Vector2(0.2f, 0.13f), Orientation = PlaneMesh.OrientationEnum.Z, SubdivideWidth = 6, SubdivideDepth = 1, Material = flag },
+                Position = foot + new Vector3(0.1f, h - 0.07f, 0),
+            });
+            tops.Add(foot + new Vector3(0, h - 0.1f, 0));
+        }
+        // Lanterns strung from pole to pole, sagging a little.
+        var glow = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(1, 0.8f, 0.45f), EmissionEnabled = true, Emission = new Color(1, 0.7f, 0.35f), EmissionEnergyMultiplier = 3,
+            ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+        };
+        var bulb = new SphereMesh { Radius = 0.013f, Height = 0.026f, RadialSegments = 6, Rings = 3, Material = glow };
+        for (int i = 0; i < tops.Count; i++)
+        {
+            var (from, to) = (tops[i], tops[(i + 1) % tops.Count]);
+            for (int k = 1; k < 8; k++)
+            {
+                float t = k / 8f;
+                var at = from.Lerp(to, t) - new Vector3(0, 0.05f * Mathf.Sin(Mathf.Pi * t), 0);
+                town.AddChild(new MeshInstance3D { Mesh = bulb, Position = at, CastShadow = GeometryInstance3D.ShadowCastingSetting.Off });
+            }
+        }
+    }
 
     private static string AgeName(AgeKind age) => age switch
     {

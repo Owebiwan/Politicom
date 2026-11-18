@@ -68,3 +68,6 @@
   `tools/models/build_soldiers.py` (Blender).
 - Locomotives, carriages, wagons and track in `Game/models/trains/`: made for this project by
   `tools/models/build_trains.py` (Blender).
+- Event pictures for the anniversary, mourning and the barricades (`Game/art/events/celebration_*`,
+  `mourning_*`, `barricades_*`): rendered for this project by `tools/art/render_event_art.py`
+  (Blender) from the game's own models.

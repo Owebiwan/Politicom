@@ -44,6 +44,7 @@ internal static class EventSystem
     internal static void Apply(World w, EventEffects e, string reason = "A decision")
     {
         if (e.Tension != 0) StruggleSystem.Catalyst(w, e.Tension, reason);
+        if (e.Celebrate > 0) w.CelebrationUntil = Math.Max(w.CelebrationUntil, w.Tick + (int)Math.Ceiling(e.Celebrate / w.Weeks));
         var b = w.Balance;
         var targets = e.Communes.Length == 0
             ? w.Federation.ToList()

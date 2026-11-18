@@ -13,3 +13,4 @@ __pycache__/
 tools/ui/.art_cache/
 tools/ui/.lore_cache/
 tools/audio/.cache/
+tools/art/.renders/

@@ -394,6 +394,41 @@ public class SimulationTests
     }
 
     [Fact]
+    public void The_rising_is_remembered_every_year_and_celebrating_dresses_the_towns()
+    {
+        var w = World.Load(DataDir, "catalonia_1936@500", seed: 1);
+        foreach (var e in w.Enemies) { e.Strength = 0.1; e.Growth = 0; e.Offensives.Clear(); }
+        PendingEvent? anniversary = null;
+        for (int i = 0; i < 60 && anniversary is null; i++)
+        {
+            w.Step();
+            anniversary = w.PendingEvents.FirstOrDefault(p => p.Id.StartsWith("anniversary_"));
+        }
+        Assert.NotNull(anniversary);
+        Assert.Equal("anniversary_1", anniversary!.Id);
+        Assert.True(w.Apply(new ChooseEventOption(anniversary.Id, 0)).Ok);
+        Assert.True(w.Celebrating);
+        w.Run(55);
+        Assert.Contains(w.Scenario.Events, e => e.Id == "anniversary_2");
+        Assert.Single(w.Scenario.Events, e => e.Id == "anniversary_1");
+
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.Equal(w.AnniversariesMarked, loaded.AnniversariesMarked);
+    }
+
+    [Fact]
+    public void Peace_on_every_front_brings_liberation()
+    {
+        // A campaign: in a normal game peace on every front ends it, and the ending says so.
+        var w = World.Load(DataDir, "catalonia_1936@1300", seed: 1);
+        w.Step();
+        foreach (var e in w.Enemies) Systems.PeaceSystem.MakePeace(w, e);
+        for (int i = 0; i < 4 && !w.PendingEvents.Any(p => p.Id == "liberation"); i++) w.Step();
+        Assert.True(w.Liberated);
+        Assert.Contains(w.PendingEvents, p => p.Id == "liberation");
+    }
+
+    [Fact]
     public void Scarcity_raises_prices_and_dear_goods_buy_less_abroad()
     {
         var w = NewWorld();

@@ -564,6 +564,30 @@ supplies, enthusiasm, less drift. The Overview tab shows the phase and tension; 
 lists what moved it. Balance (balanced AI, 200 games): Catalonia 75%, Free Territory 75%,
 Paris 45%.
 
+## Celebrations
+
+The movement marks what it has won (`Sim/Systems/CelebrationSystem.cs`):
+- **The anniversary of the rising**, every year on its date (19 July in Catalonia): how many
+  communes are still free and how many have fallen, the war's end or recognition if they've
+  come, and the fallen named in the speeches. Celebrate across the federation (influence and
+  food, for enthusiasm, trust and culture), modestly, or not at all; in hard times some say it's
+  no year for feasting.
+- **Liberation**, once, when the last front closes in a campaign or the allies recognize the
+  collectives: a festival of the free communes, or back to work.
+- **On the map**, while a celebration lasts, the towns are dressed in black-and-red flags and
+  strings of lanterns, the squares are louder, and the church bells ring more often.
+
+### Event art rendered for the game
+
+Where no period picture fits, the game has its own (`tools/art/render_event_art.py`): scenes
+built in Blender from the game's own models (the age's buildings and figures), rendered, then
+given a light ink line and the same sepia duotone, grain and vignette as the period art
+(`tools/art/tone_event_art.py`). Thirteen so far: **the anniversary** in a town square dressed
+with flags, bunting, lanterns and long tables, and **mourning**, a funeral procession behind a
+coffin draped in the black-and-red flag, for every age; and **the barricades**, militia firing
+over paving stones, barrels and carts, from the age of muskets on. Events about anniversaries
+and liberation, deaths and funerals, and barricades show them.
+
 ## Goals
 
 Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits

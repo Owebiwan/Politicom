@@ -120,6 +120,11 @@ public sealed class World
     public List<Faction> Factions { get; } = new();
     /// <summary>The struggle with the movement's allies of convenience, if it has any.</summary>
     public Struggle? Struggle { get; internal set; }
+    /// <summary>Anniversaries of the rising already marked; whether liberation has come; until when a celebration dresses the towns.</summary>
+    public int AnniversariesMarked { get; internal set; }
+    public bool Liberated { get; internal set; }
+    public int CelebrationUntil { get; internal set; } = -1;
+    public bool Celebrating => Tick <= CelebrationUntil;
     public int LastGoal { get; internal set; } = -999;
     /// <summary>Turn a figure last did something the movement had to answer.</summary>
     public int LastFigureMoment { get; internal set; } = -999;
@@ -385,6 +390,9 @@ public sealed class World
         Battles = Battles.ToList(),
         Factions = Factions.ToList(),
         Struggle = Struggle,
+        AnniversariesMarked = AnniversariesMarked,
+        Liberated = Liberated,
+        CelebrationUntil = CelebrationUntil,
         LastGoal = LastGoal,
         LastFigureMoment = LastFigureMoment,
         FigureYear = FigureYear,
@@ -480,6 +488,9 @@ public sealed class World
         w.Battles.AddRange(s.Battles);
         w.Factions.AddRange(s.Factions);
         w.Struggle = s.Struggle;
+        w.AnniversariesMarked = s.AnniversariesMarked;
+        w.Liberated = s.Liberated;
+        w.CelebrationUntil = s.CelebrationUntil;
         w._log.AddRange(s.Log);
         w.History.AddRange(s.History);
         w.RefreshTechShares();
@@ -496,6 +507,7 @@ public sealed class World
         RefreshTechShares();
         EventSystem.Run(this);
         GoalSystem.Run(this);
+        CelebrationSystem.Run(this);
         RandomEventSystem.Run(this);
         ProposalSystem.Run(this);
         EconomySystem.Run(this);
