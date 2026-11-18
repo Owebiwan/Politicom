@@ -115,6 +115,7 @@ internal static class EconomySystem
     {
         var b = w.Balance;
         double trustGain = b.AidTrustGain * DriftEffects.TrustGrowth(w.Drift.Stage) * (1 + w.SocietyEffect(e => e.TrustGrowth));
+        double aid = w.SocietyEffect(e => e.Aid);
         var needy = w.Active.Where(c => Stock(c, food) < 0).OrderBy(c => Stock(c, food) / c.Population).ToList();
         foreach (var r in needy)
         {
@@ -126,7 +127,8 @@ internal static class EconomySystem
                 if (d.Occupied) continue;
                 double surplus = Stock(d, food) - Reserve(b, d, food);
                 if (surplus <= 0) continue;
-                double generosity = b.NeighborGenerosity * Generosity(d) * w.Trust[d.Id, r.Id] * (w.Rail(d.Id, r.Id) ? b.RailAid : 1);
+                double generosity = b.NeighborGenerosity * Generosity(d) * w.Trust[d.Id, r.Id] * (w.Rail(d.Id, r.Id) ? b.RailAid : 1) * Math.Max(0, 1 + aid)
+                                    * (d.Focus == CommuneFocus.Junction || r.Focus == CommuneFocus.Junction ? Foci.JunctionAid : 1);
                 if (d.Federated != r.Federated) generosity *= 0.5;
                 double amount = Math.Min(deficit, surplus * generosity);
                 if (amount <= 1e-6) continue;
@@ -150,7 +152,7 @@ internal static class EconomySystem
         {
             double surplus = Stock(m, food) - Reserve(b, m, food);
             if (surplus <= 0) continue;
-            double give = surplus * b.PoolShare * w.Trust.AverageTrust(m.Id) * Math.Min(1, Generosity(m));
+            double give = surplus * b.PoolShare * w.Trust.AverageTrust(m.Id) * Math.Min(1, Generosity(m) * Math.Max(0, 1 + w.SocietyEffect(e => e.Aid)));
             if (give <= 1e-6) continue;
             AddStock(m, food, -give);
             givers.Add((m, give));

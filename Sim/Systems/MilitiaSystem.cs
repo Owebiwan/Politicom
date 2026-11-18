@@ -26,7 +26,8 @@ internal static class MilitiaSystem
                         + b.EnthusiasmCulture * CultureSystem.Mean(w)
                         - b.EnthusiasmHunger * hungry
                         - b.EnthusiasmHierarchy * (int)w.Drift.Stage
-                        - (w.Conscription ? b.ConscriptionEnthusiasm : 0);
+                        - (w.Conscription ? b.ConscriptionEnthusiasm : 0)
+                        + w.SocietyEffect(e => e.Enthusiasm);
         w.Enthusiasm = Math.Clamp(w.Enthusiasm + change * w.Weeks, 0, 1);
     }
 }

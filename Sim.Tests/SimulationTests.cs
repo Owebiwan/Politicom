@@ -1,3 +1,4 @@
+using Politicom.Sim.Systems;
 using Politicom.Sim.Ai;
 using Politicom.Sim.Sandbox;
 
@@ -1691,5 +1692,77 @@ public class SimulationTests
         var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
         Assert.Equal(w.Communes.Sum(c => c.Refugees), loaded.Communes.Sum(c => c.Refugees), 9);
         Assert.Equal(w.Communes.Sum(c => c.WarDead), loaded.Communes.Sum(c => c.WarDead), 9);
+    }
+
+    [Fact]
+    public void Milestones_are_reached_and_a_campaigns_chapters_leave_legacies_and_crises()
+    {
+        World w = null!;
+        bool crisis = false, chose = false;
+        for (ulong seed = 1; seed < 10; seed++)
+        {
+            w = World.Load(DataDir, "catalonia_1936@1300", seed: seed);
+            var policy = new Balanced();
+            crisis = chose = false;
+            while (w.Legacy.Chapter < 2 && w.Outcome == Outcome.Ongoing)
+            {
+                policy.Act(w);
+                w.Step();
+                crisis |= w.Legacy.Crisis is { Stage: > 0 };
+                chose |= w.Legacy.Crisis is { Policies.Count: > 0 };
+            }
+            if (w.Outcome == Outcome.Ongoing) break;
+        }
+        Assert.Equal(Outcome.Ongoing, w.Outcome);
+        Assert.Equal(2, w.Legacy.Chapter);
+        Assert.True(crisis);
+        Assert.True(chose);
+        Assert.Single(w.Legacy.History);
+        Assert.Null(w.Legacy.Crisis);
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(w.Save(), Json.Options)), w.Techs);
+        Assert.Equal(w.Legacy.History, loaded.Legacy.History);
+        Assert.Equal(w.Legacy.Levels, loaded.Legacy.Levels);
+    }
+
+    [Fact]
+    public void Historical_scenarios_have_one_chapter_and_no_crisis()
+    {
+        var w = NewWorld();
+        w.Run(w.Scenario.EndTick);
+        Assert.Equal(1, w.Legacy.Chapter);
+        Assert.Null(w.Legacy.Crisis);
+    }
+
+    [Fact]
+    public void Legacies_and_crisis_policies_take_effect()
+    {
+        var w = NewWorld();
+        w.Step();
+        double aid = w.SocietyEffect(e => e.Aid);
+        w.Legacy.Levels[nameof(LegacyPath.MutualAid)] = 2;
+        Assert.True(w.SocietyEffect(e => e.Aid) > aid);
+        var c = w.Active.First();
+        double food = w.LocalEffect(c, e => e.FoodProduction);
+        w.Legacy.Crisis = new Crisis { Kind = CrisisKind.HungerYears, Name = "test", Stage = 2 };
+        Assert.True(w.LocalEffect(c, e => e.FoodProduction) < food);
+        CrisisSystem.Adopt(w, "hunger_ration");
+        Assert.Contains("hunger_ration", w.Legacy.Crisis.Policies);
+        Assert.Contains(w.StandingEffects(), s => s.Label.Contains("ration by need"));
+    }
+
+    [Fact]
+    public void A_communes_focus_shifts_its_work_and_settles_for_a_season()
+    {
+        var plain = NewWorld();
+        var focused = NewWorld();
+        var c = focused.Active.First(x => x.Kind == CommuneKind.Agrarian && !x.Front);
+        Assert.True(focused.Apply(new SetFocus(c.Id, CommuneFocus.Granary)).Ok);
+        Assert.False(focused.Apply(new SetFocus(c.Id, CommuneFocus.Workshop)).Ok); // it keeps a focus a season
+        plain.Step();
+        focused.Step();
+        Assert.True(focused.Communes[c.Id].FoodProduced > plain.Communes[c.Id].FoodProduced);
+        Assert.True(focused.Communes[c.Id].GoodsProduced < plain.Communes[c.Id].GoodsProduced);
+        var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(focused.Save(), Json.Options)), focused.Techs);
+        Assert.Equal(CommuneFocus.Granary, loaded.Communes[c.Id].Focus);
     }
 }

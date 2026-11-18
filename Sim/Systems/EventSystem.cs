@@ -130,6 +130,7 @@ internal static class EventSystem
         }
         if (e.FigureRisk > 0 && w.Figures.FirstOrDefault(f => f.Name == e.Figure) is { Alive: true } atRisk && w.Rng.Chance(e.FigureRisk))
             FigureSystem.Kill(w, atRisk, $"{atRisk.Name} did not come back. The movement mourns.");
+        if (e.CrisisPolicy.Length > 0) CrisisSystem.Adopt(w, e.CrisisPolicy);
         if (e.StartGoal.Length > 0 && w.Goals.FirstOrDefault(g => g.Id == e.StartGoal) is { } goal)
         {
             goal.Active = true;

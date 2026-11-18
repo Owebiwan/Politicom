@@ -84,6 +84,8 @@ public sealed record BuyAbroad(Purchase What) : PlayerAction;
 public sealed record ChooseEventOption(string EventId, int Option) : PlayerAction;
 /// <summary>Meet a faction's communes and answer their grievance: much of its strength fades.</summary>
 public sealed record AddressFaction(FactionKind Kind) : PlayerAction;
+/// <summary>Ask a commune's assembly to take up a focus (Foci).</summary>
+public sealed record SetFocus(int Commune, CommuneFocus Focus) : PlayerAction;
 
 public sealed record ActionResult(bool Ok, string Message)
 {
@@ -126,8 +128,23 @@ internal static class ActionSystem
             BuyAbroad a => Buy(w, a),
             FoundCulturalWork a => CulturalWork(w, a),
             AddressFaction a => Systems.FactionSystem.Address(w, a.Kind),
+            SetFocus a => DoFocus(w, a),
             _ => ActionResult.Fail($"Unknown action {action.GetType().Name}."),
         };
+    }
+
+    private static ActionResult DoFocus(World w, SetFocus a)
+    {
+        if (Member(w, a.Commune) is not { } c) return NotMember(w, a.Commune);
+        if (c.Focus == a.Focus) return ActionResult.Fail($"{c.Name} is already a {Foci.Name(a.Focus).ToLowerInvariant()}.");
+        int weeks = (int)((w.Tick - c.FocusSince) * w.Weeks);
+        if (weeks < Foci.SettleWeeks) return ActionResult.Fail($"{c.Name} took up its focus only {weeks} weeks ago; give it {Foci.SettleWeeks - weeks} more.");
+        if (!Spend(w, w.Balance.CostFocus)) return Broke(w, w.Balance.CostFocus);
+        c.Focus = a.Focus;
+        c.FocusSince = w.Tick;
+        string what = a.Focus == CommuneFocus.None ? "goes back to doing a bit of everything" : $"makes itself a {Foci.Name(a.Focus).ToLowerInvariant()}";
+        w.Emit(Severity.Info, $"{c.Name}'s assembly agrees: it {what}. {Foci.Why(a.Focus)}", c.Id);
+        return ActionResult.Done($"{c.Name}: {Foci.Name(a.Focus)}.");
     }
 
     private static ActionResult FundSchool(World w, FundSchool a)

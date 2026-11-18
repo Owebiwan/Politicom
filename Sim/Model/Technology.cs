@@ -27,6 +27,11 @@ public sealed class TechEffects
     public double Science { get; set; }
     /// <summary>Cultural output of holders, as a fraction (the press, songs, theatre).</summary>
     public double Culture { get; set; }
+    /// <summary>Wellbeing in every commune (flat), enthusiasm each week, and neighbours' generosity in aid (fraction):
+    /// used by legacies and crisis policies (CrisisSystem), not by technologies.</summary>
+    public double Wellbeing { get; set; }
+    public double Enthusiasm { get; set; }
+    public double Aid { get; set; }
 
     /// <summary>Plain-language effects, strengths first and costs last, e.g. "Food +15%", "Drift +0.06/turn".</summary>
     public IEnumerable<(string Text, bool Good)> Describe()
@@ -46,7 +51,10 @@ public sealed class TechEffects
         if (Influence != 0) yield return ($"Influence {(Influence > 0 ? "+" : "−")}{Math.Abs(Influence):0.0}/turn", Influence > 0);
         if (DriftBrake != 0) yield return ($"Drift brake −{DriftBrake:0.00}/turn", true);
         if (GoodsUpkeep != 0) yield return ($"Goods upkeep +{GoodsUpkeep:0.00} per head (holders)", false);
-        if (DriftPerTick != 0) yield return ($"Drift +{DriftPerTick:0.00}/turn", false);
+        if (Wellbeing != 0) yield return ($"Wellbeing {(Wellbeing > 0 ? "+" : "−")}{Math.Abs(Wellbeing) * 100:0} pts", Wellbeing > 0);
+        if (Enthusiasm != 0) yield return ($"Enthusiasm {(Enthusiasm > 0 ? "+" : "−")}{Math.Abs(Enthusiasm) * 5200:0.#}% a year", Enthusiasm > 0);
+        if (Aid != 0) yield return ($"Aid between neighbours {Pct(Aid)}", Aid > 0);
+        if (DriftPerTick != 0) yield return ($"Drift {(DriftPerTick > 0 ? "+" : "−")}{Math.Abs(DriftPerTick):0.00}/turn", DriftPerTick < 0);
     }
 }
 

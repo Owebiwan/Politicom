@@ -32,6 +32,9 @@ public static class Explain
         if (c.Front) parts.Add(new("Ground lost at the front", -0.15 * (1 - c.Control)));
         if (w.RecallPenaltyTicks > 0) parts.Add(new("Delegates just recalled", -0.03));
         if (c.Kind == CommuneKind.Industrial && w.FoodPrice > 1) parts.Add(new("Dear food in a factory town", -b.DearFoodWellbeing * (w.FoodPrice - 1)));
+        foreach (var (label, e) in w.StandingEffects())
+            if (e.Wellbeing != 0) parts.Add(new(label, e.Wellbeing));
+        if (Systems.CrisisSystem.Afflicted(w, c)) parts.Add(new("The sickness is here", -0.04 * w.Legacy.Crisis!.Stage));
         return parts;
     }
 

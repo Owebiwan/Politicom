@@ -127,6 +127,7 @@ public sealed class Balanced : IPolicy
         foreach (var s in w.PendingSecessions.ToList()) Helpers.MediateFor(w, s.Commune);
         Helpers.Figures(w, crisis, rotateAt: 0.3);
         Helpers.Front(w, crisis);
+        Helpers.Foci(w); // a focus is a lasting investment: before the turn's other spending
         if (margin < 5 && w.Influence >= b.CostRecall * DriftEffects.RecallCost(w.Drift.Stage)) w.Apply(new RecallDelegates());
 
         if (crisis) w.Apply(new ProposeProject(ProjectKind.DefensiveCampaign));
@@ -178,6 +179,24 @@ public sealed class Trader : IPolicy
 
 internal static class Helpers
 {
+    /// <summary>
+    /// Communes' focus, one change at a time: fort towns where the line is pressed hardest, a
+    /// granary behind the lines when people go hungry, a workshop when the front lacks arms.
+    /// </summary>
+    public static void Foci(World w)
+    {
+        if (w.Tick % 4 != 3 || w.Influence < w.Balance.CostFocus) return;
+        var members = w.Federation.Where(c => !c.Occupied).ToList();
+        bool fed = Explain.StockWeeks(w).Food > 3 && !members.Any(c => c.Starving);
+        var pressed = members.Where(c => fed && c.Front && c.Pressure > 0.8 * c.Defense && c.Focus != CommuneFocus.Fortress).OrderByDescending(c => c.Pressure / Math.Max(1e-6, c.Defense)).FirstOrDefault();
+        if (pressed != null && w.Apply(new SetFocus(pressed.Id, CommuneFocus.Fortress)).Ok) return;
+        var rear = members.Where(c => !c.Front && c.Focus == CommuneFocus.None).ToList();
+        if (members.Any(c => c.Starving) && rear.Where(c => c.Kind == CommuneKind.Agrarian).OrderByDescending(c => c.Population).FirstOrDefault() is { } farm
+            && w.Apply(new SetFocus(farm.Id, CommuneFocus.Granary)).Ok) return;
+        if (members.Any(c => c.Front && c.GoodsCoverage < 0.9) && rear.Where(c => c.Kind == CommuneKind.Industrial).OrderByDescending(c => c.Population).FirstOrDefault() is { } works)
+            w.Apply(new SetFocus(works.Id, CommuneFocus.Workshop));
+    }
+
     /// <summary>
     /// The movement's foreign policy: delegates to the state whose stance matters most right now
     /// (an intervener, or a powerful state near a threshold), and an appeal for volunteers in a crisis.

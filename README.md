@@ -634,6 +634,77 @@ light ink line and the same sepia duotone, grain and vignette as the period art
 Events about anniversaries and liberation, deaths and funerals, and barricades show them. The
 anniversary and liberation pop-ups show the live 3D festival instead.
 
+## Chapters, legacies and crises
+
+Taken from Civilization VII's legacy paths and age crises (`Sim/Systems/LegacySystem.cs`,
+`CrisisSystem.cs`). A game is told in **chapters**: a short game is one chapter, and a campaign
+has a chapter about every five years. The Overview tab shows the chapter. Hover it for every
+milestone and its progress.
+
+**Legacy paths.** Each chapter has three milestones on each of four paths. Each milestone
+reached lifts enthusiasm a little.
+
+| Path | Milestones | Legacy |
+|---|---|---|
+| Mutual aid | a season without hunger; wellbeing 70%; no commune under 50% for 8 weeks | Granaries held in common: aid +15%, food +3% |
+| The new culture | culture 25%; 40%; 55% with enthusiasm 75% | Songs everyone knows: culture +10%, enthusiasm |
+| Defence of the revolution | throw back 12 attacks; hold every front 26 weeks; exhaust an enemy or force a peace | A people in arms: defence +5% |
+| Knowledge | practical education 30%; four new technologies; both educations 50% | Rationalist schools: science +10%, trust |
+
+- **Earning a legacy.** At a chapter's end, a path with two milestones becomes a legacy (level
+  1), and one with all three a lasting legacy (level 2). Legacies add up from chapter to chapter.
+  The legacy column gives the effects at level 1.
+- **Earned, not given.** Milestones count from the chapter's ninth week. Those already met when
+  a chapter opens count but earn nothing. A legacy belongs to the whole federation, so
+  milestones recede as the chapter's communes are lost.
+- **Short games.** In a short game, the legacies are its epitaph.
+
+**Crises of the age.** In campaigns and open starts, the last quarter of each chapter brings a
+crisis that builds in three stages. Each stage offers a choice of policy, and each policy is
+double-edged and holds until the crisis ends. The historical scenarios keep their own history
+and have no crises.
+- **The plague** (cholera, influenza, an epidemic, by age) spreads along roads and rails and
+  kills. Its policies:
+  - quarantine (slower spread, less trust and trade) or keep the roads open
+  - physicians' brigades (half the deaths) or each commune for itself
+  - bury the dead together, or blame the outsiders (a guard on strangers, drift)
+- **The hungry years** cut the harvest by up to 18%. Its policies:
+  - ration by need, or let towns trade for what they lack
+  - requisition (drift, bitterness), appeal abroad, or tighten belts
+  - sow new fields, or hold on until the harvest
+- **The great offensive** (campaigns only) brings three pushes, each stronger. Its policies:
+  - dig in along the whole front, or strike first
+  - general mobilization (drift) or columns of volunteers
+  - hold every town, or trust the line
+- **The counter-revolution within** grows the party's cells and drift. Its policies:
+  - open the assemblies to the critics, or expel the agitators (a precedent)
+  - a congress of all the communes, or emergency powers for the committees
+  - recall every delegate, or let it burn out
+
+Come through a crisis without losing a commune, and the assemblies take heart (enthusiasm, +10
+influence).
+
+## Town focus
+
+Each commune's assembly can be asked to take up a focus, from Civilization VII's town
+specialisations: one lever per town that needs no managing afterwards (`Sim/Model/Focus.cs`).
+Buttons in the Commune tab set it. It costs nothing, since it is the assembly's choice, but a
+commune keeps a focus at least 13 weeks.
+
+| Focus | Effect |
+|---|---|
+| Granary | food +15%, goods −4% |
+| Workshop | goods +15%, food −4% |
+| Fort town | defence +10%, food −5%: drill and works take hands from the fields, not arms from the workshops |
+| Schoolhouse | science +30%, culture +20%, political schooling +15%, a little less food and goods |
+| Junction | aid to and from it +35% along every road, goods −3% |
+
+The balanced AI uses focus too, with fort towns where the line is pressed and food allows, a
+granary behind the lines in a hunger, and a workshop when the front lacks arms.
+
+**Balance after all three** (balanced AI, survival): Catalonia 77%, Free Territory 83%, Paris
+41%, Catalonia campaign 39%, sandbox 60%, open start (1200, France) 56%.
+
 ## Goals
 
 Every five or six months, from about ten weeks in, the movement is offered a **goal** that fits

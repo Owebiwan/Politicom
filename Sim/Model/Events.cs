@@ -82,6 +82,8 @@ public sealed class EventEffects
     public Dictionary<string, double> Stances { get; set; } = new();
     /// <summary>A goal (by id) the movement takes on (GoalSystem).</summary>
     public string StartGoal { get; set; } = "";
+    /// <summary>A crisis policy (by id) the movement adopts until the crisis ends (CrisisSystem).</summary>
+    public string CrisisPolicy { get; set; } = "";
     /// <summary>Changes to <see cref="Figure"/>'s prestige and ambition, and the chance they are killed doing it.</summary>
     public double FigurePrestige { get; set; }
     public double FigureAmbition { get; set; }
@@ -140,6 +142,8 @@ public sealed class EventEffects
         if (Federate.Length > 0) parts.Add("its cities join your federation");
         if (PartyInfluence > 0) parts.Add($"party cells +{PartyInfluence * 100:0}%");
         if (StartGoal.Length > 0) parts.Add("the goal is taken on");
+        if (CrisisPolicy.Length > 0 && Systems.CrisisSystem.Find(CrisisPolicy) is { } policy && policy.Effects.Describe().Any())
+            parts.AddRange(policy.Effects.Describe().Select(d => d.Text.Replace(" (holders)", "") + " until the crisis ends"));
         Add(Control * 100, "% ground held" + scope);
         Add(EnemyExhaustion * 100, "% enemy exhaustion");
         Add(Tension, "tension with the allies");

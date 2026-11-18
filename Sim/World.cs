@@ -120,6 +120,8 @@ public sealed class World
     public List<Faction> Factions { get; } = new();
     /// <summary>The struggle with the movement's allies of convenience, if it has any.</summary>
     public Struggle? Struggle { get; internal set; }
+    /// <summary>Chapters, their legacies and their crises (LegacySystem, CrisisSystem).</summary>
+    public LegacyState Legacy { get; internal set; } = new();
     /// <summary>Anniversaries of the rising already marked; whether liberation has come; until when a celebration dresses the towns.</summary>
     public int AnniversariesMarked { get; internal set; }
     public bool Liberated { get; internal set; }
@@ -390,6 +392,7 @@ public sealed class World
         Battles = Battles.ToList(),
         Factions = Factions.ToList(),
         Struggle = Struggle,
+        Legacy = Legacy,
         AnniversariesMarked = AnniversariesMarked,
         Liberated = Liberated,
         CelebrationUntil = CelebrationUntil,
@@ -488,6 +491,7 @@ public sealed class World
         w.Battles.AddRange(s.Battles);
         w.Factions.AddRange(s.Factions);
         w.Struggle = s.Struggle;
+        w.Legacy = s.Legacy ?? new LegacyState();
         w.AnniversariesMarked = s.AnniversariesMarked;
         w.Liberated = s.Liberated;
         w.CelebrationUntil = s.CelebrationUntil;
@@ -529,6 +533,8 @@ public sealed class World
         PeaceSystem.Run(this);
         WarSystem.Run(this);
         PopulationSystem.Run(this);
+        LegacySystem.Run(this);
+        CrisisSystem.Run(this);
         TrustSystem.Run(this);
         FederationSystem.Run(this);
         FactionSystem.Run(this);
@@ -554,8 +560,29 @@ public sealed class World
         double sum = 0;
         foreach (var t in Techs.All)
             if (!CommonKnowledge(t)) sum += effect(t.Effects) * TechShare(t.Id);
+        foreach (var (_, e) in StandingEffects()) sum += effect(e);
         return sum;
     }
+
+    /// <summary>
+    /// Effects that hold for the whole federation outside the tech tree: legacies of past chapters,
+    /// the crisis under way and the policies chosen for it. They count in both SocietyEffect and
+    /// LocalEffect (which read different effects, so nothing is counted twice).
+    /// </summary>
+    public IReadOnlyList<(string Label, TechEffects Effects)> StandingEffects()
+    {
+        var crisis = Legacy.Crisis;
+        int key = HashCode.Combine(Legacy.Chapter, Legacy.Levels.Values.Sum(), crisis?.Kind, crisis?.Stage, crisis?.Policies.Count);
+        if (_standing is null || key != _standingKey)
+        {
+            _standing = LegacySystem.Effects(this).Concat(CrisisSystem.Effects(this)).ToList();
+            _standingKey = key;
+        }
+        return _standing;
+    }
+
+    private List<(string Label, TechEffects Effects)>? _standing;
+    private int _standingKey;
 
     /// <summary>Sum of a local effect over the technologies one commune holds.</summary>
     public double LocalEffect(Commune c, Func<TechEffects, double> effect)
@@ -563,6 +590,8 @@ public sealed class World
         double sum = 0;
         foreach (var id in c.Techs)
             if (Techs[id] is var t && !CommonKnowledge(t)) sum += effect(t.Effects);
+        foreach (var (_, e) in StandingEffects()) sum += effect(e); // legacies and crises reach every commune
+        if (c.Focus != CommuneFocus.None) sum += effect(Foci.Effects(c.Focus));
         return sum;
     }
 

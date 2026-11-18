@@ -33,6 +33,27 @@ public sealed class Balance
     public double PoolLoss { get; set; } = 0.2;
     public double FamineMortality { get; set; } = 0.01;
 
+    /// <summary>Influence to ask an assembly to take up a focus (none: it is theirs to decide; they keep it a season).</summary>
+    public double CostFocus { get; set; } = 0;
+
+    // ── Legacies and crises ────────────────────────────────────────────────
+    /// <summary>Influence and enthusiasm for each legacy milestone reached.</summary>
+    public double MilestoneInfluence { get; set; } = 0;
+    public double MilestoneEnthusiasm { get; set; } = 0.004;
+    /// <summary>A crisis offensive's strength in its three stages, as multiples of the enemy's typical offensive.</summary>
+    public double[] CrisisOffensive { get; set; } = { 0.35, 0.6, 0.85 };
+    /// <summary>Weekly chance, per stage, that the plague crosses to each neighbour; and the weekly share of the afflicted who die, per stage.</summary>
+    public double PlagueSpread { get; set; } = 0.06;
+    public double PlagueMortality { get; set; } = 0.0012;
+    /// <summary>Weekly growth of the party's cells everywhere, per stage, in the counter-revolution.</summary>
+    public double CrisisPartyGrowth { get; set; } = 0.0015;
+    /// <summary>Whether campaigns and open starts have crises at all (for comparing in batches).</summary>
+    public double Crises { get; set; } = 1;
+    /// <summary>For batches: only this crisis kind (by its index in CrisisKind), or -1 for any.</summary>
+    public double CrisisOnly { get; set; } = -1;
+    /// <summary>Enthusiasm for coming through a crisis without losing a commune.</summary>
+    public double CrisisWeathered { get; set; } = 0.06;
+
     // ── Population ─────────────────────────────────────────────────────────
     /// <summary>Weekly natural growth at full wellbeing with food in store (0.0002 ≈ 1% a year); it falls with wellbeing, below zero in misery.</summary>
     public double PopulationGrowth { get; set; } = 0.0002;

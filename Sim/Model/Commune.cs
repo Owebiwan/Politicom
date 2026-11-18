@@ -55,6 +55,9 @@ public sealed class Commune
     public double PoliticalSchooling { get; set; }
 
     public double Wellbeing { get; set; } = 0.6;
+    /// <summary>What the commune puts its effort into (Foci), and when it took that up.</summary>
+    public CommuneFocus Focus { get; set; }
+    public int FocusSince { get; set; } = -999;
     public bool Federated { get; set; } = true;
     public bool Occupied { get; set; }
     /// <summary>Indices of the enemies this commune faces. Empty = behind the lines.</summary>

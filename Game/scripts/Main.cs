@@ -1308,6 +1308,7 @@ public partial class Main : Control
         BuildAttention(overview);
         BuildFactions(overview);
         BuildStruggle(overview);
+        BuildLegacy(overview);
         _goal = AddRich(overview);
         Section(overview, "Resources");
         _resources = AddRich(overview);
@@ -1385,6 +1386,7 @@ public partial class Main : Control
 
         var commune = Tab("Commune");
         _commune = AddRich(commune);
+        BuildFocus(commune);
         var actions = new HFlowContainer();
         commune.AddChild(actions);
         AddButton(actions, "Practical school", "Productivity and innovation. Watch the expert trap.", () => WithSelected(id => new FundSchool(id, EducationTrack.Practical)));
@@ -1455,6 +1457,7 @@ public partial class Main : Control
         RefreshAttention();
         RefreshFactions();
         RefreshStruggle();
+        RefreshLegacy();
         _stepButton.Text = $"+1 {w.Turn}";
         _status["influence"].Text = $"{UiTheme.Img("influence")} [b]{w.Influence:0}[/b] [color=#929aa6](+{w.InfluenceRegen:0.0}/{w.Turn})[/color]";
         _status["commune"].Text = $"{UiTheme.Img("commune")} [b]{w.Federation.Count()}[/b]" +
@@ -1533,6 +1536,7 @@ public partial class Main : Control
         _trade.SetPressedNoSignal(w.ForeignTrade);
         RefreshDecisions();
         RefreshCommune();
+        RefreshFocus();
         RefreshProjects();
 
         var recent = w.Log.TakeLast(30).Reverse().Select(ev =>
@@ -1805,7 +1809,7 @@ public partial class Main : Control
         string status = c.Occupied ? "[color=#f07060]occupied[/color]" : !c.Federated ? "[color=#e0c050]seceded[/color]" : c.Front ? $"[color=#f07060]front, control {c.Control:P0}[/color]" : "federated";
         string neighbours = string.Join(", ", w.Trust.Neighbors(id).Select(n => $"{Esc(w.Communes[n].Name)} {w.Trust[id, n]:P0}"));
         _commune.Text =
-            $"[b]{Esc(c.Name)}[/b] — {c.Kind}, {c.Population:0}k, {status}\n" +
+            $"[b]{Esc(c.Name)}[/b] — {c.Kind}{(c.Focus != CommuneFocus.None ? $" ({Foci.Name(c.Focus).ToLowerInvariant()})" : "")}, {c.Population:0}k, {status}\n" +
             (c.Description.Length > 0 ? $"[i]{Esc(c.Description)}[/i]\n" : "") +
             PopulationLine(w, c) + "\n" +
             $"Values: collectivism {c.Values.Collectivism:+0.0;-0.0}, militancy {c.Values.Militancy:+0.0;-0.0}, federalism {c.Values.Federalism:+0.0;-0.0}\n" +

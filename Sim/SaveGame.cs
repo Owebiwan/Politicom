@@ -57,6 +57,7 @@ public sealed class SaveGame
     public List<BattleReport> Battles { get; set; } = new();
     public List<Faction> Factions { get; set; } = new();
     public Struggle? Struggle { get; set; }
+    public LegacyState? Legacy { get; set; }
     public int AnniversariesMarked { get; set; }
     public bool Liberated { get; set; }
     public int CelebrationUntil { get; set; } = -1;
