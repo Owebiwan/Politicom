@@ -576,6 +576,13 @@ The movement marks what it has won (`Sim/Systems/CelebrationSystem.cs`):
   collectives: a festival of the free communes, or back to work.
 - **On the map**, while a celebration lasts, the towns are dressed in black-and-red flags and
   strings of lanterns, the squares are louder, and the church bells ring more often.
+- **The festival, in 3D.** The anniversary and liberation pop-ups show a live scene in place of a
+  picture, staged like the battle scenes (`Game/scripts/Map3D.Celebration.cs`). The federation's
+  largest town stands at dusk, dressed in flags and lanterns. Before it, a ring of dancers turns
+  hand in hand (the sardana, the farandole, the khorovod) while knots of people cheer and
+  fireworks burst over the roofs, to the crowd's noise and the bells. A slow camera circles the
+  square. The figures have two new clips for this, Dance and Cheer, with weapons set down
+  (`tools/models/build_soldiers.py`). `--celebration` opens the scene directly.
 
 ### Event art rendered for the game
 

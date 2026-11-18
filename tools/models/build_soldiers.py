@@ -10,8 +10,8 @@ in Godot (-Y in Blender), with:
   cartridge boxes, bandoliers, puttees and gaiters) and a detailed weapon (musket lock, barrel bands,
   ramrod and sling; rifle bolt; spear socket and blade; shield rims and bosses);
 - ambient occlusion baked into its vertex colours (darker in creases, under brims, between the legs);
-- four animations: Idle (at ease), March, Attack (fire and reload, or thrust) and Guard (aim, or
-  shield up).
+- six animations: Idle (at ease), March, Attack (fire and reload, or thrust), Guard (aim, or
+  shield up), and for celebrations Dance (a ring dance, hands joined) and Cheer, weapon set down.
 
 Eras: ancient, medieval, earlymodern, industrial, modern. Three variants of each side (height,
 build, skin, hair, beards). A soldier's "Uniform" material (and "UniformDark") is replaced in the game
@@ -633,6 +633,13 @@ def assemble(B, scale):
 
 def key_pose(arm, frame, p, last):
     for key, value in p.items():
+        if key == "Unarmed":
+            # Celebrating, the figure sets its weapon and shield down: those bones shrink to nothing.
+            for name in ("Weapon", "Shield"):
+                pb = arm.pose.bones[name]
+                pb.scale = (1e-3, 1e-3, 1e-3) if value else (1, 1, 1)
+                pb.keyframe_insert("scale", frame=frame)
+            continue
         if key == "HipsZ":
             b3 = arm.data.bones["Hips"].matrix_local.to_3x3()
             pb = arm.pose.bones["Hips"]
@@ -654,7 +661,7 @@ def key_pose(arm, frame, p, last):
 
 
 def rest_pose():
-    return dict(HipsZ=0.0, Hips=(0, 0, 0), Spine=(0, 0, 0), Head=(0, 0, 0),
+    return dict(Unarmed=False, HipsZ=0.0, Hips=(0, 0, 0), Spine=(0, 0, 0), Head=(0, 0, 0),
                 UpperArm_R=(-8, 0, 0), Forearm_R=(-38, 0, 0), Weapon=(46, 0, 0),
                 UpperArm_L=(4, 0, -4), Forearm_L=(-12, 0, 0), Shield=(0, 0, 0),
                 Thigh_R=(0, 0, 0), Thigh_L=(0, 0, 0), Shin_R=(0, 0, 0), Shin_L=(0, 0, 0))
@@ -709,6 +716,24 @@ def animate(arm, era):
                  Spine=(4, 0, 0), HipsZ=0.008 * abs(c))
         return p
     clip("March", [(1 + int(i * 3), step(i / 8)) for i in range(9)], 24)
+
+    # The ring dance (sardana, farandole, khorovod): hands joined and raised, a light step and a bounce.
+    def dance(phase):
+        p = step(phase)
+        s = math.sin(phase * 2 * math.pi)
+        p.update(Unarmed=True, Spine=(-3, 0, 2 * s), Head=(-6, 0, 0), HipsZ=0.018 * abs(math.cos(phase * 2 * math.pi)),
+                 UpperArm_L=(-25, -62, 0), Forearm_L=(-35, 0, 0), UpperArm_R=(-25, 62, 0), Forearm_R=(-35, 0, 0))
+        return p
+    clip("Dance", [(1 + int(i * 3), dance(i / 8)) for i in range(9)], 24)
+
+    # Cheering: one arm raised and waving, the weight shifting.
+    def cheer(t):
+        p = dict(rest)
+        p.update(Unarmed=True, UpperArm_R=(-150, 0, 18 * math.sin(t * 2 * math.pi)), Forearm_R=(-20, 0, 0),
+                 UpperArm_L=(-10, 0, -6), Forearm_L=(-30, 0, 0), Head=(-12, 0, 0), Spine=(-3, 3 * math.sin(t * 2 * math.pi), 0),
+                 HipsZ=0.006 * abs(math.sin(t * 2 * math.pi)))
+        return p
+    clip("Cheer", [(1 + i * 4, cheer(i / 8)) for i in range(9)], 32)
 
     aim = aim_pose(firearm)
     if firearm:
@@ -803,7 +828,7 @@ def render_clips(arm, clips, stem):
     scene.world = world
     scene.render.engine = "BLENDER_EEVEE"
     scene.render.resolution_x, scene.render.resolution_y = 440, 640
-    frames = {"Idle": 1, "March": 7, "Attack": 10, "Guard": 1}
+    frames = {"Idle": 1, "March": 7, "Attack": 10, "Guard": 1, "Dance": 7, "Cheer": 5}
     for clip_name in clips:
         for t in arm.animation_data.nla_tracks:
             t.mute = t.name != clip_name

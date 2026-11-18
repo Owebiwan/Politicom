@@ -441,6 +441,8 @@ public partial class Map3D
             "march" => "March",
             "fight" => "Attack",
             "guard" => "Guard",
+            "dance" => "Dance",
+            "cheer" => "Cheer",
             _ => "Idle",
         };
         var rng = new Random(company.GetInstanceId().GetHashCode());

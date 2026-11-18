@@ -269,6 +269,8 @@ public partial class Main : Control
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
         int codexAt = Array.IndexOf(args, "--codex");
         if (codexAt >= 0) ShowCodex(codexAt + 1 < args.Length && !args[codexAt + 1].StartsWith("--") ? args[codexAt + 1] : null);
+        // --celebration: open the celebration scene, as the anniversary pop-up shows it.
+        if (Array.IndexOf(args, "--celebration") >= 0) ShowOverlay("The festival", "", CelebrationFrame(1100), 1180, ("Close", () => CloseOverlay()));
         // --battle [COMMUNE]: open a battle (by default the most eventful of last turn's).
         int battleAt = Array.IndexOf(args, "--battle");
         if (battleAt >= 0)
@@ -1713,7 +1715,8 @@ public partial class Main : Control
         var v = new VBoxContainer();
         v.AddThemeConstantOverride("separation", 12);
         panel.AddChild(v);
-        if (EventArt.Slot(_world, heading, body) is { } art) v.AddChild(EventArt.Frame(art, 640));
+        if (IsCelebration(_popupDecision)) v.AddChild(CelebrationFrame(640));
+        else if (EventArt.Slot(_world, heading, body) is { } art) v.AddChild(EventArt.Frame(art, 640));
         var date = new Label { Text = _world.Format(e.Date, "d MMMM yyyy").ToUpperInvariant(), Modulate = accent };
         date.AddThemeFontSizeOverride("font_size", 12);
         v.AddChild(date);

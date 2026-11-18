@@ -146,9 +146,8 @@ public partial class Main
                 var stream = GD.Load<AudioStream>($"res://audio/ambience/{kind}.ogg");
                 if (stream is AudioStreamOggVorbis ogg) ogg.Loop = true;
                 float fierce = r.Result is BattleResult.Repulsed ? 0.6f : r.Result is BattleResult.Fell ? 0.5f : 1f;
-                var player = new AudioStreamPlayer { Stream = stream, VolumeDb = Mathf.LinearToDb(audio.AmbienceGain * fierce * 1.6f) };
+                var player = new AudioStreamPlayer { Stream = stream, VolumeDb = Mathf.LinearToDb(audio.AmbienceGain * fierce * 1.6f), Autoplay = true };
                 AddChild(player);
-                player.Play();
             }
         }
 
