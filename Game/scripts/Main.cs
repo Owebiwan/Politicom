@@ -1324,8 +1324,17 @@ public partial class Main : Control
         _stepButton.Pressed += StepByHand;
         clock.AddChild(_stepButton);
         clock.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        AddButton(clock, "Save", "Save the game under a name (F5 quick-saves).", ShowSaveDialog);
-        AddButton(clock, "Load", "Load a saved game (F9 loads the quick-save).", () => ShowLoadDialog());
+        foreach (var (icon, tip, action) in new (string, string, Action)[]
+        {
+            ("save", "Save the game under a name (F5 quick-saves)", ShowSaveDialog),
+            ("load", "Load a saved game (F9 loads the quick-save)", () => ShowLoadDialog()),
+        })
+        {
+            var b = AddButton(clock, "", tip, action);
+            b.Icon = GD.Load<Texture2D>($"res://ui/{icon}.svg");
+            b.FocusMode = FocusModeEnum.None;
+            UiTheme.Round(b, 40);
+        }
 
         var view = new HFlowContainer(); // wraps rather than widening the dashboard
         side.AddChild(view);

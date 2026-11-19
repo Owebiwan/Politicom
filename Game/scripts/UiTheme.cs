@@ -254,13 +254,16 @@ internal static class UiTheme
         t.SetStylebox("fill", "ProgressBar", Box(new Color("5a8fd0"), radius: 2));
         t.SetStylebox("separator", "HSeparator", Line(new Color(GoldDim, 0.7f)));
         t.SetConstant("separation", "HSeparator", 14);
-        t.SetStylebox("scroll", "VScrollBar", Box(new Color(0, 0, 0, 0), radius: 4));
-        t.SetStylebox("grabber", "VScrollBar", Box(new Color("3e4a5c"), radius: 4));
-        t.SetStylebox("grabber_highlight", "VScrollBar", Box(GoldDim, radius: 4));
-        t.SetStylebox("grabber_pressed", "VScrollBar", Box(Gold, radius: 4));
-        t.SetStylebox("scroll", "HScrollBar", Box(new Color(0, 0, 0, 0), radius: 4));
-        t.SetStylebox("grabber", "HScrollBar", Box(new Color("3e4a5c"), radius: 4));
-        t.SetStylebox("grabber_highlight", "HScrollBar", Box(GoldDim, radius: 4));
+        // A slim dark groove with a brass handle. The margins give the bars their width: without
+        // them a bar is a pixel or two wide, and a scrollable list looks like it simply ends.
+        foreach (var bar in new[] { "VScrollBar", "HScrollBar" })
+        {
+            t.SetStylebox("scroll", bar, Box(new Color(0, 0, 0, 0.35f), radius: 4, margin: 4));
+            t.SetStylebox("scroll_focus", bar, Box(new Color(0, 0, 0, 0.35f), radius: 4, margin: 4));
+            t.SetStylebox("grabber", bar, Box(new Color(GoldDim, 0.85f), radius: 4, margin: 4));
+            t.SetStylebox("grabber_highlight", bar, Box(Gold, radius: 4, margin: 4));
+            t.SetStylebox("grabber_pressed", bar, Box(GoldBright, radius: 4, margin: 4));
+        }
 
         // Commune table
         t.SetStylebox("panel", "Tree", Box(new Color("0e131b"), border: GoldDim, radius: 2, margin: 2));
