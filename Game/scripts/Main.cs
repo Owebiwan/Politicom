@@ -122,6 +122,8 @@ public partial class Main : Control
                 Alignment = HorizontalAlignment.Left,
                 ToggleMode = true,
                 ButtonPressed = id == _selectedState,
+                // Wrapped, not one long line: a long one widened the whole dashboard (and so re-fitted the map).
+                AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(300, 0),
             };
             row.AddThemeColorOverride("font_color", s.Stance < -0.3 ? new Color(0.94f, 0.5f, 0.45f) : s.Stance > 0.3 ? new Color(0.55f, 0.85f, 0.6f) : UiTheme.Text);
             row.Pressed += () => SelectState(id);
@@ -321,6 +323,17 @@ public partial class Main : Control
         if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
         if (Array.IndexOf(args, "--licences") >= 0) ShowLicences();
         if (Array.IndexOf(args, "--fold") >= 0) SetPanel(false, save: false); // dev: the folded dashboard, without touching the setting
+        if (Array.IndexOf(args, "--widths") >= 0) // dev: each tab's minimum width, and what sets it
+            for (int t = 0; t < _tabs.GetTabCount(); t++)
+            {
+                _tabs.CurrentTab = t;
+                for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                var page = _tabs.GetTabControl(t);
+                GD.Print($"tab {_tabs.GetTabTitle(t)}: page min {page.GetCombinedMinimumSize().X:0}, panel {_sidePanel.Size.X:0}, map {_map3d.Size.X:0}");
+                foreach (var c in page.FindChildren("*", "Control", true, false).OfType<Control>()
+                             .Where(c => c.GetCombinedMinimumSize().X > 330).OrderByDescending(c => c.GetCombinedMinimumSize().X).Take(4))
+                    GD.Print($"   {c.GetType().Name} {c.Name} min {c.GetCombinedMinimumSize().X:0} {(c is Button b2 ? b2.Text : "")}");
+            }
         if (Array.IndexOf(args, "--load") >= 0) ShowLoadDialog();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
@@ -674,6 +687,9 @@ public partial class Main : Control
         GC.Collect();
         GC.WaitForPendingFinalizers();
     }
+
+    /// <summary>The dashboard's width, the same on every tab.</summary>
+    private const float PanelWidth = 446;
 
     private void NewGame()
     {
@@ -1283,7 +1299,9 @@ public partial class Main : Control
         };
         _map3d.AddChild(_communeList);
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(360, 0) };
+        // One width for every tab: the dashboard was as wide as its widest content, so switching tabs
+        // widened or narrowed it and the map beside it re-fitted its zoom. Content wraps within it.
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(PanelWidth, 0) };
         panel.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(14)); // clear of the corner ornaments
         root.AddChild(panel);
         _sidePanel = panel;
@@ -2135,7 +2153,10 @@ public partial class Main : Control
     /// <summary>A scrolling tab page; TabContainer takes the title from the child's name.</summary>
     private VBoxContainer Tab(string title)
     {
-        var scroll = new ScrollContainer { Name = title, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        // Horizontal scrolling on Auto, not Disabled: Disabled passes the page's minimum width up to the
+        // dashboard, so anything too wide on one tab would widen the panel and shrink the map. Content
+        // wraps to fit; whatever can't gets a scrollbar instead.
+        var scroll = new ScrollContainer { Name = title, HorizontalScrollMode = ScrollContainer.ScrollMode.Auto };
         _tabs.AddChild(scroll);
         var page = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         scroll.AddChild(page);

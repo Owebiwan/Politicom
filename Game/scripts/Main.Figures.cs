@@ -116,8 +116,9 @@ public partial class Main
             box.AddChild(text);
             if (f.Alive && !f.Retired)
             {
-                var row = new HBoxContainer();
-                row.AddThemeConstantOverride("separation", 6);
+                var row = new HFlowContainer(); // two long buttons wrap rather than widen the dashboard
+                row.AddThemeConstantOverride("h_separation", 6);
+                row.AddThemeConstantOverride("v_separation", 4);
                 box.AddChild(row);
                 int fid = f.Id;
                 if (f.Resting == 0)
