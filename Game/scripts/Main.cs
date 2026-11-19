@@ -293,7 +293,17 @@ public partial class Main : Control
             }
         }
         if (Array.IndexOf(args, "--communes") >= 0) ToggleCommuneList();
-        if (Array.IndexOf(args, "--tutorial") >= 0) StartTutorial();
+        if (Array.IndexOf(args, "--tutorial") >= 0)
+        {
+            StartTutorial();
+            // --tutorial-step N: jump to a step, for checking how it reads.
+            int stepAt = Array.IndexOf(args, "--tutorial-step");
+            if (stepAt >= 0 && stepAt + 1 < args.Length && int.TryParse(args[stepAt + 1], out int step))
+            {
+                _tutorialStep = Math.Max(0, step - 1);
+                ShowTutorialStep();
+            }
+        }
         if (Array.IndexOf(args, "--ledger") >= 0) ShowLedger();
         int codexAt = Array.IndexOf(args, "--codex");
         if (codexAt >= 0) ShowCodex(codexAt + 1 < args.Length && !args[codexAt + 1].StartsWith("--") ? args[codexAt + 1] : null);

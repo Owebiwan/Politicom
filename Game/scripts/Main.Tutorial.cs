@@ -10,7 +10,7 @@ namespace Politicom.Game;
 /// The tutorial: a guided first game in Revolutionary Catalonia. A panel at the top left of the
 /// map gives one step at a time; each step waits until the player has done what it asks (selected
 /// a commune, funded a school, let time run, backed a campaign, mediated, opened the tree and the
-/// ledger), then moves on. Steps that only explain have a Next button. It can be left at any time.
+/// ledger, a focus, the Codex), then moves on. Steps that only explain have a Next button. It can be left at any time.
 /// </summary>
 public partial class Main
 {
@@ -73,10 +73,34 @@ public partial class Main
             new("The ledger",
                 "Press [b]Ledger[/b] (or L) to see the federation's history: food, prices, wellbeing, militia, drift and more. Close it to go on.",
                 () => _done.Contains("ledger")),
-            new("You're on your own",
-                "That's the heart of it. Hold out as a free federation until 1939; you're scored on survival, quality of life, spread and freedom.\n\n" +
-                "Tips will keep appearing at the top right when something needs you. Hover anything for an explanation. Good luck.",
+            new("A commune's focus",
+                "Each assembly can take up a [b]focus[/b]: a granary, a workshop, a fort town on the line, a schoolhouse, or a rail junction for aid. Each gives more of one thing for a little less of others, and costs nothing: the commune decides, and keeps it a season.\n\n" +
+                "Select a commune behind the lines and press one of the [b]Focus[/b] buttons in the Commune tab.",
+                () => _done.Contains("SetFocus"), CommuneTab),
+            new("Its people",
+                "Under a commune's name, [b]People[/b] shows how many live there and how that changed last week. Hover it for why: births when it's fed and well, the war dead, [b]refugees[/b] fleeing towns that lose ground, people moving to better-off neighbours.\n\n" +
+                "Refugees eat at once but join the militia only once they've settled.",
+                null, CommuneTab),
+            new("Legacy paths",
+                "In the Overview tab, [b]Legacy paths[/b] tracks four long paths: mutual aid, the new culture, defence of the revolution, knowledge. Each has three milestones; reaching two on a path makes it this game's legacy.\n\n" +
+                "Hover the panel for every milestone and how far along you are. In a long campaign each chapter ends in a [b]crisis of the age[/b], and legacies carry into the next.",
+                null, 0),
+            new("Factions and allies",
+                "Communes with a shared grievance band into [b]factions[/b]: at full strength they put a demand to the congress. When one forms it appears in the Overview tab; answer it early with [b]Address[/b].\n\n" +
+                "[b]The antifascist front[/b], also in the Overview tab, is your struggle with the Republic and the party: cooperation, tension, hostility. At 90 it breaks into barricades.",
+                null, 0),
+            new("Decisions",
+                "Some moments stop the clock and ask you: historical events, figures acting in character, communes' own proposals, goals, the anniversary of the rising. Every choice is double-edged; the outcome of each option is listed under it.\n\n" +
+                "Click a battle's crossed swords on the map to see how that week's fighting went.",
                 null),
+            new("The Codex",
+                "Press [b]Codex[/b] (or J). It explains the history and ideas behind everything here: mutual aid, the mandate, drift, the people, the debates against anarchism and the anarchist answers.\n\n" +
+                "Clicking the drift bar, the legacy panel, a faction or the struggle opens the entry behind it. Close the Codex to go on.",
+                () => _done.Contains("codex")),
+            new("You're on your own",
+                "That's the heart of it. Hold out as a free federation until 1939; you're scored on survival, quality of life, spread and freedom, and remembered by your legacies.\n\n" +
+                "[b]Needs attention[/b] at the top of the Overview tab lists what wants you now, each with a remedy. Hover anything for an explanation. Good luck.",
+                null, 0),
         };
         _ = balaguer;
         _tutorialStep = 0;

@@ -50,11 +50,16 @@ dotnet run --project Sim.Cli -c Release -- batch --runs 300
 The game opens on a start menu: continue the latest save, choose a historical revolution, or
 start in the open world. Esc brings the menu back during a game.
 
-**Tutorial** (start menu): a guided first game in Revolutionary Catalonia. A panel at the
-top left takes you through ten steps (the movement, communes, hierarchy drift, schools and
-the expert trap, running the clock, the front and defensive campaigns, trust and mediation,
-technologies, the ledger), each moving on when you've done what it asks. You can leave it at
-any time and keep playing (`Game/scripts/Main.Tutorial.cs`).
+**Tutorial** (start menu): a guided first game in Revolutionary Catalonia
+(`Game/scripts/Main.Tutorial.cs`). A panel at the top left takes you through sixteen steps:
+- **The basics:** the movement, communes, hierarchy drift, schools and the expert trap, running
+  the clock, the front and defensive campaigns, trust and mediation, technologies, the ledger.
+- **The newer systems:** a commune's focus, its people and refugees, legacy paths and crises,
+  factions and the struggle between allies, decisions and battles, and the Codex.
+
+Steps that ask for something move on when you've done it; the rest have a Next button. You can
+leave it at any time and keep playing. `--tutorial --tutorial-step N` opens it at a given step,
+for checking.
 
 Controls:
 - Click a commune to select it; shift-click a second commune for mediation or railways.

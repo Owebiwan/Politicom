@@ -57,6 +57,7 @@ public partial class Main
     {
         var all = Codex();
         if (all.Count == 0) return;
+        Did("codex");
         var current = id != null && all.TryGetValue(id, out var found) ? found : all.Values.First();
 
         var row = new HBoxContainer { CustomMinimumSize = new Vector2(0, 600) };
