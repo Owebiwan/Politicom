@@ -197,4 +197,15 @@ public partial class MapView
         if (poly.Length < 3 || Geometry2D.TriangulatePolygon(poly).Length == 0) return;
         target.DrawColoredPolygon(poly, color);
     }
+
+    /// <summary>Lets go of the shared ground, sea and relief textures (at quit).</summary>
+    internal static void ReleaseStatics()
+    {
+        _overview?.Dispose(); _overview = null;
+        _terrain?.Dispose(); _terrain = null;
+        _landMask?.Dispose(); _landMask = null;
+        _reliefWorld?.Dispose(); _reliefWorld = null;
+        foreach (var t in ReliefTiles.Values) t?.Dispose();
+        ReliefTiles.Clear();
+    }
 }

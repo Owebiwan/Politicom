@@ -1780,4 +1780,26 @@ public class SimulationTests
         var loaded = World.Restore(SaveGame.FromJson(System.Text.Json.JsonSerializer.Serialize(focused.Save(), Json.Options)), focused.Techs);
         Assert.Equal(CommuneFocus.Granary, loaded.Communes[c.Id].Focus);
     }
+
+    [Fact]
+    public void A_save_from_before_population_legacies_and_crises_still_loads_and_plays_on()
+    {
+        // Saved by the game as it was before population, legacies, crises, focus and compacted
+        // events (Free Territory, turn 50): missing fields must take their defaults.
+        string path = Path.Combine(DataDir, "..", "Sim.Tests", "Fixtures", "save_before_population_and_legacies.json.gz");
+        using var gz = new System.IO.Compression.GZipStream(File.OpenRead(path), System.IO.Compression.CompressionMode.Decompress);
+        string json = new StreamReader(gz).ReadToEnd();
+        var w = World.LoadJson(json, NewWorld().Techs);
+        Assert.Equal(50, w.Tick);
+        Assert.All(w.Communes, c => Assert.Equal(CommuneFocus.None, c.Focus)); // fields the old save lacks take their defaults
+        var policy = new Balanced();
+        for (int i = 0; i < 30 && w.Outcome == Outcome.Ongoing; i++)
+        {
+            policy.Act(w);
+            w.Step();
+        }
+        Assert.True(w.Tick > 50);
+        Assert.True(w.Legacy.ChapterEnd > 0);
+        Assert.Contains(w.Communes, c => c.PopulationChange.Count > 0);
+    }
 }

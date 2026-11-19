@@ -162,11 +162,11 @@ public static class OpenStartGenerator
         // later the outcome turns on peace, treaties and drift. (It's also far quicker.)
         if (length is int campaign && campaign > ScenarioDefinition.CampaignTurns)
         {
-            var opening = calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario;
+            var opening = calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 40) : scenario;
             return opening.WithLength(campaign);
         }
         if (length is int turns) scenario = scenario.WithLength(turns);
-        return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 20) : scenario; // real maps vary more than generated ones
+        return calibrate ? sandbox.Calibrate(scenario, seed ^ 0xA5A5UL, games: 40) : scenario; // real maps vary more than generated ones
     }
 
     /// <summary>The cities that become communes: the home cities, minus the capital the government holds.</summary>

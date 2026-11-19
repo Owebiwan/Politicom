@@ -100,10 +100,10 @@ It returns an ordinary scenario, so play, batch runs, the AI players and saves a
 unchanged. A sandbox save carries its own map.
 
 **Calibration.** Generated maps differ wildly in how defensible they are. So after building
-one, the generator plays a few quick games with the built-in balanced player, and bisects a
-strength multiplier for the enemies until that player survives about 70% of the time. This
-takes about half a second and is deterministic. Without it, the balanced player's survival
-ranged from 0% to 100% across maps. With it, every map lands between about 30% and 70%.
+one, the generator plays 32 quick games with the built-in balanced player, side by side on
+every core, and bisects a strength multiplier for the enemies until that player survives at
+least 60% of them. This takes about a second and is deterministic. Without it, the balanced
+player's survival ranged from 0% to 100% across maps. With it, sandbox maps average about 67%.
 
 - **Godot:** the scenario picker has a Sandbox row with a seed, a Random button and a size
   (20–40 communes). The header and results screen show the seed, so a good map can be shared.
@@ -194,9 +194,10 @@ choose.
   `open:-500:ACHAEMENID` or `open:1:ROMAN` for the early eras. A state's id is in
   `Data/world/<era>.json`.
 - **Calibration:** the enemy's strength is set to the strongest level at which the balanced AI
-  survives at least 55% of trial games: 20 games for open starts, because real maps vary more
-  than generated ones, and 12 for sandbox maps. Generation takes about 4 seconds.
-  Individual maps still vary, roughly 30–90%.
+  survives at least 60% of trial games: 40 games for open starts, because real maps vary more
+  than generated ones, and 32 for sandbox maps, run in parallel. Generation takes 3–5 seconds.
+  Open starts average about 67%; individual maps still vary, roughly 45–85%, because survival
+  can fall off a cliff between two strengths.
 
 Balanced AI over 100 games each. The centralizer becomes a state in (almost) every game.
 

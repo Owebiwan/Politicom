@@ -110,4 +110,11 @@ public static class Motion
             button.MouseExited += () => To(Colors.White, 0.18f);
         };
     }
+
+    /// <summary>Lets go of the cached backdrop shader (at quit).</summary>
+    internal static void ReleaseStatics()
+    {
+        _backdrop?.Dispose();
+        _backdrop = null;
+    }
 }

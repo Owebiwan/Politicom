@@ -272,4 +272,17 @@ public partial class Map3D : Control
     {
         if (what == NotificationMouseExit) Map.ClearHover();
     }
+
+    /// <summary>Lets go of the shared heights, meshes and materials (at quit, so Godot doesn't find them still held).</summary>
+    internal static void ReleaseStatics()
+    {
+        _height?.Dispose(); _height = null;
+        _heightImage?.Dispose(); _heightImage = null;
+        _landCover?.Dispose(); _landCover = null;
+        _shadowDisc?.Dispose(); _shadowDisc = null;
+        foreach (var m in BuildingMaterials.Values) m.Dispose();
+        BuildingMaterials.Clear();
+        foreach (var m in Uniforms.Values) m.Dispose();
+        Uniforms.Clear();
+    }
 }

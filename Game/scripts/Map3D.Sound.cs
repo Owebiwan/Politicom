@@ -26,6 +26,18 @@ public partial class Map3D
 
     private readonly Dictionary<string, (AudioStreamPlayer Player, float Gain, float Target)> _layers = new();
     private readonly AudioStreamPlayer _oneShot = new() { Bus = "Master" };
+
+    /// <summary>At quit: the soundscape's loops stop and let go of their streams (see Audio._ExitTree).</summary>
+    internal void StopSoundscape()
+    {
+        foreach (var (player, _, _) in _layers.Values)
+        {
+            player.Stop();
+            player.Stream = null;
+        }
+        _oneShot.Stop();
+        _oneShot.Stream = null;
+    }
     private double _soundClock, _nextShot = 8;
     private readonly Random _soundRng = new();
 

@@ -41,8 +41,8 @@ public sealed class SandboxGenerator
     };
 
     // Calibration: the balanced AI should survive about this often on every generated map.
-    private const double TargetSurvival = 0.55;
-    private const int CalibrationGames = 12;
+    private const double TargetSurvival = 0.6;
+    private const int CalibrationGames = 32; // enough that one map lands near the target, not 20 points off it
     private const int CalibrationSteps = 6;
 
     private readonly List<Template> _templates;
@@ -351,8 +351,10 @@ public sealed class SandboxGenerator
         {
             double mid = (lo + hi) / 2;
             var trial = Scaled(scenario, Math.Exp(mid));
+            // The trial games are independent (each its own world and seed), so they run side by side;
+            // the count, and so the result, is the same as playing them one after another.
             int survived = 0;
-            for (int g = 0; g < games; g++)
+            Parallel.For(0, games, g =>
             {
                 var w = World.Create(trial, _techs, seed: seed * 7919 + (ulong)g);
                 var policy = new Ai.Balanced();
@@ -361,8 +363,8 @@ public sealed class SandboxGenerator
                     policy.Act(w);
                     w.Step();
                 }
-                if (w.Outcome == Outcome.Survived) survived++;
-            }
+                if (w.Outcome == Outcome.Survived) Interlocked.Increment(ref survived);
+            });
             if (survived / (double)games >= TargetSurvival) lo = mid; // too easy: stronger enemies
             else hi = mid;
         }

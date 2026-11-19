@@ -656,6 +656,22 @@ public partial class Main : Control
         + $" (textures {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TextureMemUsed) / 1048576:0}, buffers {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.BufferMemUsed) / 1048576:0})"
         + $" · map {_map3d.MemoryReport()} · {_map.TextureReport()}";
 
+    /// <summary>
+    /// At quit: the shared caches (textures, meshes, materials, fonts, shaders) are held by static
+    /// C# fields, which .NET would release only after Godot had begun shutting down, so Godot
+    /// reported them as leaked. Let them go while the engine is still up.
+    /// </summary>
+    public override void _ExitTree()
+    {
+        _map3d?.StopSoundscape();
+        Map3D.ReleaseStatics();
+        MapView.ReleaseStatics();
+        UiTheme.ReleaseStatics();
+        Motion.ReleaseStatics();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+    }
+
     private void NewGame()
     {
         CloseOverlay();

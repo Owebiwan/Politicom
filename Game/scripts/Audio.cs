@@ -42,6 +42,24 @@ public partial class Audio : Node
     /// <summary>Raised when a piece starts: its title and credit.</summary>
     public event Action<string, string>? TrackStarted;
 
+    /// <summary>
+    /// At quit: stop every player and let go of the streams, or the piece playing when the window
+    /// closed (and its decoder) is still held when Godot shuts down, and reported as leaked.
+    /// </summary>
+    public override void _ExitTree()
+    {
+        _tween?.Kill();
+        foreach (var player in _music.Concat(_sfx))
+        {
+            if (player is null) continue;
+            player.Stop();
+            player.Stream = null;
+        }
+        foreach (var sound in _sounds.Values) sound?.Dispose();
+        _sounds.Clear();
+        if (Instance == this) Instance = null;
+    }
+
     public override void _Ready()
     {
         Instance = this;

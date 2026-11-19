@@ -378,6 +378,20 @@ internal static class UiTheme
     }
 
     private static StyleBoxLine Line(Color color) => new() { Color = color, Thickness = 1 };
+
+    /// <summary>Lets go of the cached fonts, icons and textures (at quit).</summary>
+    internal static void ReleaseStatics()
+    {
+        foreach (var font in new Font?[] { _body, _bodyMedium, _bodyBold, _bodyItalic, _display, _displayBold, _roman, _italic }) font?.Dispose();
+        _body = _bodyMedium = _bodyBold = _bodyItalic = _display = _displayBold = null;
+        _roman = _italic = null;
+        foreach (var t in IconCache.Values) t?.Dispose();
+        IconCache.Clear();
+        foreach (var t in Textures.Values) t.Dispose();
+        Textures.Clear();
+        global::Politicom.Game.Ornament.ReleaseStatics();
+        Symbols.Dispose();
+    }
 }
 
 /// <summary>A tapered gold rule that fades at both ends: the divider under titles.</summary>
@@ -385,9 +399,17 @@ public partial class Ornament : Control
 {
     private static Texture2D? _divider;
 
+    internal static void ReleaseStatics()
+    {
+        _divider?.Dispose();
+        _divider = null;
+    }
+
+
     public override void _Draw()
     {
         _divider ??= GD.Load<Texture2D>("res://ui/orn_divider.png");
         DrawTextureRect(_divider, new Rect2(0, Size.Y / 2 - 4, Size.X, 8), false);
     }
+
 }
