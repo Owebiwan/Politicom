@@ -256,13 +256,19 @@ internal static class UiTheme
         t.SetConstant("separation", "HSeparator", 14);
         // A slim dark groove with a brass handle. The margins give the bars their width: without
         // them a bar is a pixel or two wide, and a scrollable list looks like it simply ends.
+        StyleBoxFlat Bar(Color color)
+        {
+            var sb = Box(color, radius: 3);
+            sb.ContentMarginLeft = sb.ContentMarginRight = sb.ContentMarginTop = sb.ContentMarginBottom = 2.4f; // a bar about 5 px wide
+            return sb;
+        }
         foreach (var bar in new[] { "VScrollBar", "HScrollBar" })
         {
-            t.SetStylebox("scroll", bar, Box(new Color(0, 0, 0, 0.35f), radius: 4, margin: 4));
-            t.SetStylebox("scroll_focus", bar, Box(new Color(0, 0, 0, 0.35f), radius: 4, margin: 4));
-            t.SetStylebox("grabber", bar, Box(new Color(GoldDim, 0.85f), radius: 4, margin: 4));
-            t.SetStylebox("grabber_highlight", bar, Box(Gold, radius: 4, margin: 4));
-            t.SetStylebox("grabber_pressed", bar, Box(GoldBright, radius: 4, margin: 4));
+            t.SetStylebox("scroll", bar, Bar(new Color(0, 0, 0, 0.35f)));
+            t.SetStylebox("scroll_focus", bar, Bar(new Color(0, 0, 0, 0.35f)));
+            t.SetStylebox("grabber", bar, Bar(new Color(GoldDim, 0.85f)));
+            t.SetStylebox("grabber_highlight", bar, Bar(Gold));
+            t.SetStylebox("grabber_pressed", bar, Bar(GoldBright));
         }
 
         // Commune table
