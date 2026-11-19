@@ -72,18 +72,49 @@ public partial class Map3D
     private Vector3 Ground(Vector2 local, Vector2 origin, Vector2 deg, float lift)
     {
         var px = local + _offset;
-        float y = 0;
-        if (lift > 0 && _heightImage is { } h)
-        {
-            var ll = origin + px * deg;
-            if (Mathf.Abs(ll.Y) < 89)
-            {
-                int x = (int)Mathf.PosMod((ll.X + 180) / 360 * h.GetWidth(), h.GetWidth());
-                int yy = Mathf.Clamp((int)((90 - ll.Y) / 180 * h.GetHeight()), 0, h.GetHeight() - 1);
-                y = h.GetPixel(x, yy).R * 8848 * lift;
-            }
-        }
+        float y = lift > 0 ? TerrainMetres(px, origin, deg) * lift : 0;
         return new Vector3(px.X, y, px.Y);
+    }
+
+    // The terrain's own heights, where its mesh has vertices: the ground shader lifts each vertex by
+    // the height map sampled smoothly there, and the surface runs straight between vertices. Objects
+    // stand on that surface, not on the height map itself, or a railway sinks into the ground on a
+    // convex slope and floats over a hollow (and, read pixel by pixel, rises in steps).
+    private float[]? _vertexMetres;
+    private (Vector2 Extent, Vector2 Origin, Vector2 Deg, int Columns, int Rows) _vertexFor;
+
+    /// <summary>Height of the terrain's surface in metres at a point of the map's drawing area.</summary>
+    private float TerrainMetres(Vector2 px, Vector2 origin, Vector2 deg)
+    {
+        if (_heightImage is not { } h || _extent.X < 1) return 0;
+        int columns = TerrainColumns, rows = TerrainRows;
+        if (_vertexMetres is null || _vertexFor != (_extent, origin, deg, columns, rows))
+        {
+            _vertexFor = (_extent, origin, deg, columns, rows);
+            _vertexMetres = new float[(columns + 1) * (rows + 1)];
+            int w = h.GetWidth(), hh = h.GetHeight();
+            float Sample(float u, float v) // bilinear, as the shader's linear filter (wrapping east-west)
+            {
+                float x = u * w - 0.5f, yv = Mathf.Clamp(v * hh - 0.5f, 0, hh - 1);
+                int x0 = Mathf.FloorToInt(x), y0 = (int)yv;
+                float fx = x - x0, fy = yv - y0;
+                int xa = Mathf.PosMod(x0, w), xb = Mathf.PosMod(x0 + 1, w), y1 = Mathf.Min(y0 + 1, hh - 1);
+                float top = Mathf.Lerp(h.GetPixel(xa, y0).R, h.GetPixel(xb, y0).R, fx);
+                float bottom = Mathf.Lerp(h.GetPixel(xa, y1).R, h.GetPixel(xb, y1).R, fx);
+                return Mathf.Lerp(top, bottom, fy) * 8848;
+            }
+            for (int j = 0; j <= rows; j++)
+                for (int i = 0; i <= columns; i++)
+                {
+                    var ll = origin + new Vector2(_extent.X * i / columns, _extent.Y * j / rows) * deg;
+                    _vertexMetres[j * (columns + 1) + i] = Mathf.Abs(ll.Y) > 89 ? 0 : Sample((ll.X + 180) / 360, (90 - ll.Y) / 180);
+                }
+        }
+        float gx = Mathf.Clamp(px.X / _extent.X * columns, 0, columns), gz = Mathf.Clamp(px.Y / _extent.Y * rows, 0, rows);
+        int ci = Mathf.Min((int)gx, columns - 1), cj = Mathf.Min((int)gz, rows - 1);
+        float tx = gx - ci, tz = gz - cj;
+        float At(int i, int j) => _vertexMetres![j * (columns + 1) + i];
+        return Mathf.Lerp(Mathf.Lerp(At(ci, cj), At(ci + 1, cj), tx), Mathf.Lerp(At(ci, cj + 1), At(ci + 1, cj + 1), tx), tz);
     }
 
     private object? _objectsFor;

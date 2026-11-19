@@ -152,6 +152,10 @@ public partial class Map3D : Control
     /// <summary>The map's render targets, for the --memory report.</summary>
     public string MemoryReport() => $"view {_view.Size} ×{_view.Msaa3D}, flat {_flat.Size}, resolution {_resolution}";
 
+    /// <summary>The terrain mesh's grid: quads across and down (a plane subdivided n times has n + 1).</summary>
+    private const int TerrainColumns = 221;
+    private int TerrainRows => Mathf.Max(1, (int)(220 * _extent.Y / Mathf.Max(1, _extent.X)) + 1);
+
     private void Layout()
     {
         if (Size.X < 4 || Size.Y < 4) return;
@@ -176,7 +180,7 @@ public partial class Map3D : Control
         Map.Position = _offset;
         Map.Size = Size;
         Map.ExtentOverride = new Rect2(-_offset, _extent);
-        _ground.Mesh = new PlaneMesh { Size = _extent, SubdivideWidth = 220, SubdivideDepth = (int)(220 * _extent.Y / _extent.X) };
+        _ground.Mesh = new PlaneMesh { Size = _extent, SubdivideWidth = TerrainColumns - 1, SubdivideDepth = TerrainRows - 1 };
         _ground.Position = new Vector3(_extent.X / 2, 0, _extent.Y / 2);
         _groundMaterial.SetShaderParameter("extent", _extent);
         _postMaterial.SetShaderParameter("size", Size);
