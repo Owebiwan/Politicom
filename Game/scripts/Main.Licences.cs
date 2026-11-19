@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 
 namespace Politicom.Game;
@@ -27,7 +28,9 @@ public partial class Main
         };
         text.AddThemeFontSizeOverride("normal_font_size", 14);
         text.AddThemeFontSizeOverride("bold_font_size", 14);
-        string credits = Esc(Read("res://data/geo/ATTRIBUTION.md")).Replace("**", "");
+        // The credits file is Markdown: headings become titles, the rest plain text.
+        string credits = string.Join("\n", Read("res://data/geo/ATTRIBUTION.md").Split('\n').Select(line =>
+            line.StartsWith('#') ? $"[b]{Esc(line.TrimStart('#', ' '))}[/b]" : Esc(line.Replace("**", "").Replace("`", ""))));
         text.Text = $"{UiTheme.DisplayText("Politicom", 20)}\n{GameNotice}\n\n"
                     + $"{UiTheme.DisplayText("Credits", 20)}\n{credits}\n\n"
                     + $"{UiTheme.DisplayText("Godot Engine", 20)}\n{Esc(Engine.GetLicenseText())}\n\n"

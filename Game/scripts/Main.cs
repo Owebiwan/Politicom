@@ -319,6 +319,7 @@ public partial class Main : Control
         }
         if (Array.IndexOf(args, "--save") >= 0) QuickSave();
         if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
+        if (Array.IndexOf(args, "--licences") >= 0) ShowLicences();
         if (Array.IndexOf(args, "--load") >= 0) ShowLoadDialog();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
