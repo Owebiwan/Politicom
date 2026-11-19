@@ -18,25 +18,18 @@ public partial class Main
 
     private void BuildPanelToggle()
     {
-        // A round brass button on the map's edge, a chevron pointing the way the panel will go.
-        _panelToggle = new Button
-        {
-            AnchorLeft = 1, AnchorRight = 1, AnchorTop = 0.5f, AnchorBottom = 0.5f,
-            OffsetLeft = -50, OffsetRight = -6, OffsetTop = -22, OffsetBottom = 22,
-            FocusMode = FocusModeEnum.None,
-        };
-        UiTheme.Round(_panelToggle, 44);
-        _panelToggle.AddThemeFontOverride("font", UiTheme.DisplayBold);
-        _panelToggle.AddThemeFontSizeOverride("font_size", 24);
-        _panelToggle.AddThemeColorOverride("font_color", UiTheme.GoldBright);
-        _panelToggle.AddThemeColorOverride("font_hover_color", new Color("fff6e0"));
+        // A round brass button seated on the dashboard's edge (on the window's edge when it's folded),
+        // a chevron pointing the way the panel will go. An icon, not a letter, so it stays a circle.
+        _panelToggle = new Button { FocusMode = FocusModeEnum.None };
+        UiTheme.Round(_panelToggle, ToggleSize);
+        _panelToggle.Size = new Vector2(ToggleSize, ToggleSize);
         _panelToggle.Pressed += () => SetPanel(!_sidePanel.Visible);
-        _map3d.AddChild(_panelToggle);
+        AddChild(_panelToggle); // over the map and the dashboard both, so it can straddle the border
 
         // The clock while the dashboard is folded: the date, and pause, play, fast, fastest.
         _miniClock = new PanelContainer
         {
-            AnchorLeft = 0.5f, AnchorRight = 0.5f, OffsetLeft = -230, OffsetRight = 230, OffsetTop = 10, OffsetBottom = 66,
+            AnchorLeft = 0.5f, AnchorRight = 0.5f, OffsetLeft = -195, OffsetRight = 195, OffsetTop = 10, OffsetBottom = 66,
             Visible = false,
         };
         _miniClock.AddThemeStyleboxOverride("panel", UiTheme.FrameStrong(8));
@@ -47,17 +40,7 @@ public partial class Main
         _miniHeader.AddThemeFontOverride("font", UiTheme.Display);
         _miniHeader.AddThemeColorOverride("font_color", UiTheme.GoldBright);
         row.AddChild(_miniHeader);
-        foreach (var (label, speed) in new[] { ("pause", 0), ("play", 1), ("fast", 2), ("fastest", 3) })
-        {
-            var b = new Button
-            {
-                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, FocusMode = FocusModeEnum.None,
-            };
-            UiTheme.Round(b, 40);
-            b.Pressed += () => SetSpeed(speed);
-            row.AddChild(b);
-            _miniSpeed.Add(b);
-        }
+        _miniSpeed.AddRange(BuildClockButtons(row));
         _map3d.AddChild(_miniClock);
         SetPanel(LoadPanelSetting(), save: false);
     }
@@ -66,7 +49,8 @@ public partial class Main
     {
         _sidePanel.Visible = open;
         _miniClock.Visible = !open;
-        _panelToggle.Text = open ? "›" : "‹";
+        _panelToggle.Icon = GD.Load<Texture2D>(open ? "res://ui/chevron_right.svg" : "res://ui/chevron_left.svg");
+        PlacePanelToggle();
         _panelToggle.TooltipText = open ? "Fold the dashboard away and give the map the whole window (P)" : "Bring back the dashboard (P)";
         if (save)
         {
@@ -75,6 +59,20 @@ public partial class Main
             config.SetValue("ui", "panel", open);
             config.Save("user://settings.cfg");
         }
+    }
+
+    private const int ToggleSize = 40;
+
+    /// <summary>Centres the fold button on the dashboard's left border, or just inside the window's edge when folded.</summary>
+    private void PlacePanelToggle()
+    {
+        if (_panelToggle is null) return;
+        float y = _map3d.GlobalPosition.Y + _map3d.Size.Y / 2 - ToggleSize / 2f;
+        float x = _sidePanel.Visible
+            ? _sidePanel.GlobalPosition.X - ToggleSize / 2f + 4 // a little over the frame, onto the panel's own border
+            : GetViewportRect().Size.X - ToggleSize - 8;
+        _panelToggle.Position = new Vector2(x, y);
+        _panelToggle.Size = new Vector2(ToggleSize, ToggleSize);
     }
 
     private static bool LoadPanelSetting()

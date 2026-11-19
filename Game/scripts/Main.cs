@@ -320,6 +320,7 @@ public partial class Main : Control
         if (Array.IndexOf(args, "--save") >= 0) QuickSave();
         if (Array.IndexOf(args, "--leaderboard") >= 0) ShowLeaderboard();
         if (Array.IndexOf(args, "--licences") >= 0) ShowLicences();
+        if (Array.IndexOf(args, "--fold") >= 0) SetPanel(false, save: false); // dev: the folded dashboard, without touching the setting
         if (Array.IndexOf(args, "--load") >= 0) ShowLoadDialog();
         int techAt = Array.IndexOf(args, "--techs");
         if (techAt >= 0)
@@ -419,6 +420,7 @@ public partial class Main : Control
     public override void _Process(double delta)
     {
         if (_map3d != null) _map3d.Ducked = _overlay != null; // a window over the map: its sounds step back
+        if (_sidePanel != null) PlacePanelToggle(); // the panel's edge moves when the window does
         UpdateTutorial();
         if (_uiStale && (_speed < 3 || Time.GetTicksMsec() - _lastRefresh >= 200)) Refresh();
         if (_speed == 0 || _world.Outcome != Outcome.Ongoing) return;
@@ -477,7 +479,7 @@ public partial class Main : Control
                 break;
             case Key.Escape when _communeList.Visible: ToggleCommuneList(); break;
             case Key.Escape: ShowStartMenu(); break;
-            case Key.Space: SetSpeed(_speed == 0 ? 1 : 0); break;
+            case Key.Space: PlayPause(); break;
             case Key.Key1: SetSpeed(1); break;
             case Key.Key2: SetSpeed(2); break;
             case Key.Key3: SetSpeed(3); break;
@@ -1299,18 +1301,7 @@ public partial class Main : Control
 
         var clock = new HBoxContainer();
         side.AddChild(clock);
-        foreach (var (label, speed) in new[] { ("pause", 0), ("play", 1), ("fast", 2), ("fastest", 3) })
-        {
-            var b = new Button
-            {
-                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = true, TooltipText = "Space pauses; 1–3 set speed; 4 is fastest, for campaigns",
-                CustomMinimumSize = new Vector2(46, 30), IconAlignment = HorizontalAlignment.Center, ExpandIcon = true,
-            };
-            UiTheme.Round(b, 40);
-            b.Pressed += () => SetSpeed(speed);
-            clock.AddChild(b);
-            _speedButtons.Add(b);
-        }
+        _speedButtons.AddRange(BuildClockButtons(clock));
         _stepButton = new Button { TooltipText = "Advance one turn (.)" };
         _stepButton.Pressed += StepByHand;
         clock.AddChild(_stepButton);
@@ -2066,9 +2057,52 @@ public partial class Main : Control
             Say(_popup != null ? "Answer the pop-up first: time stands still while it's open." : "Close the window first: time stands still while it's open.");
         }
         _speed = speed;
+        if (speed > 0) _lastSpeed = speed;
         _accumulator = 0;
-        for (int i = 0; i < _speedButtons.Count; i++) _speedButtons[i].SetPressedNoSignal(i == Math.Min(speed, 3));
-        for (int i = 0; i < _miniSpeed.Count; i++) _miniSpeed[i].SetPressedNoSignal(i == Math.Min(speed, 3));
+        ShowClock(_speedButtons);
+        ShowClock(_miniSpeed);
+    }
+
+    /// <summary>The speed time last ran at, so play resumes there.</summary>
+    private int _lastSpeed = 1;
+
+    private void PlayPause() => SetSpeed(_speed == 0 ? _lastSpeed : 0);
+
+    private static Texture2D? _playIcon, _pauseIcon;
+
+    /// <summary>
+    /// A clock's buttons: one that plays or pauses (showing what pressing it will do), then fast
+    /// and fastest. The dashboard and the folded clock each have a set.
+    /// </summary>
+    private List<Button> BuildClockButtons(Container row)
+    {
+        _playIcon ??= GD.Load<Texture2D>("res://ui/play.svg");
+        _pauseIcon ??= GD.Load<Texture2D>("res://ui/pause.svg");
+        var buttons = new List<Button>();
+        foreach (var (label, speed) in new[] { ("play", 0), ("fast", 2), ("fastest", 3) })
+        {
+            var b = new Button
+            {
+                Icon = GD.Load<Texture2D>($"res://ui/{label}.svg"), ToggleMode = speed > 0, FocusMode = FocusModeEnum.None,
+                TooltipText = speed == 0 ? "Play or pause (Space). 1–3 set the speed; 4 is fastest, for campaigns."
+                    : speed == 2 ? "Fast (2)" : "Fastest (3)",
+            };
+            UiTheme.Round(b, 40);
+            if (speed == 0) b.Pressed += PlayPause;
+            else b.Pressed += () => SetSpeed(_speed == speed ? 1 : speed); // pressed again: back to normal speed
+            row.AddChild(b);
+            buttons.Add(b);
+        }
+        ShowClock(buttons);
+        return buttons;
+    }
+
+    private void ShowClock(List<Button> buttons)
+    {
+        if (buttons.Count < 3) return;
+        buttons[0].Icon = _speed == 0 ? _playIcon : _pauseIcon;
+        buttons[1].SetPressedNoSignal(_speed == 2);
+        buttons[2].SetPressedNoSignal(_speed >= 3);
     }
 
     private void Say(string text)
