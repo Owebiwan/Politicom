@@ -1,3 +1,17 @@
+# Politicom's licence
+
+Politicom (its code, its scenarios and the data made for it) is free software, released under
+the **GNU General Public License, version 3 or (at your option) any later version**: see
+`LICENSE`. Its source comes with every copy of the game. The material below that was made by
+others keeps its own licence and credit; the CC BY-SA and ODbL parts stay under those licences.
+
+# Software
+
+- **Godot Engine** (godotengine.org): MIT licence, © 2014-present Godot Engine contributors and
+  © 2007-2014 Juan Linietsky and Ariel Manzur. Its licence and its third-party components'
+  notices are shown in the game (start menu, Licences).
+- **.NET** runtime (dotnet.microsoft.com): MIT licence, © .NET Foundation and contributors.
+
 # Map data credits
 
 - World maps for 1871, 1918 and 1936 (`Data/world/`): countries, land and populated places
@@ -8,8 +22,7 @@
   contributors (github.com/aourednik/historical-basemaps), licensed under the **GNU General
   Public License v3.0**. These files are simplified derivatives (grouped by ruling state,
   simplified, with Natural Earth coasts and modern city names added) and are under the same
-  licence. Distributing a build that contains them means distributing it under GPL-3.0 terms,
-  or replacing these files.
+  licence, as is the game itself (see below).
 - Land, lakes, rivers, land borders and provinces: **Natural Earth** (naturalearthdata.com), public domain.
 - The ground under the map (`Data/land/`, mirrored into the game): **NASA Earth Observatory**, Blue Marble: Next
   Generation (July 2004, with topography and bathymetry) and the GEBCO-derived elevation

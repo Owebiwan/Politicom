@@ -1328,24 +1328,54 @@ out exactly as it would have. Tests check this at three points in the game.
 
 ## Exporting a standalone build
 
-`Data/` is mirrored into `Game/data/` on every build and packed into exports, so the app
+`Data/` is mirrored into `Game/data/` on every build and packed into exports, so the game
 needs nothing outside itself.
 
-1. Install the macOS export template once. In Godot, use **Editor → Manage Export Templates**.
-   Or copy `templates/macos.zip` and `templates/version.txt` from the official
-   `Godot_v4.7.2-stable_mono_export_templates.tpz` into
-   `~/Library/Application Support/Godot/export_templates/4.7.2.stable.mono/`. Only the macOS
-   template (124 MB) is needed, not the whole 1.2 GB bundle.
-2. Export:
-   `godot --headless --path Game --export-release macOS ../build/Politicom.zip`,
-   then unzip it to get `Politicom.app`. It's a universal build for Apple Silicon and Intel.
+1. **Install the export templates once.** Either use **Editor → Manage Export Templates** in
+   Godot, or unpack the needed files from the official
+   `Godot_v4.7.2-stable_mono_export_templates.tpz` (1.2 GB) into
+   `~/Library/Application Support/Godot/export_templates/4.7.2.stable.mono/`:
+   - **macOS:** `macos.zip`
+   - **Windows:** `windows_release_x86_64.exe`, `windows_debug_x86_64.exe` and their
+     `_console` variants
+   - **Linux:** `linux_release.x86_64` and `linux_debug.x86_64`
 
-The app is unsigned. It runs normally on the Mac that built it. Anyone you send it to must
-right-click it and choose **Open** the first time, or macOS will refuse to start it.
+   Add `version.txt` from the same archive.
+2. **Commit, then run `tools/export.sh`** (or `tools/export.sh macOS`, `Windows` or `Linux`).
+   It writes:
+   - `build/Politicom.app`: macOS, a universal build for Apple Silicon and Intel
+   - `build/windows/Politicom.exe`: Windows, x86_64
+   - `build/linux/Politicom.x86_64`: Linux, x86_64
+   - a zip of each for sending: `build/Politicom-macos.zip`, `-windows.zip`, `-linux.zip`
+
+   Each package carries `LICENSE.txt` (the GPL), `ATTRIBUTION.md` (every credit), the font's
+   licence and `Politicom-source.zip`. That last one is the complete source of the last commit,
+   which the GPL requires to travel with the game.
+
+**First launch on other machines.** Nothing is signed. On another Mac, right-click the app
+and choose **Open** the first time. On Windows, SmartScreen asks once: choose **More info →
+Run anyway**. Signing and notarization need an Apple Developer account and a Windows
+code-signing certificate.
 
 Two project settings the export needs, already in place:
 - `Game/Politicom.Game.sln`, so Godot can build the C# code.
 - ETC2/ASTC texture import, required for Apple Silicon.
+
+## Licence
+
+Politicom is **free software under the GNU General Public License, version 3 or (at your
+option) any later version** (`LICENSE`). You may run, study, share and change it; copies and
+changed versions you distribute must carry the same freedoms and their source.
+
+What others made keeps its own licence, listed with its credit in `Data/geo/ATTRIBUTION.md`
+and in the game (start menu, **Licences**):
+- **Historical borders:** historical-basemaps, GPL v3.
+- **No conditions:** Natural Earth and NASA maps (public domain); Kenney sounds and Poly Haven
+  assets (CC0).
+- **Credit required:** game-icons emblems (CC BY 3.0); Wikipedia lore and some Commons
+  pictures and recordings (CC BY or CC BY-SA, the BY-SA parts staying BY-SA).
+- **Other licences:** the Paris districts (ODbL); the Crimson Pro font (SIL OFL 1.1); Godot
+  and .NET (MIT).
 
 ## Balancing with batches
 

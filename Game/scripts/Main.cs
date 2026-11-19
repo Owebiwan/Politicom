@@ -807,11 +807,12 @@ public partial class Main : Control
         if (saves.Count > 0) Item("Load game", "Any saved game.", () => ShowLoadDialog(ShowStartMenu));
         Item("Leaderboard", "Your finished games, ranked by score.", () => ShowLeaderboard(ShowStartMenu));
         Item("Settings", "Music, sound and the map.", ShowSettings);
+        Item("Licences", "Politicom is free software under the GNU GPL; the credits and licences for everything in it.", ShowLicences);
         Item("Quit", "", () => GetTree().Quit());
 
         var credit = new Label
         {
-            Text = "Pictures from Wikimedia Commons · histories from Wikipedia (CC BY-SA) · maps from Natural Earth and historical-basemaps",
+            Text = "Free software under the GNU GPL v3 · pictures from Wikimedia Commons · histories from Wikipedia (CC BY-SA) · maps from Natural Earth and historical-basemaps",
             HorizontalAlignment = HorizontalAlignment.Center, Modulate = new Color(1, 1, 1, 0.4f),
         };
         credit.AddThemeFontSizeOverride("font_size", 12);
