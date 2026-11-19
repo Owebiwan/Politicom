@@ -15,7 +15,9 @@ public partial class Main
         var row = new HFlowContainer();
         row.AddThemeConstantOverride("h_separation", 4);
         commune.AddChild(row);
-        row.AddChild(new Label { Text = "Focus:", VerticalAlignment = VerticalAlignment.Center });
+        var title = new Label { Text = "Focus:", VerticalAlignment = VerticalAlignment.Center, TooltipText = "What the commune puts its effort into. Click to read about fields, factories and workshops (Codex)." };
+        row.AddChild(title);
+        LinkCodex(title, () => "specialization");
         foreach (var f in Foci.All)
         {
             var focus = f;

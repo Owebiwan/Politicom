@@ -16,6 +16,7 @@ public partial class Main
         _struggle.AddThemeFontSizeOverride("bold_font_size", 14);
         overview.AddChild(_struggle);
         overview.MoveChild(_struggle, 2); // under Factions
+        LinkCodex(_struggle, () => "allies");
     }
 
     private void RefreshStruggle()
@@ -33,6 +34,7 @@ public partial class Main
                          + (s.Recognized ? " · [color=#70d080]the collectives are recognized[/color]" : s.Tension >= 75 ? " · [color=#f07060]near breaking point (90)[/color]" : "");
         _struggle.TooltipText = "The struggle with the movement's allies of convenience. At 90 it breaks into open conflict; kept under 20 for half a year, they recognize the collectives.\n\n"
                                 + $"Each {w.Turn}:\n" + string.Join("\n", s.LastChange.Select(p => $"  {p.Value:+0.00;-0.00}  {p.Label}"))
+                                + "\n\nClick to read about allies of convenience (Codex)."
                                 + (s.Catalysts.Count > 0 ? "\n\nChoices that moved it:\n" + string.Join("\n", s.Catalysts.Select(c => $"  {c.Amount:+0;-0}  {c.Why} ({w.Format(w.DateAt(c.Tick), "MMM yyyy")})")) : "");
     }
 }

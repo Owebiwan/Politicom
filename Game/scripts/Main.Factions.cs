@@ -49,7 +49,8 @@ public partial class Main
                                + string.Join(", ", f.Members.Select(id => w.Communes[id].Name))
                                + "\n\nAt full strength they put their demand to the congress. Conceding buys peace at a price; refusing angers their communes"
                                + (f.Kind == FactionKind.Localists ? ", and the most aggrieved leave." : ".");
-            text.MouseFilter = MouseFilterEnum.Pass;
+            LinkCodex(text, () => "factions");
+            text.TooltipText += "\n\nClick to read about factions and the right to leave (Codex).";
             row.AddChild(text);
             var kind = f.Kind;
             var button = AddButton(row, $"Address ({w.Balance.CostAddressFaction:0})",

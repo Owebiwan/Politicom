@@ -21,6 +21,7 @@ public partial class Main
         _legacy.AddThemeFontSizeOverride("bold_font_size", 14);
         overview.AddChild(_legacy);
         overview.MoveChild(_legacy, 3); // under the struggle
+        LinkCodex(_legacy, () => _world.Legacy.Crisis is { Stage: > 0 } ? "emergency" : "prefiguration");
     }
 
     private void RefreshLegacy()
@@ -77,6 +78,6 @@ public partial class Main
             tip.AddRange(s.History);
         }
         _legacy.Text = string.Join("\n", lines);
-        _legacy.TooltipText = string.Join("\n", tip);
+        _legacy.TooltipText = string.Join("\n", tip) + "\n\nClick to read about the ideas behind it (Codex).";
     }
 }

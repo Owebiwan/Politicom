@@ -453,26 +453,54 @@ Commons** where its article has one. Flags are skipped.
 ## Codex
 
 The **Codex** (button in the dashboard, or **J**) explains where the game's ideas come from, in
-35 entries (`Data/codex.json`) under five headings:
+53 entries (`Data/codex.json`) under six headings:
 
-- **Ideas:** anarchism, the many anarchisms (syndicalist, communist, individualist, pacifist,
-  platformist and synthesist, anarcha-feminist), mutual aid, federation, the critique of the
-  state, means and ends, anarcho-syndicalism, libertarian communism.
-- **Practices:** the assembly, the imperative mandate and recall, rotation, ateneos and
-  rationalist schools, collectivization, militias, trust between communes.
-- **Dangers:** hierarchy drift (Bakunin, Michels's iron law of oligarchy), the expert trap,
-  double-edged technology, war or revolution, parties and commissars, leaders in a leaderless
-  movement.
-- **Histories:** the Paris Commune, the Free Territory, Revolutionary Catalonia, and
-  experiments elsewhere.
+- **Ideas:**
+  - anarchism, and the many anarchisms (syndicalist, communist, individualist, pacifist,
+    platformist and synthesist, anarcha-feminist)
+  - mutual aid, federation, the critique of the state, means and ends
+  - anarcho-syndicalism, libertarian communism
+  - building the new world "in the shell of the old" (prefigurative politics)
+- **Practices:**
+  - the assembly, the imperative mandate and recall, rotation
+  - ateneos and rationalist schools, collectivization, militias, trust between communes
+  - Kropotkin's fields, factories and workshops (specialization)
+  - festivals and the culture of the movement
+- **Dangers:**
+  - hierarchy drift (Bakunin, Michels's iron law of oligarchy), the expert trap,
+    double-edged technology
+  - war or revolution, parties and commissars, leaders in a leaderless movement
+  - crisis and emergency powers, factions and the right to leave, allies of convenience
+- **Debates:** the strongest objections to anarchism, each with the anarchist answers and
+  their limits:
+  - can a stateless society defend itself (Engels's "On Authority")
+  - coordination at scale (Hayek, Ostrom, participatory economics)
+  - free riders and those who won't join (the Aragon collectives)
+  - human nature (Hobbes, Kropotkin, Malatesta)
+  - anarchists and Marxists (the First International, Kronstadt)
+  - rights without a state (Nozick, and a note on "anarcho-capitalism")
+- **Histories:**
+  - the Paris Commune, the Free Territory, Revolutionary Catalonia
+  - refugees and the rear, experiments elsewhere
+  - anarchism in East Asia (Kōtoku, Ōsugi and Itō, the Chinese anarchists, Shinmin)
+  - anarchism in Latin America (the FORA, Flores Magón, the recovered factories)
+  - the Zapatistas, democratic confederalism in north-east Syria
+  - anarchism today (mutual-aid networks, Occupy, Food Not Bombs)
 - **People:** Proudhon, Bakunin, Kropotkin, Malatesta, Goldman, Louise Michel, Makhno,
   Durruti, Montseny, Lucía Sánchez Saornil and Mujeres Libres.
 
 Each entry says what it was, how it appears in the game, and what to read next, and links to
-related entries. The scenarios' historical events link to their history from their pop-up
-("The history behind this"), and clicking the drift line opens the entry on drift. The game
-models one tradition, the federated communes of Spain, Ukraine and France; the entry on the
-many anarchisms says so.
+related entries.
+
+**Links into the Codex:**
+- **Pop-ups.** Historical events link to their history from their pop-up ("The history behind
+  this"), and so do generated events: anniversaries and liberation, crises, faction demands,
+  rival offers, ruptures between allies, goals, and figures' moments and bids.
+- **The dashboard.** Clicking the drift line, the legacy panel, the struggle between allies, a
+  faction, or "Focus:" opens the matching entry.
+
+The game models one tradition, the federated communes of Spain, Ukraine and France. The entry
+on the many anarchisms says so, and the Debates make the case against it.
 
 ## Needs attention
 

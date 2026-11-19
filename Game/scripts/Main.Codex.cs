@@ -39,7 +39,19 @@ public partial class Main
     }
 
     /// <summary>The entry about a scripted event, if there is one.</summary>
-    private static CodexEntry? CodexForEvent(string eventId) => Codex().Values.FirstOrDefault(e => e.Events.Contains(eventId));
+    private static CodexEntry? CodexForEvent(string eventId) =>
+        Codex().Values.FirstOrDefault(e => e.Events.Any(pattern => pattern.EndsWith('*') ? eventId.StartsWith(pattern[..^1]) : pattern == eventId));
+
+    /// <summary>Makes a dashboard label open a Codex entry when clicked (`entry` decides which, at the moment of the click).</summary>
+    private void LinkCodex(Control label, System.Func<string> entry)
+    {
+        label.MouseFilter = MouseFilterEnum.Stop;
+        label.MouseDefaultCursorShape = CursorShape.PointingHand;
+        label.GuiInput += e =>
+        {
+            if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) ShowCodex(entry());
+        };
+    }
 
     private void ShowCodex(string? id = null)
     {

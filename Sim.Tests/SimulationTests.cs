@@ -256,13 +256,20 @@ public class SimulationTests
         Assert.Equal(entries.Count, ids.Count);
         var events = new[] { "catalonia_1936", "free_territory_1918", "paris_commune_1871" }
             .SelectMany(s => World.Load(DataDir, s).Scenario.Events.Select(e => e.Id)).ToHashSet();
+        // Events the simulation makes up as it runs, from its source.
+        string source = string.Concat(Directory.EnumerateFiles(Path.Combine(DataDir, "..", "Sim"), "*.cs", SearchOption.AllDirectories).Select(File.ReadAllText));
         foreach (var e in entries)
         {
             Assert.Contains(e.GetProperty("category").GetString()!, categories);
             if (e.TryGetProperty("related", out var related))
                 foreach (var r in related.EnumerateArray()) Assert.Contains(r.GetString()!, ids);
             if (e.TryGetProperty("events", out var linked))
-                foreach (var x in linked.EnumerateArray()) Assert.Contains(x.GetString()!, events);
+                foreach (var x in linked.EnumerateArray().Select(x => x.GetString()!))
+                {
+                    // "prefix_*" links the events the simulation generates with that prefix (anniversaries, crises…).
+                    if (x.EndsWith('*')) Assert.Contains($"Id = $\"{x[..^1]}", source);
+                    else Assert.True(events.Contains(x) || source.Contains($"Id = \"{x}\""), $"unknown event {x}");
+                }
         }
     }
 
