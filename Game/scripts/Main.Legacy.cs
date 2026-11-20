@@ -13,14 +13,23 @@ namespace Politicom.Game;
 public partial class Main
 {
     private RichTextLabel _legacy = null!;
+    private VBoxContainer _legacySection = null!;
+    private Label? _legacyTitle;
 
     private void BuildLegacy(Container overview)
     {
+        // A section with its own heading bar, like Needs attention and Factions.
+        _legacySection = new VBoxContainer();
+        _legacySection.AddThemeConstantOverride("separation", 4);
+        var title = UiTheme.SectionTitle("Legacy paths");
+        _legacyTitle = title.FindChildren("*", "Label", true, false).FirstOrDefault() as Label;
+        _legacySection.AddChild(title);
         _legacy = new RichTextLabel { BbcodeEnabled = true, FitContent = true, ScrollActive = false, MouseFilter = MouseFilterEnum.Stop };
         _legacy.AddThemeFontSizeOverride("normal_font_size", 13);
         _legacy.AddThemeFontSizeOverride("bold_font_size", 14);
-        overview.AddChild(_legacy);
-        overview.MoveChild(_legacy, 3); // under the struggle
+        _legacySection.AddChild(_legacy);
+        overview.AddChild(_legacySection);
+        overview.MoveChild(_legacySection, 3); // under the struggle
         LinkCodex(_legacy, () => _world.Legacy.Crisis is { Stage: > 0 } ? "emergency" : "prefiguration");
     }
 
@@ -28,13 +37,14 @@ public partial class Main
     {
         var w = _world;
         var s = w.Legacy;
-        if (s.ChapterEnd == 0) { _legacy.Visible = false; return; }
-        _legacy.Visible = true;
+        if (s.ChapterEnd == 0) { _legacySection.Visible = false; return; }
+        _legacySection.Visible = true;
         bool one = s.ChapterEnd >= w.Scenario.EndTick && s.Chapter == 1;
+        if (_legacyTitle != null) _legacyTitle.Text = one ? "Legacy paths" : $"Legacy paths · chapter {s.Chapter}";
         var lines = new System.Collections.Generic.List<string>
         {
-            one ? "[b]Legacy paths[/b] [color=#929aa6](two milestones on a path make it this game's legacy)[/color]"
-                : $"[b]Chapter {s.Chapter}[/b] [color=#929aa6]to {w.Format(w.DateAt(s.ChapterEnd), "MMMM yyyy")} · two milestones on a path leave a legacy[/color]",
+            one ? "[color=#929aa6]Two milestones on a path make it this game's legacy.[/color]"
+                : $"[color=#929aa6]Chapter {s.Chapter} runs to {w.Format(w.DateAt(s.ChapterEnd), "MMMM yyyy")}. Two milestones on a path leave a lasting legacy.[/color]",
         };
         var tip = new System.Collections.Generic.List<string>
         {

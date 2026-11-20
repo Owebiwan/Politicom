@@ -339,6 +339,7 @@ public sealed class World
         world.TechLevelStart = world.TechLevel;
         FigureSystem.Create(world, new Rng(seed ^ 0xF16A5E5UL)); // its own stream, so the game's random draws are unchanged
         foreach (var e in world.Enemies) e.TechStart = e.TechLevel;
+        LegacySystem.Start(world); // the first chapter opens with the game, so its paths show from the start
         world.Emit(Severity.Info, scenario.Description);
         return world;
     }
