@@ -5,6 +5,29 @@ It covers the prototype scope from the design doc: the trust network, voluntary 
 hierarchy drift with thresholds and brakes, both education tracks, double-edged technologies,
 hostile states, and an "ally" that offers arms in exchange for centralization.
 
+## Download and play
+
+Ready-made builds for Windows, macOS and Linux are on the
+**[releases page](https://github.com/Owebiwan/Politicom/releases/latest)**. Nothing else needs
+installing.
+
+| System | File | To start it |
+|---|---|---|
+| **Windows** 10 or 11, 64-bit | `Politicom-windows.zip` | Unzip it and run `Politicom.exe`. |
+| **macOS** 11 or later (Apple Silicon or Intel) | `Politicom-macos.zip` | Unzip it and open `Politicom.app`. |
+| **Linux**, 64-bit | `Politicom-linux.zip` | Unzip it and run `./Politicom.x86_64`. |
+
+- **Windows:** keep `Politicom.pck` and the `data_Politicom.Game_windows_x86_64` folder next to
+  the `.exe`. The first time, SmartScreen warns that the app is unrecognised (it isn't signed):
+  choose **More info → Run anyway**.
+- **macOS:** the first time, right-click the app and choose **Open**, then **Open** again (it
+  isn't notarized).
+- **Linux:** keep `Politicom.pck` and the `data_` folder next to the program.
+
+Each download also carries the licence, the credits and the complete source
+(`Politicom-source.zip`). To build it yourself, see
+[Exporting a standalone build](#exporting-a-standalone-build).
+
 ## Scenarios
 
 | Scenario | Communes | Enemies | What it tests |
@@ -1351,6 +1374,27 @@ needs nothing outside itself.
    Each package carries `LICENSE.txt` (the GPL), `ATTRIBUTION.md` (every credit), the font's
    licence and `Politicom-source.zip`. That last one is the complete source of the last commit,
    which the GPL requires to travel with the game.
+
+### Building on Windows
+
+1. **Install the tools** (all free):
+   - [Git for Windows](https://git-scm.com)
+   - the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or newer
+   - **Godot 4.7.2, .NET edition**, from the
+     [4.7.2 archive](https://godotengine.org/download/archive/4.7.2-stable) ("Godot Engine -
+     .NET"). It must be exactly 4.7.2, and the .NET edition.
+2. **Get the code:** `git clone https://github.com/Owebiwan/Politicom.git`
+3. **Open it:** in Godot, choose **Import** and pick `Politicom\Game\project.godot`. The first
+   opening imports the maps, pictures and sounds (a few minutes).
+4. **To play:** press **F5**. Godot builds the code and starts the game.
+5. **To make a standalone `.exe`:**
+   - Once: **Editor → Manage Export Templates → Download and Install**.
+   - Then: **Project → Export**, choose the **Windows** preset, untick **Export With Debug**,
+     and click **Export Project**.
+
+   Or, from the `Politicom` folder:
+   `Godot_v4.7.2-stable_mono_win64.exe --headless --path Game --export-release Windows ..\build\windows\Politicom.exe`.
+   `tools/export.sh` is for macOS and Linux.
 
 **First launch on other machines.** Nothing is signed. On another Mac, right-click the app
 and choose **Open** the first time. On Windows, SmartScreen asks once: choose **More info →
